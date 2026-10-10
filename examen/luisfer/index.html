@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/img/logo.webp">
+<title>Examen sorpresa MOON Digital</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+html{color-scheme:light}body{margin:0}img{max-width:100%}[hidden]{display:none!important}
+/* Layout: una sola columna tipo expediente; cada bloque es una "hoja" con marco fino; envío fijo al final */
+:root{
+  --bg:#f4f6fa; --paper:#ffffff; --ink:#0b1220; --muted:#5a6578; --line:#d5dbe6;
+  --navy:#0f2a5c; --navy-soft:#e6ecf7; --ok:#1d6b45; --warn:#9a5b00;
+  --display:"Unbounded",system-ui,sans-serif; --body:"IBM Plex Sans",system-ui,-apple-system,sans-serif; --mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#070b14; --paper:#0e1524; --ink:#e9eef7; --muted:#9aa6bb; --line:#24314a;
+  --navy:#8fb0ff; --navy-soft:#16213a; --ok:#6fd3a0; --warn:#f0b35a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#070b14; --paper:#0e1524; --ink:#e9eef7; --muted:#9aa6bb; --line:#24314a;
+  --navy:#8fb0ff; --navy-soft:#16213a; --ok:#6fd3a0; --warn:#f0b35a; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55}
+.wrap{max-width:720px;margin:0 auto;padding-inline:16px;padding-block:40px 80px;display:grid;gap:20px}
+header{display:grid;gap:12px;padding-bottom:8px}
+.brand{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--navy)}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(28px,6vw,40px);line-height:1.1;margin:0;text-wrap:balance}
+.lead{color:var(--muted);margin:0;max-width:60ch}
+.meta{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-family:var(--mono);font-size:12px;border:1px solid var(--line);border-radius:999px;padding:4px 10px;color:var(--muted);background:var(--paper)}
+section{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:24px 20px;display:grid;gap:22px}
+section h2{font-family:var(--display);font-weight:500;font-size:18px;margin:0;display:flex;gap:10px;align-items:baseline}
+section h2 span{font-family:var(--mono);font-size:12px;color:var(--navy)}
+.why{margin:-12px 0 0;color:var(--muted);font-size:14px}
+.q{display:grid;gap:8px;min-width:0}
+.q > label,.q > .lbl{font-weight:600}
+.hint{font-size:13px;color:var(--muted);margin-top:-4px}
+.otro{margin-top:4px}
+input[type=text],input[type=number],textarea{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:10px 12px}
+textarea{min-height:84px;resize:vertical}
+input:focus-visible,textarea:focus-visible,button:focus-visible,.opt input:focus-visible+span{outline:2px solid var(--navy);outline-offset:2px}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.row .q label{font-weight:500;font-size:14px}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opt{position:relative}
+.opt input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.opt span{display:inline-block;border:1px solid var(--line);border-radius:4px;padding:8px 12px;font-size:14px;background:var(--bg);cursor:pointer}
+.opt input:checked+span{border-color:var(--navy);background:var(--navy-soft);color:var(--navy);font-weight:600}
+.send{display:grid;gap:14px}
+button{font:inherit;font-weight:600;border:0;border-radius:4px;padding:14px 20px;background:var(--navy);color:var(--paper);cursor:pointer}
+button.ghost{background:transparent;color:var(--navy);border:1px solid var(--navy)}
+button[disabled]{opacity:.6;cursor:default}
+.status{font-size:14px;margin:0}
+.status.ok{color:var(--ok)} .status.warn{color:var(--warn)}
+.fallback{display:grid;gap:12px;border-top:1px solid var(--line);padding-top:16px}
+.fallback textarea{font-family:var(--mono);font-size:12px;min-height:180px}
+.mail{font-family:var(--mono);user-select:all;color:var(--navy);word-break:break-all}
+footer{color:var(--muted);font-size:13px;text-align:left}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <header>
+    <div class="brand">MOON Digital · Diagnóstico de campañas</div>
+    <h1>Examen sorpresa</h1>
+    <p class="lead">Luis Fer, Gerardo: ustedes conocen el mercado. Primero queremos entender qué esperan de trabajar con nosotros; después, solo lo que los números de la cuenta no cuentan. Contesten lo que sepan; si algo no lo tienen a la mano, déjenlo en blanco.</p>
+    <div class="meta"><span class="chip">Unos 10 minutos</span><span class="chip">Todo es opcional</span><span class="chip">Se guarda mientras escriben</span></div>
+  </header>
+
+  <form id="f" novalidate>
+    <input type="text" id="sitio" name="_sitio" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
+    <div style="display:grid;gap:20px">
+    <section>
+      <h2><span>01</span>Trabajar juntos</h2>
+      <p class="why">Antes de tocar una campaña, queremos que ustedes y nosotros entendamos lo mismo.</p>
+      <div class="q"><span class="lbl">¿Qué les gustaría que MOON Digital hiciera por ustedes?</span><span class="hint">Pueden elegir varios.</span>
+        <div class="opts" data-name="Qué les gustaría que hiciera MOON Digital">
+          <label class="opt"><input type="checkbox" value="Diagnóstico de la campaña"><span>Diagnóstico de la campaña</span></label>
+          <label class="opt"><input type="checkbox" value="Mejorar anuncios y formulario"><span>Mejorar anuncios y formulario</span></label>
+          <label class="opt"><input type="checkbox" value="Manejar las campañas cada mes"><span>Manejar las campañas cada mes</span></label>
+          <label class="opt"><input type="checkbox" value="Ayudar con el seguimiento de los leads"><span>Ayudar con el seguimiento de los leads</span></label>
+          <label class="opt"><input type="checkbox" value="Organizar la base de clientes"><span>Organizar la base de clientes</span></label>
+          <label class="opt"><input type="checkbox" value="Contenido para redes"><span>Contenido para redes</span></label>
+          <label class="opt"><input type="checkbox" value="Otro"><span>Otro</span></label>
+        </div>
+        <input type="text" class="otro" id="otro-servicio" aria-label="Escriban qué otra cosa les gustaría" placeholder="Escriban aquí qué otra cosa les gustaría" hidden>
+      </div>
+      <div class="q"><label for="varita">Si tuvieran una varita mágica, ¿qué resolverían mañana mismo en su negocio?</label><textarea id="varita" name="Varita mágica: qué resolverían mañana" placeholder="Sin filtro, lo primero que les venga a la mente"></textarea></div>
+      <div class="q"><label for="nunca">De las experiencias anteriores, ¿qué no quieren que vuelva a pasar?</label><textarea id="nunca" name="Qué no quieren que vuelva a pasar" placeholder="Promesas, formas de trabajar, quién se queda con qué…"></textarea></div>
+      <div class="q"><span class="lbl">¿Cómo se imaginan la relación con nosotros?</span>
+        <div class="opts" data-name="Cómo imaginan la relación" data-single>
+          <label class="opt"><input type="radio" name="_r" value="Solo el diagnóstico, y luego vemos"><span>Solo el diagnóstico, y luego vemos</span></label>
+          <label class="opt"><input type="radio" name="_r" value="Un proyecto con inicio y fin"><span>Un proyecto con inicio y fin</span></label>
+          <label class="opt"><input type="radio" name="_r" value="Acompañamiento mes con mes"><span>Acompañamiento mes con mes</span></label>
+          <label class="opt"><input type="radio" name="_r" value="Todavía no lo sabemos"><span>Todavía no lo sabemos</span></label>
+        </div>
+      </div>
+      <div class="q"><label for="exito">En 90 días, ¿qué tendría que haber pasado para que digan "valió la pena"?</label><textarea id="exito" name="Qué significa éxito a 90 días" placeholder="En sus palabras: apartados, citas, costo por lead, ritmo de ventas, tranquilidad…"></textarea></div>
+      <div class="row">
+        <div class="q"><span class="lbl">¿Con quién vemos cambios de presupuesto?</span>
+          <div class="opts" data-name="Con quién se aprueban cambios de presupuesto" data-single>
+            <label class="opt"><input type="radio" name="_d" value="Gerardo"><span>Gerardo</span></label>
+            <label class="opt"><input type="radio" name="_d" value="Luis Fer"><span>Luis Fer</span></label>
+            <label class="opt"><input type="radio" name="_d" value="Los dos"><span>Los dos</span></label>
+          </div>
+        </div>
+        <div class="q"><span class="lbl">¿Con quién hablamos en el día a día?</span>
+          <div class="opts" data-name="Contacto del día a día" data-single>
+            <label class="opt"><input type="radio" name="_c" value="Gerardo"><span>Gerardo</span></label>
+            <label class="opt"><input type="radio" name="_c" value="Luis Fer"><span>Luis Fer</span></label>
+            <label class="opt"><input type="radio" name="_c" value="Los dos"><span>Los dos</span></label>
+          </div>
+        </div>
+      </div>
+      <div class="q"><span class="lbl">¿Cómo prefieren que les reportemos avances?</span>
+        <div class="opts" data-name="Cómo prefieren los reportes" data-single>
+          <label class="opt"><input type="radio" name="_p" value="WhatsApp corto cada semana"><span>WhatsApp corto cada semana</span></label>
+          <label class="opt"><input type="radio" name="_p" value="Llamada cada quince días"><span>Llamada cada quince días</span></label>
+          <label class="opt"><input type="radio" name="_p" value="Reporte mensual por escrito"><span>Reporte mensual por escrito</span></label>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2><span>02</span>La etapa que sí funcionó</h2>
+      <p class="why">La campaña de PW Capital que trajo los mejores leads. Queremos entender qué la hizo funcionar para repetirlo. Con números aproximados basta: si nos dan acceso a la cuenta, los exactos los sacamos de ahí.</p>
+      <div class="q"><label for="fechas">¿Entre qué fechas estuvo activa esa campaña?</label><input type="text" id="fechas" name="Fechas de la campaña buena" placeholder="Ej. de marzo a junio de 2026"></div>
+      <div class="row">
+        <div class="q"><label for="inv">Inversión al mes (MXN)</label><input class="num" type="number" id="inv" name="Inversión mensual en esa etapa (MXN)" inputmode="numeric"></div>
+        <div class="q"><label for="leads">Leads al mes</label><input class="num" type="number" id="leads" name="Leads al mes en esa etapa" inputmode="numeric"></div>
+      </div>
+      <div class="row">
+        <div class="q"><label for="citas">De esos, ¿cuántos llegaron a cita?</label><input class="num" type="number" id="citas" name="Leads que llegaron a cita" inputmode="numeric"></div>
+        <div class="q"><label for="cierres">¿Y cuántos apartaron o compraron?</label><input class="num" type="number" id="cierres" name="Leads que apartaron o compraron" inputmode="numeric"></div>
+      </div>
+      <div class="q"><label for="enfrio">Cuando los resultados bajaron, ¿qué había cambiado?</label><textarea id="enfrio" name="Qué cambió cuando bajaron los resultados" placeholder="Anuncio, presupuesto, formulario, temporada, la forma de dar seguimiento…"></textarea></div>
+    </section>
+
+    <section>
+      <h2><span>03</span>Lo que se anuncia</h2>
+      <p class="why">Para que el anuncio y el formulario digan exactamente lo que ustedes venden, y no vuelva a llegar quien busca dos recámaras con presupuesto de una.</p>
+      <div class="q"><label for="desarrollo">Desarrollo, ubicación y tipologías con su precio de salida</label><textarea id="desarrollo" name="Desarrollo, ubicación, tipologías y precios" placeholder="Ej. 1 rec 62 m² desde 3.8 M · 2 rec 90 m² desde… (o manden el brochure al correo de abajo)"></textarea></div>
+      <div class="q"><span class="lbl">¿Quién les cierra más?</span><span class="hint">Pueden elegir varios.</span>
+        <div class="opts" data-name="Comprador que más cierra">
+          <label class="opt"><input type="checkbox" value="Para vivir"><span>Para vivir</span></label>
+          <label class="opt"><input type="checkbox" value="Inversión / renta vacacional"><span>Inversión / renta vacacional</span></label>
+          <label class="opt"><input type="checkbox" value="Comprador nacional"><span>Comprador nacional</span></label>
+          <label class="opt"><input type="checkbox" value="Comprador extranjero"><span>Comprador extranjero</span></label>
+          <label class="opt"><input type="checkbox" value="Otro"><span>Otro</span></label>
+        </div>
+        <input type="text" class="otro" id="otro-comprador" aria-label="Escriban qué otro comprador" placeholder="Escriban aquí qué otro perfil les cierra" hidden>
+      </div>
+      <div class="row">
+        <div class="q"><label for="unidades">Unidades disponibles</label><input class="num" type="number" id="unidades" name="Unidades disponibles" inputmode="numeric"></div>
+        <div class="q"><label for="meta">Meta de cierre</label><input type="text" id="meta" name="Meta de cierre (fecha o ritmo)" placeholder="Ej. 6 unidades antes de marzo"></div>
+      </div>
+    </section>
+
+    <section>
+      <h2><span>04</span>Formulario y atención</h2>
+      <p class="why">Un buen anuncio rinde según lo que pasa después del clic.</p>
+      <div class="q"><label for="form">¿Qué preguntas tenía el formulario de Facebook?</label><textarea id="form" name="Preguntas del formulario" placeholder="Cópienlas aquí o manden la captura al correo de abajo"></textarea></div>
+      <div class="q"><span class="lbl">Hoy, cuando entra un lead nuevo, normalmente se le responde en…</span>
+        <div class="opts" data-name="Tiempo de respuesta a un lead" data-single>
+          <label class="opt"><input type="radio" name="_t" value="Menos de 15 minutos"><span>Menos de 15 min</span></label>
+          <label class="opt"><input type="radio" name="_t" value="Menos de 1 hora"><span>Menos de 1 hora</span></label>
+          <label class="opt"><input type="radio" name="_t" value="El mismo día"><span>El mismo día</span></label>
+          <label class="opt"><input type="radio" name="_t" value="Al día siguiente o más"><span>Al día siguiente o más</span></label>
+        </div>
+      </div>
+      <div class="q"><label for="capacidad">Con el equipo de hoy, ¿cuántos leads nuevos por semana pueden atender bien?</label><input class="num" type="number" id="capacidad" name="Leads por semana que pueden atender bien" inputmode="numeric" style="max-width:200px"></div>
+    </section>
+
+    <section>
+      <h2><span>05</span>Cuentas y presupuesto</h2>
+      <p class="why">Lo que se construya tiene que quedar a nombre de ustedes.</p>
+      <div class="q"><span class="lbl">Hoy, en el administrador comercial de PW Capital y Pennyworth…</span>
+        <div class="opts" data-name="Accesos al administrador comercial" data-single>
+          <label class="opt"><input type="radio" name="_a" value="Solo tenemos acceso nosotros"><span>Solo tenemos acceso nosotros</span></label>
+          <label class="opt"><input type="radio" name="_a" value="Todavía hay personas externas con acceso"><span>Todavía hay externos</span></label>
+          <label class="opt"><input type="radio" name="_a" value="No estamos seguros"><span>No estamos seguros</span></label>
+        </div>
+      </div>
+      <div class="q"><label for="presu">Presupuesto mensual para anuncios en esta etapa (MXN)</label><input class="num" type="number" id="presu" name="Presupuesto mensual para anuncios (MXN)" inputmode="numeric" style="max-width:240px"></div>
+      <div class="q"><span class="lbl">Acceso para revisar los números</span>
+        <div class="opts" data-name="Acceso de analista (solo lectura)" data-single>
+          <label class="opt"><input type="radio" name="_x" value="Sí, damos acceso de analista"><span>Sí, les damos acceso de analista</span></label>
+          <label class="opt"><input type="radio" name="_x" value="Prefieren mandar capturas o exportes"><span>Prefiero mandar capturas</span></label>
+        </div>
+        <span class="hint">El acceso de analista solo permite ver: no se puede mover nada ni gastar un peso. Les mandamos cómo darlo, es un minuto.</span>
+      </div>
+      <div class="q"><label for="preguntas">¿Hay algo que no les preguntamos y deberíamos saber? ¿O algo que quieran preguntarnos a nosotros?</label><textarea id="preguntas" name="Algo más / preguntas para MOON Digital"></textarea></div>
+      <div class="q"><label for="quien">¿Quién contesta?</label><input type="text" id="quien" name="Contestó" placeholder="Luis Fer, Gerardo o ambos"></div>
+    </section>
+
+    <section class="send">
+      <button type="submit" id="go">Enviar respuestas</button>
+      <p class="status" id="st" role="status" aria-live="polite"></p>
+      <div class="fallback" id="fb" hidden>
+        <p class="status">Copien este resumen y mándenlo por correo a <span class="mail">moondigitalia@gmail.com</span> junto con capturas, brochure o lo que quieran compartir.</p>
+        <textarea id="out" readonly aria-label="Resumen de respuestas"></textarea>
+        <button type="button" class="ghost" id="copy">Copiar resumen</button>
+      </div>
+    </section>
+    </div>
+  </form>
+
+  <footer>Capturas, brochure o exportes de la cuenta: <span class="mail">moondigitalia@gmail.com</span></footer>
+</div>
+
+<script>
+(function(){
+  const f=document.getElementById('f'), st=document.getElementById('st'), go=document.getElementById('go');
+  const KEY='examen-sorpresa-borrador-v3';
+  function collect(){
+    const out=[];
+    f.querySelectorAll('.q').forEach(q=>{
+      const el=q.querySelector('input[type=text],input[type=number],textarea');
+      const grp=q.querySelector('.opts');
+      if(grp){
+        const otro=q.querySelector('.otro');
+        const v=[...grp.querySelectorAll('input:checked')].map(i=>i.value==='Otro'&&otro&&otro.value.trim()?'Otro: '+otro.value.trim():i.value).join(', ');
+        out.push([grp.dataset.name,v]);
+      } else if(el){ out.push([el.name,el.value.trim()]); }
+    });
+    return out;
+  }
+  function saveDraft(){
+    const d={};
+    f.querySelectorAll('input,textarea').forEach((el,i)=>{d[i]=(el.type==='checkbox'||el.type==='radio')?el.checked:el.value});
+    try{localStorage.setItem(KEY,JSON.stringify(d))}catch(e){}
+  }
+  try{
+    const d=JSON.parse(localStorage.getItem(KEY)||'null');
+    if(d) f.querySelectorAll('input,textarea').forEach((el,i)=>{ if(!(i in d))return; if(el.type==='checkbox'||el.type==='radio') el.checked=!!d[i]; else el.value=d[i]; });
+  }catch(e){}
+  function syncOtro(){
+    f.querySelectorAll('.otro').forEach(o=>{
+      const box=o.closest('.q').querySelector('input[value="Otro"]');
+      o.hidden=!(box&&box.checked);
+    });
+  }
+  syncOtro();
+  f.addEventListener('input',saveDraft); f.addEventListener('change',()=>{syncOtro();saveDraft();});
+
+  const CLIENTE='luisfer', CUESTIONARIO='examen-sorpresa-v1';
+
+  function showFallback(pairs){
+    const txt='EXAMEN SORPRESA · MOON Digital\n\n'+pairs.map(([k,v])=>k+':\n'+(v||'(sin respuesta)')).join('\n\n');
+    document.getElementById('out').value=txt;
+    document.getElementById('fb').hidden=false;
+  }
+  document.getElementById('copy').addEventListener('click',()=>{
+    const t=document.getElementById('out');
+    navigator.clipboard.writeText(t.value).then(()=>{st.className='status ok';st.textContent='Resumen copiado. Péguenlo en un correo a moondigitalia@gmail.com.'}).catch(()=>{t.focus();t.select();st.className='status warn';st.textContent='Seleccionamos el texto: cópienlo con el menú del teléfono o Ctrl+C.'});
+  });
+
+  f.addEventListener('submit',async e=>{
+    e.preventDefault();
+    const pairs=collect();
+    if(!pairs.some(([,v])=>v)){st.className='status warn';st.textContent='Todavía no hay respuestas. Contesten al menos una pregunta.';return;}
+    go.disabled=true; st.className='status'; st.textContent='Enviando…';
+    try{
+      const ctrl=new AbortController(); const t=setTimeout(()=>ctrl.abort(),12000);
+      const r=await fetch('/api/cuestionario',{method:'POST',headers:{'Content-Type':'application/json'},signal:ctrl.signal,
+        body:JSON.stringify({cliente:CLIENTE,cuestionario:CUESTIONARIO,sitio:document.getElementById('sitio').value,respuestas:Object.fromEntries(pairs)})});
+      clearTimeout(t);
+      const j=await r.json().catch(()=>({}));
+      if(r.ok&&j.ok){
+        st.className='status ok'; st.textContent='Listo, sus respuestas ya llegaron a MOON Digital. ¡Gracias! Si tienen capturas o el brochure, mándenlos a moondigitalia@gmail.com.';
+        try{localStorage.removeItem(KEY)}catch(e){}
+        go.textContent='Enviado'; return;
+      }
+    }catch(err){ /* sigue al plan B */ }
+    go.disabled=false;
+    st.className='status warn'; st.textContent='No pudimos enviarlas desde aquí. Usen el resumen de abajo: un solo correo y listo.';
+    showFallback(pairs);
+  });
+})();
+</script>
+
+</body>
+</html>
