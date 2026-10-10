@@ -57,10 +57,6 @@ button.ghost{background:transparent;color:var(--navy);border:1px solid var(--nav
 button[disabled]{opacity:.6;cursor:default}
 .status{font-size:14px;margin:0}
 .status.ok{color:var(--ok)} .status.warn{color:var(--warn)}
-.fallback{display:grid;gap:12px;border-top:1px solid var(--line);padding-top:16px}
-.fallback textarea{font-family:var(--mono);font-size:12px;min-height:180px}
-.mail{font-family:var(--mono);user-select:all;color:var(--navy);word-break:break-all}
-footer{color:var(--muted);font-size:13px;text-align:left}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -147,7 +143,7 @@ footer{color:var(--muted);font-size:13px;text-align:left}
     <section>
       <h2><span>03</span>Lo que se anuncia</h2>
       <p class="why">Para que el anuncio y el formulario digan exactamente lo que ustedes venden, y no vuelva a llegar quien busca dos recámaras con presupuesto de una.</p>
-      <div class="q"><label for="desarrollo">Desarrollo, ubicación y tipologías con su precio de salida</label><textarea id="desarrollo" name="Desarrollo, ubicación, tipologías y precios" placeholder="Ej. 1 rec 62 m² desde 3.8 M · 2 rec 90 m² desde… (o manden el brochure al correo de abajo)"></textarea></div>
+      <div class="q"><label for="desarrollo">Desarrollo, ubicación y tipologías con su precio de salida</label><textarea id="desarrollo" name="Desarrollo, ubicación, tipologías y precios" placeholder="Ej. 1 rec 62 m² desde 3.8 M · 2 rec 90 m² desde…"></textarea></div>
       <div class="q"><span class="lbl">¿Quién les cierra más?</span><span class="hint">Pueden elegir varios.</span>
         <div class="opts" data-name="Comprador que más cierra">
           <label class="opt"><input type="checkbox" value="Para vivir"><span>Para vivir</span></label>
@@ -167,7 +163,7 @@ footer{color:var(--muted);font-size:13px;text-align:left}
     <section>
       <h2><span>04</span>Formulario y atención</h2>
       <p class="why">Un buen anuncio rinde según lo que pasa después del clic.</p>
-      <div class="q"><label for="form">¿Qué preguntas tenía el formulario de Facebook?</label><textarea id="form" name="Preguntas del formulario" placeholder="Cópienlas aquí o manden la captura al correo de abajo"></textarea></div>
+      <div class="q"><label for="form">¿Qué preguntas tenía el formulario de Facebook?</label><textarea id="form" name="Preguntas del formulario" placeholder="Escríbanlas como las recuerden"></textarea></div>
       <div class="q"><span class="lbl">Hoy, cuando entra un lead nuevo, normalmente se le responde en…</span>
         <div class="opts" data-name="Tiempo de respuesta a un lead" data-single>
           <label class="opt"><input type="radio" name="_t" value="Menos de 15 minutos"><span>Menos de 15 min</span></label>
@@ -204,16 +200,10 @@ footer{color:var(--muted);font-size:13px;text-align:left}
     <section class="send">
       <button type="submit" id="go">Enviar respuestas</button>
       <p class="status" id="st" role="status" aria-live="polite"></p>
-      <div class="fallback" id="fb" hidden>
-        <p class="status">Copien este resumen y mándenlo por correo a <span class="mail">moondigitalia@gmail.com</span> junto con capturas, brochure o lo que quieran compartir.</p>
-        <textarea id="out" readonly aria-label="Resumen de respuestas"></textarea>
-        <button type="button" class="ghost" id="copy">Copiar resumen</button>
-      </div>
     </section>
     </div>
   </form>
 
-  <footer>Capturas, brochure o exportes de la cuenta: <span class="mail">moondigitalia@gmail.com</span></footer>
 </div>
 
 <script>
@@ -253,36 +243,45 @@ footer{color:var(--muted);font-size:13px;text-align:left}
 
   const CLIENTE='luisfer', CUESTIONARIO='examen-sorpresa-v1';
 
-  function showFallback(pairs){
-    const txt='EXAMEN SORPRESA · MOON Digital\n\n'+pairs.map(([k,v])=>k+':\n'+(v||'(sin respuesta)')).join('\n\n');
-    document.getElementById('out').value=txt;
-    document.getElementById('fb').hidden=false;
+  const PEND='examen-sorpresa-pendiente';
+  const espera=ms=>new Promise(r=>setTimeout(r,ms));
+  async function mandar(payload){
+    try{
+      const ctrl=new AbortController(); const t=setTimeout(()=>ctrl.abort(),12000);
+      const r=await fetch('/api/cuestionario',{method:'POST',headers:{'Content-Type':'application/json'},signal:ctrl.signal,body:JSON.stringify(payload)});
+      clearTimeout(t);
+      const j=await r.json().catch(()=>({}));
+      return r.ok&&j.ok;
+    }catch(e){ return false; }
   }
-  document.getElementById('copy').addEventListener('click',()=>{
-    const t=document.getElementById('out');
-    navigator.clipboard.writeText(t.value).then(()=>{st.className='status ok';st.textContent='Resumen copiado. Péguenlo en un correo a moondigitalia@gmail.com.'}).catch(()=>{t.focus();t.select();st.className='status warn';st.textContent='Seleccionamos el texto: cópienlo con el menú del teléfono o Ctrl+C.'});
-  });
+  function listo(){
+    st.className='status ok'; st.textContent='Listo, sus respuestas ya llegaron a MOON Digital. ¡Gracias!';
+    go.disabled=true; go.textContent='Enviado';
+    try{localStorage.removeItem(KEY);localStorage.removeItem(PEND)}catch(e){}
+  }
+  // Si algo falla de nuestro lado, la página lo vuelve a intentar sola: el cliente no hace nada más.
+  async function insistir(payload){
+    try{localStorage.setItem(PEND,JSON.stringify(payload))}catch(e){}
+    const pausas=[0,2000,5000,10000,20000,30000];
+    for(let i=0;;i++){
+      await espera(pausas[Math.min(i,pausas.length-1)]);
+      if(await mandar(payload)){ listo(); return; }
+      if(i===1){ st.className='status'; st.textContent='Un momento, seguimos enviando sus respuestas…'; }
+    }
+  }
+  // Si quedó algo sin enviar en una visita anterior, se manda solo al volver a abrir la página.
+  try{
+    const p=JSON.parse(localStorage.getItem(PEND)||'null');
+    if(p){ go.disabled=true; st.className='status'; st.textContent='Terminando de enviar sus respuestas…'; insistir(p); }
+  }catch(e){}
 
-  f.addEventListener('submit',async e=>{
+  f.addEventListener('submit',e=>{
     e.preventDefault();
+    if(go.disabled) return;
     const pairs=collect();
     if(!pairs.some(([,v])=>v)){st.className='status warn';st.textContent='Todavía no hay respuestas. Contesten al menos una pregunta.';return;}
     go.disabled=true; st.className='status'; st.textContent='Enviando…';
-    try{
-      const ctrl=new AbortController(); const t=setTimeout(()=>ctrl.abort(),12000);
-      const r=await fetch('/api/cuestionario',{method:'POST',headers:{'Content-Type':'application/json'},signal:ctrl.signal,
-        body:JSON.stringify({cliente:CLIENTE,cuestionario:CUESTIONARIO,sitio:document.getElementById('sitio').value,respuestas:Object.fromEntries(pairs)})});
-      clearTimeout(t);
-      const j=await r.json().catch(()=>({}));
-      if(r.ok&&j.ok){
-        st.className='status ok'; st.textContent='Listo, sus respuestas ya llegaron a MOON Digital. ¡Gracias! Si tienen capturas o el brochure, mándenlos a moondigitalia@gmail.com.';
-        try{localStorage.removeItem(KEY)}catch(e){}
-        go.textContent='Enviado'; return;
-      }
-    }catch(err){ /* sigue al plan B */ }
-    go.disabled=false;
-    st.className='status warn'; st.textContent='No pudimos enviarlas desde aquí. Usen el resumen de abajo: un solo correo y listo.';
-    showFallback(pairs);
+    insistir({cliente:CLIENTE,cuestionario:CUESTIONARIO,sitio:document.getElementById('sitio').value,respuestas:Object.fromEntries(pairs)});
   });
 })();
 </script>
