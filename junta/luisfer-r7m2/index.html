@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Junta MOON · Luis Fer y Gerardo">
+<meta property="og:description" content="Todo el contexto y una decisión libre para Daniel, Dan y Kid.">
+<meta property="og:url" content="https://moon-digital-web.vercel.app/junta/luisfer-r7m2/">
+<meta property="og:image" content="https://moon-digital-web.vercel.app/img/logo.webp">
+<link rel="icon" href="/img/logo.webp">
+<title>Junta MOON Luis Fer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+html{color-scheme:light}body{margin:0}img{max-width:100%}[hidden]{display:none!important}
+/* Layout: una sola columna tipo expediente; cada bloque es una "hoja" con marco fino; envío fijo al final */
+:root{
+  --bg:#f4f6fa; --paper:#ffffff; --ink:#0b1220; --muted:#5a6578; --line:#d5dbe6;
+  --navy:#0f2a5c; --navy-soft:#e6ecf7; --ok:#1d6b45; --warn:#9a5b00;
+  --display:"Unbounded",system-ui,sans-serif; --body:"IBM Plex Sans",system-ui,-apple-system,sans-serif; --mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#070b14; --paper:#0e1524; --ink:#e9eef7; --muted:#9aa6bb; --line:#24314a;
+  --navy:#8fb0ff; --navy-soft:#16213a; --ok:#6fd3a0; --warn:#f0b35a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#070b14; --paper:#0e1524; --ink:#e9eef7; --muted:#9aa6bb; --line:#24314a;
+  --navy:#8fb0ff; --navy-soft:#16213a; --ok:#6fd3a0; --warn:#f0b35a; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55}
+.wrap{max-width:720px;margin:0 auto;padding-inline:16px;padding-block:40px 80px;display:grid;gap:20px}
+header{display:grid;gap:12px;padding-bottom:8px}
+.brand{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--navy)}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(28px,6vw,40px);line-height:1.1;margin:0;text-wrap:balance}
+.lead{color:var(--muted);margin:0;max-width:60ch}
+.meta{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-family:var(--mono);font-size:12px;border:1px solid var(--line);border-radius:999px;padding:4px 10px;color:var(--muted);background:var(--paper)}
+section{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:24px 20px;display:grid;gap:22px}
+section h2{font-family:var(--display);font-weight:500;font-size:18px;margin:0;display:flex;gap:10px;align-items:baseline}
+section h2 span{font-family:var(--mono);font-size:12px;color:var(--navy)}
+.why{margin:-12px 0 0;color:var(--muted);font-size:14px}
+.q{display:grid;gap:8px;min-width:0}
+.q > label,.q > .lbl{font-weight:600}
+.hint{font-size:13px;color:var(--muted);margin-top:-4px}
+.otro{margin-top:4px}
+input[type=text],input[type=number],textarea{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:10px 12px}
+textarea{min-height:84px;resize:vertical}
+input:focus-visible,textarea:focus-visible,button:focus-visible,.opt input:focus-visible+span{outline:2px solid var(--navy);outline-offset:2px}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.row .q label{font-weight:500;font-size:14px}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opt{position:relative}
+.opt input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.opt span{display:inline-block;border:1px solid var(--line);border-radius:4px;padding:8px 12px;font-size:14px;background:var(--bg);cursor:pointer}
+.opt input:checked+span{border-color:var(--navy);background:var(--navy-soft);color:var(--navy);font-weight:600}
+.send{display:grid;gap:14px}
+button{font:inherit;font-weight:600;border:0;border-radius:4px;padding:14px 20px;background:var(--navy);color:var(--paper);cursor:pointer}
+button.ghost{background:transparent;color:var(--navy);border:1px solid var(--navy)}
+button[disabled]{opacity:.6;cursor:default}
+.status{font-size:14px;margin:0}
+.status.ok{color:var(--ok)} .status.warn{color:var(--warn)}
+.ctx{display:grid;gap:14px}
+.ctx p{margin:0;max-width:65ch}
+.ctx ul{margin:0;padding-left:1.2em;display:grid;gap:6px}
+.cita{margin:0;border-left:3px solid var(--navy);padding:4px 0 4px 14px;color:var(--ink);font-style:italic}
+.cita b{font-style:normal}
+.dato{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.dato div{border:1px solid var(--line);border-radius:6px;padding:12px;display:grid;gap:2px;background:var(--bg)}
+.dato b{font-family:var(--display);font-size:20px;font-variant-numeric:tabular-nums}
+.dato small{color:var(--muted);font-size:13px}
+.quien{font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--navy)}
+.no{border:1px dashed var(--warn);border-radius:6px;padding:14px;display:grid;gap:8px}
+.no h3{margin:0;font-size:15px;color:var(--warn)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <header>
+    <div class="brand">MOON Digital · uso interno</div>
+    <h1>Luis Fer y Gerardo: ¿lo tomamos?</h1>
+    <p class="lead">Daniel, Dan, Kid: aquí está todo lo que pasó con Luis Fer y Gerardo, lo que nos contestaron y lo que podríamos ofrecerles. Al final, cada quien contesta por su lado, sin ver lo de los demás. No hay respuesta correcta: "sí", "solo una parte" y "no" valen igual. Con lo de los tres armamos la junta.</p>
+    <div class="meta"><span class="chip">Lectura: 8 minutos</span><span class="chip">Preguntas: 5 minutos</span><span class="chip">Cada quien por su lado</span></div>
+  </header>
+
+  <form id="f" novalidate>
+    <input type="text" id="sitio" name="_sitio" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
+    <div style="display:grid;gap:20px">
+
+    <section class="ctx">
+      <h2><span>01</span>Lo que pasó</h2>
+      <ul>
+        <li><b>10 de octubre:</b> llamada de Kid con Luis Fer. Pidió que revisáramos la campaña que mejor les funcionó y les ayudáramos a mejorar costo, calidad y cantidad de interesados.</li>
+        <li><b>Ese mismo día:</b> les mandamos un cuestionario corto (el "examen sorpresa") para entender su proyecto antes de proponer nada.</li>
+        <li><b>12 de octubre:</b> lo contestaron <b>Luis Fer y Gerardo juntos</b>, completo y con mucho detalle.</li>
+      </ul>
+      <p>No es la primera vez que trabajamos con ellos: hay confianza, y justo por eso hay que cuidarla.</p>
+    </section>
+
+    <section class="ctx">
+      <h2><span>02</span>Lo que nos contestaron</h2>
+      <p><b>El proyecto:</b> THE LANDMARK, en el centro de Playa del Carmen (3 min de la Quinta Avenida). Estudios, 1 y 2 recámaras, de ~$2.8 a ~$9 millones de pesos. Entrega en 2028 (preventa). Lo más llamativo: el Sky Club (alberca infinita, restaurante, spa, coworking). Quedan <b>80 unidades</b>.</p>
+      <p><b>Lo que sueñan</b> ("si tuvieran una varita mágica"):</p>
+      <p class="cita">"Dejar de perseguir compradores y empezar a recibir compradores con alta intención, capacidad financiera y disposición para cerrar… conseguir 2 - 3 operaciones mensuales."</p>
+      <ul>
+        <li><b>Meta cercana:</b> 3 unidades antes de que termine el año.</li>
+        <li><b>Qué significaría que valió la pena:</b> "Cierres efectivos." Solo miden ventas.</li>
+      </ul>
+      <p><b>Su mejor etapa (2025):</b></p>
+      <div class="dato">
+        <div><b>$15,000</b><small>al mes en anuncios</small></div>
+        <div><b>5 a 8</b><small>interesados al mes</small></div>
+        <div><b>3</b><small>llegaron a cita</small></div>
+        <div><b>1</b><small>compró o apartó</small></div>
+      </div>
+      <ul>
+        <li><b>Qué funcionó:</b> videos de los renders con un mensaje fuerte y una invitación clara a actuar.</li>
+        <li><b>Qué cambió después:</b> demasiada oferta de departamentos, precios más altos, mala fama de la zona en redes (Tulum), sargazo y desarrollos que nunca se entregaron.</li>
+        <li><b>Cómo atienden:</b> mensaje automático de bienvenida por WhatsApp y Gerardo llama de inmediato. Pueden atender 3 interesados al día.</li>
+        <li><b>Lo que nos piden:</b> revisar la campaña, mejorar anuncios y formulario, y llevar las campañas mes con mes. Prefieren <b>empezar con algo puntual y luego ver</b>.</li>
+        <li><b>Inversión en anuncios:</b> prefieren platicarlo. <b>Acceso de solo vista a su cuenta:</b> "Sí, con gusto".</li>
+        <li><b>Lo más importante para ellos al trabajar con alguien:</b> "que comprendan cada proyecto, el mercado y la factibilidad de una campaña antes de lanzarla".</li>
+      </ul>
+      <p><b>Su mensaje final</b>, que es lo más importante de todo:</p>
+      <p class="cita">"En Pennyworth hemos trabajado ya con <b>ocho agencias</b> de marketing… los resultados han estado muy lejos de lo que esperábamos. Hoy no queremos volver a pasar por lo mismo… Sabemos que no existen fórmulas mágicas ni resultados garantizados… por la confianza que tenemos contigo, nos gustaría que esta vez fuera diferente."</p>
+    </section>
+
+    <section class="ctx">
+      <h2><span>03</span>Para Daniel · la relación y la confianza</h2>
+      <p>Luis Fer y Gerardo no están buscando otra agencia: ya probaron ocho. Están buscando a alguien de confianza que les diga la verdad. Eso es lo que nos están ofreciendo: su confianza, por la relación que ya existe.</p>
+      <p>Lo que más cuidaría: prometer poco y cumplir. Si les decimos "les traemos 3 ventas al mes" y no pasa, no solo perdemos un cliente: se lastima una relación que ya tenemos. Con sus propios números, 3 ventas al mes serían como tres veces su mejor época, y la venta final depende de cosas que no controlamos (precio, mercado, el cierre de Gerardo).</p>
+      <p>Lo que sí podemos prometer con la cara en alto: entender su proyecto antes de mover nada, decirles con claridad qué funciona y qué no, y avisarles cada semana cómo vamos. Justo lo que ellos pidieron.</p>
+    </section>
+
+    <section class="ctx">
+      <h2><span>04</span>Para Dan · campañas y creativos</h2>
+      <p>Lo que hay hoy en Meta, con sus números de la mejor etapa:</p>
+      <ul>
+        <li><b>$15k MXN/mes</b> → 5 a 8 leads → costo por lead de ~$1,900 a ~$3,000 → 3 citas → 1 cierre. Falta confirmar si ese cierre fue al mes o en toda la etapa.</li>
+        <li><b>Creativo que funcionó:</b> video de renders + mensaje de alto impacto + CTA. Tienen material fuerte: renders, dron y el Sky Club, que según ellos ningún competidor en su precio puede igualar.</li>
+        <li><b>Formulario instantáneo:</b> sigue diciendo "desde $3,800,000, ¿es ideal para ti?", pero el estudio ya empieza en ~$2.8M. Además es una pregunta de sí/no muy fácil de contestar que sí. Seguramente por eso llegaban personas buscando 2 recámaras con presupuesto de una.</li>
+        <li><b>Segmentación que ellos ya pensaron:</b> estudio para inversionista de 28 a 38 años; 2 recámaras para familias empresarias de Monterrey y Guadalajara con presupuesto de segunda casa.</li>
+        <li><b>El ángulo que falta:</b> confianza. Con tanto desarrollo sin entregar en la zona, el comprador duda. Creativos con quién construye, avance de obra y fecha de entrega.</li>
+        <li>Nos dan <b>acceso de solo vista</b> a la cuenta: podemos revisar todo sin mover nada.</li>
+      </ul>
+      <p>La pregunta para ti: ¿te ves operando esta cuenta, con tus tiempos de hoy, y sabiendo que lo que miden ellos son cierres?</p>
+    </section>
+
+    <section class="ctx">
+      <h2><span>05</span>Lo que podríamos ofrecer</h2>
+      <p><span class="quien">Etapa 1 · algo puntual · ~2 semanas</span><br>Revisar su cuenta con el acceso de solo vista y entregarles un diagnóstico claro. Corregir lo barato y evidente (el formulario con el precio viejo y la pregunta de sí/no). Proponer 2 o 3 creativos nuevos basados en lo que ya les funcionó, más el ángulo de confianza. Precio fijo y pequeño. Si no les convence, se quedan con el diagnóstico y no pasa nada.</p>
+      <p><span class="quien">Etapa 2 · solo si la Etapa 1 les convence · 60 a 90 días</span><br>Operar las campañas, con un WhatsApp corto cada semana. Prometemos lo que controlamos: interesados que sí pueden comprar, citas, costo por cita y comunicación clara. Las ventas se miden juntos, pero no se prometen. Una idea: cuota fija más un bono por cada venta cerrada.</p>
+      <p><span class="quien">Más adelante</span><br>Herramientas de MOON (por ejemplo, una página del desarrollo con un asistente que conteste a cualquier hora). No ahorita: ya los quemó una agencia que les prometió que "la IA lo hacía todo".</p>
+      <p><b>Quién haría qué:</b> Daniel, la relación y las pláticas con ellos · Dan, las campañas y los videos · Kid, lo técnico y la organización · Claude, leer sus números, los diagnósticos y los reportes.</p>
+      <div class="no">
+        <h3>Razones válidas para decir que no, o solo una parte</h3>
+        <ul>
+          <li>Seríamos la agencia número nueve: si fallamos, se lastima una relación que ya tenemos.</li>
+          <li>Las ventas dependen de cosas que no controlamos (precio, mercado, cierre).</li>
+          <li>Operar campañas cada semana pide tiempo real de Dan.</li>
+          <li>Todavía no sabemos cuánto quieren invertir en anuncios ni cuánto estarían dispuestos a pagarnos.</li>
+          <li>Ofrecer solo la Etapa 1 también es una respuesta honesta y profesional.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section>
+      <h2><span>06</span>Tu respuesta</h2>
+      <p class="why">Contesta solo lo tuyo. Nadie ve tus respuestas antes de la junta.</p>
+      <div class="q"><span class="lbl">¿Quién contesta?</span>
+        <div class="opts" data-name="Quién contesta" data-single>
+          <label class="opt"><input type="radio" name="_q" value="Daniel"><span>Daniel</span></label>
+          <label class="opt"><input type="radio" name="_q" value="Dan"><span>Dan</span></label>
+          <label class="opt"><input type="radio" name="_q" value="Kid"><span>Kid</span></label>
+        </div>
+      </div>
+      <div class="q"><span class="lbl">Con lo que leíste, ¿qué harías?</span>
+        <div class="opts" data-name="Qué haría" data-single>
+          <label class="opt"><input type="radio" name="_d" value="Ofrecer Etapa 1 y, si funciona, Etapa 2"><span>Etapa 1 y, si funciona, Etapa 2</span></label>
+          <label class="opt"><input type="radio" name="_d" value="Ofrecer solo la Etapa 1"><span>Solo la Etapa 1</span></label>
+          <label class="opt"><input type="radio" name="_d" value="No tomarlo por ahora"><span>No tomarlo por ahora</span></label>
+          <label class="opt"><input type="radio" name="_d" value="Necesito platicarlo antes"><span>Necesito platicarlo antes</span></label>
+        </div>
+      </div>
+      <div class="q"><label for="porque">¿Por qué?</label><textarea id="porque" name="Por qué" placeholder="Con tus palabras"></textarea></div>
+      <div class="q"><span class="lbl">¿Qué te preocupa más?</span><span class="hint">Puedes elegir varios.</span>
+        <div class="opts" data-name="Lo que más le preocupa">
+          <label class="opt"><input type="checkbox" value="Que no haya resultados"><span>Que no haya resultados</span></label>
+          <label class="opt"><input type="checkbox" value="Cuidar la relación con ellos"><span>Cuidar la relación con ellos</span></label>
+          <label class="opt"><input type="checkbox" value="El tiempo que pide"><span>El tiempo que pide</span></label>
+          <label class="opt"><input type="checkbox" value="Cuánto cobrar"><span>Cuánto cobrar</span></label>
+          <label class="opt"><input type="checkbox" value="No tener la experiencia suficiente"><span>No tener la experiencia suficiente</span></label>
+          <label class="opt"><input type="checkbox" value="Otro"><span>Otro</span></label>
+        </div>
+        <input type="text" class="otro" id="otro-preocupa" aria-label="Escribe qué otra cosa te preocupa" placeholder="Escribe aquí qué otra cosa te preocupa" hidden>
+      </div>
+      <div class="q"><span class="lbl">¿Te ves haciendo tu parte (la de "quién haría qué")?</span>
+        <div class="opts" data-name="Se ve haciendo su parte" data-single>
+          <label class="opt"><input type="radio" name="_p" value="Sí"><span>Sí</span></label>
+          <label class="opt"><input type="radio" name="_p" value="Sí, con ayuda"><span>Sí, con ayuda</span></label>
+          <label class="opt"><input type="radio" name="_p" value="No por ahora"><span>No por ahora</span></label>
+        </div>
+      </div>
+      <div class="q"><span class="lbl">¿Cuánto tiempo a la semana podrías darle?</span>
+        <div class="opts" data-name="Tiempo a la semana" data-single>
+          <label class="opt"><input type="radio" name="_t" value="Menos de 2 horas"><span>Menos de 2 horas</span></label>
+          <label class="opt"><input type="radio" name="_t" value="2 a 5 horas"><span>2 a 5 horas</span></label>
+          <label class="opt"><input type="radio" name="_t" value="Más de 5 horas"><span>Más de 5 horas</span></label>
+        </div>
+      </div>
+      <div class="q"><span class="lbl">Para la Etapa 1, ¿qué precio te parece justo?</span>
+        <div class="opts" data-name="Precio justo Etapa 1" data-single>
+          <label class="opt"><input type="radio" name="_c" value="Menos de $5,000"><span>Menos de $5,000</span></label>
+          <label class="opt"><input type="radio" name="_c" value="$5,000 a $10,000"><span>$5,000 a $10,000</span></label>
+          <label class="opt"><input type="radio" name="_c" value="$10,000 a $20,000"><span>$10,000 a $20,000</span></label>
+          <label class="opt"><input type="radio" name="_c" value="Más de $20,000"><span>Más de $20,000</span></label>
+          <label class="opt"><input type="radio" name="_c" value="Cortesía por la relación"><span>Cortesía por la relación</span></label>
+          <label class="opt"><input type="radio" name="_c" value="No sé, platicarlo"><span>No sé, platicarlo</span></label>
+        </div>
+      </div>
+      <div class="q"><span class="lbl">Si llegamos a la Etapa 2, ¿cobrarías un bono por cada venta cerrada?</span>
+        <div class="opts" data-name="Bono por venta en Etapa 2" data-single>
+          <label class="opt"><input type="radio" name="_b" value="Sí"><span>Sí</span></label>
+          <label class="opt"><input type="radio" name="_b" value="No"><span>No</span></label>
+          <label class="opt"><input type="radio" name="_b" value="Platicarlo"><span>Platicarlo</span></label>
+        </div>
+      </div>
+      <div class="q"><label for="nunca">¿Qué NO deberíamos prometerles?</label><textarea id="nunca" name="Qué no prometer"></textarea></div>
+      <div class="q"><label for="antes">De las veces que ya trabajamos con ellos, ¿qué aprendimos?</label><textarea id="antes" name="Qué aprendimos de trabajar antes con ellos"></textarea></div>
+      <div class="q"><label for="mas">¿Algo más que quieras decir antes de la junta?</label><textarea id="mas" name="Algo más"></textarea></div>
+    </section>
+
+    <section class="send">
+      <button type="submit" id="go">Enviar mi respuesta</button>
+      <p class="status" id="st" role="status" aria-live="polite"></p>
+    </section>
+    </div>
+  </form>
+
+</div>
+
+<script>
+(function(){
+  const f=document.getElementById('f'), st=document.getElementById('st'), go=document.getElementById('go');
+  const KEY='junta-luisfer-borrador-v1';
+  function collect(){
+    const out=[];
+    f.querySelectorAll('.q').forEach(q=>{
+      const el=q.querySelector('input[type=text],input[type=number],textarea');
+      const grp=q.querySelector('.opts');
+      if(grp){
+        const otro=q.querySelector('.otro');
+        const v=[...grp.querySelectorAll('input:checked')].map(i=>i.value==='Otro'&&otro&&otro.value.trim()?'Otro: '+otro.value.trim():i.value).join(', ');
+        out.push([grp.dataset.name,v]);
+      } else if(el){ out.push([el.name,el.value.trim()]); }
+    });
+    return out;
+  }
+  function saveDraft(){
+    const d={};
+    f.querySelectorAll('input,textarea').forEach((el,i)=>{d[i]=(el.type==='checkbox'||el.type==='radio')?el.checked:el.value});
+    try{localStorage.setItem(KEY,JSON.stringify(d))}catch(e){}
+  }
+  try{
+    const d=JSON.parse(localStorage.getItem(KEY)||'null');
+    if(d) f.querySelectorAll('input,textarea').forEach((el,i)=>{ if(!(i in d))return; if(el.type==='checkbox'||el.type==='radio') el.checked=!!d[i]; else el.value=d[i]; });
+  }catch(e){}
+  function syncOtro(){
+    f.querySelectorAll('.otro').forEach(o=>{
+      const box=o.closest('.q').querySelector('input[value="Otro"]');
+      o.hidden=!(box&&box.checked);
+    });
+  }
+  syncOtro();
+  f.addEventListener('input',saveDraft); f.addEventListener('change',()=>{syncOtro();saveDraft();});
+
+  const CLIENTE='junta-luisfer', CUESTIONARIO='junta-v1';
+
+  const PEND='junta-luisfer-pendiente';
+  const espera=ms=>new Promise(r=>setTimeout(r,ms));
+  async function mandar(payload){
+    try{
+      const ctrl=new AbortController(); const t=setTimeout(()=>ctrl.abort(),12000);
+      const r=await fetch('/api/cuestionario',{method:'POST',headers:{'Content-Type':'application/json'},signal:ctrl.signal,body:JSON.stringify(payload)});
+      clearTimeout(t);
+      const j=await r.json().catch(()=>({}));
+      return r.ok&&j.ok;
+    }catch(e){ return false; }
+  }
+  function listo(){
+    st.className='status ok'; st.textContent='Listo, tu respuesta ya llegó. Gracias; nos vemos en la junta.';
+    go.disabled=true; go.textContent='Enviado';
+    try{localStorage.removeItem(KEY);localStorage.removeItem(PEND)}catch(e){}
+  }
+  // Si algo falla de nuestro lado, la página lo vuelve a intentar sola: el cliente no hace nada más.
+  async function insistir(payload){
+    try{localStorage.setItem(PEND,JSON.stringify(payload))}catch(e){}
+    const pausas=[0,2000,5000,10000,20000,30000];
+    for(let i=0;;i++){
+      await espera(pausas[Math.min(i,pausas.length-1)]);
+      if(await mandar(payload)){ listo(); return; }
+      if(i===1){ st.className='status'; st.textContent='Un momento, seguimos enviando sus respuestas…'; }
+    }
+  }
+  // Si quedó algo sin enviar en una visita anterior, se manda solo al volver a abrir la página.
+  try{
+    const p=JSON.parse(localStorage.getItem(PEND)||'null');
+    if(p){ go.disabled=true; st.className='status'; st.textContent='Terminando de enviar sus respuestas…'; insistir(p); }
+  }catch(e){}
+
+  f.addEventListener('submit',e=>{
+    e.preventDefault();
+    if(go.disabled) return;
+    const pairs=collect();
+    if(!pairs.some(([,v])=>v)){st.className='status warn';st.textContent='Todavía no hay respuestas. Contesten al menos una pregunta.';return;}
+    go.disabled=true; st.className='status'; st.textContent='Enviando…';
+    insistir({cliente:CLIENTE,cuestionario:CUESTIONARIO,sitio:document.getElementById('sitio').value,respuestas:Object.fromEntries(pairs)});
+  });
+})();
+</script>
+
+</body>
+</html>
