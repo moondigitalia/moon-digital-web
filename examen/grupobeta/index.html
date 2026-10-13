@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Grupo Beta · ¿Cómo arrancamos? · MOON Digital">
+<meta property="og:description" content="Lo que entendimos de Grupo Beta, en sencillo, y unas preguntas para decidir cómo empezar el demo.">
+<meta property="og:url" content="https://moon-digital-web.vercel.app/examen/grupobeta/">
+<meta property="og:image" content="https://moon-digital-web.vercel.app/img/logo.webp">
+<link rel="icon" href="/img/logo.webp">
+<title>Grupo Beta · ¿Cómo arrancamos?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+html{color-scheme:light}body{margin:0}img{max-width:100%}[hidden]{display:none!important}
+/* Una sola columna; tarjetas redondeadas con marco fino; todo con un toque. */
+:root{
+  --bg:#f4f6fa; --paper:#ffffff; --ink:#0b1220; --muted:#5a6578; --line:#d5dbe6;
+  --navy:#0f2a5c; --navy-soft:#e6ecf7; --ok:#1d6b45; --warn:#9a5b00;
+  --display:"Unbounded",system-ui,sans-serif; --body:"IBM Plex Sans",system-ui,-apple-system,sans-serif; --mono:"IBM Plex Mono",ui-monospace,monospace;
+  --suave:220ms cubic-bezier(.2,.7,.2,1);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#070b14; --paper:#0e1524; --ink:#e9eef7; --muted:#9aa6bb; --line:#24314a;
+  --navy:#8fb0ff; --navy-soft:#16213a; --ok:#6fd3a0; --warn:#f0b35a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#070b14; --paper:#0e1524; --ink:#e9eef7; --muted:#9aa6bb; --line:#24314a;
+  --navy:#8fb0ff; --navy-soft:#16213a; --ok:#6fd3a0; --warn:#f0b35a; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;-webkit-text-size-adjust:100%}
+.wrap{max-width:720px;margin:0 auto;padding-inline:16px;padding-block:40px 80px;display:grid;gap:20px}
+header{display:grid;gap:12px;padding-bottom:8px}
+.brand{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--navy)}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(28px,7vw,40px);line-height:1.1;margin:0;text-wrap:balance}
+.lead{color:var(--muted);margin:0;max-width:60ch}
+.meta{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-family:var(--mono);font-size:12px;border:1px solid var(--line);border-radius:999px;padding:4px 12px;color:var(--muted);background:var(--paper)}
+section{background:var(--paper);border:1px solid var(--line);border-radius:28px;padding:28px 20px;display:grid;gap:22px;min-width:0}
+section h2{font-family:var(--display);font-weight:500;font-size:18px;margin:0;display:flex;gap:12px;align-items:center}
+section h2 span{font-family:var(--mono);font-size:12px;color:var(--navy);width:32px;height:32px;border-radius:50%;border:1px solid var(--navy);display:inline-grid;place-items:center;flex:none}
+.why{margin:-10px 0 0;color:var(--muted);font-size:14px}
+
+/* La cadena: de la fábrica al coche */
+.cadena{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;position:relative;margin:4px 0 0}
+.cadena::before{content:"";position:absolute;left:10%;right:10%;top:22px;height:1px;background:var(--line)}
+.eslabon{display:grid;justify-items:center;gap:6px;text-align:center;position:relative;min-width:0}
+.eslabon i{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--paper);display:grid;place-items:center;font-style:normal;font-family:var(--mono);font-size:13px;color:var(--muted)}
+.eslabon b{font-weight:500;font-size:12px;line-height:1.25;color:var(--muted)}
+.eslabon.beta i{background:var(--navy);border-color:var(--navy);color:var(--paper)}
+.eslabon.beta b{color:var(--ink);font-weight:600}
+
+/* Tarjetas de "lo que entendimos" */
+.tarjetas{display:grid;gap:12px}
+.tarjeta{border:1px solid var(--line);border-radius:22px;padding:18px 18px;display:grid;gap:6px;background:var(--bg)}
+.tarjeta h3{margin:0;font-size:15px;font-weight:600;display:flex;gap:10px;align-items:center}
+.tarjeta h3 em{font-style:normal;font-family:var(--mono);font-size:11px;width:24px;height:24px;border-radius:50%;background:var(--navy-soft);color:var(--navy);display:inline-grid;place-items:center;flex:none}
+.tarjeta p{margin:0;color:var(--muted);font-size:15px}
+.tarjeta p strong{color:var(--ink);font-weight:600}
+.tarjeta.pend{border-style:dashed}
+.tarjeta ul{margin:2px 0 0;padding-left:18px;color:var(--muted);font-size:15px;display:grid;gap:4px}
+
+/* Preguntas */
+.q{display:grid;gap:8px;min-width:0}
+.q > label,.q > .lbl{font-weight:600}
+.hint{font-size:13px;color:var(--muted);margin-top:-4px}
+.otro{margin-top:4px}
+input[type=text],textarea{width:100%;font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:18px;padding:12px 16px;transition:border-color var(--suave)}
+input[type=text]:focus,textarea:focus{border-color:var(--navy)}
+textarea{min-height:88px;resize:vertical}
+input:focus-visible,textarea:focus-visible,button:focus-visible,.opt input:focus-visible+span,.camino input:focus-visible~.c-cuerpo{outline:2px solid var(--navy);outline-offset:2px}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opt{position:relative}
+.opt input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.opt span{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:9px 16px;font-size:14px;background:var(--bg);cursor:pointer;transition:background-color var(--suave),border-color var(--suave),color var(--suave)}
+.opt input:checked+span{border-color:var(--navy);background:var(--navy-soft);color:var(--navy);font-weight:600}
+
+/* Los tres caminos */
+.caminos{display:grid;gap:12px}
+.camino{position:relative;display:block;cursor:pointer}
+.camino input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.c-cuerpo{display:grid;gap:8px;border:1px solid var(--line);border-radius:22px;padding:18px;background:var(--bg);transition:background-color var(--suave),border-color var(--suave)}
+.c-top{display:flex;gap:12px;align-items:center}
+.c-punto{width:22px;height:22px;border-radius:50%;border:1px solid var(--line);flex:none;display:grid;place-items:center;background:var(--paper);transition:border-color var(--suave)}
+.c-punto::after{content:"";width:10px;height:10px;border-radius:50%;background:var(--navy);opacity:0;transition:opacity var(--suave)}
+.c-titulo{font-weight:600;font-size:16px;line-height:1.3}
+.c-reco{font-family:var(--mono);font-size:11px;border-radius:999px;padding:2px 10px;background:var(--navy);color:var(--paper);margin-left:auto;white-space:nowrap}
+.c-desc{margin:0;color:var(--muted);font-size:15px}
+.c-pros{display:grid;gap:4px;font-size:14px}
+.c-pros div{display:flex;gap:8px}
+.c-pros b{font-weight:600;flex:none;width:68px;color:var(--ink)}
+.c-pros span{color:var(--muted)}
+.camino input:checked~.c-cuerpo{border-color:var(--navy);background:var(--navy-soft)}
+.camino input:checked~.c-cuerpo .c-punto{border-color:var(--navy)}
+.camino input:checked~.c-cuerpo .c-punto::after{opacity:1}
+
+.send{display:grid;gap:14px}
+button{font:inherit;font-weight:600;border:0;border-radius:999px;padding:16px 24px;background:var(--navy);color:var(--paper);cursor:pointer;transition:opacity var(--suave)}
+button[disabled]{opacity:.6;cursor:default}
+.status{font-size:14px;margin:0;min-height:1.55em}
+.status.ok{color:var(--ok)} .status.warn{color:var(--warn)}
+@media (max-width:380px){ .eslabon b{font-size:11px} section{padding:24px 16px} }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="brand">MOON Digital · Grupo Beta</div>
+    <h1>¿Cómo arrancamos?</h1>
+    <p class="lead">Daniel, aquí va lo que entendimos de Grupo Beta, explicado en sencillo, y unas preguntas que solo tú puedes contestar. Con tus respuestas decidimos cómo hacer el demo. No hay respuestas correctas: contesta lo que sepas y lo demás déjalo en blanco.</p>
+    <div class="meta"><span class="chip">Unos 7 minutos</span><span class="chip">Todo es opcional</span><span class="chip">Se guarda mientras escribes</span></div>
+  </header>
+
+  <form id="f" novalidate>
+    <input type="text" id="sitio" name="_sitio" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
+    <div style="display:grid;gap:20px">
+
+    <section aria-labelledby="t1">
+      <h2 id="t1"><span>01</span>Lo que entendimos</h2>
+      <p class="why">Así se mueve una pieza de coche hasta llegar al taller:</p>
+      <div class="cadena" aria-label="Fábrica, Grupo Beta, refaccionaria, taller, coche">
+        <div class="eslabon"><i>1</i><b>Fábrica</b></div>
+        <div class="eslabon beta"><i>2</i><b>Grupo Beta</b></div>
+        <div class="eslabon"><i>3</i><b>Refac&shy;cionaria</b></div>
+        <div class="eslabon"><i>4</i><b>Taller</b></div>
+        <div class="eslabon"><i>5</i><b>Coche</b></div>
+      </div>
+      <div class="tarjetas">
+        <div class="tarjeta">
+          <h3><em>1</em>¿Quién es Grupo Beta?</h3>
+          <p>Vende piezas de coche <strong>al mayoreo</strong>. No le vende a la gente ni a los talleres: le vende a las <strong>refaccionarias</strong>, las tiendas de piezas. Es como un Costco, pero solo para ellas. Tiene sucursales en CDMX, Mérida, Querétaro, Cancún y Monterrey.</p>
+        </div>
+        <div class="tarjeta">
+          <h3><em>2</em>¿Qué le duele?</h3>
+          <p>Una refaccionaria pide unas balatas para un Versa. Hay dos tipos de balatas para ese coche y le mandan las que no son. <strong>La pieza regresa</strong>, la camioneta da otra vuelta y se pierde tiempo y dinero. Además, tardan en entregar y en atender en mostrador.</p>
+        </div>
+        <div class="tarjeta">
+          <h3><em>3</em>La idea</h3>
+          <p>Un <strong>vendedor en el celular</strong> que, antes de mandar la pieza, pregunta lo necesario: "¿tu coche es motor 1.6 o 1.8?". Así la pieza sale bien a la primera. Después avisa cuándo está listo el pedido o cuándo sale la camioneta.</p>
+        </div>
+        <div class="tarjeta pend">
+          <h3><em>?</em>Lo que todavía no sabemos</h3>
+          <ul>
+            <li>Si su sistema (iZeus) nos deja conectarnos.</li>
+            <li>Si su catálogo sabe qué pieza le queda a cada coche. Su página busca por marca, modelo y año, pero no pregunta el motor.</li>
+            <li>Cuántas piezas les regresan al mes.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="t2">
+      <h2 id="t2"><span>02</span>¿Qué camino tomamos?</h2>
+      <p class="why">"Demo" es una muestra para que el dueño vea la idea funcionando. Elige el camino que te late más.</p>
+      <div class="q">
+        <div class="caminos opts" data-name="Camino elegido" data-single role="radiogroup" aria-label="Camino elegido">
+          <label class="camino">
+            <input type="radio" name="_camino" value="Mixto: demo rápido con datos inventados que al final pide lo que necesitamos">
+            <div class="c-cuerpo">
+              <div class="c-top"><span class="c-punto"></span><span class="c-titulo">Mixto</span><span class="c-reco">Lo recomendamos</span></div>
+              <p class="c-desc">Hacemos un demo rápido con piezas inventadas. Al final del demo, una pantalla le dice al dueño: "para hacerlo con sus piezas de verdad, necesitamos esto".</p>
+              <div class="c-pros"><div><b>Lo bueno</b><span>Ve la idea funcionando y en la misma junta nos da la información, porque ya entendió para qué es.</span></div><div><b>Lo malo</b><span>Un poco más de trabajo para nosotros.</span></div></div>
+            </div>
+          </label>
+          <label class="camino">
+            <input type="radio" name="_camino" value="Camino 1: demo ya con lo que sabemos">
+            <div class="c-cuerpo">
+              <div class="c-top"><span class="c-punto"></span><span class="c-titulo">Camino 1: demo ya</span></div>
+              <p class="c-desc">Con lo que sabemos hoy armamos el demo, quede perfecto o no, solo para que se entienda la idea.</p>
+              <div class="c-pros"><div><b>Lo bueno</b><span>Es lo más rápido y el dueño ve algo pronto.</span></div><div><b>Lo malo</b><span>Puede no parecerse a cómo trabajan ellos de verdad.</span></div></div>
+            </div>
+          </label>
+          <label class="camino">
+            <input type="radio" name="_camino" value="Camino 2: primero preguntarle todo al dueño">
+            <div class="c-cuerpo">
+              <div class="c-top"><span class="c-punto"></span><span class="c-titulo">Camino 2: primero preguntar</span></div>
+              <p class="c-desc">Antes de hacer nada, le preguntamos al dueño todo lo que nos falta y con eso hacemos un demo más fiel.</p>
+              <div class="c-pros"><div><b>Lo bueno</b><span>El demo se parece más a su negocio real.</span></div><div><b>Lo malo</b><span>Tarda más y el dueño todavía no ve nada que lo emocione.</span></div></div>
+            </div>
+          </label>
+          <label class="opt"><input type="radio" name="_camino" value="Otro"><span>Otro camino</span></label>
+        </div>
+        <input type="text" class="otro" id="otro-camino" aria-label="Escribe qué otro camino" placeholder="Escribe aquí qué otro camino" hidden>
+      </div>
+      <div class="q"><label for="porque">¿Por qué ese camino?</label><textarea id="porque" name="Por qué ese camino" placeholder="En tus palabras, si quieres"></textarea></div>
+    </section>
+
+    <section aria-labelledby="t3">
+      <h2 id="t3"><span>03</span>Lo que solo tú sabes</h2>
+      <p class="why">Tú platicaste con ellos. Esto nos ayuda a que el demo se parezca a su negocio.</p>
+
+      <div class="q"><label for="contacto">¿Con quién platicaste en Grupo Beta?</label><input type="text" id="contacto" name="Con quién platicó en Grupo Beta" placeholder="Nombre y puesto, como lo recuerdes"></div>
+
+      <div class="q"><span class="lbl">Esa persona…</span>
+        <div class="opts" data-name="Qué tanto decide esa persona" data-single>
+          <label class="opt"><input type="radio" name="_decide" value="Es el dueño"><span>Es el dueño</span></label>
+          <label class="opt"><input type="radio" name="_decide" value="Decide, aunque no es el dueño"><span>Decide, aunque no es el dueño</span></label>
+          <label class="opt"><input type="radio" name="_decide" value="Lo tiene que consultar con alguien más"><span>Lo tiene que consultar</span></label>
+          <label class="opt"><input type="radio" name="_decide" value="No estoy seguro"><span>No estoy seguro</span></label>
+        </div>
+      </div>
+
+      <div class="q"><span class="lbl">¿De qué sucursal es?</span>
+        <div class="opts" data-name="Sucursal del contacto" data-single>
+          <label class="opt"><input type="radio" name="_suc" value="Mérida"><span>Mérida</span></label>
+          <label class="opt"><input type="radio" name="_suc" value="CDMX (la principal)"><span>CDMX (la principal)</span></label>
+          <label class="opt"><input type="radio" name="_suc" value="Cancún"><span>Cancún</span></label>
+          <label class="opt"><input type="radio" name="_suc" value="Querétaro"><span>Querétaro</span></label>
+          <label class="opt"><input type="radio" name="_suc" value="Monterrey"><span>Monterrey</span></label>
+          <label class="opt"><input type="radio" name="_suc" value="No sé"><span>No sé</span></label>
+        </div>
+      </div>
+
+      <div class="q"><span class="lbl">¿Cómo le piden hoy las refaccionarias a Grupo Beta?</span><span class="hint">Puedes elegir varios.</span>
+        <div class="opts" data-name="Cómo piden hoy las refaccionarias">
+          <label class="opt"><input type="checkbox" value="Por teléfono"><span>Por teléfono</span></label>
+          <label class="opt"><input type="checkbox" value="Por WhatsApp"><span>Por WhatsApp</span></label>
+          <label class="opt"><input type="checkbox" value="Por su página de internet"><span>Por su página de internet</span></label>
+          <label class="opt"><input type="checkbox" value="En persona, en mostrador"><span>En persona, en mostrador</span></label>
+          <label class="opt"><input type="checkbox" value="Con un vendedor que las visita"><span>Con un vendedor que las visita</span></label>
+          <label class="opt"><input type="checkbox" value="No sé"><span>No sé</span></label>
+          <label class="opt"><input type="checkbox" value="Otro"><span>Otro</span></label>
+        </div>
+        <input type="text" class="otro" id="otro-pedido" aria-label="Escribe de qué otra forma piden" placeholder="Escribe aquí de qué otra forma piden" hidden>
+      </div>
+
+      <div class="q"><span class="lbl">¿Qué les platicaste ya de lo que podríamos hacer?</span><span class="hint">Puedes elegir varios.</span>
+        <div class="opts" data-name="Qué se le platicó ya a Grupo Beta">
+          <label class="opt"><input type="checkbox" value="Un chatbot en su página"><span>Un chatbot en su página</span></label>
+          <label class="opt"><input type="checkbox" value="Un vendedor por WhatsApp"><span>Un vendedor por WhatsApp</span></label>
+          <label class="opt"><input type="checkbox" value="Un precio"><span>Un precio</span></label>
+          <label class="opt"><input type="checkbox" value="Una fecha"><span>Una fecha</span></label>
+          <label class="opt"><input type="checkbox" value="Nada concreto todavía"><span>Nada concreto todavía</span></label>
+          <label class="opt"><input type="checkbox" value="Otro"><span>Otro</span></label>
+        </div>
+        <input type="text" class="otro" id="otro-platica" aria-label="Escribe qué más les platicaste" placeholder="Escribe aquí qué más les platicaste" hidden>
+      </div>
+      <div class="q"><label for="detalle">Si les diste un precio o una fecha, ¿cuál fue?</label><input type="text" id="detalle" name="Precio o fecha que se platicó" placeholder="Aproximado está perfecto"></div>
+
+      <div class="q"><label for="devoluciones">¿Te dijeron más o menos cuántas piezas les regresan al mes?</label><span class="hint">Si no te dijeron, déjalo en blanco.</span><input type="text" id="devoluciones" name="Piezas que regresan al mes (aprox.)" placeholder="Ej. unas 200 al mes"></div>
+
+      <div class="q"><span class="lbl">¿Crees que nos pasarían un Excel con su lista de piezas y otro con las piezas que les regresan?</span>
+        <div class="opts" data-name="Nos pasarían los Excel de piezas y devoluciones" data-single>
+          <label class="opt"><input type="radio" name="_excel" value="Sí, seguro"><span>Sí, seguro</span></label>
+          <label class="opt"><input type="radio" name="_excel" value="Probablemente"><span>Probablemente</span></label>
+          <label class="opt"><input type="radio" name="_excel" value="No creo"><span>No creo</span></label>
+          <label class="opt"><input type="radio" name="_excel" value="Hay que preguntarles"><span>Hay que preguntarles</span></label>
+        </div>
+      </div>
+
+      <div class="q"><span class="lbl">¿Podríamos platicar con la persona que hizo su sistema (iZeus)?</span>
+        <div class="opts" data-name="Platicar con quien hizo iZeus" data-single>
+          <label class="opt"><input type="radio" name="_izeus" value="Sí, seguro"><span>Sí, seguro</span></label>
+          <label class="opt"><input type="radio" name="_izeus" value="Probablemente"><span>Probablemente</span></label>
+          <label class="opt"><input type="radio" name="_izeus" value="No creo"><span>No creo</span></label>
+          <label class="opt"><input type="radio" name="_izeus" value="Hay que preguntarles"><span>Hay que preguntarles</span></label>
+        </div>
+      </div>
+
+      <div class="q"><span class="lbl">¿Sabes si su página de internet está conectada a su sistema?</span><span class="hint">O sea, si los precios y piezas de la página salen solos de iZeus.</span>
+        <div class="opts" data-name="La página está conectada a iZeus" data-single>
+          <label class="opt"><input type="radio" name="_pagina" value="Sí"><span>Sí</span></label>
+          <label class="opt"><input type="radio" name="_pagina" value="No"><span>No</span></label>
+          <label class="opt"><input type="radio" name="_pagina" value="No sé"><span>No sé</span></label>
+        </div>
+      </div>
+
+      <div class="q"><span class="lbl">Grupo Beta tiene sucursal en Cancún. ¿Kid podría ir una hora a ver cómo atienden en mostrador?</span>
+        <div class="opts" data-name="Visita de Kid a la sucursal de Cancún" data-single>
+          <label class="opt"><input type="radio" name="_visita" value="Sí, yo lo arreglo"><span>Sí, yo lo arreglo</span></label>
+          <label class="opt"><input type="radio" name="_visita" value="Sí, pero que Kid lo pida directo"><span>Sí, que Kid lo pida directo</span></label>
+          <label class="opt"><input type="radio" name="_visita" value="Mejor todavía no"><span>Mejor todavía no</span></label>
+        </div>
+      </div>
+
+      <div class="q"><span class="lbl">¿Cuándo te gustaría enseñarle algo al dueño?</span>
+        <div class="opts" data-name="Cuándo enseñarle algo al dueño" data-single>
+          <label class="opt"><input type="radio" name="_cuando" value="Esta semana"><span>Esta semana</span></label>
+          <label class="opt"><input type="radio" name="_cuando" value="La próxima semana"><span>La próxima semana</span></label>
+          <label class="opt"><input type="radio" name="_cuando" value="En dos semanas o más"><span>En dos semanas o más</span></label>
+          <label class="opt"><input type="radio" name="_cuando" value="Cuando esté bien hecho"><span>Cuando esté bien hecho</span></label>
+          <label class="opt"><input type="radio" name="_cuando" value="Otro"><span>Otra fecha</span></label>
+        </div>
+        <input type="text" class="otro" id="otro-cuando" aria-label="Escribe la fecha" placeholder="Escribe aquí la fecha" hidden>
+      </div>
+
+      <div class="q"><span class="lbl">Lo primero que les hagamos, ¿se cobra?</span>
+        <div class="opts" data-name="Lo primero se cobra" data-single>
+          <label class="opt"><input type="radio" name="_cobro" value="El demo es gratis; cobramos al empezar el trabajo real"><span>El demo es gratis, luego cobramos</span></label>
+          <label class="opt"><input type="radio" name="_cobro" value="Cobramos desde el principio"><span>Cobramos desde el principio</span></label>
+          <label class="opt"><input type="radio" name="_cobro" value="Todavía no lo hemos platicado"><span>Todavía no lo hemos platicado</span></label>
+          <label class="opt"><input type="radio" name="_cobro" value="Prefiero platicarlo"><span>Prefiero platicarlo</span></label>
+        </div>
+      </div>
+
+      <div class="q"><label for="wow">¿Qué tendría que ver el dueño en el demo para decir "esto lo quiero"?</label><textarea id="wow" name="Qué tendría que ver el dueño para decir esto lo quiero" placeholder="Lo que tú sientas que lo va a convencer"></textarea></div>
+    </section>
+
+    <section aria-labelledby="t4">
+      <h2 id="t4"><span>04</span>Para cerrar</h2>
+      <div class="q"><label for="algo">¿Hay algo que no te preguntamos y que nos sirva saber? ¿O algo que quieras preguntarnos?</label><textarea id="algo" name="Algo más / preguntas"></textarea></div>
+      <div class="q"><label for="quien">¿Quién contesta?</label><input type="text" id="quien" name="Contestó" placeholder="Tu nombre"></div>
+    </section>
+
+    <section class="send">
+      <button type="submit" id="go">Enviar respuestas</button>
+      <p class="status" id="st" role="status" aria-live="polite"></p>
+    </section>
+    </div>
+  </form>
+
+</div>
+
+<script>
+(function(){
+  const f=document.getElementById('f'), st=document.getElementById('st'), go=document.getElementById('go');
+  const KEY='grupobeta-decision-borrador-v1';
+  function collect(){
+    const out=[];
+    f.querySelectorAll('.q').forEach(q=>{
+      const grp=q.querySelector('.opts');
+      if(grp){
+        const otro=q.querySelector('.otro');
+        const v=[...grp.querySelectorAll('input:checked')].map(i=>i.value==='Otro'&&otro&&otro.value.trim()?'Otro: '+otro.value.trim():i.value).join(', ');
+        out.push([grp.dataset.name,v]);
+        return;
+      }
+      const el=q.querySelector('input[type=text],textarea');
+      if(el) out.push([el.name,el.value.trim()]);
+    });
+    return out;
+  }
+  function saveDraft(){
+    const d={};
+    f.querySelectorAll('input,textarea').forEach((el,i)=>{d[i]=(el.type==='checkbox'||el.type==='radio')?el.checked:el.value});
+    try{localStorage.setItem(KEY,JSON.stringify(d))}catch(e){}
+  }
+  try{
+    const d=JSON.parse(localStorage.getItem(KEY)||'null');
+    if(d) f.querySelectorAll('input,textarea').forEach((el,i)=>{ if(!(i in d))return; if(el.type==='checkbox'||el.type==='radio') el.checked=!!d[i]; else el.value=d[i]; });
+  }catch(e){}
+  function syncOtro(){
+    f.querySelectorAll('.otro').forEach(o=>{
+      const box=o.closest('.q').querySelector('input[value="Otro"]');
+      o.hidden=!(box&&box.checked);
+    });
+  }
+  syncOtro();
+  f.addEventListener('input',saveDraft); f.addEventListener('change',()=>{syncOtro();saveDraft();});
+
+  const CLIENTE='grupobeta', CUESTIONARIO='decision-demo-v1';
+
+  const PEND='grupobeta-decision-pendiente';
+  const espera=ms=>new Promise(r=>setTimeout(r,ms));
+  async function mandar(payload){
+    try{
+      const ctrl=new AbortController(); const t=setTimeout(()=>ctrl.abort(),12000);
+      const r=await fetch('/api/cuestionario',{method:'POST',headers:{'Content-Type':'application/json'},signal:ctrl.signal,body:JSON.stringify(payload)});
+      clearTimeout(t);
+      const j=await r.json().catch(()=>({}));
+      return r.ok&&j.ok;
+    }catch(e){ return false; }
+  }
+  function listo(){
+    st.className='status ok'; st.textContent='Listo, tus respuestas ya llegaron. ¡Gracias, Daniel!';
+    go.disabled=true; go.textContent='Enviado';
+    try{localStorage.removeItem(KEY);localStorage.removeItem(PEND)}catch(e){}
+  }
+  // Si algo falla de nuestro lado, la página lo vuelve a intentar sola: no hay que hacer nada más.
+  async function insistir(payload){
+    try{localStorage.setItem(PEND,JSON.stringify(payload))}catch(e){}
+    const pausas=[0,2000,5000,10000,20000,30000];
+    for(let i=0;;i++){
+      await espera(pausas[Math.min(i,pausas.length-1)]);
+      if(await mandar(payload)){ listo(); return; }
+      if(i===1){ st.className='status'; st.textContent='Un momento, seguimos enviando tus respuestas…'; }
+    }
+  }
+  // Si quedó algo sin enviar en una visita anterior, se manda solo al volver a abrir la página.
+  try{
+    const p=JSON.parse(localStorage.getItem(PEND)||'null');
+    if(p){ go.disabled=true; st.className='status'; st.textContent='Terminando de enviar tus respuestas…'; insistir(p); }
+  }catch(e){}
+
+  f.addEventListener('submit',e=>{
+    e.preventDefault();
+    if(go.disabled) return;
+    const pairs=collect();
+    if(!pairs.some(([,v])=>v)){st.className='status warn';st.textContent='Todavía no hay respuestas. Contesta al menos una pregunta.';return;}
+    go.disabled=true; st.className='status'; st.textContent='Enviando…';
+    insistir({cliente:CLIENTE,cuestionario:CUESTIONARIO,sitio:document.getElementById('sitio').value,respuestas:Object.fromEntries(pairs)});
+  });
+})();
+</script>
+
+</body>
+</html>
