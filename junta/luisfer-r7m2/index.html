@@ -62,6 +62,10 @@ button.ghost{background:transparent;color:var(--navy);border:1px solid var(--nav
 button[disabled]{opacity:.6;cursor:default}
 .status{font-size:14px;margin:0}
 .status.ok{color:var(--ok)} .status.warn{color:var(--warn)}
+.audio{border:1px solid var(--navy);border-radius:6px;padding:16px;display:grid;gap:10px;background:var(--navy-soft)}
+.audio b{font-family:var(--display);font-weight:500;font-size:17px;color:var(--navy)}
+.audio p{margin:0;font-size:14px;color:var(--muted)}
+.audio audio{width:100%}
 .ctx{display:grid;gap:14px}
 .ctx p{margin:0;max-width:65ch}
 .ctx ul{margin:0;padding-left:1.2em;display:grid;gap:6px}
@@ -85,6 +89,11 @@ button[disabled]{opacity:.6;cursor:default}
     <div class="brand">MOON Digital · uso interno</div>
     <h1>Luis Fer y Gerardo: ¿lo tomamos?</h1>
     <p class="lead">Daniel, Dan, Kid: aquí está todo lo que pasó con Luis Fer y Gerardo, lo que nos contestaron y lo que podríamos ofrecerles. Al final, cada quien contesta por su lado, sin ver lo de los demás. No hay respuesta correcta: "sí", "solo una parte" y "no" valen igual. Con lo de los tres armamos la junta.</p>
+    <div class="audio">
+      <b>¿Prefieres escuchar? Resumen en audio · 2 minutos</b>
+      <p>Cuenta lo mismo que esta página, en corto. Después solo faltan las preguntas del final.</p>
+      <audio controls preload="metadata" src="/api/archivo?id=junta-luisfer-resumen-mp3"></audio>
+    </div>
     <div class="meta"><span class="chip">Lectura: 8 minutos</span><span class="chip">Preguntas: 5 minutos</span><span class="chip">Cada quien por su lado</span></div>
   </header>
 
@@ -154,7 +163,7 @@ button[disabled]{opacity:.6;cursor:default}
     <section class="ctx">
       <h2><span>05</span>Lo que podríamos ofrecer</h2>
       <p><span class="quien">Etapa 1 · algo puntual · ~2 semanas</span><br>Revisar su cuenta con el acceso de solo vista y entregarles un diagnóstico claro. Corregir lo barato y evidente (el formulario con el precio viejo y la pregunta de sí/no). Proponer 2 o 3 creativos nuevos basados en lo que ya les funcionó, más el ángulo de confianza. Precio fijo y pequeño. Si no les convence, se quedan con el diagnóstico y no pasa nada.</p>
-      <p><span class="quien">Etapa 2 · solo si la Etapa 1 les convence · 60 a 90 días</span><br>Operar las campañas, con un WhatsApp corto cada semana. Prometemos lo que controlamos: interesados que sí pueden comprar, citas, costo por cita y comunicación clara. Las ventas se miden juntos, pero no se prometen. Una idea: cuota fija más un bono por cada venta cerrada.</p>
+      <p><span class="quien">Etapa 2 · solo si la Etapa 1 les convence · 60 a 90 días</span><br>Operar las campañas, con un WhatsApp corto cada semana. Prometemos lo que controlamos: interesados que sí pueden comprar, citas, costo por cita y comunicación clara. Las ventas se miden juntos, pero no se prometen.</p>
       <p><span class="quien">Más adelante</span><br>Herramientas de MOON (por ejemplo, una página del desarrollo con un asistente que conteste a cualquier hora). No ahorita: ya los quemó una agencia que les prometió que "la IA lo hacía todo".</p>
       <p><b>Quién haría qué:</b> Daniel, la relación y las pláticas con ellos · Dan, las campañas y los videos · Kid, lo técnico y la organización · Claude, leer sus números, los diagnósticos y los reportes.</p>
       <div class="no">
@@ -221,13 +230,6 @@ button[disabled]{opacity:.6;cursor:default}
           <label class="opt"><input type="radio" name="_c" value="Más de $20,000"><span>Más de $20,000</span></label>
           <label class="opt"><input type="radio" name="_c" value="Cortesía por la relación"><span>Cortesía por la relación</span></label>
           <label class="opt"><input type="radio" name="_c" value="No sé, platicarlo"><span>No sé, platicarlo</span></label>
-        </div>
-      </div>
-      <div class="q"><span class="lbl">Si llegamos a la Etapa 2, ¿cobrarías un bono por cada venta cerrada?</span>
-        <div class="opts" data-name="Bono por venta en Etapa 2" data-single>
-          <label class="opt"><input type="radio" name="_b" value="Sí"><span>Sí</span></label>
-          <label class="opt"><input type="radio" name="_b" value="No"><span>No</span></label>
-          <label class="opt"><input type="radio" name="_b" value="Platicarlo"><span>Platicarlo</span></label>
         </div>
       </div>
       <div class="q"><label for="nunca">¿Qué NO deberíamos prometerles?</label><textarea id="nunca" name="Qué no prometer"></textarea></div>
