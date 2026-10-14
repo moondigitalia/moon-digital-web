@@ -1,0 +1,552 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#eef0ec">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Que llegue la correcta a la primera · Demo para Grupo Beta">
+<meta property="og:description" content="Demo de MOON Digital: pedir una refacción sin errores, de la búsqueda a la entrega.">
+<meta property="og:url" content="https://moon-digital-web.vercel.app/demo/grupobeta/">
+<meta property="og:image" content="https://moon-digital-web.vercel.app/img/logo.webp">
+<link rel="icon" href="/img/logo.webp">
+<title>Demo Grupo Beta · MOON Digital</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap">
+<style>
+html{color-scheme:light}body{margin:0}img{max-width:100%}[hidden]{display:none!important}
+/* Una columna tipo mostrador: pasos en círculos arriba, una pantalla a la vez; el dibujo técnico con flecha de medida es el sello. */
+:root{
+  --fondo:#eef0ec; --papel:#fbfcfa; --tinta:#15181c; --suave:#5b6168; --linea:#cbd0ca;
+  --azul:#1f4fd6; --azul-suave:#e3e9fb; --ok:#0e8a5f; --ok-suave:#ddf1e8; --rev:#a86800; --rev-suave:#f8ecd5;
+  --t:"Archivo",system-ui,-apple-system,sans-serif;
+  --dur:280ms; --curva:cubic-bezier(.22,.7,.2,1);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --fondo:#101316; --papel:#171b1f; --tinta:#e9ece8; --suave:#a3aab1; --linea:#2c3238;
+  --azul:#86a6ff; --azul-suave:#1b2540; --ok:#4fd1a0; --ok-suave:#12302a; --rev:#f0b25a; --rev-suave:#33260f; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --fondo:#101316; --papel:#171b1f; --tinta:#e9ece8; --suave:#a3aab1; --linea:#2c3238;
+  --azul:#86a6ff; --azul-suave:#1b2540; --ok:#4fd1a0; --ok-suave:#12302a; --rev:#f0b25a; --rev-suave:#33260f; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--fondo);color:var(--tinta);font:400 16px/1.5 var(--t);font-stretch:100%;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
+.marco{max-width:560px;margin:0 auto;padding:max(14px,env(safe-area-inset-top)) 16px max(40px,env(safe-area-inset-bottom));display:grid;gap:18px}
+
+.aviso{font-size:13px;color:var(--suave);text-align:center;padding:8px 14px;border:1px solid var(--linea);border-radius:999px;background:var(--papel)}
+.aviso b{color:var(--tinta);font-weight:600}
+
+/* Pasos: es una secuencia real, por eso van numerados en círculos */
+.pasos{display:flex;align-items:center;justify-content:space-between;gap:4px;position:relative;padding:4px 6px}
+.pasos::before{content:"";position:absolute;left:24px;right:24px;top:50%;height:1px;background:var(--linea)}
+.paso{position:relative;width:34px;height:34px;border-radius:50%;border:1px solid var(--linea);background:var(--fondo);color:var(--suave);font:600 14px var(--t);font-variant-numeric:tabular-nums;display:grid;place-items:center;padding:0;cursor:default;transition:background-color var(--dur) var(--curva),color var(--dur) var(--curva),border-color var(--dur) var(--curva)}
+.paso.hecho{border-color:var(--azul);color:var(--azul);cursor:pointer}
+.paso.actual{background:var(--azul);border-color:var(--azul);color:var(--papel)}
+
+h1,h2{font-family:var(--t);font-stretch:125%;font-weight:750;letter-spacing:-.01em;line-height:1.08;margin:0;text-wrap:balance}
+h1{font-size:clamp(28px,8.4vw,38px)}
+h2{font-size:20px;font-stretch:112%;font-weight:700}
+p{margin:0}
+.sub{color:var(--suave);max-width:46ch}
+
+.pantalla{display:grid;gap:18px;transition:opacity var(--dur) var(--curva),transform var(--dur) var(--curva)}
+.pantalla.entra{opacity:0;transform:translateY(10px)}
+@media (prefers-reduced-motion:reduce){.pantalla.entra{transform:none}}
+
+.hoja{background:var(--papel);border:1px solid var(--linea);border-radius:28px;padding:22px 18px;display:grid;gap:16px;min-width:0}
+
+/* Búsqueda */
+.buscar{display:flex;gap:8px;align-items:center;background:var(--papel);border:1px solid var(--linea);border-radius:999px;padding:6px 6px 6px 18px;transition:border-color var(--dur) var(--curva)}
+.buscar:focus-within{border-color:var(--azul)}
+.buscar input{flex:1;min-width:0;width:0;border:0;background:transparent;font:500 16px var(--t);color:var(--tinta);padding:10px 0;outline:none}
+.buscar input::placeholder{color:var(--suave)}
+.redondo{width:46px;height:46px;flex:none;border-radius:50%;border:0;background:var(--azul);color:var(--papel);display:grid;place-items:center;cursor:pointer;padding:0}
+.redondo svg{width:20px;height:20px}
+.o{display:flex;align-items:center;gap:12px;color:var(--suave);font-size:14px}
+.o::before,.o::after{content:"";flex:1;height:1px;background:var(--linea)}
+.marco > *{min-width:0}
+.selects{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+@media (max-width:360px){select{padding-left:12px;padding-right:26px;background-position:right 10px center;font-size:14px}}
+.selects label{display:grid;gap:4px;font-size:13px;color:var(--suave);min-width:0}
+select{appearance:none;-webkit-appearance:none;font:500 15px var(--t);color:var(--tinta);background:var(--papel) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%235b6168' stroke-width='1.5'/%3E%3C/svg%3E") no-repeat right 14px center;border:1px solid var(--linea);border-radius:999px;padding:11px 32px 11px 14px;width:100%;min-width:0}
+.sugerencia{justify-self:start;font:500 14px var(--t);color:var(--azul);background:var(--azul-suave);border:0;border-radius:999px;padding:8px 14px;cursor:pointer}
+.mensaje{font-size:15px;color:var(--rev);background:var(--rev-suave);border-radius:20px;padding:12px 16px}
+
+.entendimos{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:15px}
+.entendimos span{border:1px solid var(--linea);border-radius:999px;padding:5px 12px;background:var(--papel);font-weight:600}
+.entendimos button{border:0;background:none;color:var(--azul);font:500 15px var(--t);padding:5px 4px;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+
+/* Coche visto desde arriba: se toca adelante o atrás */
+.coche{display:grid;justify-items:center;gap:8px}
+.coche svg{width:min(220px,62vw);height:auto;overflow:visible}
+.zona{cursor:pointer;outline:none}
+.zona .llanta{fill:var(--papel);stroke:var(--tinta);stroke-width:1.5;transition:fill var(--dur) var(--curva),stroke var(--dur) var(--curva)}
+.zona .etq{font:700 15px var(--t);fill:var(--tinta)}
+.zona .anillo{fill:none;stroke:var(--azul);stroke-width:1.5;opacity:0;transition:opacity var(--dur) var(--curva)}
+.zona:hover .llanta,.zona:focus-visible .llanta{fill:var(--azul-suave);stroke:var(--azul)}
+.zona:hover .anillo,.zona:focus-visible .anillo{opacity:1}
+.carro{fill:none;stroke:var(--suave);stroke-width:1.5}
+
+/* Botones */
+.boton{font:650 16px var(--t);border:0;border-radius:999px;padding:16px 22px;background:var(--azul);color:var(--papel);cursor:pointer;width:100%;transition:opacity var(--dur) var(--curva)}
+.boton[disabled]{opacity:.5;cursor:default}
+.liga{justify-self:center;border:0;background:none;color:var(--azul);font:500 15px var(--t);cursor:pointer;padding:8px;text-decoration:underline;text-underline-offset:3px}
+button:focus-visible,select:focus-visible,input:focus-visible,.zona:focus-visible .anillo{outline:2px solid var(--azul);outline-offset:3px}
+
+/* Caminos para saber cuál */
+.caminos{display:grid;gap:10px}
+.camino{border:1px solid var(--linea);border-radius:24px;background:var(--papel);overflow:hidden;transition:border-color var(--dur) var(--curva)}
+.camino.abierto{border-color:var(--azul)}
+.camino > button{width:100%;display:flex;gap:14px;align-items:center;text-align:left;border:0;background:none;padding:16px;cursor:pointer;color:var(--tinta);font:inherit}
+.ico{width:44px;height:44px;flex:none;border-radius:50%;background:var(--azul-suave);color:var(--azul);display:grid;place-items:center}
+.ico svg{width:22px;height:22px}
+.camino b{display:block;font-weight:650}
+.camino small{display:block;color:var(--suave);font-size:14px}
+.cuerpo{display:grid;grid-template-rows:0fr;transition:grid-template-rows var(--dur) var(--curva)}
+.camino.abierto .cuerpo{grid-template-rows:1fr}
+.cuerpo > div{overflow:hidden}
+.cuerpo .dentro{padding:0 16px 18px;display:grid;gap:14px}
+.dos{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.chico{font:600 15px var(--t);border:1px solid var(--azul);border-radius:999px;padding:12px 10px;background:none;color:var(--azul);cursor:pointer}
+
+/* Dibujo técnico */
+.plano{background:var(--fondo);border-radius:20px;padding:12px;display:grid;place-items:center}
+.plano svg{width:100%;max-width:300px;height:auto}
+.trazo{fill:none;stroke:var(--tinta);stroke-width:1.6;stroke-linejoin:round}
+.cota{stroke:var(--azul);stroke-width:1.4;fill:none}
+.cota-txt{font:700 15px var(--t);fill:var(--azul);font-variant-numeric:tabular-nums}
+.punta{fill:var(--azul)}
+.dibuja{stroke-dasharray:var(--l);stroke-dashoffset:var(--l);animation:trazar .9s var(--curva) .15s forwards}
+@keyframes trazar{to{stroke-dashoffset:0}}
+@media (prefers-reduced-motion:reduce){.dibuja{animation:aparece .5s var(--curva) forwards;stroke-dashoffset:0;opacity:0}@keyframes aparece{to{opacity:1}}}
+
+.tarjeta-ej{border:1px dashed var(--linea);border-radius:18px;padding:14px;display:grid;gap:6px;font-size:14px;background:var(--fondo)}
+.tarjeta-ej .renglon{display:flex;justify-content:space-between;gap:10px}
+.tarjeta-ej .renglon span:first-child{color:var(--suave)}
+.tarjeta-ej .renglon span:last-child{font-weight:600;text-align:right}
+.ej{font-size:12px;color:var(--rev);font-weight:600}
+
+/* Pieza */
+.pieza{border:1px solid var(--linea);border-radius:24px;padding:16px;display:grid;gap:10px;background:var(--papel)}
+.sello{display:inline-flex;align-items:center;gap:8px;justify-self:start;border-radius:999px;padding:6px 12px 6px 8px;font-size:14px;font-weight:650}
+.sello i{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:12px;color:var(--papel)}
+.sello.ok{background:var(--ok-suave);color:var(--ok)} .sello.ok i{background:var(--ok)}
+.sello.rev{background:var(--rev-suave);color:var(--rev)} .sello.rev i{background:var(--rev)}
+.pieza h3{margin:0;font:650 16px/1.35 var(--t)}
+.codigo{font-size:14px;color:var(--suave);font-variant-numeric:tabular-nums}
+.desc{font-size:13px;color:var(--suave);line-height:1.45}
+.marcas{display:flex;flex-wrap:wrap;gap:6px}
+.marcas span{font-size:13px;border:1px solid var(--linea);border-radius:999px;padding:4px 10px}
+.precio{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:14px;color:var(--suave)}
+.precio b{font-size:18px;color:var(--tinta);font-variant-numeric:tabular-nums}
+.nota{font-size:14px;color:var(--suave);border-left:2px solid var(--azul);padding-left:12px}
+
+/* Seguimiento */
+.ruta{display:grid;gap:0}
+.etapa{display:grid;grid-template-columns:40px 1fr;gap:2px 14px;align-items:center;position:relative;padding-bottom:28px}
+.etapa:last-child{padding-bottom:0}
+.etapa::before{content:"";position:absolute;left:19.5px;top:40px;bottom:0;width:1px;background:var(--linea)}
+.etapa:last-child::before{display:none}
+.bola{grid-row:span 2;width:40px;height:40px;border-radius:50%;border:1px solid var(--linea);background:var(--papel);display:grid;place-items:center;transition:background-color 400ms var(--curva),border-color 400ms var(--curva)}
+.bola svg{width:18px;height:18px;opacity:0;transition:opacity 400ms var(--curva);color:var(--papel)}
+.etapa.lista .bola{background:var(--ok);border-color:var(--ok)}
+.etapa.lista .bola svg{opacity:1}
+.etapa.ahora .bola{border-color:var(--ok);border-width:2px}
+.etapa b{font-weight:650}
+.etapa small{grid-column:2;color:var(--suave);font-size:14px;font-variant-numeric:tabular-nums}
+.etapa b{grid-column:2}
+
+/* Calculadora */
+.calc{display:grid;gap:20px}
+.calc label{display:grid;gap:10px}
+.calc .fila{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.calc .fila b{font-size:22px;font-stretch:112%;font-variant-numeric:tabular-nums}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:28px;background:transparent;cursor:pointer}
+input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:999px;background:linear-gradient(var(--azul),var(--azul)) 0/var(--p,50%) 100% no-repeat,var(--linea)}
+input[type=range]::-moz-range-track{height:4px;border-radius:999px;background:var(--linea)}
+input[type=range]::-moz-range-progress{height:4px;border-radius:999px;background:var(--azul)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;border-radius:50%;background:var(--papel);border:2px solid var(--azul);margin-top:-11px}
+input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--papel);border:2px solid var(--azul)}
+.total{border-radius:24px;background:var(--azul);color:var(--papel);padding:20px;display:grid;gap:4px}
+.total small{opacity:.85;font-size:14px}
+.total b{font-size:clamp(30px,9vw,40px);font-stretch:118%;font-weight:750;font-variant-numeric:tabular-nums;line-height:1.1}
+.total span{font-size:15px;opacity:.9;font-variant-numeric:tabular-nums}
+.lista{margin:0;padding:0;list-style:none;display:grid;gap:12px}
+.lista li{display:grid;grid-template-columns:28px 1fr;gap:12px;align-items:start;font-size:15px}
+.lista li i{width:28px;height:28px;border-radius:50%;border:1px solid var(--azul);color:var(--azul);font:600 13px var(--t);font-style:normal;display:grid;place-items:center}
+.lista li .pt{width:10px;height:10px;border:0;background:var(--azul);margin:9px}
+.firma{text-align:center;font-size:13px;color:var(--suave)}
+</style>
+</head>
+<body>
+<div class="marco">
+  <p class="aviso"><b>Demo de MOON Digital para Grupo Beta.</b> Piezas de su catálogo público; precios y existencias son de ejemplo.</p>
+
+  <nav class="pasos" aria-label="Pasos del pedido">
+    <button class="paso actual" data-ir="1" aria-label="Paso 1: buscar">1</button>
+    <button class="paso" data-ir="2" aria-label="Paso 2: confirmar la pieza" disabled>2</button>
+    <button class="paso" data-ir="3" aria-label="Paso 3: pedido" disabled>3</button>
+    <button class="paso" data-ir="4" aria-label="Paso 4: seguimiento" disabled>4</button>
+    <button class="paso" data-ir="5" aria-label="Paso 5: lo que ahorra" disabled>5</button>
+  </nav>
+
+  <!-- 1 · Buscar -->
+  <section class="pantalla" data-p="1" aria-labelledby="t1">
+    <h1 id="t1">¿Qué pieza necesitas?</h1>
+    <form class="buscar" id="f-buscar" role="search">
+      <input id="q" type="text" autocomplete="off" enterkeyhint="search" aria-label="Escribe la pieza" placeholder="Escríbelo como lo dirías">
+      <button class="redondo" aria-label="Buscar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></button>
+    </form>
+    <button class="sugerencia" type="button" data-q="balatas pa un versa 2012">Ejemplo: "balatas pa un versa 2012"</button>
+    <p class="o">o elige el coche</p>
+    <div class="selects">
+      <label>Marca<select id="s-marca"><option value="">Marca</option><option>Nissan</option></select></label>
+      <label>Modelo<select id="s-modelo"><option value="">Modelo</option><option>Versa</option></select></label>
+      <label>Año<select id="s-anio"><option value="">Año</option></select></label>
+    </div>
+    <button class="boton" type="button" id="b-select" disabled>Buscar balatas</button>
+    <p class="mensaje" id="m1" role="status" hidden></p>
+  </section>
+
+  <!-- 2 · Confirmar -->
+  <section class="pantalla" data-p="2" aria-labelledby="t2" hidden>
+    <h1 id="t2">Que llegue la correcta a la primera</h1>
+    <div class="entendimos" id="entendimos"></div>
+
+    <div class="hoja" id="q-pos">
+      <h2>¿Las de adelante o las de atrás?</h2>
+      <p class="sub">Toca la parte del coche.</p>
+      <div class="coche">
+        <svg viewBox="0 0 200 300" role="group" aria-label="Coche visto desde arriba">
+          <rect class="carro" x="45" y="30" width="110" height="240" rx="48"/>
+          <path class="carro" d="M58 92 Q100 76 142 92 M58 206 Q100 222 142 206"/>
+          <rect class="carro" x="62" y="100" width="76" height="98" rx="14"/>
+          <g class="zona" data-pos="adelante" role="button" tabindex="0" aria-label="Adelante">
+            <circle class="anillo" cx="100" cy="66" r="66"/>
+            <rect class="llanta" x="28" y="52" width="18" height="40" rx="9"/>
+            <rect class="llanta" x="154" y="52" width="18" height="40" rx="9"/>
+            <text class="etq" x="100" y="20" text-anchor="middle">Adelante</text>
+          </g>
+          <g class="zona" data-pos="atras" role="button" tabindex="0" aria-label="Atrás">
+            <circle class="anillo" cx="100" cy="234" r="66"/>
+            <rect class="llanta" x="28" y="208" width="18" height="40" rx="9"/>
+            <rect class="llanta" x="154" y="208" width="18" height="40" rx="9"/>
+            <text class="etq" x="100" y="294" text-anchor="middle">Atrás</text>
+          </g>
+        </svg>
+      </div>
+    </div>
+
+    <div id="resultado" hidden></div>
+  </section>
+
+  <!-- 3 · Pedido -->
+  <section class="pantalla" data-p="3" aria-labelledby="t3" hidden>
+    <h1 id="t3">Tu pedido</h1>
+    <div id="pedido"></div>
+    <p class="nota">Si esta marca se acaba, te ofrecemos al momento la misma pieza en otra marca.</p>
+    <button class="boton" type="button" id="b-enviar">Enviar pedido</button>
+    <button class="liga" type="button" id="b-otra">Buscar otra pieza</button>
+  </section>
+
+  <!-- 4 · Seguimiento -->
+  <section class="pantalla" data-p="4" aria-labelledby="t4" hidden>
+    <h1 id="t4">¿Dónde va mi pedido?</h1>
+    <div class="hoja">
+      <div class="ruta" id="ruta" aria-live="polite"></div>
+    </div>
+    <p class="nota">El chofer marca "salí" y "entregué" con un solo botón en su celular.</p>
+    <button class="boton" type="button" id="b-ahorro" disabled>Ver lo que esto le ahorra</button>
+  </section>
+
+  <!-- 5 · Para Juanqui -->
+  <section class="pantalla" data-p="5" aria-labelledby="t5" hidden>
+    <h1 id="t5">Lo que esto le ahorra</h1>
+    <div class="hoja calc">
+      <label><span class="fila"><span>¿Cuántas piezas le regresan al mes?</span><b id="v-piezas">40</b></span>
+        <input type="range" id="r-piezas" min="0" max="500" step="5" value="40" aria-describedby="ej1"></label>
+      <label><span class="fila"><span>¿Cuánto le cuesta cada vuelta de camioneta?</span><b id="v-vuelta">$250</b></span>
+        <input type="range" id="r-vuelta" min="50" max="1000" step="10" value="250" aria-describedby="ej1"></label>
+      <p class="ej" id="ej1">Los números de arranque son de ejemplo: muévalos a los suyos.</p>
+      <div class="total" aria-live="polite">
+        <small>Hoy se va en vueltas de regreso</small>
+        <b id="v-mes">$10,000 al mes</b>
+        <span id="v-anio">$120,000 al año</span>
+      </div>
+    </div>
+
+    <div class="hoja">
+      <h2>Lo que vimos en su catálogo</h2>
+      <ul class="lista">
+        <li><i class="pt"></i><span>La información de cada pieza ya está ahí: año, posición y versión del coche. La ordenamos para que encontrar la correcta sea más fácil.</span></li>
+        <li><i class="pt"></i><span>Algunas piezas dicen dos cosas distintas, como el Versa 2012 trasero. Las juntamos en una lista para que su equipo decida.</span></li>
+        <li><i class="pt"></i><span>Cada pieza ya tiene sus equivalentes en otras marcas. Los usamos para no atrasar entregas.</span></li>
+      </ul>
+    </div>
+
+    <div class="hoja">
+      <h2>Para hacerlo con sus piezas reales</h2>
+      <ol class="lista">
+        <li><i>1</i><span>Su lista de piezas, o acceso de solo lectura a la conexión que ya usa su página.</span></li>
+        <li><i>2</i><span>Las devoluciones del último año con su motivo, aunque sea aproximado.</span></li>
+        <li><i>3</i><span>Una plática de 30 minutos con quien hizo iZeus.</span></li>
+      </ol>
+    </div>
+    <button class="liga" type="button" id="b-inicio">Empezar de nuevo</button>
+    <p class="firma">Preparado por MOON Digital</p>
+  </section>
+</div>
+
+<script>
+(function(){
+  'use strict';
+  /* ---------- Catálogo: descripciones reales del catálogo público de Grupo Beta (14-oct-2026). Precios y existencias de ejemplo. ---------- */
+  const PIEZAS = {
+    d1592: { pos:'adelante', titulo:'Balata de disco delantera', codigo:'SPC-8804-Z · D1592',
+      desc:'BALATA DISCO DELANTERA NISSAN VERSA 2012-2019 MARCH 2012-2023 NOTE 2014-2019 V-DRIVE 2020-2022',
+      marcas:['Fritec SPC','Raybestos 8804-D1592-SG','FAG D15928804'], precio:'$ 485', exist:'Hay 14 en Mérida',
+      anios:[2012,2019], medida:{tipo:'pastilla', texto:'13.87 cm'} },
+    s1462: { pos:'atras', titulo:'Balata de tambor trasera', codigo:'OW1462-ZV · S919',
+      desc:'BALATA TAMBOR TRASERA NISSAN VERSA BASE 4L 1.6 LTS 2009-2011 VERSA S 4L 1.6 LTS 2012',
+      marcas:['Fritec One Way'], precio:'$ 410', exist:'Hay 9 en Mérida',
+      anios:[2009,2012], medida:{tipo:'tambor', texto:'22.9 cm'} },
+    s1689: { pos:'atras', titulo:'Balata de tambor trasera', codigo:'OW1689-ZV · S1020',
+      desc:'BALATA TAMBOR TRASERA NISSAN VERSA 2012-2016 MARCH ADVANCE 2012-2016 MARCH SENSE 2012-2016',
+      marcas:['Fritec One Way'], precio:'$ 430', exist:'Hay 11 en Mérida',
+      anios:[2012,2016], medida:null }
+  };
+  const ANIO_MIN=2009, ANIO_MAX=2019;
+  const candidatas=(pos,anio)=>Object.entries(PIEZAS).filter(([,p])=>p.pos===pos&&anio>=p.anios[0]&&anio<=p.anios[1]).map(([k])=>k);
+
+  /* ---------- Estado ---------- */
+  const E={ anio:null, pos:null, pedido:[], visto:1 };
+  const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+  const reduce=matchMedia('(prefers-reduced-motion: reduce)');
+
+  /* ---------- Navegación entre pantallas ---------- */
+  function ir(n){
+    const actual=$('.pantalla:not([hidden])'), nueva=$(`.pantalla[data-p="${n}"]`);
+    if(actual===nueva) return;
+    if(actual) actual.hidden=true;
+    nueva.hidden=false; nueva.classList.add('entra');
+    requestAnimationFrame(()=>requestAnimationFrame(()=>nueva.classList.remove('entra')));
+    E.visto=Math.max(E.visto,n);
+    $$('.paso').forEach(b=>{const k=+b.dataset.ir; b.classList.toggle('actual',k===n); b.classList.toggle('hecho',k<=E.visto&&k!==n); b.disabled=!(k<=E.visto);});
+    window.scrollTo({top:0,behavior:reduce.matches?'auto':'smooth'});
+    const h=nueva.querySelector('h1'); if(h){h.setAttribute('tabindex','-1'); h.focus({preventScroll:true});}
+  }
+  $$('.paso').forEach(b=>b.addEventListener('click',()=>{ if(!b.disabled) ir(+b.dataset.ir); }));
+
+  /* ---------- Pantalla 1: entender lo que escribe ---------- */
+  const anioSel=$('#s-anio');
+  for(let a=ANIO_MAX;a>=ANIO_MIN;a--){const o=document.createElement('option');o.textContent=a;anioSel.appendChild(o);}
+  ['#s-marca','#s-modelo','#s-anio'].forEach(s=>$(s).addEventListener('change',()=>{$('#b-select').disabled=!($('#s-marca').value&&$('#s-modelo').value&&anioSel.value);}));
+  $('#b-select').addEventListener('click',()=>empezar(+anioSel.value,null));
+
+  function entender(texto){
+    const t=texto.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+    const r={versa:/versa/.test(t), pieza:/balat|freno|pastilla/.test(t), anio:null, pos:null};
+    const m4=t.match(/\b(19|20)\d{2}\b/); const m2=t.match(/\b(\d{2})\b/);
+    if(m4) r.anio=+m4[0]; else if(m2) r.anio=2000+(+m2[1]);
+    if(/delanter|adelant|enfrente|frente/.test(t)) r.pos='adelante';
+    else if(/traser|atras|detras/.test(t)) r.pos='atras';
+    return r;
+  }
+  function aviso1(txt){const m=$('#m1'); m.textContent=txt; m.hidden=!txt;}
+  $('#f-buscar').addEventListener('submit',e=>{
+    e.preventDefault();
+    const r=entender($('#q').value);
+    if(!$('#q').value.trim()){aviso1('Escribe la pieza y el coche, por ejemplo: balatas versa 2012.');return;}
+    if(!r.versa){aviso1('En este demo está cargado el Nissan Versa. Prueba con: balatas versa 2012.');return;}
+    if(r.anio&&(r.anio<ANIO_MIN||r.anio>ANIO_MAX)){aviso1(`En este demo el Versa va de ${ANIO_MIN} a ${ANIO_MAX}. Escribe un año en ese rango.`);return;}
+    if(!r.anio){aviso1('¿De qué año es el Versa? Agrégalo, por ejemplo: balatas versa 2012. Si no lo sabes, elige el año abajo o mira la tarjeta de circulación.');return;}
+    empezar(r.anio,r.pos);
+  });
+  $$('.sugerencia').forEach(b=>b.addEventListener('click',()=>{$('#q').value=b.dataset.q; $('#f-buscar').requestSubmit();}));
+
+  function empezar(anio,pos){
+    aviso1(''); E.anio=anio; E.pos=null;
+    $('#resultado').hidden=true; $('#resultado').innerHTML='';
+    $('#q-pos').hidden=false;
+    pintarEntendimos();
+    ir(2);
+    if(pos) elegirPos(pos);
+  }
+  function pintarEntendimos(){
+    const e=$('#entendimos');
+    e.innerHTML='<span>Balatas</span><span>Nissan Versa</span><span></span>'+(E.pos?'<span></span>':'')+'<button type="button">Cambiar</button>';
+    e.children[2].textContent=E.anio;
+    if(E.pos) e.children[3].textContent=E.pos==='adelante'?'Adelante':'Atrás';
+    e.querySelector('button').addEventListener('click',()=>ir(1));
+  }
+
+  /* ---------- Pantalla 2: adelante o atrás, y si hay dos, cómo saber cuál ---------- */
+  $$('.zona').forEach(z=>{
+    z.addEventListener('click',()=>elegirPos(z.dataset.pos));
+    z.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();elegirPos(z.dataset.pos);}});
+  });
+
+  function elegirPos(pos){
+    E.pos=pos; pintarEntendimos();
+    const c=candidatas(pos,E.anio), res=$('#resultado');
+    $('#q-pos').hidden=true; res.hidden=false; res.innerHTML='';
+    if(c.length===1){
+      res.append(hoja(`<h2>Solo hay una que le queda a tu Versa ${E.anio}.</h2>`, tarjetaPieza(c[0],'ok'), botonAgregar(c[0],'ok')));
+    } else if(c.length===0){
+      res.append(hoja(`<h2>No la tenemos ubicada para el Versa ${E.anio}.</h2><p class="sub">No te dejamos a ciegas: un vendedor de Beta te busca la correcta y te avisa antes de mandarla.</p>`, botonAgregar(null,'rev')));
+    } else {
+      res.append(resolver(c));
+    }
+    const otra=document.createElement('button'); otra.type='button'; otra.className='liga'; otra.textContent='Cambiar adelante o atrás';
+    otra.addEventListener('click',()=>{E.pos=null;pintarEntendimos();res.hidden=true;$('#q-pos').hidden=false;});
+    res.append(otra);
+  }
+
+  function hoja(...partes){const d=document.createElement('div');d.className='hoja';partes.forEach(p=>typeof p==='string'?d.insertAdjacentHTML('beforeend',p):d.append(p));return d;}
+  function tarjetaPieza(k,estado){
+    const p=PIEZAS[k], d=document.createElement('div'); d.className='pieza';
+    d.innerHTML=`<span class="sello ${estado}"><i>${estado==='ok'?'✓':'!'}</i>${estado==='ok'?`Verificada: le queda a tu Versa ${E.anio} (${p.pos==='adelante'?'adelante':'atrás'})`:'Un vendedor la confirma antes de salir'}</span>
+      <h3></h3><p class="codigo"></p><p class="desc"></p><div class="marcas"></div>
+      <div class="precio"><span>${p.exist} <span class="ej">(ejemplo)</span></span><b>${p.precio}</b></div>`;
+    d.querySelector('h3').textContent=p.titulo; d.querySelector('.codigo').textContent=p.codigo; d.querySelector('.desc').textContent=p.desc;
+    p.marcas.forEach(m=>{const s=document.createElement('span');s.textContent=m;d.querySelector('.marcas').append(s);});
+    return d;
+  }
+  function botonAgregar(k,estado,opciones){
+    const b=document.createElement('button'); b.type='button'; b.className='boton'; b.textContent='Agregar al pedido';
+    b.addEventListener('click',()=>{E.pedido.push({k,estado,anio:E.anio,pos:E.pos,opciones}); pintarPedido(); ir(3);});
+    return b;
+  }
+
+  const ICO={
+    regla:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="8" width="20" height="8" rx="2"/><path d="M6 8v3M10 8v4M14 8v3M18 8v4"/></svg>',
+    foto:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="6" width="18" height="14" rx="3"/><circle cx="12" cy="13" r="3.5"/><path d="M8 6l1.5-2h5L16 6"/></svg>',
+    duda:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5v.7"/><circle cx="12" cy="17" r=".6" fill="currentColor"/></svg>'
+  };
+
+  function resolver(c){
+    const cont=document.createElement('div'); cont.style.display='grid'; cont.style.gap='14px';
+    cont.append(hoja(`<h2>Para el Versa ${E.anio} hay dos balatas traseras.</h2><p class="sub">Te ayudamos a saber cuál es. Escoge lo que tengas a la mano.</p>`));
+    const caminos=document.createElement('div'); caminos.className='caminos';
+    const conMedida=c.find(k=>PIEZAS[k].medida), sinMedida=c.find(k=>!PIEZAS[k].medida);
+
+    // A · Medir la pieza vieja
+    const a=camino(ICO.regla,'Mídela con una regla','Si tienes la balata vieja a la mano');
+    a.dentro.innerHTML=`<p>Mide lo redondo de la balata, de punta a punta.</p>
+      <div class="plano">${dibujoTambor(PIEZAS[conMedida].medida.texto)}</div>
+      <p class="sub">¿Cuánto mide?</p>`;
+    const dosA=document.createElement('div'); dosA.className='dos';
+    const b1=document.createElement('button'); b1.type='button'; b1.className='chico'; b1.textContent='Unos 23 cm';
+    const b2=document.createElement('button'); b2.type='button'; b2.className='chico'; b2.textContent='Otra medida';
+    dosA.append(b1,b2); a.dentro.append(dosA);
+    b1.addEventListener('click',()=>decidir(cont,conMedida,'ok'));
+    b2.addEventListener('click',()=>decidir(cont,sinMedida,'rev',c));
+
+    // B · Foto de la tarjeta de circulación
+    const b=camino(ICO.foto,'Manda foto de la tarjeta de circulación','Casi todos la traen en la guantera');
+    b.dentro.innerHTML=`<div class="tarjeta-ej" aria-label="Tarjeta de circulación de ejemplo">
+        <span class="ej">Foto de ejemplo</span>
+        <div class="renglon"><span>Marca</span><span>Nissan</span></div>
+        <div class="renglon"><span>Modelo</span><span>Versa S 1.6</span></div>
+        <div class="renglon"><span>Año</span><span>${E.anio}</span></div>
+        <div class="renglon"><span>Número de serie</span><span>3N1CN7AD0CL000000</span></div>
+      </div>
+      <p class="sub">Con la tarjeta sabemos la versión exacta. En este ejemplo dice "Versa S", y la que le queda es una sola.</p>`;
+    const bB=document.createElement('button'); bB.type='button'; bB.className='boton'; bB.textContent='Usar la foto de ejemplo';
+    bB.addEventListener('click',()=>decidir(cont,conMedida,'ok')); b.dentro.append(bB);
+
+    // C · No sé
+    const cc=camino(ICO.duda,'No sé / no tengo cómo','No te preocupes');
+    cc.dentro.innerHTML=`<p>Lo mandamos con revisión: un vendedor de Beta confirma cuál es antes de que salga la camioneta.</p>`;
+    cc.dentro.append(botonAgregar(null,'rev',c));
+
+    caminos.append(a.el,b.el,cc.el); cont.append(caminos);
+    return cont;
+  }
+  function camino(ico,titulo,sub){
+    const el=document.createElement('div'); el.className='camino';
+    const id='c'+Math.random().toString(36).slice(2,8);
+    el.innerHTML=`<button type="button" aria-expanded="false" aria-controls="${id}"><span class="ico">${ico}</span><span><b></b><small></small></span></button><div class="cuerpo" id="${id}"><div><div class="dentro"></div></div></div>`;
+    el.querySelector('b').textContent=titulo; el.querySelector('small').textContent=sub;
+    const btn=el.querySelector('button');
+    btn.addEventListener('click',()=>{
+      const abierto=!el.classList.contains('abierto');
+      el.parentElement.querySelectorAll('.camino').forEach(x=>{x.classList.remove('abierto');x.querySelector('button').setAttribute('aria-expanded','false');});
+      if(abierto){el.classList.add('abierto');btn.setAttribute('aria-expanded','true');
+        el.querySelectorAll('.dibuja').forEach(p=>{p.style.animation='none';p.getBoundingClientRect();p.style.animation='';});}
+    });
+    return {el,dentro:el.querySelector('.dentro')};
+  }
+  function decidir(cont,k,estado,opciones){
+    cont.innerHTML='';
+    const titulo=estado==='ok'?'<h2>Es esta.</h2>':'<h2>Va con revisión.</h2><p class="sub">Un vendedor confirma cuál es antes de que salga. Te sugerimos esta:</p>';
+    cont.append(hoja(titulo,tarjetaPieza(k,estado),botonAgregar(k,estado,opciones)));
+  }
+
+  /* Dibujos técnicos: la flecha de medida se traza sola */
+  function dibujoTambor(medida){
+    return `<svg viewBox="0 0 300 190" aria-label="Balata de tambor: mide ${medida} de punta a punta">
+      <path class="trazo" d="M40 150 A110 110 0 0 1 260 150 L240 150 A90 90 0 0 0 60 150 Z"/>
+      <path class="trazo" d="M60 150 A90 90 0 0 1 82 92" style="stroke-dasharray:4 5"/>
+      <circle class="trazo" cx="150" cy="58" r="6"/>
+      <line class="cota dibuja" x1="40" y1="174" x2="260" y2="174" style="--l:220"/>
+      <line class="cota" x1="40" y1="158" x2="40" y2="182"/><line class="cota" x1="260" y1="158" x2="260" y2="182"/>
+      <path class="punta" d="M40 174l10-5v10z"/><path class="punta" d="M260 174l-10-5v10z"/>
+      <rect x="112" y="160" width="76" height="26" rx="13" fill="var(--fondo)"/>
+      <text class="cota-txt" x="150" y="179" text-anchor="middle">${medida}</text>
+    </svg>`;
+  }
+
+  /* ---------- Pantalla 3: pedido ---------- */
+  function pintarPedido(){
+    const d=$('#pedido'); d.innerHTML='';
+    const lista=document.createElement('div'); lista.style.display='grid'; lista.style.gap='12px';
+    E.pedido.forEach(it=>{
+      if(it.k){ const t=tarjetaPieza(it.k,it.estado); lista.append(t);
+        if(it.estado==='rev'&&it.opciones){const n=document.createElement('p');n.className='desc';n.textContent='El vendedor elige entre '+it.opciones.map(k=>PIEZAS[k].codigo.split(' · ')[0]).join(' y ')+'.';t.append(n);} }
+      else { const v=document.createElement('div'); v.className='pieza';
+        v.innerHTML=`<span class="sello rev"><i>!</i>Un vendedor la confirma antes de salir</span><h3>Balatas ${it.pos==='adelante'?'delanteras':'traseras'} · Nissan Versa ${it.anio}</h3>`;
+        if(it.opciones){const n=document.createElement('p');n.className='desc';n.textContent='El vendedor elige entre '+it.opciones.map(k=>PIEZAS[k].codigo.split(' · ')[0]).join(' y ')+'.';v.append(n);}
+        lista.append(v); }
+    });
+    d.append(lista);
+  }
+  $('#b-otra').addEventListener('click',()=>{$('#q').value='';ir(1);$('#q').focus();});
+
+  /* ---------- Pantalla 4: seguimiento que avanza solo ---------- */
+  const ETAPAS=[['Recibido','Beta ya tiene tu pedido'],['Surtido','Ya está listo en el almacén'],['En camino','El chofer salió'],['Entregado','Llegó a tu refaccionaria']];
+  const PALOMA='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+  let reloj=[];
+  $('#b-enviar').addEventListener('click',()=>{
+    if(!E.pedido.length) return;
+    ir(4); reloj.forEach(clearTimeout); reloj=[];
+    const ruta=$('#ruta'); ruta.innerHTML='';
+    const base=new Date(); const mins=[0,12,25,58];
+    ETAPAS.forEach(([t,s],i)=>{
+      const e=document.createElement('div'); e.className='etapa';
+      const h=new Date(base.getTime()+mins[i]*60000).toLocaleTimeString('es-MX',{hour:'numeric',minute:'2-digit'});
+      e.innerHTML=`<span class="bola">${PALOMA}</span><b></b><span></span><small></small>`;
+      e.querySelector('b').textContent=t; e.querySelector('small').textContent=s+' · '; const hh=document.createElement('span'); hh.style.whiteSpace='nowrap'; hh.textContent=h; e.querySelector('small').append(hh);
+      e.querySelector('span:not(.bola)').remove();
+      ruta.append(e);
+    });
+    const et=$$('.etapa'); $('#b-ahorro').disabled=true;
+    et.forEach((e,i)=>reloj.push(setTimeout(()=>{ et.forEach(x=>x.classList.remove('ahora')); e.classList.add('lista'); if(et[i+1]) et[i+1].classList.add('ahora'); if(i===et.length-1) $('#b-ahorro').disabled=false; }, 500+i*1500)));
+  });
+  $('#b-ahorro').addEventListener('click',()=>ir(5));
+
+  /* ---------- Pantalla 5: calculadora ---------- */
+  const fmt=n=>'$'+Math.round(n).toLocaleString('es-MX');
+  function calcular(){
+    const p=+$('#r-piezas').value, v=+$('#r-vuelta').value;
+    $('#v-piezas').textContent=p; $('#v-vuelta').textContent=fmt(v);
+    $('#v-mes').textContent=fmt(p*v)+' al mes'; $('#v-anio').textContent=fmt(p*v*12)+' al año';
+    $$('input[type=range]').forEach(r=>r.style.setProperty('--p',((r.value-r.min)/(r.max-r.min)*100)+'%'));
+  }
+  $$('input[type=range]').forEach(r=>r.addEventListener('input',calcular)); calcular();
+  $('#b-inicio').addEventListener('click',()=>{E.pedido=[];E.visto=1;$('#q').value='';reloj.forEach(clearTimeout);ir(1);});
+})();
+</script>
+</body>
+</html>
