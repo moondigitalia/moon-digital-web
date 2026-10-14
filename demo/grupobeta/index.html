@@ -261,12 +261,47 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
 .invita .bolita svg{width:20px;height:20px}
 .invita b{display:block;font-weight:650}
 .invita small{display:block;color:#b9c3e6;font-size:14px}
+/* ---------- Vista Grupo Beta: lo que ve su equipo por dentro ---------- */
+.vistas{display:flex;justify-content:center}
+.vistas div{display:inline-flex;border:1px solid var(--linea);border-radius:999px;background:var(--papel);padding:4px}
+.vistas button{border:0;background:none;font:600 14px var(--t);color:var(--suave);padding:9px 16px;border-radius:999px;cursor:pointer;transition:background-color var(--dur) var(--curva),color var(--dur) var(--curva)}
+.vistas button[aria-pressed="true"]{background:var(--tinta);color:var(--papel)}
+.beta{display:grid;gap:18px}
+.pestanas{display:flex;gap:8px;flex-wrap:wrap}
+.pestanas button{border:1px solid var(--linea);background:var(--papel);color:var(--tinta);font:600 13px var(--t);padding:8px 12px;border-radius:999px;cursor:pointer;display:inline-flex;gap:8px;align-items:center;transition:background-color var(--dur) var(--curva),border-color var(--dur) var(--curva)}
+.pestanas button[aria-selected="true"]{background:var(--azul-suave);border-color:var(--azul);color:var(--azul)}
+.pestanas .cuenta{min-width:22px;height:22px;border-radius:999px;background:var(--rev);color:var(--papel);font-size:12px;display:inline-grid;place-items:center;padding:0 6px}
+.cruda{font:500 13px/1.5 ui-monospace,Menlo,Consolas,monospace;background:var(--fondo);border-radius:18px;padding:14px 16px;color:var(--tinta);word-break:break-word;letter-spacing:.01em}
+.cruda mark{background:var(--rev-suave);color:var(--rev);border-radius:4px;padding:0 2px}
+.flecha{justify-self:center;width:44px;height:44px;border-radius:50%;border:1px solid var(--linea);display:grid;place-items:center;color:var(--azul);transition:opacity var(--dur) var(--curva)}
+.tabla-o{width:100%;border-collapse:separate;border-spacing:0;font-size:14px}
+.tabla-o th{text-align:left;font-size:12px;color:var(--suave);font-weight:600;padding:0 8px 6px}
+.tabla-o td{padding:8px;border-top:1px solid var(--linea);font-variant-numeric:tabular-nums}
+.tabla-o tr{transition:opacity 300ms var(--curva),transform 300ms var(--curva)}
+.tabla-o tr.nueva{opacity:0;transform:translateY(6px)}
+@media (prefers-reduced-motion:reduce){.tabla-o tr.nueva{transform:none}}
+.envoltura{overflow-x:auto;margin:0 -4px;padding:0 4px}
+.duda{display:grid;grid-template-columns:28px 1fr;gap:10px;align-items:start;font-size:14px}
+.duda i{width:28px;height:28px;border-radius:50%;background:var(--rev-suave);color:var(--rev);display:grid;place-items:center;font-style:normal;font-weight:800;font-size:13px}
+.duda small{display:block;color:var(--suave);font-size:12px}
+.grupo{border:1px solid var(--linea);border-radius:24px;padding:14px 16px;display:grid;gap:8px;background:var(--papel)}
+.grupo h3{margin:0;font:650 15px var(--t);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.grupo h3 span{font-weight:500;color:var(--suave);font-size:13px}
+.contador{font-size:14px;color:var(--suave);font-variant-numeric:tabular-nums}
+.duda-pedido{border:1px solid var(--linea);border-radius:24px;padding:16px;display:grid;gap:10px;background:var(--papel);transition:border-color var(--dur) var(--curva),background-color var(--dur) var(--curva)}
+.duda-pedido.lista{border-color:var(--ok);background:var(--ok-suave)}
+.duda-pedido .quien{font-size:13px;color:var(--suave)}
+.duda-pedido h3{margin:0;font:650 16px var(--t)}
+.opciones{display:flex;gap:8px;flex-wrap:wrap}
+.vacio{text-align:center;color:var(--suave);font-size:15px;padding:18px}
 </style>
 </head>
 <body>
 <div class="marco">
   <div class="arriba"><p class="aviso"><b>Demo de MOON Digital para Grupo Beta.</b> Piezas de su catálogo público; precios y existencias son de ejemplo.</p>
     <div class="idioma" role="group" aria-label="Idioma"><button type="button" data-lang="es" aria-pressed="true">ES</button><button type="button" data-lang="en" aria-pressed="false">EN</button></div></div>
+
+  <div class="vistas"><div role="group" aria-label="Vista"><button type="button" data-vista="refa" aria-pressed="true">Refaccionaria</button><button type="button" data-vista="beta" aria-pressed="false">Grupo Beta</button></div></div>
 
   <nav class="pasos" aria-label="Pasos del pedido">
     <button class="paso actual" data-ir="1" aria-label="Paso 1: buscar">1</button>
@@ -395,6 +430,45 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
     <button class="liga" type="button" id="b-inicio">Empezar de nuevo</button>
     <p class="firma">Preparado por MOON Digital</p>
   </section>
+
+  <!-- Vista Grupo Beta -->
+  <section class="beta" id="vista-beta" hidden aria-labelledby="tb">
+    <h1 id="tb">Así lo ve su equipo</h1>
+    <div class="pestanas" role="tablist">
+      <button type="button" role="tab" id="tab-ord" aria-selected="true" aria-controls="panel-ord">Agente Ordenador</button>
+      <button type="button" role="tab" id="tab-ped" aria-selected="false" aria-controls="panel-ped">Pedidos con duda <span class="cuenta" id="cuenta-ped">0</span></button>
+    </div>
+
+    <div id="panel-ord" role="tabpanel" aria-labelledby="tab-ord" style="display:grid;gap:16px">
+      <div class="hoja">
+        <h2>Así llega una ficha de su catálogo</h2>
+        <p class="sub">Es el nombre real de una balata en su página. Toda la información está ahí, pero en un solo renglón.</p>
+        <div class="cruda" id="ord-cruda"></div>
+        <button class="boton" type="button" id="b-ordenar">Ordenar esta ficha</button>
+        <div id="ord-una" hidden style="display:grid;gap:12px">
+          <div class="envoltura"><table class="tabla-o" id="ord-tabla"></table></div>
+          <div id="ord-dudas-una" style="display:grid;gap:10px"></div>
+        </div>
+      </div>
+      <div class="hoja" id="ord-todas-hoja" hidden>
+        <h2>Ahora, todas las fichas de balatas del Versa</h2>
+        <p class="sub">Las 22 que vimos en su página. Las junta por pieza (las que son iguales en distintas marcas) y busca lo que no cuadra.</p>
+        <button class="boton" type="button" id="b-ordenar-todas">Ordenar las 22 fichas</button>
+        <p class="contador" id="ord-contador" aria-live="polite"></p>
+        <div id="ord-grupos" style="display:grid;gap:10px"></div>
+      </div>
+      <div class="hoja" id="ord-dudas-hoja" hidden>
+        <h2>Lo que no cuadra, para su equipo</h2>
+        <p class="sub">El agente no decide solo cuando duda: lo junta en esta lista. Su equipo contesta una vez y la ficha queda corregida.</p>
+        <div id="ord-dudas" style="display:grid;gap:12px"></div>
+      </div>
+    </div>
+
+    <div id="panel-ped" role="tabpanel" aria-labelledby="tab-ped" hidden style="display:grid;gap:14px">
+      <p class="sub">Lo que el Agente de Mostrador no pudo confirmar solo. Un vendedor de Beta decide con un toque, y la refaccionaria recibe el aviso.</p>
+      <div id="lista-ped" style="display:grid;gap:12px"></div>
+    </div>
+  </section>
 </div>
 
 <!-- Recorrido narrado (mismo link: ?ver=recorrido lo abre directo) -->
@@ -422,6 +496,20 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
   /* ---------- Idioma: español / inglés. El texto en español es la fuente; el inglés se aplica encima y se quita al volver. ---------- */
   let LANG='es';
   const EXACTO={
+    // Vista Grupo Beta
+    'Refaccionaria':'Parts store','Así lo ve su equipo':'What your team sees','Agente Ordenador':'Organizer Agent','Pedidos con duda':'Orders to check',
+    'Así llega una ficha de su catálogo':'This is how a listing comes in from your catalog',
+    'Es el nombre real de una balata en su página. Toda la información está ahí, pero en un solo renglón.':'This is the real name of a brake pad on your site. All the information is there, but on a single line.',
+    'Ordenar esta ficha':'Organize this listing','Motor':'Engine','Años':'Years','(sin modelo)':'(no model)',
+    'Ahora, todas las fichas de balatas del Versa':'Now, every Versa brake pad listing',
+    'Las 22 que vimos en su página. Las junta por pieza (las que son iguales en distintas marcas) y busca lo que no cuadra.':"The 22 we saw on your site. It groups them by part (the ones that are the same across brands) and looks for what doesn't add up.",
+    'Ordenar las 22 fichas':'Organize the 22 listings',"Lo que no cuadra, para su equipo":"What doesn't add up, for your team",
+    'El agente no decide solo cuando duda: lo junta en esta lista. Su equipo contesta una vez y la ficha queda corregida.':"When in doubt, the agent doesn't decide alone: it adds it to this list. Your team answers once and the listing stays fixed.",
+    'Varias piezas para el mismo coche':'Several parts for the same car',
+    'Lo que el Agente de Mostrador no pudo confirmar solo. Un vendedor de Beta decide con un toque, y la refaccionaria recibe el aviso.':"What the Counter Agent couldn't confirm on its own. A Beta salesperson decides with one tap, and the parts store gets notified.",
+    'Su pedido de esta prueba':'Your order from this test','Refaccionaria en Mérida (ejemplo)':'Parts store in Mérida (example)','Refaccionaria en Cancún (ejemplo)':'Parts store in Cancún (example)',
+    'Ya la encontré':'I found it','No encontramos la pieza en su catálogo: hay que buscarla.':"We didn't find the part in your catalog: it needs to be looked up.",
+    'FAG semimetálica':'FAG semi-metallic','FAG cerámica':'FAG ceramic','FP cerámica':'FP ceramic','Brembo metálica':'Brembo metallic','Brembo cerámica':'Brembo ceramic',
     'Demo de MOON Digital para Grupo Beta.':'MOON Digital demo for Grupo Beta.',
     'Piezas de su catálogo público; precios y existencias son de ejemplo.':'Parts from your public catalog; prices and stock are examples.',
     '¿Qué pieza necesitas?':'Which part do you need?',
@@ -477,6 +565,21 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
     '¿De qué año es el Versa? Agrégalo, por ejemplo: balatas versa 2012. Si no lo sabes, viene en la tarjeta de circulación.':"What year is the Versa? Add it, for example: brake pads versa 2012. If you don't know, it's on the registration card."
   };
   const PATRONES=[
+    // Vista Grupo Beta
+    [/^Leyendo ficha (\d+) de (\d+)…$/,'Reading listing $1 of $2…'],
+    [/^(\d+) fichas leídas · (\d+) piezas distintas(?: · (\d+) dudas para su equipo)?$/,(m,a,b,c)=>`${a} listings read · ${b} different parts`+(c?` · ${c} questions for your team`:'')],
+    [/^(\d+) fichas? · (\d+) marcas?$/,(m,a,b)=>`${a} ${a==='1'?'listing':'listings'} · ${b} ${b==='1'?'brand':'brands'}`],
+    [/^Balata (delantera|trasera) · (clave|número) (.+)$/,(m,a,b,c)=>`${a==='delantera'?'Front':'Rear'} pad · ${b==='clave'?'code':'number'} ${c}`],
+    [/^Dice «(.+)»: ¿quiso decir «(.+)»\?$/,'It says «$1»: did you mean «$2»?'],
+    [/^(.+): dice «(.+)», ¿quiso decir (.+)\?$/,'$1: it says «$2», did you mean $3?'],
+    [/^(.+): dice «(.+)», año incompleto$/,'$1: it says «$2», incomplete year'],
+    [/^Dice «(.+)» sin el modelo antes: ¿es (.+)\?$/,'It says «$1» with no model before it: is it $2?'],
+    [/^Misma pieza \((.+)\), fichas con años distintos$/,'Same part ($1), listings with different years'],
+    [/^Versa (.+), (delantera|trasera): le quedan (\d+) piezas distintas \((.+)\)\. ¿Cuál es la buena, o depende de la versión\?$/,(m,a,b,n,c)=>`Versa ${a.replace(' a ',' to ')}, ${b==='delantera'?'front':'rear'}: ${n} different parts fit (${c}). Which one is right, or does it depend on the trim?`],
+    [/^Balatas (delanteras|traseras) · Nissan Versa (\d{4})$/,(m,a,b)=>`${a==='delanteras'?'Front':'Rear'} pads · Nissan Versa ${b}`],
+    [/^Su catálogo tiene (\d+) piezas para este coche: (.+)\.$/,'Your catalog has $1 parts for this car: $2.'],
+    [/^Mandar (.+)$/,'Send $1'],
+    [/^Confirmada: (.+) · se avisó a la refaccionaria$/,(m,a)=>`Confirmed: ${a==='pieza encontrada'?'part found':a} · the parts store was notified`],
     [/^Solo hay una que le queda a tu Versa (\d{4})\.$/,'Only one fits your $1 Versa.'],
     [/^Es la misma pieza en una marca\.$/,'It is the same part in one brand.'],
     [/^Es la misma pieza en (\d+) versiones de (\d+) marcas: escoge la que tengas a la mano\.$/,'It is the same part in $1 versions from $2 brands: pick the one you have on hand.'],
@@ -494,7 +597,8 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
     [/^(.*?)(\d+) fichas? dic(?:e|en) (\S+)(.*)$/,null],
     [/^(\$[\d,]+) al mes$/,'$1 a month'],[/^(\$[\d,]+) al año$/,'$1 a year'],
     [/^En este demo el Versa va de (\d{4}) a (\d{4})\. Escribe un año en ese rango\.$/,'In this demo the Versa goes from $1 to $2. Type a year in that range.'],
-    [/^(Beta ya tiene tu pedido|Ya está listo en el almacén|El chofer marcó «Salí»|El chofer marcó «Entregué») · $/,(m,a)=>EXACTO[a]+' · ']
+    [/^(Beta ya tiene tu pedido|Ya está listo en el almacén|El chofer marcó «Salí»|El chofer marcó «Entregué») · $/,(m,a)=>EXACTO[a]+' · '],
+    [/^([A-Z][^:?«]*): ([^?«]*\d{4}[^?«]*)$/,(m,a,b)=>a+': '+b.replace(/semimetálica/g,'semi-metallic').replace(/cerámica/g,'ceramic').replace(/metálica/g,'metallic').replace(/(\d{4}) a (\d{4})/g,'$1 to $2')],
   ];
   function traducir(es){
     const t=es.trim(); if(!t) return es;
@@ -617,32 +721,32 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
      Se agrupan por su clave de equivalencia (la misma pieza en varias marcas). Precios y existencias de ejemplo. ---------- */
   const FICHAS=[
     // Delantera · clave D1592
-    {c:'D1592',pos:'adelante',marca:'Fritec SPC',sku:'SPC-8804-Z',a:[2012,2019]},
-    {c:'D1592',pos:'adelante',marca:'FAG semimetálica',sku:'D15928804',a:[2012,2019]},
-    {c:'D1592',pos:'adelante',marca:'FAG cerámica',sku:'CMD15928804',a:[2012,2019]},
-    {c:'D1592',pos:'adelante',marca:'Fritec Azul',sku:'M-8804-Z',a:[2012,2019]},
-    {c:'D1592',pos:'adelante',marca:'FP',sku:'41080-1HL0AFP',a:[2012,2019]},
-    {c:'D1592',pos:'adelante',marca:'FP cerámica',sku:'41080-1HL0ACFP',a:[2012,2019]},
-    {c:'D1592',pos:'adelante',marca:'Brembo metálica',sku:'P56070',a:[2012,2019]},
-    {c:'D1592',pos:'adelante',marca:'Brembo cerámica',sku:'P56070N',a:[2012,2019]},
-    {c:'D1592',pos:'adelante',marca:'Raybestos',sku:'8804-D1592-SG',a:[2012,2012]},
+    {c:'D1592',pos:'adelante',marca:'Fritec SPC',sku:'SPC-8804-Z',desc:'BALATA DISCO DELANTERA NISSAN VERSA 2012-2019 MARCH 2012-2023 NOTE 2014-2019 V-DRIVE 2020-2022 TOYOYA YARIS 2023-2024 ANTES: SPC-8X48-Z F381 ()',a:[2012,2019]},
+    {c:'D1592',pos:'adelante',marca:'FAG semimetálica',sku:'D15928804',desc:'BALATA DISCO DELANTERA NISSAN VERSA 2012-2019 MARCH 2012-2023 NOTE 2013-2019 ()',a:[2012,2019]},
+    {c:'D1592',pos:'adelante',marca:'FAG cerámica',sku:'CMD15928804',desc:'BALATA DISCO DELANTERA NISSAN VERSA 2012-2019 MARCH 2012-2023 NOTE 2014-2019 V-DRIVE 2020-2024 ()',a:[2012,2019]},
+    {c:'D1592',pos:'adelante',marca:'Fritec Azul',sku:'M-8804-Z',desc:'BALATA DISCO DELANTERA NISSAN MARCH 2012-2023 VERSA 2012-2019 NOTE 2014-2019 V-DRIVE 2021-2022 TOYOTA YARIS 2023-2024 ANTES: M-8X48-Z F381 ()',a:[2012,2019]},
+    {c:'D1592',pos:'adelante',marca:'FP',sku:'41080-1HL0AFP',desc:'BALATA DISCO DELANTERA NISSAN VERSA 4L 1.6 LTS 2012-2019 MARCH 4L 1.6 LTS 2012-2023 NOTE 4L 1.6 LTS 2014-2019 V-DRIVE 4L 1.6 LTS 2020-204 ANTES: 8X48-ZF381 ()',a:[2012,2019]},
+    {c:'D1592',pos:'adelante',marca:'FP cerámica',sku:'41080-1HL0ACFP',desc:'BALATA DISCO CERAMICA DELANTERA NISSAN MARCH 4L 1.6 LTS 2012-2023 VERSA 4L 1.6 LTS 2012-2019 NOTE 4L 1.6 LTS 2014-2019 DOHC 16 VALVULAS V-DRIVE 4L 1.6 LTS 2020-2022 ()',a:[2012,2019]},
+    {c:'D1592',pos:'adelante',marca:'Brembo metálica',sku:'P56070',desc:'BALATA DISCO METALICA DELANTERA NISSAN VERSA ADVANCE 2012-2019 VERSA DRIVE 2017-2019 VERSA EXCLUSIVE 2013-2019 VERSA SENSE 2012-2019 NOTE ADVANCE 2014-2019 NOTE DRIVE 2016-2019 ()',a:[2012,2019]},
+    {c:'D1592',pos:'adelante',marca:'Brembo cerámica',sku:'P56070N',desc:'BALATA DISCO CERAMICA DELANTERA NISSAN VERSA ADVANCE 2012-2019 VERSA DRIVE 2017-2019 VERSA EXCLUSIVE 2013-2019 MARCH ACTIVE 2014 MARCH ACTIVE 2016-2018 MARCH ACTIVE CARGO 2016-2018 NOTE ADVANCE 2014-2019 NOTE DRIVE 2016-2019 ()',a:[2012,2019]},
+    {c:'D1592',pos:'adelante',marca:'Raybestos',sku:'8804-D1592-SG',desc:'BALATA DISCO CERAMICA DELANTERA NISSAN MARCH 2012 VERSA 2012 ()',a:[2012,2012]},
     // Delantera · clave D2038
-    {c:'D2038',pos:'adelante',marca:'Fritec SPC',sku:'SPC-9269-Z',a:[2020,2026]},
-    {c:'D2038',pos:'adelante',marca:'Brembo metálica',sku:'P49055',a:[2020,2024]},
-    {c:'D2038',pos:'adelante',marca:'Brembo cerámica',sku:'P49055N',a:[2020,2024]},
-    {c:'D2038',pos:'adelante',marca:'FAG cerámica',sku:'CMD20389269',a:[2020,2023]},
-    {c:'D1060-5RB0B',pos:'adelante',marca:'FP',sku:'D1060-5RB0BFP',a:[2020,2024],sinClave:true},
+    {c:'D2038',pos:'adelante',marca:'Fritec SPC',sku:'SPC-9269-Z',desc:'BALATA DISCO DELANTERA NISSAN VERSA S 4L 1.6 LTS 2020 VERSA SR 4 1.6 LTS 2020-2026 VERSA SV 4L 1.6 LTS 2020-2026 NISSAN TRUCK KICKS ADVANCE 4L 1.6 LTS 2017-2020 KICKS BITONO 4L 1.6 LTS 2017-2018 V-DRIVE 4L 1.6 LTS 2026 1598 HR16DE DOHC 16 VALVULAS =D2038 ()',a:[2020,2026]},
+    {c:'D2038',pos:'adelante',marca:'Brembo metálica',sku:'P49055',desc:'BALATA DISCO METALICA DELANTERA NISSAN VERSA ADVANCE 2020-2024 VERSA EXCLUSIVE 2020-2024 VERSA PLATINUM 2020-2022 TOYOTA YARIS L 2019-2020 YARIS LE 2019-2020 YARIS XLE 2019-2020 NISSAN TRUCK KICKS ADVANCE 2017-2019 ()',a:[2020,2024]},
+    {c:'D2038',pos:'adelante',marca:'Brembo cerámica',sku:'P49055N',desc:'BALATA DISCO CERAMICA DELANTERA NISSAN VERSA ADVANCE 2020-2024 VERSA EXCLUSIVE 2020-2024 VERSA PLATINUM 2020-2022 VERSA SENSE 2020-2024 TOYOTA YARIS L 2019-2020 YARIS LE 2019-2020 YARIS XLE 2019-2020 YARIS R BASE 2016 ()',a:[2020,2024]},
+    {c:'D2038',pos:'adelante',marca:'FAG cerámica',sku:'CMD20389269',desc:'BALATA DISCO DELANTERA NISSAN VERSA 4L 1.6 LTS 2020-2023 NISSAN TRUCK KICKS 4L 1.6 LTS 2017-2023 ()',a:[2020,2023]},
+    {c:'D1060-5RB0B',pos:'adelante',marca:'FP',sku:'D1060-5RB0BFP',desc:'BALATA DISCO DELANTERA NISSAN VERSA II 2020-2024 NISSAN TRUCK KICKS 2017-2020 ()',a:[2020,2024],sinClave:true},
     // Trasera · clave S919
-    {c:'S919',pos:'atras',marca:'Fritec One Way',sku:'OW1462-ZV',a:[2009,2012],nota:'Su ficha dice: Versa Base 2009-2011 y Versa S 2012'},
+    {c:'S919',pos:'atras',marca:'Fritec One Way',sku:'OW1462-ZV',desc:'BALATA TAMBOR TRASERA NISSAN VERSA BASE 4L 1.6 LTS 2009-2011 VERSA S 4L 1.6 LTS 2012 SENTRA BASE 4L 2.0 LTS 2007-2012 SENTRA CUSTOM 4L 2.0 LTS 2007-2012 CHRYSLER SEBRING BASE 4L 2.4 LTS 2007 DODGE AVENGER SE 4L 2.0 LTS 2008-2009 S919 1462-S919-SM ()',a:[2009,2012],nota:'Su ficha dice: Versa Base 2009-2011 y Versa S 2012'},
     // Trasera · clave S1020
-    {c:'S1020',pos:'atras',marca:'Fritec One Way',sku:'OW1689-ZV',a:[2012,2016]},
-    {c:'S1020',pos:'atras',marca:'Raybestos',sku:'1689-S1020-SM',a:[2012,2016]},
-    {c:'S1020',pos:'atras',marca:'FAG',sku:'S10201689',a:[2012,2019]},
-    {c:'S1020',pos:'atras',marca:'FP',sku:'44060-1HL0BFP',a:[2012,2019]},
+    {c:'S1020',pos:'atras',marca:'Fritec One Way',sku:'OW1689-ZV',desc:'BALATA TAMBOR TRASERA NISSAN VERSA 2012-2016 MARCH ADVANCE 2012-2016 MARCH DRIVE 2012-2013 MARCH SENSE 2012-2016 =S1020 ()',a:[2012,2016]},
+    {c:'S1020',pos:'atras',marca:'Raybestos',sku:'1689-S1020-SM',desc:'BALATA SEMI METALICA TRASERA NISSAN MARCH 2012-2016 NOTE 2014-2016 VERSA 2012-2016 ()',a:[2012,2016]},
+    {c:'S1020',pos:'atras',marca:'FAG',sku:'S10201689',desc:'BALATA TAMBOR TRASERA NISSAN MARCH 2012-2023 VERSA 2012-2019 NOTE 2014-2019 V-DRIVE 2020-2024 ()',a:[2012,2019]},
+    {c:'S1020',pos:'atras',marca:'FP',sku:'44060-1HL0BFP',desc:'BALATA TAMBOR TRASERA NISSAN VERSA 4L 1.6 LTS 2012-2019 MARCH 4L 1.6 LTS 2012-2023 NOTE 4L 1.6 LTS 2014-2019 V-DRIVE 2020-2024 1689-S1020 ANTES: A903 ()',a:[2012,2019]},
     // Trasera · Versa nuevo
-    {c:'FT119',pos:'atras',marca:'Fritec One Way',sku:'OW1Y21-ZV',a:[2020,2022]},
-    {c:'S1106',pos:'atras',marca:'FAG',sku:'S11061751',a:[2020,2021]},
-    {c:'D4060-5RB0A',pos:'atras',marca:'FP',sku:'D4060-5RB0AFP',a:[2020,2024],sinClave:true}
+    {c:'FT119',pos:'atras',marca:'Fritec One Way',sku:'OW1Y21-ZV',desc:'BALATA TAMBOR TRASERA NISSAN ADVANCE 4L 1.6 LTS 2020-2021 VERSA EXCLUSIVE 4L 1.6 LTS 2020-2021 VERSA 4L 1.6 LTS 2020-2021 VERSA S 4L 1.6 LTS 2020-2022 VERSA SENSA 4L 1.6 LTS 2020-2021=FT119 ()',a:[2020,2022]},
+    {c:'S1106',pos:'atras',marca:'FAG',sku:'S11061751',desc:'BALATA TAMBOR TRASERA NISSAN TRUCK KICKS 4L 1.6 LTS 2017-2023 VERSA 4L 1.6 LTS 2020-2021 ()',a:[2020,2021]},
+    {c:'D4060-5RB0A',pos:'atras',marca:'FP',sku:'D4060-5RB0AFP',desc:'BALATA TAMBOR TRASERA NISSAN VERSA 4L 1.6 LTS 2020-2024 NISSAN TRUCK KICKS 4L 1.6 LTS 2017-2020 ()',a:[2020,2024],sinClave:true}
   ];
   const PRECIO={D1592:'$ 485',D2038:'$ 560','D1060-5RB0B':'$ 590',S919:'$ 410',S1020:'$ 430',FT119:'$ 470',S1106:'$ 455','D4060-5RB0A':'$ 495'};
   const ANIO_MIN=2009, ANIO_MAX=2026;
@@ -884,6 +988,157 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
   }
   $$('input[type=range]').forEach(r=>r.addEventListener('input',calcular)); calcular();
   $('#b-inicio').addEventListener('click',()=>{E.pedido=[];E.visto=1;$('#q').value='';reloj.forEach(clearTimeout);ir(1);});
+  /* ---------- Agente Ordenador: lee el nombre de cada ficha y lo acomoda en tabla (lector real, no simulado) ---------- */
+  const MARCAS_AUTO=['NISSAN','TOYOTA','CHRYSLER','DODGE','CHEVROLET','FORD','VOLKSWAGEN','HONDA','MAZDA','JEEP','SUZUKI','KIA','HYUNDAI','RENAULT','SEAT'];
+  const MODELOS=['VERSA','MARCH','NOTE','V-DRIVE','YARIS','SENTRA','SEBRING','AVENGER','KICKS','TSURU','AVEO','JETTA'];
+  const VERSIONES=['BASE','S','ADVANCE','DRIVE','EXCLUSIVE','SENSE','ACTIVE','CARGO','CUSTOM','SE','SR','SV','PLATINUM','II','BITONO','L','LE','XLE','R'];
+  function distancia(a,b){ const m=a.length,n=b.length,d=Array.from({length:m+1},(_,i)=>[i,...Array(n).fill(0)]); for(let j=1;j<=n;j++) d[0][j]=j; for(let i=1;i<=m;i++) for(let j=1;j<=n;j++) d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1)); return d[m][n]; }
+  function leerFicha(texto){
+    let t=texto.replace(/\(\)\s*$/,'').replace(/ANTES:.*$/,'').replace(/=\S+/g,'').trim();
+    const datos={tipo:null,posicion:null,filas:[],dudas:[]};
+    const tk=t.split(/\s+/); let i=0;
+    if(tk[i]==='BALATA') i++;
+    const tipos=[]; while(i<tk.length && /^(DISCO|TAMBOR|SEMI|METALICA|CERAMICA)$/.test(tk[i])) tipos.push(tk[i++]);
+    datos.tipo=tipos.join(' ').toLowerCase().replace('semi metalica','semimetálica').replace('metalica','metálica').replace('ceramica','cerámica');
+    if(/^(DELANTERA|TRASERA)$/.test(tk[i])) datos.posicion=tk[i++]==='DELANTERA'?'adelante':'atrás';
+    let marca=null, buf=[];
+    const cierra=(anios)=>{
+      // buf: [modelo, versiones..., motor..., extras...]
+      let w=buf.slice(); buf=[];
+      while(w.length && MARCAS_AUTO.includes(w[0])){ marca=w.shift(); }
+      // palabras sueltas antes del modelo (ej. "DOHC 16 VALVULAS") pertenecen a la fila anterior
+      const im=w.findIndex(x=>MODELOS.includes(x));
+      if(im>0 && datos.filas.length && !MARCAS_AUTO.some(m=>distancia(m,w[0])<=1)){ const prev=datos.filas[datos.filas.length-1]; prev.extra=(prev.extra+' '+w.splice(0,im).join(' ').toLowerCase()).trim(); }
+      if(w.length && !MODELOS.includes(w[0]) && !VERSIONES.includes(w[0])){
+        const cerca=MARCAS_AUTO.find(m=>distancia(m,w[0])===1);
+        if(cerca){ datos.dudas.push({tipo:'dedazo',texto:`Dice «${w[0]}»: ¿quiso decir «${cerca}»?`}); marca=cerca; w.shift(); }
+      }
+      if(w.length && VERSIONES.includes(w[0]) && !MODELOS.includes(w[0])) datos.dudas.push({tipo:'falta',texto:`Dice «${w[0]}» sin el modelo antes: ¿es Versa ${w[0][0]+w[0].slice(1).toLowerCase()}?`});
+      const modelo=(w.length && VERSIONES.includes(w[0]) && !MODELOS.includes(w[0]))?'?':(w.shift()||'?');
+      const ver=[]; while(w.length && (VERSIONES.includes(w[0]) || (w[0].length>3 && VERSIONES.some(v=>v.length>3&&distancia(v,w[0])===1)))){ let v=w.shift(); if(!VERSIONES.includes(v)){ const ok=VERSIONES.find(z=>z.length>3&&distancia(z,v)===1); datos.dudas.push({tipo:'dedazo',texto:`Dice «${modelo} ${v}»: ¿quiso decir «${modelo} ${ok}»?`}); v=ok; } ver.push(v); }
+      let motor=null; const mi=w.findIndex((x,k)=>/^\d\.\d$/.test(x)&&w[k+1]==='LTS'); if(mi>=0){ motor=w[mi]+' L'; w.splice(Math.max(0,mi-1),3); }
+      const extra=w.filter(x=>!/^(4L|4|V6|V8|LTS)$/.test(x)).join(' ').toLowerCase();
+      let [desde,hasta]=anios.split('-'); desde=+desde; hasta=hasta===undefined?desde:hasta;
+      if(String(hasta).length!==4){
+        // año incompleto: probamos agregarle un dígito y nos quedamos con el año posible más cercano
+        const h=String(hasta), cand=[]; for(let k=0;k<=h.length;k++) for(let dgt=0;dgt<=9;dgt++){ const c=+(h.slice(0,k)+dgt+h.slice(k)); if(String(c).length===4&&c>=desde&&c<=2027) cand.push(c); }
+        const bueno=cand.sort((x,y)=>x-y)[0];
+        const nom=modelo==='V-DRIVE'?'V-Drive':modelo[0]+modelo.slice(1).toLowerCase();
+        datos.dudas.push({tipo:'dedazo',texto:bueno?`${nom}: dice «${anios}», ¿quiso decir ${desde}-${bueno}?`:`${nom}: dice «${anios}», año incompleto`});
+        hasta=bueno||desde;
+      }
+      else hasta=+hasta;
+      datos.filas.push({marca:marca?marca[0]+marca.slice(1).toLowerCase():'',modelo:modelo==='?'?'(sin modelo)':modelo==='V-DRIVE'?'V-Drive':modelo[0]+modelo.slice(1).toLowerCase(),version:ver.map(v=>v.length<=2?v:v[0]+v.slice(1).toLowerCase()).join(' '),motor,desde,hasta,extra});
+    };
+    for(;i<tk.length;i++){
+      const x=tk[i];
+      if(/^\d{4}(-\d{2,4})?$/.test(x)){ if(buf.length) cierra(x); }
+      else if(/^[A-Z0-9]+-[A-Z0-9-]+$/.test(x)&&!MODELOS.includes(x)) continue; // códigos sueltos
+      else if(/^S\d{3,4}$/.test(x)) continue;
+      else if(x==='TRUCK') continue;
+      else buf.push(x);
+    }
+    return datos;
+  }
+  // Compara fichas de la misma clave: mismo modelo con años distintos = duda para su equipo
+  function compararFichas(fichas){
+    const dudas=[]; const porModelo={};
+    fichas.forEach(f=>f.leida.filas.forEach(r=>{ if(r.marca&&r.marca!=='Nissan') return; const k=r.modelo+(r.version?' '+r.version:''); (porModelo[k]=porModelo[k]||[]).push({marca:f.marca,desde:r.desde,hasta:r.hasta}); }));
+    Object.entries(porModelo).forEach(([mod,l])=>{
+      const rangos=[...new Set(l.map(x=>x.desde+'-'+x.hasta))];
+      if(rangos.length>1 && l.length>1){
+        const grupos=rangos.map(rg=>`${l.filter(x=>x.desde+'-'+x.hasta===rg).map(x=>x.marca).join(', ')}: ${rg.split('-')[0]===rg.split('-')[1]?rg.split('-')[0]:rg.replace('-',' a ')}`);
+        dudas.push({tipo:'choque',texto:`${mod}: ${grupos.join(' · ')}`});
+      }
+    });
+    return dudas;
+  }
+
+  /* ---------- Vista Grupo Beta ---------- */
+  const EJ_FICHA=FICHAS.find(f=>f.sku==='SPC-8804-Z');
+  function pintarCruda(){ const c=$('#ord-cruda'); c.textContent=EJ_FICHA.desc; }
+  pintarCruda();
+  function filaHTML(r){ return `<tr class="nueva"><td>${esc(r.marca)}</td><td><b>${esc(r.modelo)}</b>${r.version?' '+esc(r.version):''}</td><td>${r.motor?esc(r.motor):'—'}</td><td>${r.desde===r.hasta?r.desde:r.desde+' – '+r.hasta}</td></tr>`; }
+  const CAB='<thead><tr><th>Marca</th><th>Modelo</th><th>Motor</th><th>Años</th></tr></thead>';
+  function dudaHTML(d,origen){ return `<div class="duda"><i>!</i><span>${esc(d.texto)}${origen?`<small>${esc(origen)}</small>`:''}</span></div>`; }
+  function aparecer(cont,ms){ const filas=[...cont.querySelectorAll('tr.nueva')]; filas.forEach((tr,k)=>setTimeout(()=>tr.classList.remove('nueva'),reduce.matches?0:ms*k+40)); }
+  $('#b-ordenar').addEventListener('click',()=>{
+    const r=leerFicha(EJ_FICHA.desc);
+    $('#ord-tabla').innerHTML=CAB+'<tbody>'+r.filas.map(filaHTML).join('')+'</tbody>';
+    $('#ord-dudas-una').innerHTML=r.dudas.map(d=>dudaHTML(d)).join('');
+    // marcar en el texto lo que encontró raro
+    let html=esc(EJ_FICHA.desc); r.dudas.forEach(d=>{ const m=d.texto.match(/«([^»]+)»/); if(m) html=html.replace(esc(m[1].split(' ').pop()),`<mark>${esc(m[1].split(' ').pop())}</mark>`); }); $('#ord-cruda').innerHTML=html;
+    $('#ord-una').hidden=false; $('#b-ordenar').hidden=true; aparecer($('#ord-tabla'),120);
+    $('#ord-todas-hoja').hidden=false;
+  });
+  const NOMBRE_PIEZA=c=>{ const f=FICHAS.find(x=>x.c===c); return (f.pos==='adelante'?'Balata delantera':'Balata trasera')+' · '+(f.sinClave?'número '+c:'clave '+c); };
+  let ordenando=false;
+  $('#b-ordenar-todas').addEventListener('click',()=>{
+    if(ordenando) return; ordenando=true; $('#b-ordenar-todas').disabled=true;
+    const leidas=FICHAS.map(f=>({...f,leida:leerFicha(f.desc)}));
+    const grupos=[...new Set(leidas.map(f=>f.c))];
+    const cont=$('#ord-grupos'); cont.innerHTML='';
+    let k=0; const paso=reduce.matches?60:180;
+    const tick=()=>{
+      k++; $('#ord-contador').textContent=`Leyendo ficha ${Math.min(k,leidas.length)} de ${leidas.length}…`;
+      if(k<leidas.length){ setTimeout(tick,paso); return; }
+      $('#ord-contador').textContent=`${leidas.length} fichas leídas · ${grupos.length} piezas distintas`;
+      grupos.forEach(c=>{
+        const fs=leidas.filter(f=>f.c===c);
+        // filas del Versa, por versión y años, según la mayoría
+        const filas={}; fs.forEach(f=>f.leida.filas.filter(r=>/Versa|sin modelo/.test(r.modelo)).forEach(r=>{ const key=r.modelo+'|'+r.version+'|'+r.desde+'-'+r.hasta; filas[key]=filas[key]||{r,n:0}; filas[key].n++; }));
+        const g=document.createElement('div'); g.className='grupo';
+        const marcas=new Set(fs.map(f=>f.marca.split(' ')[0]));
+        g.innerHTML=`<h3>${esc(NOMBRE_PIEZA(c))}<span>${fs.length} ${fs.length===1?'ficha':'fichas'} · ${marcas.size} ${marcas.size===1?'marca':'marcas'}</span></h3><div class="marcas">${fs.map(f=>`<span>${esc(f.marca)}</span>`).join('')}</div><div class="envoltura"><table class="tabla-o">${CAB}<tbody>${Object.values(filas).map(x=>filaHTML(x.r)).join('')}</tbody></table></div>`;
+        cont.append(g); aparecer(g,60);
+      });
+      // dudas: las de cada ficha + los choques entre fichas de la misma pieza
+      const dudas=[];
+      leidas.forEach(f=>f.leida.dudas.forEach(d=>dudas.push(dudaHTML(d,`${f.marca} · ${f.sku}`))));
+      grupos.forEach(c=>{ const fs=leidas.filter(f=>f.c===c); if(fs.length>1) compararFichas(fs).forEach(d=>dudas.push(dudaHTML(d,`Misma pieza (${c}), fichas con años distintos`))); });
+      const multi=[]; ['adelante','atras'].forEach(pos=>{ for(let a=ANIO_MIN;a<=ANIO_MAX;a++){ const fam=familias(pos,a); if(fam.size>1) multi.push({pos,a,claves:[...fam.keys()]}); } });
+      const juntas={}; multi.forEach(m=>{ const k2=m.pos+'|'+m.claves.join(','); (juntas[k2]=juntas[k2]||{...m,anios:[]}).anios.push(m.a); });
+      Object.values(juntas).forEach(m=>dudas.push(dudaHTML({texto:`Versa ${m.anios.length>1?m.anios[0]+' a '+m.anios[m.anios.length-1]:m.anios[0]}, ${m.pos==='adelante'?'delantera':'trasera'}: le quedan ${m.claves.length} piezas distintas (${m.claves.join(', ')}). ¿Cuál es la buena, o depende de la versión?`},'Varias piezas para el mismo coche')));
+      $('#ord-dudas').innerHTML=dudas.join(''); $('#ord-dudas-hoja').hidden=false;
+      $('#ord-contador').textContent+=` · ${dudas.length} dudas para su equipo`;
+      $('#b-ordenar-todas').hidden=true; ordenando=false;
+    };
+    tick();
+  });
+
+  // Bandeja del vendedor: pedidos con duda que mandó la refaccionaria + dos de ejemplo
+  const EJEMPLOS=[{quien:'Refaccionaria en Mérida',pos:'atras',anio:2012,opciones:['S1020','S919'],ej:true},{quien:'Refaccionaria en Cancún',pos:'atras',anio:2021,opciones:['FT119','S1106','D4060-5RB0A'],ej:true}];
+  const confirmados=new Map();
+  function pedidosDuda(){ const vivos=E.pedido.filter(it=>it.estado==='rev').map((it,i)=>({quien:'Su pedido de esta prueba',pos:it.pos,anio:it.anio,opciones:it.opciones||(it.c?[it.c]:[]),id:'v'+i})); return vivos.concat(EJEMPLOS.map((e,i)=>({...e,id:'e'+i}))); }
+  function pintarPedidos(){
+    const l=$('#lista-ped'), ps=pedidosDuda(); l.innerHTML='';
+    $('#cuenta-ped').textContent=ps.filter(p=>!confirmados.has(p.id)).length;
+    ps.forEach(p=>{
+      const d=document.createElement('div'); d.className='duda-pedido'+(confirmados.has(p.id)?' lista':'');
+      const lado=p.pos==='adelante'?'delanteras':'traseras';
+      d.innerHTML=`<span class="quien"></span><h3></h3><p class="desc"></p><div class="opciones"></div>`;
+      d.querySelector('.quien').textContent=p.quien+(p.ej?' (ejemplo)':'');
+      d.querySelector('h3').textContent=`Balatas ${lado} · Nissan Versa ${p.anio}`;
+      d.querySelector('.desc').textContent=p.opciones.length>1?`Su catálogo tiene ${p.opciones.length} piezas para este coche: ${p.opciones.join(', ')}.`:'No encontramos la pieza en su catálogo: hay que buscarla.';
+      const op=d.querySelector('.opciones');
+      if(confirmados.has(p.id)){ op.innerHTML=`<span class="sello ok"><i>✓</i>Confirmada: ${esc(confirmados.get(p.id))} · se avisó a la refaccionaria</span>`; }
+      else (p.opciones.length?p.opciones:['Ya la encontré']).forEach(c=>{ const b=document.createElement('button'); b.type='button'; b.className='chico'; b.textContent=p.opciones.length?'Mandar '+c:c; b.addEventListener('click',()=>{ confirmados.set(p.id,p.opciones.length?c:'pieza encontrada'); pintarPedidos(); }); op.append(b); });
+      l.append(d);
+    });
+  }
+  function ponerPestana(cual){ const o=cual==='ord'; $('#tab-ord').setAttribute('aria-selected',String(o)); $('#tab-ped').setAttribute('aria-selected',String(!o)); $('#panel-ord').hidden=!o; $('#panel-ped').hidden=o; if(!o) pintarPedidos(); }
+  $('#tab-ord').addEventListener('click',()=>ponerPestana('ord')); $('#tab-ped').addEventListener('click',()=>ponerPestana('ped'));
+  function ponerVista(v){
+    const beta=v==='beta';
+    $$('.vistas button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.vista===v)));
+    $('#vista-beta').hidden=!beta; $('.pasos').hidden=beta;
+    if(beta){ $$('.pantalla').forEach(x=>x.hidden=true); pintarPedidos(); }
+    else { $$('.pantalla').forEach(x=>x.hidden=true); const n=Math.max(1,[...$$('.paso')].findIndex(b=>b.classList.contains('actual'))+1); $(`.pantalla[data-p="${n}"]`).hidden=false; }
+    window.scrollTo({top:0,behavior:'auto'});
+  }
+  $$('.vistas button').forEach(b=>b.addEventListener('click',()=>ponerVista(b.dataset.vista)));
+  if(new URLSearchParams(location.search).get('vista')==='beta') ponerVista('beta');
+
   document.querySelectorAll('.idioma button').forEach(b=>b.addEventListener('click',()=>ponerIdioma(b.dataset.lang)));
   obs.observe(document.querySelector('.marco'),{childList:true,subtree:true});
   let guardado=null; try{guardado=localStorage.getItem('beta-demo-idioma')}catch(e){}
