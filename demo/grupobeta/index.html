@@ -478,8 +478,9 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
   };
   const PATRONES=[
     [/^Solo hay una que le queda a tu Versa (\d{4})\.$/,'Only one fits your $1 Versa.'],
-    [/^Es la misma pieza en una marca: escoge la que tengas a la mano\.$/,'It is the same part in one brand.'],
-    [/^Es la misma pieza en (\d+) marcas: escoge la que tengas a la mano\.$/,'It is the same part in $1 brands: pick the one you have on hand.'],
+    [/^Es la misma pieza en una marca\.$/,'It is the same part in one brand.'],
+    [/^Es la misma pieza en (\d+) versiones de (\d+) marcas: escoge la que tengas a la mano\.$/,'It is the same part in $1 versions from $2 brands: pick the one you have on hand.'],
+    [/^Es la misma pieza en (\d+) versiones de una marca: escoge la que tengas a la mano\.$/,'It is the same part in $1 versions from one brand: pick the one you have on hand.'],
     [/^No encontramos balatas delanteras para el Versa (\d{4}) en su catálogo\.$/,"We didn't find front pads for the $1 Versa in your catalog."],
     [/^No encontramos balatas traseras para el Versa (\d{4}) en su catálogo\.$/,"We didn't find rear shoes for the $1 Versa in your catalog."],
     [/^Para el Versa (\d{4}) su catálogo tiene (\d+) balatas (delanteras|traseras) distintas\.$/,(m,a,n,l)=>`For the ${a} Versa your catalog has ${n} different ${l==='delanteras'?'front pads':'rear shoes'}.`],
@@ -727,7 +728,7 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
     const lado=pos==='adelante'?'delanteras':'traseras';
     if(fam.size===1){
       const [c]=fam.keys();
-      res.append(hoja(`<h2>Solo hay una que le queda a tu Versa ${E.anio}.</h2><p class="sub">Es la misma pieza en ${fam.get(c).length===1?'una marca':fam.get(c).length+' marcas'}: escoge la que tengas a la mano.</p>`, tarjetaFamilia(c,'ok'), '<p class="nota">Hoy, al buscar «balata versa» en su página, salen 49 resultados para revisar. Aquí quedó 1.</p>', botonAgregar(c,'ok')));
+      res.append(hoja(`<h2>Solo hay una que le queda a tu Versa ${E.anio}.</h2><p class="sub">${(()=>{const fs=fam.get(c), m=new Set(fs.map(f=>f.marca.split(' ')[0])).size; return fs.length===1?'Es la misma pieza en una marca.':`Es la misma pieza en ${fs.length} versiones de ${m===1?'una marca':m+' marcas'}: escoge la que tengas a la mano.`;})()}</p>`, tarjetaFamilia(c,'ok'), '<p class="nota">Hoy, al buscar «balata versa» en su página, salen 49 resultados para revisar. Aquí quedó 1.</p>', botonAgregar(c,'ok')));
     } else if(fam.size===0){
       res.append(hoja(`<h2>No encontramos balatas ${lado} para el Versa ${E.anio} en su catálogo.</h2><p class="sub">No te dejamos a ciegas: un vendedor de Beta te busca la correcta y te avisa antes de mandarla.</p>`, botonAgregar(null,'rev')));
     } else {
