@@ -46,6 +46,7 @@ body{background:var(--fondo);color:var(--tinta);font:400 16px/1.5 var(--t);font-
 
 h1,h2{font-family:var(--t);font-stretch:125%;font-weight:750;letter-spacing:-.01em;line-height:1.08;margin:0;text-wrap:balance}
 h1{font-size:clamp(28px,8.4vw,38px)}
+h1:focus{outline:none}
 h2{font-size:20px;font-stretch:112%;font-weight:700}
 p{margin:0}
 .sub{color:var(--suave);max-width:46ch}
@@ -139,12 +140,12 @@ button:focus-visible,select:focus-visible,input:focus-visible,.zona:focus-visibl
 .marcas{display:flex;flex-wrap:wrap;gap:6px}
 .marcas span{font-size:13px;border:1px solid var(--linea);border-radius:999px;padding:4px 10px}
 .precio{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:14px;color:var(--suave)}
-.precio b{font-size:18px;color:var(--tinta);font-variant-numeric:tabular-nums}
+.precio b{white-space:nowrap;font-size:18px;color:var(--tinta);font-variant-numeric:tabular-nums}
 .nota{font-size:14px;color:var(--suave);border-left:2px solid var(--azul);padding-left:12px}
 
 /* Seguimiento */
 .ruta{display:grid;gap:0}
-.etapa{display:grid;grid-template-columns:40px 1fr;gap:2px 14px;align-items:center;position:relative;padding-bottom:28px}
+.etapa{display:grid;grid-template-columns:40px 1fr;grid-template-rows:auto auto;gap:2px 14px;align-items:center;position:relative;padding-bottom:34px}
 .etapa:last-child{padding-bottom:0}
 .etapa::before{content:"";position:absolute;left:19.5px;top:40px;bottom:0;width:1px;background:var(--linea)}
 .etapa:last-child::before{display:none}
@@ -216,20 +217,20 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
 
     <div class="hoja" id="q-pos">
       <h2>¿Las de adelante o las de atrás?</h2>
-      <p class="sub">Toca la parte del coche.</p>
+      <p class="sub">Toca la mitad del coche.</p>
       <div class="coche">
         <svg viewBox="0 0 200 300" role="group" aria-label="Coche visto desde arriba">
           <rect class="carro" x="45" y="30" width="110" height="240" rx="48"/>
           <path class="carro" d="M58 92 Q100 76 142 92 M58 206 Q100 222 142 206"/>
           <rect class="carro" x="62" y="100" width="76" height="98" rx="14"/>
           <g class="zona" data-pos="adelante" role="button" tabindex="0" aria-label="Adelante">
-            <circle class="anillo" cx="100" cy="66" r="66"/>
+            <rect x="0" y="0" width="200" height="150" fill="transparent"/><circle class="anillo" cx="100" cy="66" r="66"/>
             <rect class="llanta" x="28" y="52" width="18" height="40" rx="9"/>
             <rect class="llanta" x="154" y="52" width="18" height="40" rx="9"/>
             <text class="etq" x="100" y="20" text-anchor="middle">Adelante</text>
           </g>
           <g class="zona" data-pos="atras" role="button" tabindex="0" aria-label="Atrás">
-            <circle class="anillo" cx="100" cy="234" r="66"/>
+            <rect x="0" y="150" width="200" height="150" fill="transparent"/><circle class="anillo" cx="100" cy="234" r="66"/>
             <rect class="llanta" x="28" y="208" width="18" height="40" rx="9"/>
             <rect class="llanta" x="154" y="208" width="18" height="40" rx="9"/>
             <text class="etq" x="100" y="294" text-anchor="middle">Atrás</text>
@@ -278,10 +279,13 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
 
     <div class="hoja">
       <h2>Lo que vimos en su catálogo</h2>
+      <p class="sub">Revisamos las 49 fichas que salen al buscar "balata versa". La información ya está ahí; estas son las que dicen cosas distintas, para que su equipo decida:</p>
       <ul class="lista">
-        <li><i class="pt"></i><span>La información de cada pieza ya está ahí: año, posición y versión del coche. La ordenamos para que encontrar la correcta sea más fácil.</span></li>
-        <li><i class="pt"></i><span>Algunas piezas dicen dos cosas distintas, como el Versa 2012 trasero. Las juntamos en una lista para que su equipo decida.</span></li>
-        <li><i class="pt"></i><span>Cada pieza ya tiene sus equivalentes en otras marcas. Los usamos para no atrasar entregas.</span></li>
+        <li><i class="pt"></i><span>Versa 2012, balata trasera: 4 fichas dicen la clave S1020 y 1 dice la S919 (solo para "Versa S").</span></li>
+        <li><i class="pt"></i><span>La misma S1020: dos marcas dicen que le queda hasta 2016 y dos dicen hasta 2019.</span></li>
+        <li><i class="pt"></i><span>Balata delantera D1592: ocho fichas dicen Versa 2012 a 2019 y la de Raybestos dice solo 2012.</span></li>
+        <li><i class="pt"></i><span>Versa 2020-2021, balata trasera: aparecen 3 números distintos (FT119, S1106 y uno de FP sin clave).</span></li>
+        <li><i class="pt"></i><span>Cada pieza ya tiene su equivalente en otras marcas. Con eso, si una se acaba, se ofrece otra al momento.</span></li>
       </ul>
     </div>
 
@@ -301,28 +305,54 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
 <script>
 (function(){
   'use strict';
-  /* ---------- Catálogo: descripciones reales del catálogo público de Grupo Beta (14-oct-2026). Precios y existencias de ejemplo. ---------- */
-  const PIEZAS = {
-    d1592: { pos:'adelante', titulo:'Balata de disco delantera', codigo:'SPC-8804-Z · D1592',
-      desc:'BALATA DISCO DELANTERA NISSAN VERSA 2012-2019 MARCH 2012-2023 NOTE 2014-2019 V-DRIVE 2020-2022',
-      marcas:['Fritec SPC','Raybestos 8804-D1592-SG','FAG D15928804'], precio:'$ 485', exist:'Hay 14 en Mérida',
-      anios:[2012,2019], medida:{tipo:'pastilla', texto:'13.87 cm'} },
-    s1462: { pos:'atras', titulo:'Balata de tambor trasera', codigo:'OW1462-ZV · S919',
-      desc:'BALATA TAMBOR TRASERA NISSAN VERSA BASE 4L 1.6 LTS 2009-2011 VERSA S 4L 1.6 LTS 2012',
-      marcas:['Fritec One Way'], precio:'$ 410', exist:'Hay 9 en Mérida',
-      anios:[2009,2012], medida:{tipo:'tambor', texto:'22.9 cm'} },
-    s1689: { pos:'atras', titulo:'Balata de tambor trasera', codigo:'OW1689-ZV · S1020',
-      desc:'BALATA TAMBOR TRASERA NISSAN VERSA 2012-2016 MARCH ADVANCE 2012-2016 MARCH SENSE 2012-2016',
-      marcas:['Fritec One Way'], precio:'$ 430', exist:'Hay 11 en Mérida',
-      anios:[2012,2016], medida:null }
-  };
-  const ANIO_MIN=2009, ANIO_MAX=2019;
-  const candidatas=(pos,anio)=>Object.entries(PIEZAS).filter(([,p])=>p.pos===pos&&anio>=p.anios[0]&&anio<=p.anios[1]).map(([k])=>k);
+  /* ---------- Catálogo: fichas reales de la página pública de Grupo Beta (búsqueda "balata versa", 49 resultados, revisados todos el 14-oct-2026).
+     Se agrupan por su clave de equivalencia (la misma pieza en varias marcas). Precios y existencias de ejemplo. ---------- */
+  const FICHAS=[
+    // Delantera · clave D1592
+    {c:'D1592',pos:'adelante',marca:'Fritec SPC',sku:'SPC-8804-Z',a:[2012,2019]},
+    {c:'D1592',pos:'adelante',marca:'FAG semimetálica',sku:'D15928804',a:[2012,2019]},
+    {c:'D1592',pos:'adelante',marca:'FAG cerámica',sku:'CMD15928804',a:[2012,2019]},
+    {c:'D1592',pos:'adelante',marca:'Fritec Azul',sku:'M-8804-Z',a:[2012,2019]},
+    {c:'D1592',pos:'adelante',marca:'FP',sku:'41080-1HL0AFP',a:[2012,2019]},
+    {c:'D1592',pos:'adelante',marca:'FP cerámica',sku:'41080-1HL0ACFP',a:[2012,2019]},
+    {c:'D1592',pos:'adelante',marca:'Brembo metálica',sku:'P56070',a:[2012,2019]},
+    {c:'D1592',pos:'adelante',marca:'Brembo cerámica',sku:'P56070N',a:[2012,2019]},
+    {c:'D1592',pos:'adelante',marca:'Raybestos',sku:'8804-D1592-SG',a:[2012,2012]},
+    // Delantera · clave D2038
+    {c:'D2038',pos:'adelante',marca:'Fritec SPC',sku:'SPC-9269-Z',a:[2020,2026]},
+    {c:'D2038',pos:'adelante',marca:'Brembo metálica',sku:'P49055',a:[2020,2024]},
+    {c:'D2038',pos:'adelante',marca:'Brembo cerámica',sku:'P49055N',a:[2020,2024]},
+    {c:'D2038',pos:'adelante',marca:'FAG cerámica',sku:'CMD20389269',a:[2020,2023]},
+    {c:'D1060-5RB0B',pos:'adelante',marca:'FP',sku:'D1060-5RB0BFP',a:[2020,2024],sinClave:true},
+    // Trasera · clave S919
+    {c:'S919',pos:'atras',marca:'Fritec One Way',sku:'OW1462-ZV',a:[2009,2012],nota:'Su ficha dice: Versa Base 2009-2011 y Versa S 2012'},
+    // Trasera · clave S1020
+    {c:'S1020',pos:'atras',marca:'Fritec One Way',sku:'OW1689-ZV',a:[2012,2016]},
+    {c:'S1020',pos:'atras',marca:'Raybestos',sku:'1689-S1020-SM',a:[2012,2016]},
+    {c:'S1020',pos:'atras',marca:'FAG',sku:'S10201689',a:[2012,2019]},
+    {c:'S1020',pos:'atras',marca:'FP',sku:'44060-1HL0BFP',a:[2012,2019]},
+    // Trasera · Versa nuevo
+    {c:'FT119',pos:'atras',marca:'Fritec One Way',sku:'OW1Y21-ZV',a:[2020,2022]},
+    {c:'S1106',pos:'atras',marca:'FAG',sku:'S11061751',a:[2020,2021]},
+    {c:'D4060-5RB0A',pos:'atras',marca:'FP',sku:'D4060-5RB0AFP',a:[2020,2024],sinClave:true}
+  ];
+  const PRECIO={D1592:'$ 485',D2038:'$ 560','D1060-5RB0B':'$ 590',S919:'$ 410',S1020:'$ 430',FT119:'$ 470',S1106:'$ 455','D4060-5RB0A':'$ 495'};
+  const ANIO_MIN=2009, ANIO_MAX=2026;
+  const aplica=(f,anio)=>anio>=f.a[0]&&anio<=f.a[1];
+  // Familias (claves) que le quedan a ese año y posición
+  function familias(pos,anio){
+    const m=new Map();
+    FICHAS.filter(f=>f.pos===pos&&aplica(f,anio)).forEach(f=>{ if(!m.has(f.c)) m.set(f.c,[]); m.get(f.c).push(f); });
+    return m;
+  }
+  // Fichas de la misma clave que NO incluyen ese año (información que se contradice)
+  const fueraDeAnio=(c,anio)=>FICHAS.filter(f=>f.c===c&&!aplica(f,anio));
 
   /* ---------- Estado ---------- */
   const E={ anio:null, pos:null, pedido:[], visto:1 };
   const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
   const reduce=matchMedia('(prefers-reduced-motion: reduce)');
+  const esc=s=>String(s).replace(/[&<>"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
 
   /* ---------- Navegación entre pantallas ---------- */
   function ir(n){
@@ -346,7 +376,7 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
 
   function entender(texto){
     const t=texto.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
-    const r={versa:/versa/.test(t), pieza:/balat|freno|pastilla/.test(t), anio:null, pos:null};
+    const r={versa:/\bversa\b/.test(t), anio:null, pos:null};
     const m4=t.match(/\b(19|20)\d{2}\b/); const m2=t.match(/\b(\d{2})\b/);
     if(m4) r.anio=+m4[0]; else if(m2) r.anio=2000+(+m2[1]);
     if(/delanter|adelant|enfrente|frente/.test(t)) r.pos='adelante';
@@ -356,11 +386,11 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
   function aviso1(txt){const m=$('#m1'); m.textContent=txt; m.hidden=!txt;}
   $('#f-buscar').addEventListener('submit',e=>{
     e.preventDefault();
-    const r=entender($('#q').value);
-    if(!$('#q').value.trim()){aviso1('Escribe la pieza y el coche, por ejemplo: balatas versa 2012.');return;}
+    const txt=$('#q').value.trim(), r=entender(txt);
+    if(!txt){aviso1('Escribe la pieza y el coche, por ejemplo: balatas versa 2012.');return;}
     if(!r.versa){aviso1('En este demo está cargado el Nissan Versa. Prueba con: balatas versa 2012.');return;}
     if(r.anio&&(r.anio<ANIO_MIN||r.anio>ANIO_MAX)){aviso1(`En este demo el Versa va de ${ANIO_MIN} a ${ANIO_MAX}. Escribe un año en ese rango.`);return;}
-    if(!r.anio){aviso1('¿De qué año es el Versa? Agrégalo, por ejemplo: balatas versa 2012. Si no lo sabes, elige el año abajo o mira la tarjeta de circulación.');return;}
+    if(!r.anio){aviso1('¿De qué año es el Versa? Agrégalo, por ejemplo: balatas versa 2012. Si no lo sabes, viene en la tarjeta de circulación.');return;}
     empezar(r.anio,r.pos);
   });
   $$('.sugerencia').forEach(b=>b.addEventListener('click',()=>{$('#q').value=b.dataset.q; $('#f-buscar').requestSubmit();}));
@@ -374,14 +404,12 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
     if(pos) elegirPos(pos);
   }
   function pintarEntendimos(){
-    const e=$('#entendimos');
-    e.innerHTML='<span>Balatas</span><span>Nissan Versa</span><span></span>'+(E.pos?'<span></span>':'')+'<button type="button">Cambiar</button>';
-    e.children[2].textContent=E.anio;
-    if(E.pos) e.children[3].textContent=E.pos==='adelante'?'Adelante':'Atrás';
-    e.querySelector('button').addEventListener('click',()=>ir(1));
+    const e=$('#entendimos'); e.innerHTML='';
+    ['Balatas','Nissan Versa',String(E.anio)].concat(E.pos?[E.pos==='adelante'?'Adelante':'Atrás']:[]).forEach(t=>{const s=document.createElement('span');s.textContent=t;e.append(s);});
+    const b=document.createElement('button'); b.type='button'; b.textContent='Cambiar'; b.addEventListener('click',()=>ir(1)); e.append(b);
   }
 
-  /* ---------- Pantalla 2: adelante o atrás, y si hay dos, cómo saber cuál ---------- */
+  /* ---------- Pantalla 2 ---------- */
   $$('.zona').forEach(z=>{
     z.addEventListener('click',()=>elegirPos(z.dataset.pos));
     z.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();elegirPos(z.dataset.pos);}});
@@ -389,14 +417,16 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
 
   function elegirPos(pos){
     E.pos=pos; pintarEntendimos();
-    const c=candidatas(pos,E.anio), res=$('#resultado');
+    const fam=familias(pos,E.anio), res=$('#resultado');
     $('#q-pos').hidden=true; res.hidden=false; res.innerHTML='';
-    if(c.length===1){
-      res.append(hoja(`<h2>Solo hay una que le queda a tu Versa ${E.anio}.</h2>`, tarjetaPieza(c[0],'ok'), botonAgregar(c[0],'ok')));
-    } else if(c.length===0){
-      res.append(hoja(`<h2>No la tenemos ubicada para el Versa ${E.anio}.</h2><p class="sub">No te dejamos a ciegas: un vendedor de Beta te busca la correcta y te avisa antes de mandarla.</p>`, botonAgregar(null,'rev')));
+    const lado=pos==='adelante'?'delanteras':'traseras';
+    if(fam.size===1){
+      const [c]=fam.keys();
+      res.append(hoja(`<h2>Solo hay una que le queda a tu Versa ${E.anio}.</h2><p class="sub">Es la misma pieza en ${fam.get(c).length===1?'una marca':fam.get(c).length+' marcas'}: escoge la que tengas a la mano.</p>`, tarjetaFamilia(c,'ok'), botonAgregar(c,'ok')));
+    } else if(fam.size===0){
+      res.append(hoja(`<h2>No encontramos balatas ${lado} para el Versa ${E.anio} en su catálogo.</h2><p class="sub">No te dejamos a ciegas: un vendedor de Beta te busca la correcta y te avisa antes de mandarla.</p>`, botonAgregar(null,'rev')));
     } else {
-      res.append(resolver(c));
+      res.append(resolver(fam,lado));
     }
     const otra=document.createElement('button'); otra.type='button'; otra.className='liga'; otra.textContent='Cambiar adelante o atrás';
     otra.addEventListener('click',()=>{E.pos=null;pintarEntendimos();res.hidden=true;$('#q-pos').hidden=false;});
@@ -404,64 +434,67 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
   }
 
   function hoja(...partes){const d=document.createElement('div');d.className='hoja';partes.forEach(p=>typeof p==='string'?d.insertAdjacentHTML('beforeend',p):d.append(p));return d;}
-  function tarjetaPieza(k,estado){
-    const p=PIEZAS[k], d=document.createElement('div'); d.className='pieza';
-    d.innerHTML=`<span class="sello ${estado}"><i>${estado==='ok'?'✓':'!'}</i>${estado==='ok'?`Verificada: le queda a tu Versa ${E.anio} (${p.pos==='adelante'?'adelante':'atrás'})`:'Un vendedor la confirma antes de salir'}</span>
-      <h3></h3><p class="codigo"></p><p class="desc"></p><div class="marcas"></div>
-      <div class="precio"><span>${p.exist} <span class="ej">(ejemplo)</span></span><b>${p.precio}</b></div>`;
-    d.querySelector('h3').textContent=p.titulo; d.querySelector('.codigo').textContent=p.codigo; d.querySelector('.desc').textContent=p.desc;
-    p.marcas.forEach(m=>{const s=document.createElement('span');s.textContent=m;d.querySelector('.marcas').append(s);});
+  function tarjetaFamilia(c,estado,anio=E.anio,pos=E.pos){
+    const fs=FICHAS.filter(f=>f.c===c&&aplica(f,anio)), fuera=fueraDeAnio(c,anio);
+    const d=document.createElement('div'); d.className='pieza';
+    const sello=estado==='ok'?`Verificada con su catálogo: le queda a tu Versa ${anio} (${pos==='adelante'?'adelante':'atrás'})`:'Un vendedor la confirma antes de salir';
+    d.innerHTML=`<span class="sello ${estado}"><i>${estado==='ok'?'✓':'!'}</i>${esc(sello)}</span>
+      <h3>Balata ${pos==='adelante'?'de disco delantera':'de tambor trasera'}</h3>
+      <p class="codigo">${fs[0]&&fs[0].sinClave?'Número '+esc(c):'Clave '+esc(c)}</p>
+      <div class="marcas"></div>
+      <div class="precio"><span>Hay en Mérida <span class="ej">(ejemplo)</span></span><b>desde ${(PRECIO[c]||'').replace(' ',' ')}</b></div>`;
+    fs.forEach(f=>{const s=document.createElement('span');s.textContent=f.marca+' · '+f.sku;d.querySelector('.marcas').append(s);});
+    fs.filter(f=>f.nota).forEach(f=>{const n=document.createElement('p');n.className='desc';n.textContent=f.nota+'.';d.append(n);});
+    if(fuera.length){const n=document.createElement('p');n.className='desc';n.textContent=`Ojo: ${fuera.map(f=>f.marca).join(' y ')} es la misma pieza, pero su ficha dice ${fuera.map(f=>f.a[0]===f.a[1]?f.a[0]:f.a[0]+'-'+f.a[1]).join(' / ')}. Va en la lista para su equipo.`;d.append(n);}
     return d;
   }
-  function botonAgregar(k,estado,opciones){
+  function botonAgregar(c,estado,opciones){
     const b=document.createElement('button'); b.type='button'; b.className='boton'; b.textContent='Agregar al pedido';
-    b.addEventListener('click',()=>{E.pedido.push({k,estado,anio:E.anio,pos:E.pos,opciones}); pintarPedido(); ir(3);});
+    b.addEventListener('click',()=>{E.pedido.push({c,estado,anio:E.anio,pos:E.pos,opciones}); pintarPedido(); ir(3);});
     return b;
   }
 
   const ICO={
-    regla:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="8" width="20" height="8" rx="2"/><path d="M6 8v3M10 8v4M14 8v3M18 8v4"/></svg>',
+    letrero:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 15c0-4 3-7 9-7s9 3 9 7v2H3z"/><rect x="8" y="12" width="8" height="3" rx="1.5"/></svg>',
     foto:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="6" width="18" height="14" rx="3"/><circle cx="12" cy="13" r="3.5"/><path d="M8 6l1.5-2h5L16 6"/></svg>',
     duda:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5v.7"/><circle cx="12" cy="17" r=".6" fill="currentColor"/></svg>'
   };
 
-  function resolver(c){
+  // Cuando su catálogo da más de una pieza: preguntar algo que se pueda VER, y si no alcanza, revisión.
+  function resolver(fam,lado){
+    const claves=[...fam.keys()];
     const cont=document.createElement('div'); cont.style.display='grid'; cont.style.gap='14px';
-    cont.append(hoja(`<h2>Para el Versa ${E.anio} hay dos balatas traseras.</h2><p class="sub">Te ayudamos a saber cuál es. Escoge lo que tengas a la mano.</p>`));
+    const cuenta=claves.map(c=>`${fam.get(c).length} ${fam.get(c).length===1?'ficha dice':'fichas dicen'} ${c}`).join(', ');
+    cont.append(hoja(`<h2>Para el Versa ${E.anio} su catálogo tiene ${claves.length} balatas ${lado} distintas.</h2><p class="sub">${esc(cuenta)}. Te ayudamos a saber cuál es.</p>`));
     const caminos=document.createElement('div'); caminos.className='caminos';
-    const conMedida=c.find(k=>PIEZAS[k].medida), sinMedida=c.find(k=>!PIEZAS[k].medida);
-
-    // A · Medir la pieza vieja
-    const a=camino(ICO.regla,'Mídela con una regla','Si tienes la balata vieja a la mano');
-    a.dentro.innerHTML=`<p>Mide lo redondo de la balata, de punta a punta.</p>
-      <div class="plano">${dibujoTambor(PIEZAS[conMedida].medida.texto)}</div>
-      <p class="sub">¿Cuánto mide?</p>`;
-    const dosA=document.createElement('div'); dosA.className='dos';
-    const b1=document.createElement('button'); b1.type='button'; b1.className='chico'; b1.textContent='Unos 23 cm';
-    const b2=document.createElement('button'); b2.type='button'; b2.className='chico'; b2.textContent='Otra medida';
-    dosA.append(b1,b2); a.dentro.append(dosA);
-    b1.addEventListener('click',()=>decidir(cont,conMedida,'ok'));
-    b2.addEventListener('click',()=>decidir(cont,sinMedida,'rev',c));
-
-    // B · Foto de la tarjeta de circulación
+    const conVersion=claves.filter(c=>fam.get(c).some(f=>f.nota));
+    if(conVersion.length){
+      const a=camino(ICO.letrero,'Mira el letrero de la cajuela','Dice la versión del coche');
+      a.dentro.innerHTML=`<p>Atrás, en la tapa de la cajuela, el coche dice su versión. ¿Cuál dice?</p>`;
+      const op=document.createElement('div'); op.className='dos';
+      [['S','S'],['Sense','otra'],['Advance','otra'],['Exclusive','otra']].forEach(([t,v])=>{const b=document.createElement('button');b.type='button';b.className='chico';b.textContent=t;b.addEventListener('click',()=>{
+        const elegida=v==='S'?conVersion[0]:claves.find(c=>!conVersion.includes(c));
+        const quedan=v==='S'?claves:[elegida];
+        if(quedan.length===1) decidir(cont,elegida,'ok',null,`Su ficha de la ${conVersion[0]} solo dice "Versa S ${E.anio}", así que para ${t} es esta.`);
+        else decidir(cont,elegida,'rev',claves,`Para "S", ${claves.length} fichas pueden aplicar.`);
+      });op.append(b);});
+      a.dentro.append(op); caminos.append(a.el);
+    }
     const b=camino(ICO.foto,'Manda foto de la tarjeta de circulación','Casi todos la traen en la guantera');
     b.dentro.innerHTML=`<div class="tarjeta-ej" aria-label="Tarjeta de circulación de ejemplo">
         <span class="ej">Foto de ejemplo</span>
         <div class="renglon"><span>Marca</span><span>Nissan</span></div>
-        <div class="renglon"><span>Modelo</span><span>Versa S 1.6</span></div>
+        <div class="renglon"><span>Modelo</span><span>Versa Advance</span></div>
         <div class="renglon"><span>Año</span><span>${E.anio}</span></div>
-        <div class="renglon"><span>Número de serie</span><span>3N1CN7AD0CL000000</span></div>
       </div>
-      <p class="sub">Con la tarjeta sabemos la versión exacta. En este ejemplo dice "Versa S", y la que le queda es una sola.</p>`;
+      <p class="sub">La tarjeta trae la versión y el número de serie. Con eso escogemos entre las fichas de su catálogo.</p>`;
     const bB=document.createElement('button'); bB.type='button'; bB.className='boton'; bB.textContent='Usar la foto de ejemplo';
-    bB.addEventListener('click',()=>decidir(cont,conMedida,'ok')); b.dentro.append(bB);
-
-    // C · No sé
+    bB.addEventListener('click',()=>{ if(conVersion.length) decidir(cont,claves.find(c=>!conVersion.includes(c)),'ok',null,'La tarjeta dice "Advance", y la otra ficha solo aplica a la versión S.'); else decidir(cont,claves[0],'rev',claves,'Aun con la versión, su catálogo no separa estas piezas.'); });
+    b.dentro.append(bB); caminos.append(b.el);
     const cc=camino(ICO.duda,'No sé / no tengo cómo','No te preocupes');
     cc.dentro.innerHTML=`<p>Lo mandamos con revisión: un vendedor de Beta confirma cuál es antes de que salga la camioneta.</p>`;
-    cc.dentro.append(botonAgregar(null,'rev',c));
-
-    caminos.append(a.el,b.el,cc.el); cont.append(caminos);
+    cc.dentro.append(botonAgregar(null,'rev',claves)); caminos.append(cc.el);
+    cont.append(caminos);
     return cont;
   }
   function camino(ico,titulo,sub){
@@ -471,31 +504,17 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
     el.querySelector('b').textContent=titulo; el.querySelector('small').textContent=sub;
     const btn=el.querySelector('button');
     btn.addEventListener('click',()=>{
-      const abierto=!el.classList.contains('abierto');
+      const abrir=!el.classList.contains('abierto');
       el.parentElement.querySelectorAll('.camino').forEach(x=>{x.classList.remove('abierto');x.querySelector('button').setAttribute('aria-expanded','false');});
-      if(abierto){el.classList.add('abierto');btn.setAttribute('aria-expanded','true');
-        el.querySelectorAll('.dibuja').forEach(p=>{p.style.animation='none';p.getBoundingClientRect();p.style.animation='';});}
+      if(abrir){el.classList.add('abierto');btn.setAttribute('aria-expanded','true');}
     });
     return {el,dentro:el.querySelector('.dentro')};
   }
-  function decidir(cont,k,estado,opciones){
+  function decidir(cont,c,estado,opciones,porque){
     cont.innerHTML='';
     const titulo=estado==='ok'?'<h2>Es esta.</h2>':'<h2>Va con revisión.</h2><p class="sub">Un vendedor confirma cuál es antes de que salga. Te sugerimos esta:</p>';
-    cont.append(hoja(titulo,tarjetaPieza(k,estado),botonAgregar(k,estado,opciones)));
-  }
-
-  /* Dibujos técnicos: la flecha de medida se traza sola */
-  function dibujoTambor(medida){
-    return `<svg viewBox="0 0 300 190" aria-label="Balata de tambor: mide ${medida} de punta a punta">
-      <path class="trazo" d="M40 150 A110 110 0 0 1 260 150 L240 150 A90 90 0 0 0 60 150 Z"/>
-      <path class="trazo" d="M60 150 A90 90 0 0 1 82 92" style="stroke-dasharray:4 5"/>
-      <circle class="trazo" cx="150" cy="58" r="6"/>
-      <line class="cota dibuja" x1="40" y1="174" x2="260" y2="174" style="--l:220"/>
-      <line class="cota" x1="40" y1="158" x2="40" y2="182"/><line class="cota" x1="260" y1="158" x2="260" y2="182"/>
-      <path class="punta" d="M40 174l10-5v10z"/><path class="punta" d="M260 174l-10-5v10z"/>
-      <rect x="112" y="160" width="76" height="26" rx="13" fill="var(--fondo)"/>
-      <text class="cota-txt" x="150" y="179" text-anchor="middle">${medida}</text>
-    </svg>`;
+    const p=porque?`<p class="nota">${esc(porque)}</p>`:'';
+    cont.append(hoja(titulo,p,tarjetaFamilia(c,estado),botonAgregar(c,estado,opciones)));
   }
 
   /* ---------- Pantalla 3: pedido ---------- */
@@ -503,12 +522,13 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
     const d=$('#pedido'); d.innerHTML='';
     const lista=document.createElement('div'); lista.style.display='grid'; lista.style.gap='12px';
     E.pedido.forEach(it=>{
-      if(it.k){ const t=tarjetaPieza(it.k,it.estado); lista.append(t);
-        if(it.estado==='rev'&&it.opciones){const n=document.createElement('p');n.className='desc';n.textContent='El vendedor elige entre '+it.opciones.map(k=>PIEZAS[k].codigo.split(' · ')[0]).join(' y ')+'.';t.append(n);} }
-      else { const v=document.createElement('div'); v.className='pieza';
-        v.innerHTML=`<span class="sello rev"><i>!</i>Un vendedor la confirma antes de salir</span><h3>Balatas ${it.pos==='adelante'?'delanteras':'traseras'} · Nissan Versa ${it.anio}</h3>`;
-        if(it.opciones){const n=document.createElement('p');n.className='desc';n.textContent='El vendedor elige entre '+it.opciones.map(k=>PIEZAS[k].codigo.split(' · ')[0]).join(' y ')+'.';v.append(n);}
-        lista.append(v); }
+      let t;
+      if(it.c){ t=tarjetaFamilia(it.c,it.estado,it.anio,it.pos); }
+      else { t=document.createElement('div'); t.className='pieza';
+        t.innerHTML=`<span class="sello rev"><i>!</i>Un vendedor la confirma antes de salir</span><h3></h3>`;
+        t.querySelector('h3').textContent=`Balatas ${it.pos==='adelante'?'delanteras':'traseras'} · Nissan Versa ${it.anio}`; }
+      if(it.estado==='rev'&&it.opciones){const n=document.createElement('p');n.className='desc';n.textContent='El vendedor elige entre las claves '+it.opciones.join(' y ')+'.';t.append(n);}
+      lista.append(t);
     });
     d.append(lista);
   }
