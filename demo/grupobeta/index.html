@@ -246,8 +246,10 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
 .controles button:disabled{opacity:.35;cursor:default}
 .rec button:focus-visible{outline:2px solid #ffd166;outline-offset:3px}
 .rec-voz{font-size:12px;color:#8a97c4;text-align:center}
-.rec-portada .boton-rec{border:0;background:#fff;color:#0b1a4d;font:700 17px var(--t);border-radius:999px;padding:16px 26px;cursor:pointer;display:inline-flex;gap:10px;align-items:center}
-.rec-portada .liga-rec{border:0;background:none;color:#b9c3e6;font:500 15px var(--t);text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:8px}
+.pista{display:inline-flex;gap:10px;align-items:center;border:1px solid #33427a;border-radius:999px;padding:10px 18px;color:#fff;font-size:15px}
+.pista span{width:26px;height:26px;border-radius:50%;background:#fff;color:#0b1a4d;display:grid;place-items:center;font-size:11px;padding-left:2px}
+.rec-escena .boton-rec{border:0;background:#fff;color:#0b1a4d;font:700 17px var(--t);border-radius:999px;padding:16px 26px;cursor:pointer;display:inline-flex;gap:10px;align-items:center}
+.rec-escena .liga-rec{border:0;background:none;color:#b9c3e6;font:500 15px var(--t);text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:8px}
 .invita{display:flex;gap:14px;align-items:center;text-align:left;width:100%;border:0;border-radius:24px;background:#0b1a4d;color:#fff;padding:16px 18px;cursor:pointer;font:inherit}
 .invita .bolita{width:48px;height:48px;flex:none;border-radius:50%;background:#fff;color:#0b1a4d;display:grid;place-items:center}
 .invita .bolita svg{width:20px;height:20px}
@@ -515,7 +517,7 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
     /* ---------- Recorrido narrado: la voz del propio celular o navegador (sin costo), frase por frase ---------- */
   const R=(()=>{
     const ESC=[
-      {html:`<div class="rec-portada" style="display:grid;gap:18px;justify-items:center"><h2>Lo que encontramos en su página</h2><p class="chico-t">Un recorrido de 3 minutos, con voz. Cinco detalles de betaautopartes.com y cómo resolverlos.</p><button class="boton-rec" type="button" data-accion="play"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5z"/></svg>Escuchar el recorrido</button><button class="liga-rec" type="button" data-accion="leer">Verlo sin audio</button></div>`,
+      {html:`<div class="rec-portada" style="display:grid;gap:18px;justify-items:center"><h2>Lo que encontramos en su página</h2><p class="chico-t">Un recorrido de 3 minutos, con voz. Cinco detalles de betaautopartes.com y cómo resolverlos.</p><p class="pista"><span>▶</span> Toca el botón de abajo y sube el volumen</p></div>`,
        f:[['Hola. Este es un recorrido de tres minutos por la página de Grupo Beta.'],['Lo preparó MOON Digital, revisándola como la usaría una refaccionaria desde su celular.','Lo preparó Mun Digital, revisándola como la usaría una refaccionaria desde su celular.']]},
       {html:`<div class="grande">49</div><h2>fichas de balatas revisadas</h2><p class="chico-t oculto" data-beat="reto">La información ya está. El reto es que la página la encuentre.</p>`,
        f:[['Primero, la buena noticia: revisamos 49 fichas de balatas, y la información de sus piezas ya es muy completa.'],['El reto no es la información. Es que la página la encuentre.',null,'reto'],['Le enseñamos cinco cosas, cada una con su solución.']]},
@@ -534,13 +536,13 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
     ];
     const $r=s=>document.querySelector(s);
     const hayVoz='speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
-    let voz=null, e=0, fr=0, sonando=false, conVoz=true, temporizador=null, vivas=[];
+    let voz=null, e=0, fr=0, sonando=false, temporizador=null, vigia=null, vivas=[], despierta=false;
     function elegirVoz(){
       if(!hayVoz) return;
       const vs=speechSynthesis.getVoices().filter(v=>/^es/i.test(v.lang));
       const orden=[/es[-_]MX/i,/es[-_]US/i,/es[-_]419/i,/es/i];
       for(const re of orden){ const c=vs.filter(v=>re.test(v.lang)); if(c.length){ voz=c.find(v=>/Paulina|Mónica|Monica|Google/i.test(v.name))||c.find(v=>v.localService)||c[0]; break; } }
-      $r('#rec-voz').textContent=voz?'Voz de su aparato: '+voz.name:(hayVoz?'Su aparato no tiene voz en español: el recorrido avanza con el texto.':'Su navegador no tiene voz: el recorrido avanza con el texto.');
+      $r('#rec-voz').textContent=voz?'Voz de su aparato: '+voz.name:(hayVoz?'Usa la voz en español de su aparato.':'Su navegador no tiene voz: el recorrido avanza con el texto.');
     }
     if(hayVoz){ elegirVoz(); speechSynthesis.addEventListener&&speechSynthesis.addEventListener('voiceschanged',elegirVoz); }
     function puntos(){ $r('#rec-puntos').innerHTML=ESC.map((_,i)=>`<i class="${i<e?'si':''} ${i===e?'ahora':''}"></i>`).join(''); }
@@ -548,7 +550,7 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
     function pintar(){
       const c=$r('#rec-escena'); c.style.opacity='0';
       setTimeout(()=>{ c.innerHTML=ESC[e].html; c.style.opacity='1'; c.scrollTop=0;
-        c.querySelectorAll('[data-accion]').forEach(b=>b.addEventListener('click',()=>{ const a=b.dataset.accion; if(a==='play'){ conVoz=true; siguienteEscena(); arrancar(); } else if(a==='leer'){ conVoz=false; siguienteEscena(); arrancar(); } else if(a==='demo'){ cerrar(); } })); },120);
+        c.querySelectorAll('[data-accion]').forEach(b=>b.addEventListener('click',()=>{ if(b.dataset.accion==='demo') cerrar(); })); },120);
       $r('#rec-ant').disabled=e===0; $r('#rec-sig').disabled=e===ESC.length-1; puntos();
     }
     function beat(nombre){
@@ -560,19 +562,28 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
       if(nombre==='tres') c.querySelectorAll('.circulos i').forEach((i,k)=>i.classList.toggle('on',k<3));
       if(nombre==='sol' && e===5) c.querySelectorAll('.circulos i').forEach(i=>i.classList.add('on'));
     }
-    function parar(){ clearTimeout(temporizador); if(hayVoz){ vivas=[]; speechSynthesis.cancel(); } sonando=false; iconoPlay(false); }
+    function parar(){ clearTimeout(temporizador); clearTimeout(vigia); if(hayVoz){ vivas=[]; speechSynthesis.cancel(); } sonando=false; iconoPlay(false); }
+    function fallo(){ parar(); $r('#rec-sub').textContent='No se escuchó la voz. Sube el volumen (y en iPhone quita el modo silencio) y toca ▶ otra vez.'; }
     function decir(){
       const fs=ESC[e].f; if(fr>=fs.length){ if(e<ESC.length-1){ e++; fr=0; pintar(); temporizador=setTimeout(decir,700); } else { sonando=false; iconoPlay(false); } return; }
       const [texto,habla,b]=fs[fr]; const sub=$r('#rec-sub'); sub.textContent=texto; setTimeout(()=>beat(b),150);
       const avanzar=()=>{ if(!sonando) return; fr++; temporizador=setTimeout(decir,350); };
-      if(conVoz && hayVoz && voz){
-        const u=new SpeechSynthesisUtterance(habla||texto); u.voice=voz; u.lang=voz.lang; u.rate=1; u.pitch=1;
-        u.onend=avanzar; u.onerror=avanzar; vivas.push(u); speechSynthesis.speak(u);
-        // respaldo: si el aparato nunca avisa que terminó, seguimos por tiempo
-        temporizador=setTimeout(()=>{ if(sonando&&vivas.includes(u)&&!speechSynthesis.speaking){ vivas=vivas.filter(x=>x!==u); avanzar(); } },Math.max(6000,(habla||texto).length*110));
+      if(hayVoz){
+        if(!voz) elegirVoz();
+        const u=new SpeechSynthesisUtterance(habla||texto); if(voz){ u.voice=voz; u.lang=voz.lang; } else u.lang='es-MX'; u.rate=1; u.pitch=1;
+        let empezo=false, termino=false;
+        u.onstart=()=>{ empezo=true; };
+        u.onend=()=>{ if(termino) return; termino=true; clearTimeout(vigia); vivas=vivas.filter(x=>x!==u); avanzar(); };
+        u.onerror=ev=>{ if(termino) return; termino=true; clearTimeout(vigia); if(ev&&(ev.error==='interrupted'||ev.error==='canceled')) return; fallo(); };
+        vivas.push(u); try{ speechSynthesis.resume(); }catch(_){}
+        speechSynthesis.speak(u);
+        // vigía: si la voz no arranca en 4 s, no avanzamos en silencio: paramos y avisamos
+        clearTimeout(vigia); vigia=setTimeout(()=>{ if(sonando && !empezo && !termino) fallo(); },4000);
       } else { temporizador=setTimeout(avanzar,Math.max(2200,texto.length*65)); }
     }
-    function arrancar(){ parar(); sonando=true; iconoPlay(true); decir(); }
+    // Despertar la voz dentro del toque (iPhone lo exige) y esperar un momento antes de la primera frase (Chrome pierde la frase si se habla justo después de cancelar)
+    function despertar(){ if(!hayVoz) return; if(!voz) elegirVoz(); try{ const u=new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); despierta=true; }catch(_){} }
+    function arrancar(){ parar(); despertar(); sonando=true; iconoPlay(true); temporizador=setTimeout(decir,despierta?350:0); }
     function siguienteEscena(){ if(e===0){ e=1; fr=0; pintar(); } }
     function irA(n){ const tocaba=sonando; parar(); e=Math.max(0,Math.min(ESC.length-1,n)); fr=0; pintar(); $r('#rec-sub').textContent=''; if(tocaba) setTimeout(arrancar,200); else setTimeout(()=>ESC[e].f.forEach(x=>beat(x[2])),200); }
     let foco=null;
