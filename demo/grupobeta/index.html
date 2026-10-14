@@ -261,7 +261,7 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
 .invita .bolita svg{width:20px;height:20px}
 .invita b{display:block;font-weight:650}
 .invita small{display:block;color:#b9c3e6;font-size:14px}
-/* ---------- Vista Grupo Beta: lo que ve su equipo por dentro ---------- */
+/* ---------- Vista Grupo Beta: su catálogo, todavía más claro ---------- */
 .vistas{display:flex;justify-content:center}
 .vistas div{display:inline-flex;border:1px solid var(--linea);border-radius:999px;background:var(--papel);padding:4px}
 .vistas button{border:0;background:none;font:600 14px var(--t);color:var(--suave);padding:9px 16px;border-radius:999px;cursor:pointer;transition:background-color var(--dur) var(--curva),color var(--dur) var(--curva)}
@@ -270,30 +270,28 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
 .pestanas{display:flex;gap:8px;flex-wrap:wrap}
 .pestanas button{border:1px solid var(--linea);background:var(--papel);color:var(--tinta);font:600 13px var(--t);padding:8px 12px;border-radius:999px;cursor:pointer;display:inline-flex;gap:8px;align-items:center;transition:background-color var(--dur) var(--curva),border-color var(--dur) var(--curva)}
 .pestanas button[aria-selected="true"]{background:var(--azul-suave);border-color:var(--azul);color:var(--azul)}
-.pestanas .cuenta{min-width:22px;height:22px;border-radius:999px;background:var(--rev);color:var(--papel);font-size:12px;display:inline-grid;place-items:center;padding:0 6px}
-.cruda{font:500 13px/1.5 ui-monospace,Menlo,Consolas,monospace;background:var(--fondo);border-radius:18px;padding:14px 16px;color:var(--tinta);word-break:break-word;letter-spacing:.01em}
-.cruda mark{background:var(--rev-suave);color:var(--rev);border-radius:4px;padding:0 2px}
-.flecha{justify-self:center;width:44px;height:44px;border-radius:50%;border:1px solid var(--linea);display:grid;place-items:center;color:var(--azul);transition:opacity var(--dur) var(--curva)}
+.pestanas .cuenta{min-width:22px;height:22px;border-radius:999px;background:var(--azul);color:var(--papel);font-size:12px;display:inline-grid;place-items:center;padding:0 6px}
+.etiqueta{justify-self:start;font:600 12px var(--t);letter-spacing:.02em;color:var(--suave);border:1px solid var(--linea);border-radius:999px;padding:5px 12px}
+.despues .etiqueta{color:var(--azul);border-color:var(--azul);background:var(--azul-suave)}
+.cruda{font:500 13px/1.55 ui-monospace,Menlo,Consolas,monospace;background:var(--fondo);border-radius:18px;padding:14px 16px;color:var(--tinta);word-break:break-word;letter-spacing:.01em}
+.cruda mark{background:var(--azul-suave);color:var(--azul);border-radius:4px;padding:0 2px}
+.puente{display:grid;grid-template-columns:44px 1fr;gap:12px;align-items:center;padding:0 6px;font-size:15px;color:var(--tinta)}
+.puente i{width:44px;height:44px;border-radius:50%;border:1px solid var(--linea);background:var(--papel);display:grid;place-items:center;color:var(--azul)}
+.puente svg{width:20px;height:20px}
 .tabla-o{width:100%;border-collapse:separate;border-spacing:0;font-size:14px}
 .tabla-o th{text-align:left;font-size:12px;color:var(--suave);font-weight:600;padding:0 8px 6px}
 .tabla-o td{padding:8px;border-top:1px solid var(--linea);font-variant-numeric:tabular-nums}
-.tabla-o tr{transition:opacity 300ms var(--curva),transform 300ms var(--curva)}
+.tabla-o tr{transition:opacity 420ms var(--curva),transform 420ms var(--curva)}
 .tabla-o tr.nueva{opacity:0;transform:translateY(6px)}
 @media (prefers-reduced-motion:reduce){.tabla-o tr.nueva{transform:none}}
 .envoltura{overflow-x:auto;margin:0 -4px;padding:0 4px}
-.duda{display:grid;grid-template-columns:28px 1fr;gap:10px;align-items:start;font-size:14px}
-.duda i{width:28px;height:28px;border-radius:50%;background:var(--rev-suave);color:var(--rev);display:grid;place-items:center;font-style:normal;font-weight:800;font-size:13px}
-.duda small{display:block;color:var(--suave);font-size:12px}
-.grupo{border:1px solid var(--linea);border-radius:24px;padding:14px 16px;display:grid;gap:8px;background:var(--papel)}
-.grupo h3{margin:0;font:650 15px var(--t);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
-.grupo h3 span{font-weight:500;color:var(--suave);font-size:13px}
-.contador{font-size:14px;color:var(--suave);font-variant-numeric:tabular-nums}
+.pregunta{display:grid;grid-template-columns:32px 1fr;gap:12px;align-items:center;font-size:15px}
+.pregunta i{width:32px;height:32px;border-radius:50%;background:var(--azul-suave);color:var(--azul);display:grid;place-items:center;font-style:normal;font-weight:700;font-size:14px}
 .duda-pedido{border:1px solid var(--linea);border-radius:24px;padding:16px;display:grid;gap:10px;background:var(--papel);transition:border-color var(--dur) var(--curva),background-color var(--dur) var(--curva)}
 .duda-pedido.lista{border-color:var(--ok);background:var(--ok-suave)}
 .duda-pedido .quien{font-size:13px;color:var(--suave)}
 .duda-pedido h3{margin:0;font:650 16px var(--t)}
 .opciones{display:flex;gap:8px;flex-wrap:wrap}
-.vacio{text-align:center;color:var(--suave);font-size:15px;padding:18px}
 </style>
 </head>
 <body>
@@ -432,39 +430,31 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
 
   <!-- Vista Grupo Beta -->
   <section class="beta" id="vista-beta" hidden aria-labelledby="tb">
-    <h1 id="tb">Así lo ve su equipo</h1>
+    <h1 id="tb">Su catálogo, todavía más claro</h1>
     <div class="pestanas" role="tablist">
       <button type="button" role="tab" id="tab-ord" aria-selected="true" aria-controls="panel-ord">Agente Ordenador</button>
-      <button type="button" role="tab" id="tab-ped" aria-selected="false" aria-controls="panel-ped">Pedidos con duda <span class="cuenta" id="cuenta-ped">0</span></button>
+      <button type="button" role="tab" id="tab-ped" aria-selected="false" aria-controls="panel-ped">Pedidos para confirmar <span class="cuenta" id="cuenta-ped">0</span></button>
     </div>
 
-    <div id="panel-ord" role="tabpanel" aria-labelledby="tab-ord" style="display:grid;gap:16px">
-      <div class="hoja">
-        <h2>Así llega una ficha de su catálogo</h2>
-        <p class="sub">Es el nombre real de una balata en su página. Toda la información está ahí, pero en un solo renglón.</p>
+    <div id="panel-ord" role="tabpanel" aria-labelledby="tab-ord" style="display:grid;gap:14px">
+      <div class="hoja antes" style="display:grid;gap:12px">
+        <span class="etiqueta">Hoy, en su página</span>
         <div class="cruda" id="ord-cruda"></div>
-        <button class="boton" type="button" id="b-ordenar">Ordenar esta ficha</button>
-        <div id="ord-una" hidden style="display:grid;gap:12px">
-          <div class="envoltura"><table class="tabla-o" id="ord-tabla"></table></div>
-          <div id="ord-dudas-una" style="display:grid;gap:10px"></div>
-        </div>
       </div>
-      <div class="hoja" id="ord-todas-hoja" hidden>
-        <h2>Ahora, todas las fichas de balatas del Versa</h2>
-        <p class="sub">Las 22 que vimos en su página. Las junta por pieza (las que son iguales en distintas marcas) y busca lo que no cuadra.</p>
-        <button class="boton" type="button" id="b-ordenar-todas">Ordenar las 22 fichas</button>
-        <p class="contador" id="ord-contador" aria-live="polite"></p>
-        <div id="ord-grupos" style="display:grid;gap:10px"></div>
+      <p class="puente"><i aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M6 13l6 6 6-6"/></svg></i><span>Con la información en orden, cada refaccionaria encuentra a la primera la pieza que busca.</span></p>
+      <div class="hoja despues" style="display:grid;gap:12px">
+        <span class="etiqueta">Con el Agente Ordenador</span>
+        <div class="envoltura"><table class="tabla-o" id="ord-tabla"></table></div>
       </div>
-      <div class="hoja" id="ord-dudas-hoja" hidden>
-        <h2>Lo que no cuadra, para su equipo</h2>
-        <p class="sub">El agente no decide solo cuando duda: lo junta en esta lista. Su equipo contesta una vez y la ficha queda corregida.</p>
-        <div id="ord-dudas" style="display:grid;gap:12px"></div>
+      <div class="hoja" style="display:grid;gap:12px">
+        <h2>Para confirmar con su equipo</h2>
+        <p class="sub">Una vez que su equipo lo confirma, el agente lo corrige en todas las fichas iguales.</p>
+        <div id="ord-preguntas" style="display:grid;gap:12px"></div>
       </div>
     </div>
 
     <div id="panel-ped" role="tabpanel" aria-labelledby="tab-ped" hidden style="display:grid;gap:14px">
-      <p class="sub">Lo que el Agente de Mostrador no pudo confirmar solo. Un vendedor de Beta decide con un toque, y la refaccionaria recibe el aviso.</p>
+      <p class="sub">Cuando el sistema necesita una confirmación, el pedido llega aquí. Un vendedor de Beta elige la pieza con un toque y la refaccionaria recibe el aviso.</p>
       <div id="lista-ped" style="display:grid;gap:12px"></div>
     </div>
   </section>
@@ -496,19 +486,14 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
   let LANG='es';
   const EXACTO={
     // Vista Grupo Beta
-    'Refaccionaria':'Parts store','Así lo ve su equipo':'What your team sees','Agente Ordenador':'Organizer Agent','Pedidos con duda':'Orders to check',
-    'Así llega una ficha de su catálogo':'This is how a listing comes in from your catalog',
-    'Es el nombre real de una balata en su página. Toda la información está ahí, pero en un solo renglón.':'This is the real name of a brake pad on your site. All the information is there, but on a single line.',
-    'Ordenar esta ficha':'Organize this listing','Motor':'Engine','Años':'Years','(sin modelo)':'(no model)',
-    'Ahora, todas las fichas de balatas del Versa':'Now, every Versa brake pad listing',
-    'Las 22 que vimos en su página. Las junta por pieza (las que son iguales en distintas marcas) y busca lo que no cuadra.':"The 22 we saw on your site. It groups them by part (the ones that are the same across brands) and looks for what doesn't add up.",
-    'Ordenar las 22 fichas':'Organize the 22 listings',"Lo que no cuadra, para su equipo":"What doesn't add up, for your team",
-    'El agente no decide solo cuando duda: lo junta en esta lista. Su equipo contesta una vez y la ficha queda corregida.':"When in doubt, the agent doesn't decide alone: it adds it to this list. Your team answers once and the listing stays fixed.",
-    'Varias piezas para el mismo coche':'Several parts for the same car',
-    'Lo que el Agente de Mostrador no pudo confirmar solo. Un vendedor de Beta decide con un toque, y la refaccionaria recibe el aviso.':"What the Counter Agent couldn't confirm on its own. A Beta salesperson decides with one tap, and the parts store gets notified.",
+    'Refaccionaria':'Parts store','Su catálogo, todavía más claro':'Your catalog, even clearer','Agente Ordenador':'Organizer Agent','Pedidos para confirmar':'Orders to confirm',
+    'Hoy, en su página':'Today, on your site','Con el Agente Ordenador':'With the Organizer Agent',
+    'Con la información en orden, cada refaccionaria encuentra a la primera la pieza que busca.':'With the information in order, every parts store finds the part it needs on the first try.',
+    'Para confirmar con su equipo':'To confirm with your team','Una vez que su equipo lo confirma, el agente lo corrige en todas las fichas iguales.':'Once your team confirms it, the agent fixes it in every matching listing.',
+    'Motor':'Engine','Años':'Years','(sin modelo)':'(no model)',
+    'Cuando el sistema necesita una confirmación, el pedido llega aquí. Un vendedor de Beta elige la pieza con un toque y la refaccionaria recibe el aviso.':'When the system needs a confirmation, the order lands here. A Beta salesperson picks the part with one tap and the parts store gets notified.',
     'Su pedido de esta prueba':'Your order from this test','Refaccionaria en Mérida (ejemplo)':'Parts store in Mérida (example)','Refaccionaria en Cancún (ejemplo)':'Parts store in Cancún (example)',
-    'Ya la encontré':'I found it','No encontramos la pieza en su catálogo: hay que buscarla.':"We didn't find the part in your catalog: it needs to be looked up.",
-    'FAG semimetálica':'FAG semi-metallic','FAG cerámica':'FAG ceramic','FP cerámica':'FP ceramic','Brembo metálica':'Brembo metallic','Brembo cerámica':'Brembo ceramic',
+    'Ya la encontré':'I found it','Esta pieza todavía no aparece en el catálogo; un vendedor la busca.':"This part isn't in the catalog yet; a salesperson will look for it.",
     'Demo de MOON Digital para Grupo Beta.':'MOON Digital demo for Grupo Beta.',
     'Piezas de su catálogo público; precios y existencias son de ejemplo.':'Parts from your public catalog; prices and stock are examples.',
     '¿Qué pieza necesitas?':'Which part do you need?',
@@ -565,20 +550,12 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
   };
   const PATRONES=[
     // Vista Grupo Beta
-    [/^Leyendo ficha (\d+) de (\d+)…$/,'Reading listing $1 of $2…'],
-    [/^(\d+) fichas leídas · (\d+) piezas distintas(?: · (\d+) dudas para su equipo)?$/,(m,a,b,c)=>`${a} listings read · ${b} different parts`+(c?` · ${c} questions for your team`:'')],
-    [/^(\d+) fichas? · (\d+) marcas?$/,(m,a,b)=>`${a} ${a==='1'?'listing':'listings'} · ${b} ${b==='1'?'brand':'brands'}`],
-    [/^Balata (delantera|trasera) · (clave|número) (.+)$/,(m,a,b,c)=>`${a==='delantera'?'Front':'Rear'} pad · ${b==='clave'?'code':'number'} ${c}`],
-    [/^Dice «(.+)»: ¿quiso decir «(.+)»\?$/,'It says «$1»: did you mean «$2»?'],
-    [/^(.+): dice «(.+)», ¿quiso decir (.+)\?$/,'$1: it says «$2», did you mean $3?'],
-    [/^(.+): dice «(.+)», año incompleto$/,'$1: it says «$2», incomplete year'],
-    [/^Dice «(.+)» sin el modelo antes: ¿es (.+)\?$/,'It says «$1» with no model before it: is it $2?'],
-    [/^Misma pieza \((.+)\), fichas con años distintos$/,'Same part ($1), listings with different years'],
-    [/^Versa (.+), (delantera|trasera): le quedan (\d+) piezas distintas \((.+)\)\. ¿Cuál es la buena, o depende de la versión\?$/,(m,a,b,n,c)=>`Versa ${a.replace(' a ',' to ')}, ${b==='delantera'?'front':'rear'}: ${n} different parts fit (${c}). Which one is right, or does it depend on the trim?`],
+    [/^¿«(.+)» se refiere a (.+)\?$/,'Does «$1» mean $2?'],
+    [/^En (.+), ¿«(.+)» se refiere a (.+)\?$/,'In $1, does «$2» mean $3?'],
     [/^Balatas (delanteras|traseras) · Nissan Versa (\d{4})$/,(m,a,b)=>`${a==='delanteras'?'Front':'Rear'} pads · Nissan Versa ${b}`],
-    [/^Su catálogo tiene (\d+) piezas para este coche: (.+)\.$/,'Your catalog has $1 parts for this car: $2.'],
+    [/^Hay (\d+) piezas que le pueden quedar a este coche: (.+)\.$/,(m,n,l)=>`${n} parts could fit this car: ${l.replace(' y ',' and ')}.`],
     [/^Mandar (.+)$/,'Send $1'],
-    [/^Confirmada: (.+) · se avisó a la refaccionaria$/,(m,a)=>`Confirmed: ${a==='pieza encontrada'?'part found':a} · the parts store was notified`],
+    [/^Confirmada: (.+) · la refaccionaria ya recibió el aviso$/,(m,a)=>`Confirmed: ${a==='pieza encontrada'?'part found':a} · the parts store has been notified`],
     [/^Solo hay una que le queda a tu Versa (\d{4})\.$/,'Only one fits your $1 Versa.'],
     [/^Es la misma pieza en una marca\.$/,'It is the same part in one brand.'],
     [/^Es la misma pieza en (\d+) versiones de (\d+) marcas: escoge la que tengas a la mano\.$/,'It is the same part in $1 versions from $2 brands: pick the one you have on hand.'],
@@ -597,7 +574,6 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
     [/^(\$[\d,]+) al mes$/,'$1 a month'],[/^(\$[\d,]+) al año$/,'$1 a year'],
     [/^En este demo el Versa va de (\d{4}) a (\d{4})\. Escribe un año en ese rango\.$/,'In this demo the Versa goes from $1 to $2. Type a year in that range.'],
     [/^(Beta ya tiene tu pedido|Ya está listo en el almacén|El chofer marcó «Salí»|El chofer marcó «Entregué») · $/,(m,a)=>EXACTO[a]+' · '],
-    [/^([A-Z][^:?«]*): ([^?«]*\d{4}[^?«]*)$/,(m,a,b)=>a+': '+b.replace(/semimetálica/g,'semi-metallic').replace(/cerámica/g,'ceramic').replace(/metálica/g,'metallic').replace(/(\d{4}) a (\d{4})/g,'$1 to $2')],
   ];
   function traducir(es){
     const t=es.trim(); if(!t) return es;
@@ -1038,73 +1014,39 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
     }
     return datos;
   }
-  // Compara fichas de la misma clave: mismo modelo con años distintos = duda para su equipo
-  function compararFichas(fichas){
-    const dudas=[]; const porModelo={};
-    fichas.forEach(f=>f.leida.filas.forEach(r=>{ if(r.marca&&r.marca!=='Nissan') return; const k=r.modelo+(r.version?' '+r.version:''); (porModelo[k]=porModelo[k]||[]).push({marca:f.marca,desde:r.desde,hasta:r.hasta}); }));
-    Object.entries(porModelo).forEach(([mod,l])=>{
-      const rangos=[...new Set(l.map(x=>x.desde+'-'+x.hasta))];
-      if(rangos.length>1 && l.length>1){
-        const grupos=rangos.map(rg=>`${l.filter(x=>x.desde+'-'+x.hasta===rg).map(x=>x.marca).join(', ')}: ${rg.split('-')[0]===rg.split('-')[1]?rg.split('-')[0]:rg.replace('-',' a ')}`);
-        dudas.push({tipo:'choque',texto:`${mod}: ${grupos.join(' · ')}`});
-      }
-    });
-    return dudas;
-  }
-
-  /* ---------- Vista Grupo Beta ---------- */
+  /* ---------- Vista Grupo Beta: su catálogo, todavía más claro ---------- */
   const EJ_FICHA=FICHAS.find(f=>f.sku==='SPC-8804-Z');
-  function pintarCruda(){ const c=$('#ord-cruda'); c.textContent=EJ_FICHA.desc; }
-  pintarCruda();
-  function filaHTML(r){ return `<tr class="nueva"><td>${esc(r.marca)}</td><td><b>${esc(r.modelo)}</b>${r.version?' '+esc(r.version):''}</td><td>${r.motor?esc(r.motor):'—'}</td><td>${r.desde===r.hasta?r.desde:r.desde+' – '+r.hasta}</td></tr>`; }
+  const LEIDA=leerFicha(EJ_FICHA.desc);
   const CAB='<thead><tr><th>Marca</th><th>Modelo</th><th>Motor</th><th>Años</th></tr></thead>';
-  function dudaHTML(d,origen){ return `<div class="duda"><i>!</i><span>${esc(d.texto)}${origen?`<small>${esc(origen)}</small>`:''}</span></div>`; }
-  function aparecer(cont,ms){ const filas=[...cont.querySelectorAll('tr.nueva')]; filas.forEach((tr,k)=>setTimeout(()=>tr.classList.remove('nueva'),reduce.matches?0:ms*k+40)); }
-  $('#b-ordenar').addEventListener('click',()=>{
-    const r=leerFicha(EJ_FICHA.desc);
-    $('#ord-tabla').innerHTML=CAB+'<tbody>'+r.filas.map(filaHTML).join('')+'</tbody>';
-    $('#ord-dudas-una').innerHTML=r.dudas.map(d=>dudaHTML(d)).join('');
-    // marcar en el texto lo que encontró raro
-    let html=esc(EJ_FICHA.desc); r.dudas.forEach(d=>{ const m=d.texto.match(/«([^»]+)»/); if(m) html=html.replace(esc(m[1].split(' ').pop()),`<mark>${esc(m[1].split(' ').pop())}</mark>`); }); $('#ord-cruda').innerHTML=html;
-    $('#ord-una').hidden=false; $('#b-ordenar').hidden=true; aparecer($('#ord-tabla'),120);
-    $('#ord-todas-hoja').hidden=false;
-  });
-  const NOMBRE_PIEZA=c=>{ const f=FICHAS.find(x=>x.c===c); return (f.pos==='adelante'?'Balata delantera':'Balata trasera')+' · '+(f.sinClave?'número '+c:'clave '+c); };
-  let ordenando=false;
-  $('#b-ordenar-todas').addEventListener('click',()=>{
-    if(ordenando) return; ordenando=true; $('#b-ordenar-todas').disabled=true;
-    const leidas=FICHAS.map(f=>({...f,leida:leerFicha(f.desc)}));
-    const grupos=[...new Set(leidas.map(f=>f.c))];
-    const cont=$('#ord-grupos'); cont.innerHTML='';
-    let k=0; const paso=reduce.matches?60:180;
-    const tick=()=>{
-      k++; $('#ord-contador').textContent=`Leyendo ficha ${Math.min(k,leidas.length)} de ${leidas.length}…`;
-      if(k<leidas.length){ setTimeout(tick,paso); return; }
-      $('#ord-contador').textContent=`${leidas.length} fichas leídas · ${grupos.length} piezas distintas`;
-      grupos.forEach(c=>{
-        const fs=leidas.filter(f=>f.c===c);
-        // filas del Versa, por versión y años, según la mayoría
-        const filas={}; fs.forEach(f=>f.leida.filas.filter(r=>/Versa|sin modelo/.test(r.modelo)).forEach(r=>{ const key=r.modelo+'|'+r.version+'|'+r.desde+'-'+r.hasta; filas[key]=filas[key]||{r,n:0}; filas[key].n++; }));
-        const g=document.createElement('div'); g.className='grupo';
-        const marcas=new Set(fs.map(f=>f.marca.split(' ')[0]));
-        g.innerHTML=`<h3>${esc(NOMBRE_PIEZA(c))}<span>${fs.length} ${fs.length===1?'ficha':'fichas'} · ${marcas.size} ${marcas.size===1?'marca':'marcas'}</span></h3><div class="marcas">${fs.map(f=>`<span>${esc(f.marca)}</span>`).join('')}</div><div class="envoltura"><table class="tabla-o">${CAB}<tbody>${Object.values(filas).map(x=>filaHTML(x.r)).join('')}</tbody></table></div>`;
-        cont.append(g); aparecer(g,60);
-      });
-      // dudas: las de cada ficha + los choques entre fichas de la misma pieza
-      const dudas=[];
-      leidas.forEach(f=>f.leida.dudas.forEach(d=>dudas.push(dudaHTML(d,`${f.marca} · ${f.sku}`))));
-      grupos.forEach(c=>{ const fs=leidas.filter(f=>f.c===c); if(fs.length>1) compararFichas(fs).forEach(d=>dudas.push(dudaHTML(d,`Misma pieza (${c}), fichas con años distintos`))); });
-      const multi=[]; ['adelante','atras'].forEach(pos=>{ for(let a=ANIO_MIN;a<=ANIO_MAX;a++){ const fam=familias(pos,a); if(fam.size>1) multi.push({pos,a,claves:[...fam.keys()]}); } });
-      const juntas={}; multi.forEach(m=>{ const k2=m.pos+'|'+m.claves.join(','); (juntas[k2]=juntas[k2]||{...m,anios:[]}).anios.push(m.a); });
-      Object.values(juntas).forEach(m=>dudas.push(dudaHTML({texto:`Versa ${m.anios.length>1?m.anios[0]+' a '+m.anios[m.anios.length-1]:m.anios[0]}, ${m.pos==='adelante'?'delantera':'trasera'}: le quedan ${m.claves.length} piezas distintas (${m.claves.join(', ')}). ¿Cuál es la buena, o depende de la versión?`},'Varias piezas para el mismo coche')));
-      $('#ord-dudas').innerHTML=dudas.join(''); $('#ord-dudas-hoja').hidden=false;
-      $('#ord-contador').textContent+=` · ${dudas.length} dudas para su equipo`;
-      $('#b-ordenar-todas').hidden=true; ordenando=false;
-    };
-    tick();
-  });
+  const filaHTML=r=>`<tr class="${reduce.matches?'':'nueva'}"><td>${esc(r.marca)}</td><td><b>${esc(r.modelo)}</b>${r.version?' '+esc(r.version):''}</td><td>${r.motor?esc(r.motor):'—'}</td><td>${r.desde===r.hasta?r.desde:r.desde+' – '+r.hasta}</td></tr>`;
+  const bonito=t=>t.toLowerCase().replace(/(^|[\s-])(\p{L})/gu,(m,a,b)=>a+b.toUpperCase());
+  const conY=l=>l.length>1?l.slice(0,-1).join(', ')+' y '+l[l.length-1]:l.join('');
+  (function(){
+    let html=esc(EJ_FICHA.desc);
+    LEIDA.dudas.forEach(d=>{ const m=d.texto.match(/«([^»]+)»/); if(m){ const w=esc(m[1].split(' ').pop()); html=html.replace(w,`<mark>${w}</mark>`); } });
+    $('#ord-cruda').innerHTML=html;
+    $('#ord-tabla').innerHTML=CAB+'<tbody>'+LEIDA.filas.map(filaHTML).join('')+'</tbody>';
+    // las filas aparecen con calma cuando la tabla entra a la vista
+    const filas=[...$('#ord-tabla').querySelectorAll('tr.nueva')];
+    const mostrar=()=>filas.forEach((tr,k)=>setTimeout(()=>tr.classList.remove('nueva'),110*k));
+    if(!filas.length) return;
+    if('IntersectionObserver' in window){ const io=new IntersectionObserver(es=>{ if(es.some(e=>e.isIntersecting)){ io.disconnect(); mostrar(); } },{threshold:.3}); io.observe($('#ord-tabla')); } else mostrar();
+  })();
+  // Preguntas para su equipo: escritas como las haría un compañero, máximo 3
+  (function(){
+    const vistas=new Set(), pregs=[];
+    const todas=[EJ_FICHA,...FICHAS.filter(f=>f!==EJ_FICHA)];
+    todas.forEach(f=>leerFicha(f.desc).dudas.forEach(d=>{
+      if(pregs.length>=3) return;
+      let m=d.texto.match(/^Dice «(.+)»: ¿quiso decir «(.+)»\?$/), q=null, clave=null;
+      if(m){ clave=m[1]; q=`¿«${m[1]}» se refiere a ${bonito(m[2])}?`; }
+      else if((m=d.texto.match(/^(.+): dice «(.+)», ¿quiso decir (.+)\?$/))){ clave=m[2]; q=`En ${m[1]}, ¿«${m[2]}» se refiere a ${m[3]}?`; }
+      if(q&&!vistas.has(clave)){ vistas.add(clave); pregs.push(q); }
+    }));
+    $('#ord-preguntas').innerHTML=pregs.map(q=>`<div class="pregunta"><i aria-hidden="true">?</i><span>${esc(q)}</span></div>`).join('');
+  })();
 
-  // Bandeja del vendedor: pedidos con duda que mandó la refaccionaria + dos de ejemplo
+  // Pedidos para confirmar: los de esta prueba + dos de ejemplo
   const EJEMPLOS=[{quien:'Refaccionaria en Mérida',pos:'atras',anio:2012,opciones:['S1020','S919'],ej:true},{quien:'Refaccionaria en Cancún',pos:'atras',anio:2021,opciones:['FT119','S1106','D4060-5RB0A'],ej:true}];
   const confirmados=new Map();
   function pedidosDuda(){ const vivos=E.pedido.filter(it=>it.estado==='rev').map((it,i)=>({quien:'Su pedido de esta prueba',pos:it.pos,anio:it.anio,opciones:it.opciones||(it.c?[it.c]:[]),id:'v'+i})); return vivos.concat(EJEMPLOS.map((e,i)=>({...e,id:'e'+i}))); }
@@ -1113,14 +1055,13 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
     $('#cuenta-ped').textContent=ps.filter(p=>!confirmados.has(p.id)).length;
     ps.forEach(p=>{
       const d=document.createElement('div'); d.className='duda-pedido'+(confirmados.has(p.id)?' lista':'');
-      const lado=p.pos==='adelante'?'delanteras':'traseras';
       d.innerHTML=`<span class="quien"></span><h3></h3><p class="desc"></p><div class="opciones"></div>`;
       d.querySelector('.quien').textContent=p.quien+(p.ej?' (ejemplo)':'');
-      d.querySelector('h3').textContent=`Balatas ${lado} · Nissan Versa ${p.anio}`;
-      d.querySelector('.desc').textContent=p.opciones.length>1?`Su catálogo tiene ${p.opciones.length} piezas para este coche: ${p.opciones.join(', ')}.`:'No encontramos la pieza en su catálogo: hay que buscarla.';
+      d.querySelector('h3').textContent=`Balatas ${p.pos==='adelante'?'delanteras':'traseras'} · Nissan Versa ${p.anio}`;
+      d.querySelector('.desc').textContent=p.opciones.length>1?`Hay ${p.opciones.length} piezas que le pueden quedar a este coche: ${conY(p.opciones)}.`:'Esta pieza todavía no aparece en el catálogo; un vendedor la busca.';
       const op=d.querySelector('.opciones');
-      if(confirmados.has(p.id)){ op.innerHTML=`<span class="sello ok"><i>✓</i>Confirmada: ${esc(confirmados.get(p.id))} · se avisó a la refaccionaria</span>`; }
-      else (p.opciones.length?p.opciones:['Ya la encontré']).forEach(c=>{ const b=document.createElement('button'); b.type='button'; b.className='chico'; b.textContent=p.opciones.length?'Mandar '+c:c; b.addEventListener('click',()=>{ confirmados.set(p.id,p.opciones.length?c:'pieza encontrada'); pintarPedidos(); }); op.append(b); });
+      if(confirmados.has(p.id)){ op.innerHTML=`<span class="sello ok"><i>✓</i>Confirmada: ${esc(confirmados.get(p.id))} · la refaccionaria ya recibió el aviso</span>`; }
+      else (p.opciones.length>1?p.opciones:['Ya la encontré']).forEach(c=>{ const b=document.createElement('button'); b.type='button'; b.className='chico'; b.textContent=p.opciones.length>1?'Mandar '+c:c; b.addEventListener('click',()=>{ confirmados.set(p.id,p.opciones.length>1?c:'pieza encontrada'); pintarPedidos(); }); op.append(b); });
       l.append(d);
     });
   }
@@ -1130,8 +1071,9 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
     const beta=v==='beta';
     $$('.vistas button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.vista===v)));
     $('#vista-beta').hidden=!beta; $('.pasos').hidden=beta;
-    if(beta){ $$('.pantalla').forEach(x=>x.hidden=true); pintarPedidos(); }
-    else { $$('.pantalla').forEach(x=>x.hidden=true); const n=Math.max(1,[...$$('.paso')].findIndex(b=>b.classList.contains('actual'))+1); $(`.pantalla[data-p="${n}"]`).hidden=false; }
+    $$('.pantalla').forEach(x=>x.hidden=true);
+    if(beta) pintarPedidos();
+    else { const n=Math.max(1,[...$$('.paso')].findIndex(b=>b.classList.contains('actual'))+1); $(`.pantalla[data-p="${n}"]`).hidden=false; }
     window.scrollTo({top:0,behavior:'auto'});
   }
   $$('.vistas button').forEach(b=>b.addEventListener('click',()=>ponerVista(b.dataset.vista)));
