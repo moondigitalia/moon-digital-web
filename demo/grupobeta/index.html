@@ -298,8 +298,7 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
 </head>
 <body>
 <div class="marco">
-  <div class="arriba"><p class="aviso"><b>Demo de MOON Digital para Grupo Beta.</b> Piezas de su catálogo público; precios y existencias son de ejemplo.</p>
-    <div class="idioma" role="group" aria-label="Idioma"><button type="button" data-lang="es" aria-pressed="true">ES</button><button type="button" data-lang="en" aria-pressed="false">EN</button></div></div>
+  <div class="arriba"><p class="aviso"><b>Demo de MOON Digital para Grupo Beta.</b> Piezas de su catálogo público; precios y existencias son de ejemplo.</p></div>
 
   <div class="vistas"><div role="group" aria-label="Vista"><button type="button" data-vista="refa" aria-pressed="true">Refaccionaria</button><button type="button" data-vista="beta" aria-pressed="false">Grupo Beta</button></div></div>
 
@@ -715,7 +714,6 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
   if(new URLSearchParams(location.search).get('ver')==='recorrido') R.abrir();
   document.querySelectorAll('.idioma button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.lang===l)));
     pasarNodo(document.querySelector('.marco')); obs.takeRecords();
-    try{localStorage.setItem('beta-demo-idioma',l)}catch(e){}
   }
   /* ---------- Catálogo: fichas reales de la página pública de Grupo Beta (búsqueda "balata versa", 49 resultados, revisados todos el 14-oct-2026).
      Se agrupan por su clave de equivalencia (la misma pieza en varias marcas). Precios y existencias de ejemplo. ---------- */
@@ -1139,11 +1137,10 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
   $$('.vistas button').forEach(b=>b.addEventListener('click',()=>ponerVista(b.dataset.vista)));
   if(new URLSearchParams(location.search).get('vista')==='beta') ponerVista('beta');
 
-  document.querySelectorAll('.idioma button').forEach(b=>b.addEventListener('click',()=>ponerIdioma(b.dataset.lang)));
+  window.MOON_idioma=ponerIdioma; // solo para las pruebas; el idioma lo decide el teléfono
   obs.observe(document.querySelector('.marco'),{childList:true,subtree:true});
-  let guardado=null; try{guardado=localStorage.getItem('beta-demo-idioma')}catch(e){}
   const pedido=new URLSearchParams(location.search).get('lang');
-  ponerIdioma(pedido==='en'||pedido==='es'?pedido:(guardado||((navigator.language||'es').toLowerCase().startsWith('en')?'en':'es')));
+  ponerIdioma(pedido==='en'||pedido==='es'?pedido:((navigator.language||'es').toLowerCase().startsWith('en')?'en':'es'));
 })();
 </script>
 </body>
