@@ -191,6 +191,68 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
 .lista li i{width:28px;height:28px;border-radius:50%;border:1px solid var(--azul);color:var(--azul);font:600 13px var(--t);font-style:normal;display:grid;place-items:center}
 .lista li .pt{width:10px;height:10px;border:0;background:var(--azul);margin:9px}
 .firma{text-align:center;font-size:13px;color:var(--suave)}
+/* ---------- Recorrido narrado: pantalla completa en azul Beta, una escena a la vez, la voz del propio aparato ---------- */
+.rec{position:fixed;inset:0;z-index:50;background:#0b1a4d;color:#f4f6fb;display:grid;grid-template-rows:auto 1fr auto;font-family:var(--t);overflow:hidden}
+.rec[hidden]{display:none!important}
+.rec:focus{outline:none}
+.rec-arriba{display:flex;align-items:center;gap:12px;padding:max(14px,env(safe-area-inset-top)) 16px 8px;max-width:620px;width:100%;margin:0 auto}
+.rec-firma{display:flex;align-items:center;gap:8px;font-size:13px;color:#b9c3e6;flex:1;min-width:0}
+.rec-firma img{width:26px;height:26px;border-radius:50%;background:#fff}
+.rec-firma b{color:#fff;font-weight:650}
+.rec-x{width:40px;height:40px;border-radius:50%;border:1px solid #33427a;background:none;color:#fff;display:grid;place-items:center;cursor:pointer;flex:none}
+.rec-x svg{width:16px;height:16px}
+.rec-puntos{display:flex;gap:6px;justify-content:center;padding:4px 16px 0}
+.rec-puntos i{width:8px;height:8px;border-radius:50%;background:#33427a;transition:background-color 300ms var(--curva),transform 300ms var(--curva)}
+.rec-puntos i.si{background:#8fb0ff}
+.rec-puntos i.ahora{background:#fff;transform:scale(1.35)}
+.rec-escena{position:relative;max-width:620px;width:100%;margin:0 auto;padding:12px 20px;display:grid;align-content:center;justify-items:center;gap:18px;text-align:center;overflow:auto}
+.rec-escena .grande{font-size:clamp(64px,22vw,120px);font-stretch:125%;font-weight:800;line-height:.95;letter-spacing:-.02em}
+.rec-escena h2{font-size:clamp(24px,7vw,34px);font-stretch:118%;font-weight:750;color:#fff}
+.rec-escena .chico-t{font-size:16px;color:#b9c3e6;max-width:30ch}
+.rec-escena .foto{width:min(320px,82vw);border-radius:22px;overflow:hidden;border:1px solid #33427a;background:#fff;transition:opacity 500ms var(--curva),transform 500ms var(--curva)}
+.rec-escena .foto img{display:block;width:100%;height:auto}
+.oculto{opacity:0;transform:translateY(8px)}
+@media (prefers-reduced-motion:reduce){.oculto{transform:none}}
+.chipr{display:inline-flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.chipr span{border:1px solid #33427a;border-radius:999px;padding:6px 12px;font-size:14px;color:#dfe5f7}
+.sol{display:flex;gap:10px;align-items:flex-start;text-align:left;background:#12286b;border:1px solid #2c4aa8;border-radius:22px;padding:14px 16px;max-width:420px;transition:opacity 500ms var(--curva),transform 500ms var(--curva)}
+.sol i{flex:none;width:26px;height:26px;border-radius:50%;background:#4fd1a0;color:#0b1a4d;display:grid;place-items:center;font-style:normal;font-weight:800;font-size:14px}
+.palabra{display:flex;gap:2px;font-size:clamp(30px,9.5vw,54px);font-stretch:112%;font-weight:800;letter-spacing:.02em}
+.palabra span{transition:color 500ms var(--curva),transform 500ms var(--curva)}
+.palabra.ilumina span.v{color:#ffd166;transform:translateY(-6px)}
+@media (prefers-reduced-motion:reduce){.palabra.ilumina span.v{transform:none}}
+.palabra.apagada span:not(.v){color:#46557f}
+.puntitos{display:grid;grid-template-columns:repeat(10,14px);gap:7px;justify-content:center}
+.puntitos i{width:14px;height:14px;border-radius:50%;background:#33427a;transition:background-color 400ms var(--curva)}
+.puntitos.marca i.v{background:#8fb0ff}
+.circulos{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;max-width:300px}
+.circulos i{width:44px;height:44px;border-radius:50%;border:1.5px solid #33427a;transition:background-color 400ms var(--curva),border-color 400ms var(--curva)}
+.circulos i.on{background:#8fb0ff;border-color:#8fb0ff}
+.tachado{position:relative;display:inline-block}
+.tachado::after{content:"";position:absolute;left:-4%;right:-4%;top:52%;height:4px;border-radius:2px;background:#ff8a91;transform:scaleX(0);transform-origin:left;transition:transform 500ms var(--curva)}
+.tachado.si::after{transform:scaleX(1)}
+.tabla-mini{display:grid;grid-template-columns:auto auto;gap:6px 18px;text-align:left;font-size:15px;background:#12286b;border-radius:18px;padding:14px 18px;transition:opacity 500ms var(--curva)}
+.tabla-mini b{color:#fff}
+.tres{list-style:none;margin:0;padding:0;display:grid;gap:12px;text-align:left}
+.tres li{display:flex;gap:12px;align-items:center;font-size:17px;transition:opacity 500ms var(--curva),transform 500ms var(--curva)}
+.tres li i{width:34px;height:34px;flex:none;border-radius:50%;border:1.5px solid #8fb0ff;color:#8fb0ff;display:grid;place-items:center;font-style:normal;font-weight:700}
+.rec-abajo{max-width:620px;width:100%;margin:0 auto;padding:10px 16px max(18px,env(safe-area-inset-bottom));display:grid;gap:14px}
+.subtitulo{min-height:3.2em;font-size:17px;line-height:1.45;text-align:center;color:#fff;transition:opacity 250ms var(--curva)}
+.controles{display:flex;align-items:center;justify-content:center;gap:18px}
+.controles button{border:1px solid #33427a;background:none;color:#fff;width:48px;height:48px;border-radius:50%;display:grid;place-items:center;cursor:pointer}
+.controles button svg{width:20px;height:20px}
+.controles .play{width:68px;height:68px;background:#fff;color:#0b1a4d;border:0}
+.controles .play svg{width:26px;height:26px}
+.controles button:disabled{opacity:.35;cursor:default}
+.rec button:focus-visible{outline:2px solid #ffd166;outline-offset:3px}
+.rec-voz{font-size:12px;color:#8a97c4;text-align:center}
+.rec-portada .boton-rec{border:0;background:#fff;color:#0b1a4d;font:700 17px var(--t);border-radius:999px;padding:16px 26px;cursor:pointer;display:inline-flex;gap:10px;align-items:center}
+.rec-portada .liga-rec{border:0;background:none;color:#b9c3e6;font:500 15px var(--t);text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:8px}
+.invita{display:flex;gap:14px;align-items:center;text-align:left;width:100%;border:0;border-radius:24px;background:#0b1a4d;color:#fff;padding:16px 18px;cursor:pointer;font:inherit}
+.invita .bolita{width:48px;height:48px;flex:none;border-radius:50%;background:#fff;color:#0b1a4d;display:grid;place-items:center}
+.invita .bolita svg{width:20px;height:20px}
+.invita b{display:block;font-weight:650}
+.invita small{display:block;color:#b9c3e6;font-size:14px}
 </style>
 </head>
 <body>
@@ -321,9 +383,29 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
         <li><i>3</i><span>Una plática de 30 minutos con quien hizo iZeus.</span></li>
       </ol>
     </div>
+    <button class="invita" type="button" data-abrir-recorrido><span class="bolita"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5z"/></svg></span><span><b>Escuchar lo que encontramos en su página</b><small>3 minutos, con voz</small></span></button>
     <button class="liga" type="button" id="b-inicio">Empezar de nuevo</button>
     <p class="firma">Preparado por MOON Digital</p>
   </section>
+</div>
+
+<!-- Recorrido narrado (mismo link: ?ver=recorrido lo abre directo) -->
+<div class="rec" id="rec" tabindex="-1" hidden role="dialog" aria-modal="true" aria-label="Recorrido: lo que encontramos en su página">
+  <div class="rec-arriba">
+    <div class="rec-firma"><img src="/img/logo.webp" alt=""><span><b>Grupo Beta</b> · preparado por MOON Digital</span></div>
+    <button class="rec-x" type="button" id="rec-cerrar" aria-label="Cerrar recorrido"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  </div>
+  <div class="rec-escena" id="rec-escena" aria-live="off"></div>
+  <div class="rec-abajo">
+    <div class="rec-puntos" id="rec-puntos" aria-hidden="true"></div>
+    <p class="subtitulo" id="rec-sub" aria-live="polite"></p>
+    <div class="controles">
+      <button type="button" id="rec-ant" aria-label="Escena anterior"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <button type="button" class="play" id="rec-play" aria-label="Escuchar"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5z"/></svg></button>
+      <button type="button" id="rec-sig" aria-label="Escena siguiente"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 5l7 7-7 7"/></svg></button>
+    </div>
+    <p class="rec-voz" id="rec-voz"></p>
+  </div>
 </div>
 
 <script>
@@ -364,7 +446,8 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
     'Su lista de piezas, o acceso de solo lectura a la conexión que ya usa su página.':'Your parts list, or read-only access to the connection your website already uses.',
     'Las devoluciones del último año con su motivo, aunque sea aproximado.':"Last year's returns with their reason, even if approximate.",
     'Una plática de 30 minutos con quien hizo iZeus.':'A 30-minute talk with whoever built iZeus.',
-    'Empezar de nuevo':'Start over','Preparado por MOON Digital':'Prepared by MOON Digital',
+    'Empezar de nuevo':'Start over',
+    'Escuchar lo que encontramos en su página':'Listen to what we found on your site','3 minutos, con voz':'3 minutes, narrated in Spanish','Preparado por MOON Digital':'Prepared by MOON Digital',
     'Hay en Mérida':'In stock in Mérida','(ejemplo)':'(example)','Balata de disco delantera':'Front disc pad','Balata de tambor trasera':'Rear drum shoe',
     'Un vendedor la confirma antes de salir':'A salesperson confirms it before it ships',
     'No te dejamos a ciegas: un vendedor de Beta te busca la correcta y te avisa antes de mandarla.':"We don't leave you guessing: a Beta salesperson finds the right one and lets you know before shipping.",
@@ -429,7 +512,82 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
   const obs=new MutationObserver(ms=>{ if(LANG==='es') return; ms.forEach(m=>m.addedNodes.forEach(pasarNodo)); obs.takeRecords(); });
   function ponerIdioma(l){
     LANG=l; document.documentElement.lang=l;
-    document.querySelectorAll('.idioma button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.lang===l)));
+    /* ---------- Recorrido narrado: la voz del propio celular o navegador (sin costo), frase por frase ---------- */
+  const R=(()=>{
+    const ESC=[
+      {html:`<div class="rec-portada" style="display:grid;gap:18px;justify-items:center"><h2>Lo que encontramos en su página</h2><p class="chico-t">Un recorrido de 3 minutos, con voz. Cinco detalles de betaautopartes.com y cómo resolverlos.</p><button class="boton-rec" type="button" data-accion="play"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5z"/></svg>Escuchar el recorrido</button><button class="liga-rec" type="button" data-accion="leer">Verlo sin audio</button></div>`,
+       f:[['Hola. Este es un recorrido de tres minutos por la página de Grupo Beta.'],['Lo preparó MOON Digital, revisándola como la usaría una refaccionaria desde su celular.','Lo preparó Mun Digital, revisándola como la usaría una refaccionaria desde su celular.']]},
+      {html:`<div class="grande">49</div><h2>fichas de balatas revisadas</h2><p class="chico-t oculto" data-beat="reto">La información ya está. El reto es que la página la encuentre.</p>`,
+       f:[['Primero, la buena noticia: revisamos 49 fichas de balatas, y la información de sus piezas ya es muy completa.'],['El reto no es la información. Es que la página la encuentre.',null,'reto'],['Le enseñamos cinco cosas, cada una con su solución.']]},
+      {html:`<div class="chipr"><span>Nissan</span><span>Versa</span><span>2015</span><span>Balata</span></div><div class="foto oculto" data-beat="foto"><img src="img/vacia.webp" alt="Su página responde «Categoría vacía»" width="600" height="624"></div><div class="sol oculto" data-beat="sol"><i>✓</i><span>Conectar los menús con la información que ya está en cada ficha.</span></div>`,
+       f:[['Uno. Si alguien elige Nissan, Versa, 2015 y Balata en los menús de la página…'],['…la página contesta: «Categoría vacía».',null,'foto'],['Pero sí las tienen: hay balatas para el Versa 2015 en su catálogo.'],['Quien ve eso, piensa que Beta no la tiene, y la pide en otro lado.'],['Solución: conectar esos menús con la información que ya está en cada ficha.',null,'sol']]},
+      {html:`<div class="puntitos" data-beat-clase="dots:marca">${Array.from({length:49},(_,i)=>`<i class="${i<25?'v':''}"></i>`).join('')}</div><div class="palabra oculto" data-beat="palabra" aria-label="ANIVERSARIO">${'ANIVERSARIO'.split('').map((l,i)=>`<span class="${i>=3&&i<=7?'v':''}">${l}</span>`).join('')}</div><div class="sol oculto" data-beat="sol"><i>✓</i><span>Un buscador que entienda la pieza y el coche juntos.</span></div>`,
+       f:[['Dos. Y esta es curiosa.'],['Al escribir «balata versa», salen 49 resultados. Solo 25 son de Versa.',null,'dots'],['También salen balatas de Jeep y de Mazda… ¿por qué?'],['Porque son edición «aniversario».',null,'palabra'],['Y dentro de la palabra aniversario, está escondida la palabra VERSA.','Y dentro de la palabra aniversario, está escondida la palabra Versa.','versa'],['El buscador la encuentra ahí. Por eso también salen una balata de carrito de golf y una de autobús.'],['Solución: un buscador que entienda la pieza y el coche juntos, y enseñe solo lo que sí le queda.',null,'sol']]},
+      {html:`<div class="foto oculto" data-beat="foto"><img src="img/aplicaciones.webp" alt="Pestaña Aplicaciones: «No se han encontrado aplicaciones»" width="600" height="272"></div><p class="chico-t oculto" data-beat="texto" style="font-size:14px;letter-spacing:.02em">BALATA DISCO DELANTERA NISSAN VERSA 2012-2019 MARCH 2012-2023 NOTE 2014-2019 V-DRIVE 2020-2022…</p><div class="tabla-mini oculto" data-beat="tabla"><b>Versa</b><span>2012 – 2019</span><b>March</b><span>2012 – 2023</span><b>Note</b><span>2014 – 2019</span><b>V-Drive</b><span>2020 – 2022</span></div>`,
+       f:[['Tres. Cada ficha tiene una pestaña que se llama «Aplicaciones»: a qué coches le queda la pieza.'],['Hoy dice: «No se han encontrado aplicaciones».',null,'foto'],['Pero el nombre de la pieza sí lo dice: Versa 2012 a 2019, March, Note…',null,'texto'],['La información está, pero escondida en un texto largo que la página no sabe leer.'],['Solución: la inteligencia artificial lee cada nombre y lo acomoda en una tabla, sin que su equipo capture nada.',null,'tabla']]},
+      {html:`<div class="circulos" data-beat-clase="tres:tres9">${Array.from({length:9},(_,i)=>`<i data-i="${i}"></i>`).join('')}</div><div class="grande oculto" data-beat="cero" style="font-size:clamp(48px,16vw,80px)"><span class="tachado" data-beat-clase="sol:si">$0.00</span></div><div class="sol oculto" data-beat="sol"><i>✓</i><span>Unir las 9 marcas y decir «Inicia sesión para ver tu precio».</span></div>`,
+       f:[['Cuatro. Esta balata delantera existe en nueve marcas dentro de su catálogo.',null,'nueve'],['Pero la ficha solo enseña tres.',null,'tres'],['Y sin iniciar sesión, el precio aparece en $0.00.','Y sin iniciar sesión, el precio aparece en cero pesos.','cero'],['Solución: unir las nueve, para ofrecer otra marca al momento si una se acaba, y decir «inicia sesión para ver tu precio».',null,'sol']]},
+      {html:`<div class="chipr oculto" data-beat="fechas" style="font-size:18px"><span>Ficha A: hasta 2016</span><span>Ficha B: hasta 2019</span></div><div class="grande oculto" data-beat="toyoya" style="font-size:clamp(40px,13vw,68px)">TOYO<span class="tachado" data-beat-clase="arregla:si">Y</span>A</div><div class="sol oculto" data-beat="sol"><i>✓</i><span>La computadora los encuentra sola y arma una lista para su equipo.</span></div>`,
+       f:[['Cinco. Hay fichas que se contradicen.'],['La misma balata: en una ficha le queda hasta 2016, y en otra hasta 2019.',null,'fechas'],['Y hay dedazos: Toyota aparece escrito «Toyoya».','Y hay dedazos: Toyota aparece escrito Toyoya.','toyoya'],['Solución: la computadora los encuentra sola y arma una lista. Su equipo contesta una vez, y queda corregido.',null,'sol']]},
+      {html:`<h2>Todo sale de un mismo paso: ordenar lo que ya tienen</h2><ol class="tres"><li class="oculto" data-beat="1"><i>1</i>Su lista de piezas</li><li class="oculto" data-beat="2"><i>2</i>Las devoluciones del último año</li><li class="oculto" data-beat="3"><i>3</i>Media hora con quien hizo iZeus</li></ol><button class="boton-rec oculto" type="button" data-beat="fin" data-accion="demo">Ver el demo</button>`,
+       f:[['Todo sale de un mismo paso: ordenar lo que ya tienen.'],['Para empezar, necesitamos tres cosas.'],['Su lista de piezas.',null,'1'],['Las devoluciones del último año, con su motivo.',null,'2'],['Y media hora con quien hizo iZeus.','Y media hora con quien hizo ai Zeus.','3'],['Gracias por su tiempo.',null,'fin']]}
+    ];
+    const $r=s=>document.querySelector(s);
+    const hayVoz='speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
+    let voz=null, e=0, fr=0, sonando=false, conVoz=true, temporizador=null, vivas=[];
+    function elegirVoz(){
+      if(!hayVoz) return;
+      const vs=speechSynthesis.getVoices().filter(v=>/^es/i.test(v.lang));
+      const orden=[/es[-_]MX/i,/es[-_]US/i,/es[-_]419/i,/es/i];
+      for(const re of orden){ const c=vs.filter(v=>re.test(v.lang)); if(c.length){ voz=c.find(v=>/Paulina|Mónica|Monica|Google/i.test(v.name))||c.find(v=>v.localService)||c[0]; break; } }
+      $r('#rec-voz').textContent=voz?'Voz de su aparato: '+voz.name:(hayVoz?'Su aparato no tiene voz en español: el recorrido avanza con el texto.':'Su navegador no tiene voz: el recorrido avanza con el texto.');
+    }
+    if(hayVoz){ elegirVoz(); speechSynthesis.addEventListener&&speechSynthesis.addEventListener('voiceschanged',elegirVoz); }
+    function puntos(){ $r('#rec-puntos').innerHTML=ESC.map((_,i)=>`<i class="${i<e?'si':''} ${i===e?'ahora':''}"></i>`).join(''); }
+    function iconoPlay(on){ $r('#rec-play').innerHTML=on?'<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6.5" y="5" width="4" height="14" rx="1.2"/><rect x="13.5" y="5" width="4" height="14" rx="1.2"/></svg>':'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5z"/></svg>'; $r('#rec-play').setAttribute('aria-label',on?'Pausa':'Escuchar'); }
+    function pintar(){
+      const c=$r('#rec-escena'); c.style.opacity='0';
+      setTimeout(()=>{ c.innerHTML=ESC[e].html; c.style.opacity='1'; c.scrollTop=0;
+        c.querySelectorAll('[data-accion]').forEach(b=>b.addEventListener('click',()=>{ const a=b.dataset.accion; if(a==='play'){ conVoz=true; siguienteEscena(); arrancar(); } else if(a==='leer'){ conVoz=false; siguienteEscena(); arrancar(); } else if(a==='demo'){ cerrar(); } })); },120);
+      $r('#rec-ant').disabled=e===0; $r('#rec-sig').disabled=e===ESC.length-1; puntos();
+    }
+    function beat(nombre){
+      if(!nombre) return; const c=$r('#rec-escena');
+      c.querySelectorAll(`[data-beat="${nombre}"]`).forEach(x=>x.classList.remove('oculto'));
+      c.querySelectorAll('[data-beat-clase]').forEach(x=>{ const [b,cl]=x.dataset.beatClase.split(':'); if(b===nombre) x.classList.add(cl); });
+      if(nombre==='versa'){ const p=c.querySelector('.palabra'); p&&p.classList.add('ilumina','apagada'); }
+      if(nombre==='nueve') c.querySelectorAll('.circulos i').forEach(i=>i.classList.add('on'));
+      if(nombre==='tres') c.querySelectorAll('.circulos i').forEach((i,k)=>i.classList.toggle('on',k<3));
+      if(nombre==='sol' && e===5) c.querySelectorAll('.circulos i').forEach(i=>i.classList.add('on'));
+    }
+    function parar(){ clearTimeout(temporizador); if(hayVoz){ vivas=[]; speechSynthesis.cancel(); } sonando=false; iconoPlay(false); }
+    function decir(){
+      const fs=ESC[e].f; if(fr>=fs.length){ if(e<ESC.length-1){ e++; fr=0; pintar(); temporizador=setTimeout(decir,700); } else { sonando=false; iconoPlay(false); } return; }
+      const [texto,habla,b]=fs[fr]; const sub=$r('#rec-sub'); sub.textContent=texto; setTimeout(()=>beat(b),150);
+      const avanzar=()=>{ if(!sonando) return; fr++; temporizador=setTimeout(decir,350); };
+      if(conVoz && hayVoz && voz){
+        const u=new SpeechSynthesisUtterance(habla||texto); u.voice=voz; u.lang=voz.lang; u.rate=1; u.pitch=1;
+        u.onend=avanzar; u.onerror=avanzar; vivas.push(u); speechSynthesis.speak(u);
+        // respaldo: si el aparato nunca avisa que terminó, seguimos por tiempo
+        temporizador=setTimeout(()=>{ if(sonando&&vivas.includes(u)&&!speechSynthesis.speaking){ vivas=vivas.filter(x=>x!==u); avanzar(); } },Math.max(6000,(habla||texto).length*110));
+      } else { temporizador=setTimeout(avanzar,Math.max(2200,texto.length*65)); }
+    }
+    function arrancar(){ parar(); sonando=true; iconoPlay(true); decir(); }
+    function siguienteEscena(){ if(e===0){ e=1; fr=0; pintar(); } }
+    function irA(n){ const tocaba=sonando; parar(); e=Math.max(0,Math.min(ESC.length-1,n)); fr=0; pintar(); $r('#rec-sub').textContent=''; if(tocaba) setTimeout(arrancar,200); else setTimeout(()=>ESC[e].f.forEach(x=>beat(x[2])),200); }
+    let foco=null;
+    function abrir(){ foco=document.activeElement; $r('#rec').hidden=false; document.body.style.overflow='hidden'; e=0; fr=0; pintar(); $r('#rec-sub').textContent=''; setTimeout(()=>$r('#rec').focus({preventScroll:true}),50); }
+    function cerrar(){ parar(); $r('#rec').hidden=true; document.body.style.overflow=''; if(foco&&foco.focus) foco.focus(); }
+    $r('#rec-play').addEventListener('click',()=>{ if(sonando){ parar(); return; } if(e===0){ siguienteEscena(); } arrancar(); });
+    $r('#rec-ant').addEventListener('click',()=>irA(e-1));
+    $r('#rec-sig').addEventListener('click',()=>irA(e+1));
+    $r('#rec-cerrar').addEventListener('click',cerrar);
+    document.addEventListener('keydown',ev=>{ if($r('#rec').hidden) return; if(ev.key==='Escape') cerrar(); else if(ev.key==='ArrowRight') irA(e+1); else if(ev.key==='ArrowLeft') irA(e-1); });
+    return {abrir,cerrar};
+  })();
+  document.querySelectorAll('[data-abrir-recorrido]').forEach(b=>b.addEventListener('click',R.abrir));
+  if(new URLSearchParams(location.search).get('ver')==='recorrido') R.abrir();
+  document.querySelectorAll('.idioma button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.lang===l)));
     pasarNodo(document.querySelector('.marco')); obs.takeRecords();
     try{localStorage.setItem('beta-demo-idioma',l)}catch(e){}
   }
