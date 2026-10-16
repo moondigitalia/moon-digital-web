@@ -88,7 +88,8 @@ select{appearance:none;-webkit-appearance:none;font:500 15px var(--t);color:var(
 .mensaje{font-size:15px;color:var(--rev);background:var(--rev-suave);border-radius:20px;padding:12px 16px}
 
 .entendimos{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:15px}
-.entendimos span{border:1px solid var(--linea);border-radius:999px;padding:5px 12px;background:var(--papel);font-weight:600}
+.entendimos span{font-weight:600}
+.entendimos span+span::before{content:"·";margin-right:8px;color:var(--suave);font-weight:400}
 .entendimos button{border:0;background:none;color:var(--azul);font:500 15px var(--t);padding:5px 4px;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
 
 /* Coche visto desde arriba: se toca adelante o atrás */
@@ -151,11 +152,12 @@ button:focus-visible,select:focus-visible,input:focus-visible,.zona:focus-visibl
 .codigo{font-size:14px;color:var(--suave);font-variant-numeric:tabular-nums}
 .desc{font-size:13px;color:var(--suave);line-height:1.45}
 .marcas{display:flex;flex-wrap:wrap;gap:6px}
-.marcas span{font-size:13px;border:1px solid var(--linea);border-radius:999px;padding:4px 10px}
+.marcas span{font-size:13px}
 .marcas button{font:500 13px var(--t);color:var(--tinta);background:var(--papel);border:1px solid var(--linea);border-radius:999px;padding:8px 12px;min-height:36px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:background-color var(--dur) var(--curva),border-color var(--dur) var(--curva),color var(--dur) var(--curva)}
 .marcas button[aria-pressed="true"]{background:var(--azul-suave);border-color:var(--azul);color:var(--azul);font-weight:600}
 .marcas button[aria-pressed="true"]::before{content:"✓";font-weight:700}
-.marcas span.elegida{background:var(--azul-suave);border-color:var(--azul);color:var(--azul);font-weight:600}
+.marcas span.elegida{color:var(--azul);font-weight:600;font-size:14px}
+.marcas span.una{font-size:14px;color:var(--tinta)}
 .precio{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:14px;color:var(--suave)}
 .precio b{white-space:nowrap;font-size:18px;color:var(--tinta);font-variant-numeric:tabular-nums}
 .nota{font-size:14px;color:var(--suave);border-left:2px solid var(--azul);padding-left:12px}
@@ -275,12 +277,12 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
 .pestanas button{border:1px solid var(--linea);background:var(--papel);color:var(--tinta);font:600 13px var(--t);padding:8px 12px;border-radius:999px;cursor:pointer;display:inline-flex;gap:8px;align-items:center;transition:background-color var(--dur) var(--curva),border-color var(--dur) var(--curva)}
 .pestanas button[aria-selected="true"]{background:var(--azul-suave);border-color:var(--azul);color:var(--azul)}
 .pestanas .cuenta{min-width:22px;height:22px;border-radius:999px;background:var(--azul);color:var(--papel);font-size:12px;display:inline-grid;place-items:center;padding:0 6px}
-.etiqueta{justify-self:start;font:600 12px var(--t);letter-spacing:.02em;color:var(--suave);border:1px solid var(--linea);border-radius:999px;padding:5px 12px}
-.despues .etiqueta{color:var(--azul);border-color:var(--azul);background:var(--azul-suave)}
+.etiqueta{justify-self:start;font:700 12px var(--t);letter-spacing:.06em;text-transform:uppercase;color:var(--suave)}
+.despues .etiqueta{color:var(--azul)}
 .cruda{font:500 13px/1.55 ui-monospace,Menlo,Consolas,monospace;background:var(--fondo);border-radius:18px;padding:14px 16px;color:var(--tinta);word-break:break-word;letter-spacing:.01em}
 .cruda mark{background:var(--azul-suave);color:var(--azul);border-radius:4px;padding:0 2px}
 .puente{display:grid;grid-template-columns:44px 1fr;gap:12px;align-items:center;padding:0 6px;font-size:15px;color:var(--tinta)}
-.puente i{width:44px;height:44px;border-radius:50%;border:1px solid var(--linea);background:var(--papel);display:grid;place-items:center;color:var(--azul)}
+.puente i{width:44px;height:44px;display:grid;place-items:center;color:var(--azul)}
 .puente svg{width:20px;height:20px}
 .tabla-o{width:100%;border-collapse:separate;border-spacing:0;font-size:14px}
 .tabla-o th{text-align:left;font-size:12px;color:var(--suave);font-weight:600;padding:0 8px 6px}
@@ -366,7 +368,7 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
   <section class="pantalla" data-p="3" aria-labelledby="t3" hidden>
     <h1 id="t3">Tu pedido</h1>
     <div id="pedido"></div>
-    <p class="nota">Si esta marca se acaba, te ofrecemos al momento la misma pieza en otra marca.</p>
+    <p class="nota" id="nota-marca" hidden>Si la marca que elegiste se acaba, te ofrecemos al momento la misma pieza en otra.</p>
     <button class="boton" type="button" id="b-enviar">Enviar pedido</button>
     <button class="liga" type="button" id="b-otra">Buscar otra pieza</button>
   </section>
@@ -489,6 +491,15 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
   /* ---------- Idioma: español / inglés. El texto en español es la fuente; el inglés se aplica encima y se quita al volver. ---------- */
   let LANG='es';
   const EXACTO={
+    'La tarjeta trae la versión y el número de serie. Con eso sabemos cuál es la tuya.':'The card shows the trim and the VIN. With that we know which one is yours.',
+    'Para este año, un vendedor confirma cuál es con los datos de tu tarjeta.':'For this year, a salesperson confirms which one it is with the details on your card.',
+    'Hoy, al buscar «balata versa» en su página, salen 49 resultados para revisar. Aquí, una sola respuesta: la pieza que le queda.':'Today, searching "balata versa" on your site shows 49 results to go through. Here, a single answer: the part that fits.',
+    'Es para Versa Base 2009-2011 y Versa S 2012.':'It is for Versa Base 2009-2011 and Versa S 2012.',
+    'Si la marca que elegiste se acaba, te ofrecemos al momento la misma pieza en otra.':'If the brand you chose runs out, we offer the same part in another one right away.',
+    'La tarjeta dice Advance, y la otra balata es solo para la versión S.':'The card says Advance, and the other pad is only for the S trim.',
+    'Te ayudamos a saber cuál es la tuya.':'We help you find out which one is yours.',
+    'Beta recibe tu pedido':'Beta receives your order','Lo preparan en el almacén':'It is being prepared at the warehouse',
+    'Cuando el chofer marque «Salí»':'When the driver taps «Salí» (I left)','Cuando el chofer marque «Entregué»':'When the driver taps «Entregué» (Delivered)',
     'Beta manda la marca que tenga disponible.':'Beta sends whichever brand it has in stock.',
     // Vista Grupo Beta
     'Refaccionaria':'Parts store','Su catálogo, todavía más claro':'Your catalog, even clearer','Agente Ordenador':'Organizer Agent','Pedidos para confirmar':'Orders to confirm',
@@ -507,7 +518,7 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
     'Buscar balatas':'Find brake pads','Que llegue la correcta a la primera':'The right part, the first time',
     '¿Las de adelante o las de atrás?':'Front or rear?','Toca la mitad del coche.':'Tap that half of the car.',
     'Adelante':'Front','Atrás':'Rear','Balatas':'Brake pads','Cambiar':'Change','Cambiar adelante o atrás':'Change front or rear',
-    'Tu pedido':'Your order','Si esta marca se acaba, te ofrecemos al momento la misma pieza en otra marca.':'If this brand runs out, we offer the same part in another brand right away.',
+    'Tu pedido':'Your order',
     'Enviar pedido':'Send order','Buscar otra pieza':'Find another part','Agregar al pedido':'Add to order',
     '¿Dónde va mi pedido?':'Where is my order?','Ver lo que esto le ahorra':'See what this saves you',
     'Así lo ve el chofer':'What the driver sees','Escanea el QR de su hoja de ruta con la cámara. No instala nada ni pone contraseña.':'He scans the QR on his route sheet with the camera. No app, no password.',
@@ -540,20 +551,22 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
     'Atrás, en la tapa de la cajuela, el coche dice su versión. ¿Cuál dice?':'On the trunk lid, the car shows its trim. Which one does it say?',
     'Manda foto de la tarjeta de circulación':'Send a photo of the registration card','Casi todos la traen en la guantera':'Almost everyone keeps it in the glovebox',
     'Foto de ejemplo':'Sample photo','Número de serie':'VIN',
-    'La tarjeta trae la versión y el número de serie. Con eso escogemos entre las fichas de su catálogo.':'The card shows the trim and the VIN. With that we choose among your catalog listings.',
     'Usar la foto de ejemplo':'Use the sample photo','No sé / no tengo cómo':"I don't know / can't check",'No te preocupes':"Don't worry",
     'Lo mandamos con revisión: un vendedor de Beta confirma cuál es antes de que salga la camioneta.':'We send it with a check: a Beta salesperson confirms which one before the truck leaves.',
     'Es esta.':'This is the one.','Va con revisión.':'It goes with a check.',
     'Un vendedor confirma cuál es antes de que salga. Te sugerimos esta:':'A salesperson confirms which one before it ships. We suggest this one:',
-    'La tarjeta dice "Advance", y la otra ficha solo aplica a la versión S.':'The card says "Advance", and the other listing only applies to the S trim.',
-    'Aun con la versión, su catálogo no separa estas piezas.':"Even with the trim, your catalog doesn't tell these parts apart.",
-    'Hoy, al buscar «balata versa» en su página, salen 49 resultados para revisar. Aquí quedó 1.':'Today, searching "balata versa" on your site shows 49 results to go through. Here: 1.',
-    'Su ficha dice: Versa Base 2009-2011 y Versa S 2012.':'Its listing says: Versa Base 2009-2011 and Versa S 2012.',
     'Escribe la pieza y el coche, por ejemplo: balatas versa 2012.':'Type the part and the car, for example: brake pads versa 2012.',
     'En este demo está cargado el Nissan Versa. Prueba con: balatas versa 2012.':'This demo has the Nissan Versa loaded. Try: brake pads versa 2012.',
     '¿De qué año es el Versa? Agrégalo, por ejemplo: balatas versa 2012. Si no lo sabes, viene en la tarjeta de circulación.':"What year is the Versa? Add it, for example: brake pads versa 2012. If you don't know, it's on the registration card."
   };
   const PATRONES=[
+    [/^Para el Versa (\d{4}) hay (\d+) balatas (delanteras|traseras) posibles\.$/,(m,a,n,l)=>`For the ${a} Versa there are ${n} possible ${l==='delanteras'?'front pads':'rear shoes'}.`],
+    [/^La otra balata es solo para la versión S, así que para tu (.+) es esta\.$/,'The other pad is only for the S trim, so for your $1 this is the one.'],
+    [/^Para la versión S pueden quedar las (\d+); un vendedor confirma cuál antes de mandarla\.$/,'For the S trim, all $1 could fit; a salesperson confirms which one before sending it.'],
+    [/^Un vendedor elige la correcta entre (\d+) opciones antes de mandarla\.$/,'A salesperson picks the right one out of $1 options before sending it.'],
+    [/^Cualquiera de (\d+) marcas: Beta manda la que tenga disponible\.$/,'Any of $1 brands: Beta sends whichever it has in stock.'],
+    [/^Es una sola pieza, de una marca, en (\d+) versiones\. Todas le quedan igual: toca la que prefieras, o Beta te manda la que tenga\.$/,'It is a single part, from one brand, in $1 versions. They all fit the same: tap the one you prefer, or Beta sends whichever it has.'],
+    [/^Es una sola pieza, y la fabrican (\d+) marcas \((\d+) opciones\)\. Todas le quedan igual: toca la que prefieras, o Beta te manda la que tenga\.$/,'It is a single part, made by $1 brands ($2 options). They all fit the same: tap the one you prefer, or Beta sends whichever it has.'],
     // Vista Grupo Beta
     [/^¿«(.+)» se refiere a (.+)\?$/,'Does «$1» mean $2?'],
     [/^En (.+), ¿«(.+)» se refiere a (.+)\?$/,'In $1, does «$2» mean $3?'],
@@ -567,14 +580,9 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
     [/^Es una sola pieza, y la fabrican en una marca, en (\d+) versiones\. Todas le quedan igual: toca la que prefieras, o Beta te manda la que tenga\.$/,'It is a single part, made by one brand in $1 versions. They all fit the same: tap the one you prefer, or Beta sends whichever it has.'],
     [/^No encontramos balatas delanteras para el Versa (\d{4}) en su catálogo\.$/,"We didn't find front pads for the $1 Versa in your catalog."],
     [/^No encontramos balatas traseras para el Versa (\d{4}) en su catálogo\.$/,"We didn't find rear shoes for the $1 Versa in your catalog."],
-    [/^Para el Versa (\d{4}) su catálogo tiene (\d+) balatas (delanteras|traseras) distintas\.$/,(m,a,n,l)=>`For the ${a} Versa your catalog has ${n} different ${l==='delanteras'?'front pads':'rear shoes'}.`],
     [/^Verificada con su catálogo: le queda a tu Versa (\d{4}) \((adelante|atrás)\)$/,(m,a,l)=>`Verified with your catalog: fits your ${a} Versa (${l==='adelante'?'front':'rear'})`],
     [/^Clave (.+)$/,'Code $1'],[/^Número (.+)$/,'Part number $1'],[/^desde (.+)$/,'from $1'],
     [/^Balatas (delanteras|traseras) · Nissan Versa (\d{4})$/,(m,l,a)=>`${l==='delanteras'?'Front pads':'Rear shoes'} · Nissan Versa ${a}`],
-    [/^El vendedor elige entre las claves (.+) y (.+)\.$/,'The salesperson chooses between codes $1 and $2.'],
-    [/^Su ficha de la (.+) solo dice "Versa S (\d{4})", así que para (.+) es esta\.$/,'Your $1 listing only says "Versa S $2", so for $3 this is the one.'],
-    [/^Para "S", (\d+) fichas pueden aplicar\.$/,'For "S", $1 listings may apply.'],
-    [/^Ojo: (.+) es la misma pieza, pero su ficha dice (.+)\. Va en la lista para su equipo\.$/,'Heads up: $1 is the same part, but its listing says $2. It goes on the list for your team.'],
     [/^(.*?)(\d+) fichas? dic(?:e|en) (\S+)(.*)$/,null],
     [/^(\$[\d,]+) al mes$/,'$1 a month'],[/^(\$[\d,]+) al año$/,'$1 a year'],
     [/^En este demo el Versa va de (\d{4}) a (\d{4})\. Escribe un año en ese rango\.$/,'In this demo the Versa goes from $1 to $2. Type a year in that range.'],
@@ -619,7 +627,7 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
       {html:`<div class="foto oculto" data-beat="foto"><img src="img/aplicaciones.webp" alt="Pestaña Aplicaciones: «No se han encontrado aplicaciones»" width="600" height="272"></div><p class="chico-t oculto" data-beat="texto" style="font-size:14px;letter-spacing:.02em">BALATA DISCO DELANTERA NISSAN VERSA 2012-2019 MARCH 2012-2023 NOTE 2014-2019 V-DRIVE 2020-2022…</p><div class="tabla-mini oculto" data-beat="tabla"><b>Versa</b><span>2012 – 2019</span><b>March</b><span>2012 – 2023</span><b>Note</b><span>2014 – 2019</span><b>V-Drive</b><span>2020 – 2022</span></div><div class="sol oculto" data-beat="sol"><i>✓</i><span><b>Agente Ordenador:</b> lee cada ficha y la acomoda en tabla.</span></div>`,
        f:[["Tres. Cada ficha tiene una pestaña que se llama «Aplicaciones»: la lista de coches a los que les queda la pieza. Es justo lo que un mostrador necesita."], ["Hoy dice: «No se han encontrado aplicaciones».", null, "foto"], ["Pero el nombre de la pieza sí lo dice: Versa 2012 a 2019, March, Note…", null, "texto"], ["O sea, el dato existe, pero escondido en un texto largo que la página no sabe leer. De ahí vienen los dos detalles anteriores.", null, "tabla"], ["Aquí entra el Agente Ordenador: lee el nombre de cada ficha y lo acomoda en una tabla, marca, modelo y años, sin que su equipo vuelva a capturar nada. Con esa tabla, el Buscador ya no se equivoca.", null, "sol"]]},
       {html:`<div class="circulos" data-beat-clase="tres:tres9">${Array.from({length:9},(_,i)=>`<i data-i="${i}"></i>`).join('')}</div><p class="chico-t">9 fichas de la misma balata · 5 marcas</p><div class="grande oculto" data-beat="cero" style="font-size:clamp(48px,16vw,80px)"><span class="tachado" data-beat-clase="sol:si">$0.00</span></div><div class="sol oculto" data-beat="sol"><i>✓</i><span><b>Agente Ordenador + Agente de Mostrador:</b> unen las 9 y ofrecen otra marca al momento.</span></div>`,
-       f:[["Cuatro. Piense en cuando una marca se le acaba en bodega."], ["Esta balata delantera aparece en nueve fichas de su catálogo, de cinco marcas distintas.", null, "nueve"], ["Pero la ficha solo enseña tres. Las otras cinco opciones, el vendedor no las ve.", null, "tres"], ["Y sin iniciar sesión, el precio aparece en $0.00, que a la vista parece un error.", "Y sin iniciar sesión, el precio aparece en cero pesos, que a la vista parece un error.", "cero"], ["El Agente Ordenador une las nueve fichas de la misma pieza. Y el Agente de Mostrador, cuando una marca se acaba, ofrece otra al momento, sin perder la venta.", null, "sol"]]},
+       f:[["Cuatro. Piense en cuando una marca se le acaba en bodega."], ["Esta balata delantera aparece en nueve fichas de su catálogo, de cinco marcas distintas.", null, "nueve"], ["Pero la ficha solo enseña tres de ellas. Las demás, el vendedor no las ve.", null, "tres"], ["Y sin iniciar sesión, el precio aparece en $0.00, que a la vista parece un error.", "Y sin iniciar sesión, el precio aparece en cero pesos, que a la vista parece un error.", "cero"], ["El Agente Ordenador une las nueve fichas de la misma pieza. Y el Agente de Mostrador, cuando una marca se acaba, ofrece otra al momento, sin perder la venta.", null, "sol"]]},
       {html:`<div class="chipr oculto" data-beat="fechas" style="font-size:18px"><span>Ficha A: hasta 2016</span><span>Ficha B: hasta 2019</span></div><div class="grande oculto" data-beat="toyoya" style="font-size:clamp(40px,13vw,68px)">TOYO<span class="tachado" data-beat-clase="arregla:si">Y</span>A</div><div class="sol oculto" data-beat="sol"><i>✓</i><span><b>Agente Ordenador:</b> encuentra lo que no cuadra y arma la lista para su equipo.</span></div>`,
        f:[["Cinco. Hay fichas de la misma pieza que se contradicen."], ["En una le queda hasta 2016, y en otra hasta 2019. Cuando la información duda, el que vende también duda.", null, "fechas"], ["Y hay detalles de escritura: Toyota aparece escrito «Toyoya». Quien lo busque bien escrito, no lo encuentra.", "Y hay detalles de escritura: Toyota aparece escrito Toyoya. Quien lo busque bien escrito, no lo encuentra.", "toyoya"], ["El Agente Ordenador encuentra estas diferencias solo, y arma una lista. Su equipo contesta una vez, y queda corregido.", null, "sol"]]},
       {html:`<h2>Su equipo de agentes</h2><div class="equipo"><div class="ag oculto" data-beat="a1"><i>1</i><b>Buscador</b><span>Entiende qué pieza y para qué coche</span></div><div class="ag oculto" data-beat="a2"><i>2</i><b>Ordenador</b><span>Pone en orden sus fichas, una sola vez y siempre al día</span></div><div class="ag oculto" data-beat="a3"><i>3</i><b>Mostrador</b><span>Confirma antes de mandar y ofrece otra marca</span></div><div class="ag oculto" data-beat="a4"><i>4</i><b>Entregas</b><span>El chofer marca «Salí» y «Entregué» con un QR</span></div></div>`,
@@ -716,7 +724,7 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
     {c:'D2038',pos:'adelante',marca:'FAG cerámica',sku:'CMD20389269',desc:'BALATA DISCO DELANTERA NISSAN VERSA 4L 1.6 LTS 2020-2023 NISSAN TRUCK KICKS 4L 1.6 LTS 2017-2023 ()',a:[2020,2023]},
     {c:'D1060-5RB0B',pos:'adelante',marca:'FP',sku:'D1060-5RB0BFP',desc:'BALATA DISCO DELANTERA NISSAN VERSA II 2020-2024 NISSAN TRUCK KICKS 2017-2020 ()',a:[2020,2024],sinClave:true},
     // Trasera · clave S919
-    {c:'S919',pos:'atras',marca:'Fritec One Way',sku:'OW1462-ZV',desc:'BALATA TAMBOR TRASERA NISSAN VERSA BASE 4L 1.6 LTS 2009-2011 VERSA S 4L 1.6 LTS 2012 SENTRA BASE 4L 2.0 LTS 2007-2012 SENTRA CUSTOM 4L 2.0 LTS 2007-2012 CHRYSLER SEBRING BASE 4L 2.4 LTS 2007 DODGE AVENGER SE 4L 2.0 LTS 2008-2009 S919 1462-S919-SM ()',a:[2009,2012],nota:'Su ficha dice: Versa Base 2009-2011 y Versa S 2012'},
+    {c:'S919',pos:'atras',marca:'Fritec One Way',sku:'OW1462-ZV',desc:'BALATA TAMBOR TRASERA NISSAN VERSA BASE 4L 1.6 LTS 2009-2011 VERSA S 4L 1.6 LTS 2012 SENTRA BASE 4L 2.0 LTS 2007-2012 SENTRA CUSTOM 4L 2.0 LTS 2007-2012 CHRYSLER SEBRING BASE 4L 2.4 LTS 2007 DODGE AVENGER SE 4L 2.0 LTS 2008-2009 S919 1462-S919-SM ()',a:[2009,2012],nota:'Es para Versa Base 2009-2011 y Versa S 2012'},
     // Trasera · clave S1020
     {c:'S1020',pos:'atras',marca:'Fritec One Way',sku:'OW1689-ZV',desc:'BALATA TAMBOR TRASERA NISSAN VERSA 2012-2016 MARCH ADVANCE 2012-2016 MARCH DRIVE 2012-2013 MARCH SENSE 2012-2016 =S1020 ()',a:[2012,2016]},
     {c:'S1020',pos:'atras',marca:'Raybestos',sku:'1689-S1020-SM',desc:'BALATA SEMI METALICA TRASERA NISSAN MARCH 2012-2016 NOTE 2014-2016 VERSA 2012-2016 ()',a:[2012,2016]},
@@ -813,7 +821,7 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
     const lado=pos==='adelante'?'delanteras':'traseras';
     if(fam.size===1){
       const [c]=fam.keys();
-      const tarj=tarjetaFamilia(c,'ok',E.anio,E.pos,true); res.append(hoja(`<h2>Esta es la balata que le queda a tu Versa ${E.anio}.</h2><p class="sub">${(()=>{const fs=fam.get(c), m=new Set(fs.map(f=>f.marca.split(' ')[0])).size; return fs.length===1?'La tenemos en una sola marca.':`Es una sola pieza, y la fabrican ${m===1?'en una marca, en '+fs.length+' versiones':m+' marcas'}. Todas le quedan igual: toca la que prefieras, o Beta te manda la que tenga.`;})()}</p>`, tarj, '<p class="nota">Hoy, al buscar «balata versa» en su página, salen 49 resultados para revisar. Aquí quedó 1.</p>', botonAgregar(c,'ok',undefined,tarj)));
+      const tarj=tarjetaFamilia(c,'ok',E.anio,E.pos,true); res.append(hoja(`<h2>Esta es la balata que le queda a tu Versa ${E.anio}.</h2><p class="sub">${esc(textoMarcas(FICHAS.filter(f=>f.c===c&&aplica(f,E.anio))))}</p>`, tarj, '<p class="nota">Hoy, al buscar «balata versa» en su página, salen 49 resultados para revisar. Aquí, una sola respuesta: la pieza que le queda.</p>', botonAgregar(c,'ok',undefined,tarj)));
     } else if(fam.size===0){
       res.append(hoja(`<h2>No encontramos balatas ${lado} para el Versa ${E.anio} en su catálogo.</h2><p class="sub">No te dejamos a ciegas: un vendedor de Beta te busca la correcta y te avisa antes de mandarla.</p>`, botonAgregar(null,'rev')));
     } else {
@@ -825,6 +833,15 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
   }
 
   function hoja(...partes){const d=document.createElement('div');d.className='hoja';partes.forEach(p=>typeof p==='string'?d.insertAdjacentHTML('beforeend',p):d.append(p));return d;}
+  // Una sola pieza, varias marcas: el texto siempre dice lo mismo que se ve abajo
+  function textoMarcas(fs){
+    const n=fs.length, m=new Set(fs.map(f=>f.marca.split(' ')[0])).size;
+    if(n===1) return 'La tenemos en una sola marca.';
+    const cola='Todas le quedan igual: toca la que prefieras, o Beta te manda la que tenga.';
+    if(m===1) return `Es una sola pieza, de una marca, en ${n} versiones. ${cola}`;
+    if(n===m) return `Es una sola pieza, y la fabrican ${m} marcas. ${cola}`;
+    return `Es una sola pieza, y la fabrican ${m} marcas (${n} opciones). ${cola}`;
+  }
   function tarjetaFamilia(c,estado,anio=E.anio,pos=E.pos,elegible=false,marca=null){
     const fs=FICHAS.filter(f=>f.c===c&&aplica(f,anio)), fuera=fueraDeAnio(c,anio);
     const d=document.createElement('div'); d.className='pieza';
@@ -841,9 +858,8 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
         b.addEventListener('click',()=>{const ya=b.getAttribute('aria-pressed')==='true';cajaM.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed','false'));if(!ya)b.setAttribute('aria-pressed','true');d.dataset.marca=ya?'':f.marca+' · '+f.sku;});
         cajaM.append(b);});
     } else if(marca){ const s=document.createElement('span');s.className='elegida';s.textContent='✓ '+marca;cajaM.append(s); }
-    else { fs.forEach(f=>{const s=document.createElement('span');s.textContent=f.marca+' · '+f.sku;cajaM.append(s);}); if(fs.length>1&&!elegible){const n=document.createElement('p');n.className='desc';n.textContent='Beta manda la marca que tenga disponible.';d.append(n);} }
-    fs.filter(f=>f.nota).forEach(f=>{const n=document.createElement('p');n.className='desc';n.textContent=f.nota+'.';d.append(n);});
-    if(fuera.length){const n=document.createElement('p');n.className='desc';n.textContent=`Ojo: ${fuera.map(f=>f.marca).join(' y ')} es la misma pieza, pero su ficha dice ${fuera.map(f=>f.a[0]===f.a[1]?f.a[0]:f.a[0]+'-'+f.a[1]).join(' / ')}. Va en la lista para su equipo.`;d.append(n);}
+    else if(fs.length===1){ const s=document.createElement('span');s.className='una';s.textContent=fs[0].marca+' · '+fs[0].sku;cajaM.append(s); }
+    else { const n=document.createElement('p');n.className='desc';const m=new Set(fs.map(f=>f.marca.split(' ')[0])).size;n.textContent=`Cualquiera de ${m} marcas: Beta manda la que tenga disponible.`;cajaM.replaceWith(n); }
     return d;
   }
   function botonAgregar(c,estado,opciones,tarjeta){
@@ -862,8 +878,7 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
   function resolver(fam,lado){
     const claves=[...fam.keys()];
     const cont=document.createElement('div'); cont.style.display='grid'; cont.style.gap='14px';
-    const cuenta=claves.map(c=>`${fam.get(c).length} ${fam.get(c).length===1?'ficha dice':'fichas dicen'} ${c}`).join(', ');
-    cont.append(hoja(`<h2>Para el Versa ${E.anio} su catálogo tiene ${claves.length} balatas ${lado} distintas.</h2><p class="sub">${esc(cuenta)}. Te ayudamos a saber cuál es.</p>`));
+    cont.append(hoja(`<h2>Para el Versa ${E.anio} hay ${claves.length} balatas ${lado} posibles.</h2><p class="sub">Te ayudamos a saber cuál es la tuya.</p>`));
     const caminos=document.createElement('div'); caminos.className='caminos';
     const conVersion=claves.filter(c=>fam.get(c).some(f=>f.nota));
     if(conVersion.length){
@@ -873,8 +888,8 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
       [['S','S'],['Sense','otra'],['Advance','otra'],['Exclusive','otra']].forEach(([t,v])=>{const b=document.createElement('button');b.type='button';b.className='chico';b.textContent=t;b.addEventListener('click',()=>{
         const elegida=v==='S'?conVersion[0]:claves.find(c=>!conVersion.includes(c));
         const quedan=v==='S'?claves:[elegida];
-        if(quedan.length===1) decidir(cont,elegida,'ok',null,`Su ficha de la ${conVersion[0]} solo dice "Versa S ${E.anio}", así que para ${t} es esta.`);
-        else decidir(cont,elegida,'rev',claves,`Para "S", ${claves.length} fichas pueden aplicar.`);
+        if(quedan.length===1) decidir(cont,elegida,'ok',null,`La otra balata es solo para la versión S, así que para tu ${t} es esta.`);
+        else decidir(cont,elegida,'rev',claves,`Para la versión S pueden quedar las ${claves.length}; un vendedor confirma cuál antes de mandarla.`);
       });op.append(b);});
       a.dentro.append(op); caminos.append(a.el);
     }
@@ -885,9 +900,9 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
         <div class="renglon"><span>Modelo</span><span>Versa Advance</span></div>
         <div class="renglon"><span>Año</span><span>${E.anio}</span></div>
       </div>
-      <p class="sub">La tarjeta trae la versión y el número de serie. Con eso escogemos entre las fichas de su catálogo.</p>`;
+      <p class="sub">La tarjeta trae la versión y el número de serie. Con eso sabemos cuál es la tuya.</p>`;
     const bB=document.createElement('button'); bB.type='button'; bB.className='boton'; bB.textContent='Usar la foto de ejemplo';
-    bB.addEventListener('click',()=>{ if(conVersion.length) decidir(cont,claves.find(c=>!conVersion.includes(c)),'ok',null,'La tarjeta dice "Advance", y la otra ficha solo aplica a la versión S.'); else decidir(cont,claves[0],'rev',claves,'Aun con la versión, su catálogo no separa estas piezas.'); });
+    bB.addEventListener('click',()=>{ if(conVersion.length) decidir(cont,claves.find(c=>!conVersion.includes(c)),'ok',null,'La tarjeta dice Advance, y la otra balata es solo para la versión S.'); else decidir(cont,claves[0],'rev',claves,'Para este año, un vendedor confirma cuál es con los datos de tu tarjeta.'); });
     b.dentro.append(bB); caminos.append(b.el);
     const cc=camino(ICO.duda,'No sé / no tengo cómo','No te preocupes');
     cc.dentro.innerHTML=`<p>Lo mandamos con revisión: un vendedor de Beta confirma cuál es antes de que salga la camioneta.</p>`;
@@ -910,7 +925,7 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
   }
   function decidir(cont,c,estado,opciones,porque){
     cont.innerHTML='';
-    const titulo=estado==='ok'?'<h2>Es esta.</h2>':'<h2>Va con revisión.</h2><p class="sub">Un vendedor confirma cuál es antes de que salga. Te sugerimos esta:</p>';
+    const titulo=estado==='ok'?`<h2>Es esta.</h2><p class="sub">${esc(textoMarcas(FICHAS.filter(f=>f.c===c&&aplica(f,E.anio))))}</p>`:'<h2>Va con revisión.</h2><p class="sub">Un vendedor confirma cuál es antes de que salga. Te sugerimos esta:</p>';
     const p=porque?`<p class="nota">${esc(porque)}</p>`:'';
     const tarj=tarjetaFamilia(c,estado,E.anio,E.pos,true); cont.append(hoja(titulo,p,tarj,botonAgregar(c,estado,opciones,tarj)));
   }
@@ -925,15 +940,17 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
       else { t=document.createElement('div'); t.className='pieza';
         t.innerHTML=`<span class="sello rev"><i>!</i>Un vendedor la confirma antes de salir</span><h3></h3>`;
         t.querySelector('h3').textContent=`Balatas ${it.pos==='adelante'?'delanteras':'traseras'} · Nissan Versa ${it.anio}`; }
-      if(it.estado==='rev'&&it.opciones){const n=document.createElement('p');n.className='desc';n.textContent='El vendedor elige entre las claves '+it.opciones.join(' y ')+'.';t.append(n);}
+      if(it.estado==='rev'&&it.opciones){const n=document.createElement('p');n.className='desc';n.textContent=`Un vendedor elige la correcta entre ${it.opciones.length} opciones antes de mandarla.`;t.append(n);}
       lista.append(t);
     });
     d.append(lista);
+    $('#nota-marca').hidden=!E.pedido.some(it=>it.marca);
   }
   $('#b-otra').addEventListener('click',()=>{$('#q').value='';ir(1);$('#q').focus();});
 
   /* ---------- Pantalla 4: seguimiento que avanza solo ---------- */
-  const ETAPAS=[['Recibido','Beta ya tiene tu pedido'],['Surtido','Ya está listo en el almacén'],['En camino','El chofer marcó «Salí»'],['Entregado','El chofer marcó «Entregué»']];
+  const ETAPAS=[['Recibido','Beta ya tiene tu pedido','Beta recibe tu pedido'],['Surtido','Ya está listo en el almacén','Lo preparan en el almacén'],['En camino','El chofer marcó «Salí»','Cuando el chofer marque «Salí»'],['Entregado','El chofer marcó «Entregué»','Cuando el chofer marque «Entregué»']];
+  function completar(e){ if(!e||e.dataset.listo) return; e.dataset.listo='1'; const sm=e.querySelector('small'); sm.textContent=e.dataset.hecho+' · '; const hh=document.createElement('span'); hh.style.whiteSpace='nowrap'; hh.textContent=e.dataset.hora; sm.append(hh); }
   const PALOMA='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
   let reloj=[];
   $('#b-enviar').addEventListener('click',()=>{
@@ -941,16 +958,16 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
     ir(4); reloj.forEach(clearTimeout); reloj=[];
     const ruta=$('#ruta'); ruta.innerHTML='';
     const base=new Date(); const mins=[0,12,25,58];
-    ETAPAS.forEach(([t,s],i)=>{
+    ETAPAS.forEach(([t,s,pend],i)=>{
       const e=document.createElement('div'); e.className='etapa';
       const h=new Date(base.getTime()+mins[i]*60000).toLocaleTimeString('es-MX',{hour:'numeric',minute:'2-digit'});
       e.innerHTML=`<span class="bola">${PALOMA}</span><b></b><span></span><small></small>`;
-      e.querySelector('b').textContent=t; e.querySelector('small').textContent=s+' · '; const hh=document.createElement('span'); hh.style.whiteSpace='nowrap'; hh.textContent=h; e.querySelector('small').append(hh);
+      e.querySelector('b').textContent=t; e.querySelector('small').textContent=pend; e.dataset.hecho=s; e.dataset.hora=h;
       e.querySelector('span:not(.bola)').remove();
       ruta.append(e);
     });
     const et=$$('.etapa'); $('#b-ahorro').disabled=true;
-    const marcar=i=>{ et.forEach(x=>x.classList.remove('ahora')); et[i].classList.add('lista'); if(et[i+1]) et[i+1].classList.add('ahora'); if(i===et.length-1) $('#b-ahorro').disabled=false; };
+    const marcar=i=>{ et.forEach(x=>x.classList.remove('ahora')); et[i].classList.add('lista'); completar(et[i]); if(et[i+1]) et[i+1].classList.add('ahora'); if(i===et.length-1) $('#b-ahorro').disabled=false; };
     const bc=$('#b-chofer'); bc.textContent='Salí'; bc.disabled=false; bc.classList.remove('hecho'); bc.dataset.paso='2'; $('#chofer').hidden=true;
     reloj.push(setTimeout(()=>marcar(0),500));
     reloj.push(setTimeout(()=>{ marcar(1); $('#chofer').hidden=false; },2000));
@@ -958,7 +975,7 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
   $('#b-chofer').addEventListener('click',()=>{
     const bc=$('#b-chofer'), et=$$('.etapa'), i=+bc.dataset.paso;
     if(!et[i]) return;
-    et.forEach(x=>x.classList.remove('ahora')); et[i].classList.add('lista'); if(et[i+1]) et[i+1].classList.add('ahora');
+    et.forEach(x=>x.classList.remove('ahora')); et[i].classList.add('lista'); completar(et[i]); if(et[i+1]) et[i+1].classList.add('ahora');
     if(i===2){ bc.textContent='Entregué'; bc.dataset.paso='3'; }
     else { bc.textContent='Listo ✓'; bc.classList.add('hecho'); bc.disabled=true; $('#b-ahorro').disabled=false; }
   });
