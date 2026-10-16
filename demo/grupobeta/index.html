@@ -561,10 +561,10 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
     [/^Hay (\d+) piezas que le pueden quedar a este coche: (.+)\.$/,(m,n,l)=>`${n} parts could fit this car: ${l.replace(' y ',' and ')}.`],
     [/^Mandar (.+)$/,'Send $1'],
     [/^Confirmada: (.+) · la refaccionaria ya recibió el aviso$/,(m,a)=>`Confirmed: ${a==='pieza encontrada'?'part found':a} · the parts store has been notified`],
-    [/^Solo hay una que le queda a tu Versa (\d{4})\.$/,'Only one fits your $1 Versa.'],
-    [/^Es la misma pieza en una marca\.$/,'It is the same part in one brand.'],
-    [/^Es la misma pieza en (\d+) versiones de (\d+) marcas: toca la que prefieras, o Beta te manda la que tenga\.$/,'It is the same part in $1 versions from $2 brands: tap the one you prefer, or Beta sends whichever it has.'],
-    [/^Es la misma pieza en (\d+) versiones de una marca: toca la que prefieras, o Beta te manda la que tenga\.$/,'It is the same part in $1 versions from one brand: tap the one you prefer, or Beta sends whichever it has.'],
+    [/^Esta es la balata que le queda a tu Versa (\d{4})\.$/,'This is the brake pad that fits your $1 Versa.'],
+    [/^La tenemos en una sola marca\.$/,'We have it in one brand only.'],
+    [/^Es una sola pieza, y la fabrican (\d+) marcas\. Todas le quedan igual: toca la que prefieras, o Beta te manda la que tenga\.$/,'It is a single part, made by $1 brands. They all fit the same: tap the one you prefer, or Beta sends whichever it has.'],
+    [/^Es una sola pieza, y la fabrican en una marca, en (\d+) versiones\. Todas le quedan igual: toca la que prefieras, o Beta te manda la que tenga\.$/,'It is a single part, made by one brand in $1 versions. They all fit the same: tap the one you prefer, or Beta sends whichever it has.'],
     [/^No encontramos balatas delanteras para el Versa (\d{4}) en su catálogo\.$/,"We didn't find front pads for the $1 Versa in your catalog."],
     [/^No encontramos balatas traseras para el Versa (\d{4}) en su catálogo\.$/,"We didn't find rear shoes for the $1 Versa in your catalog."],
     [/^Para el Versa (\d{4}) su catálogo tiene (\d+) balatas (delanteras|traseras) distintas\.$/,(m,a,n,l)=>`For the ${a} Versa your catalog has ${n} different ${l==='delanteras'?'front pads':'rear shoes'}.`],
@@ -813,7 +813,7 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
     const lado=pos==='adelante'?'delanteras':'traseras';
     if(fam.size===1){
       const [c]=fam.keys();
-      const tarj=tarjetaFamilia(c,'ok',E.anio,E.pos,true); res.append(hoja(`<h2>Solo hay una que le queda a tu Versa ${E.anio}.</h2><p class="sub">${(()=>{const fs=fam.get(c), m=new Set(fs.map(f=>f.marca.split(' ')[0])).size; return fs.length===1?'Es la misma pieza en una marca.':`Es la misma pieza en ${fs.length} versiones de ${m===1?'una marca':m+' marcas'}: toca la que prefieras, o Beta te manda la que tenga.`;})()}</p>`, tarj, '<p class="nota">Hoy, al buscar «balata versa» en su página, salen 49 resultados para revisar. Aquí quedó 1.</p>', botonAgregar(c,'ok',undefined,tarj)));
+      const tarj=tarjetaFamilia(c,'ok',E.anio,E.pos,true); res.append(hoja(`<h2>Esta es la balata que le queda a tu Versa ${E.anio}.</h2><p class="sub">${(()=>{const fs=fam.get(c), m=new Set(fs.map(f=>f.marca.split(' ')[0])).size; return fs.length===1?'La tenemos en una sola marca.':`Es una sola pieza, y la fabrican ${m===1?'en una marca, en '+fs.length+' versiones':m+' marcas'}. Todas le quedan igual: toca la que prefieras, o Beta te manda la que tenga.`;})()}</p>`, tarj, '<p class="nota">Hoy, al buscar «balata versa» en su página, salen 49 resultados para revisar. Aquí quedó 1.</p>', botonAgregar(c,'ok',undefined,tarj)));
     } else if(fam.size===0){
       res.append(hoja(`<h2>No encontramos balatas ${lado} para el Versa ${E.anio} en su catálogo.</h2><p class="sub">No te dejamos a ciegas: un vendedor de Beta te busca la correcta y te avisa antes de mandarla.</p>`, botonAgregar(null,'rev')));
     } else {
