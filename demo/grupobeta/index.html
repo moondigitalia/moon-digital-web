@@ -152,6 +152,10 @@ button:focus-visible,select:focus-visible,input:focus-visible,.zona:focus-visibl
 .desc{font-size:13px;color:var(--suave);line-height:1.45}
 .marcas{display:flex;flex-wrap:wrap;gap:6px}
 .marcas span{font-size:13px;border:1px solid var(--linea);border-radius:999px;padding:4px 10px}
+.marcas button{font:500 13px var(--t);color:var(--tinta);background:var(--papel);border:1px solid var(--linea);border-radius:999px;padding:8px 12px;min-height:36px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:background-color var(--dur) var(--curva),border-color var(--dur) var(--curva),color var(--dur) var(--curva)}
+.marcas button[aria-pressed="true"]{background:var(--azul-suave);border-color:var(--azul);color:var(--azul);font-weight:600}
+.marcas button[aria-pressed="true"]::before{content:"✓";font-weight:700}
+.marcas span.elegida{background:var(--azul-suave);border-color:var(--azul);color:var(--azul);font-weight:600}
 .precio{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:14px;color:var(--suave)}
 .precio b{white-space:nowrap;font-size:18px;color:var(--tinta);font-variant-numeric:tabular-nums}
 .nota{font-size:14px;color:var(--suave);border-left:2px solid var(--azul);padding-left:12px}
@@ -485,6 +489,7 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
   /* ---------- Idioma: español / inglés. El texto en español es la fuente; el inglés se aplica encima y se quita al volver. ---------- */
   let LANG='es';
   const EXACTO={
+    'Beta manda la marca que tenga disponible.':'Beta sends whichever brand it has in stock.',
     // Vista Grupo Beta
     'Refaccionaria':'Parts store','Su catálogo, todavía más claro':'Your catalog, even clearer','Agente Ordenador':'Organizer Agent','Pedidos para confirmar':'Orders to confirm',
     'Hoy, en su página':'Today, on your site','Con el Agente Ordenador':'With the Organizer Agent',
@@ -558,8 +563,8 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
     [/^Confirmada: (.+) · la refaccionaria ya recibió el aviso$/,(m,a)=>`Confirmed: ${a==='pieza encontrada'?'part found':a} · the parts store has been notified`],
     [/^Solo hay una que le queda a tu Versa (\d{4})\.$/,'Only one fits your $1 Versa.'],
     [/^Es la misma pieza en una marca\.$/,'It is the same part in one brand.'],
-    [/^Es la misma pieza en (\d+) versiones de (\d+) marcas: escoge la que tengas a la mano\.$/,'It is the same part in $1 versions from $2 brands: pick the one you have on hand.'],
-    [/^Es la misma pieza en (\d+) versiones de una marca: escoge la que tengas a la mano\.$/,'It is the same part in $1 versions from one brand: pick the one you have on hand.'],
+    [/^Es la misma pieza en (\d+) versiones de (\d+) marcas: toca la que prefieras, o Beta te manda la que tenga\.$/,'It is the same part in $1 versions from $2 brands: tap the one you prefer, or Beta sends whichever it has.'],
+    [/^Es la misma pieza en (\d+) versiones de una marca: toca la que prefieras, o Beta te manda la que tenga\.$/,'It is the same part in $1 versions from one brand: tap the one you prefer, or Beta sends whichever it has.'],
     [/^No encontramos balatas delanteras para el Versa (\d{4}) en su catálogo\.$/,"We didn't find front pads for the $1 Versa in your catalog."],
     [/^No encontramos balatas traseras para el Versa (\d{4}) en su catálogo\.$/,"We didn't find rear shoes for the $1 Versa in your catalog."],
     [/^Para el Versa (\d{4}) su catálogo tiene (\d+) balatas (delanteras|traseras) distintas\.$/,(m,a,n,l)=>`For the ${a} Versa your catalog has ${n} different ${l==='delanteras'?'front pads':'rear shoes'}.`],
@@ -808,7 +813,7 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
     const lado=pos==='adelante'?'delanteras':'traseras';
     if(fam.size===1){
       const [c]=fam.keys();
-      res.append(hoja(`<h2>Solo hay una que le queda a tu Versa ${E.anio}.</h2><p class="sub">${(()=>{const fs=fam.get(c), m=new Set(fs.map(f=>f.marca.split(' ')[0])).size; return fs.length===1?'Es la misma pieza en una marca.':`Es la misma pieza en ${fs.length} versiones de ${m===1?'una marca':m+' marcas'}: escoge la que tengas a la mano.`;})()}</p>`, tarjetaFamilia(c,'ok'), '<p class="nota">Hoy, al buscar «balata versa» en su página, salen 49 resultados para revisar. Aquí quedó 1.</p>', botonAgregar(c,'ok')));
+      const tarj=tarjetaFamilia(c,'ok',E.anio,E.pos,true); res.append(hoja(`<h2>Solo hay una que le queda a tu Versa ${E.anio}.</h2><p class="sub">${(()=>{const fs=fam.get(c), m=new Set(fs.map(f=>f.marca.split(' ')[0])).size; return fs.length===1?'Es la misma pieza en una marca.':`Es la misma pieza en ${fs.length} versiones de ${m===1?'una marca':m+' marcas'}: toca la que prefieras, o Beta te manda la que tenga.`;})()}</p>`, tarj, '<p class="nota">Hoy, al buscar «balata versa» en su página, salen 49 resultados para revisar. Aquí quedó 1.</p>', botonAgregar(c,'ok',undefined,tarj)));
     } else if(fam.size===0){
       res.append(hoja(`<h2>No encontramos balatas ${lado} para el Versa ${E.anio} en su catálogo.</h2><p class="sub">No te dejamos a ciegas: un vendedor de Beta te busca la correcta y te avisa antes de mandarla.</p>`, botonAgregar(null,'rev')));
     } else {
@@ -820,7 +825,7 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
   }
 
   function hoja(...partes){const d=document.createElement('div');d.className='hoja';partes.forEach(p=>typeof p==='string'?d.insertAdjacentHTML('beforeend',p):d.append(p));return d;}
-  function tarjetaFamilia(c,estado,anio=E.anio,pos=E.pos){
+  function tarjetaFamilia(c,estado,anio=E.anio,pos=E.pos,elegible=false,marca=null){
     const fs=FICHAS.filter(f=>f.c===c&&aplica(f,anio)), fuera=fueraDeAnio(c,anio);
     const d=document.createElement('div'); d.className='pieza';
     const sello=estado==='ok'?`Verificada con su catálogo: le queda a tu Versa ${anio} (${pos==='adelante'?'adelante':'atrás'})`:'Un vendedor la confirma antes de salir';
@@ -829,14 +834,21 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
       <p class="codigo">${fs[0]&&fs[0].sinClave?'Número '+esc(c):'Clave '+esc(c)}</p>
       <div class="marcas"></div>
       <div class="precio"><span>Hay en Mérida <span class="ej">(ejemplo)</span></span><b>desde ${(PRECIO[c]||'').replace(' ',' ')}</b></div>`;
-    fs.forEach(f=>{const s=document.createElement('span');s.textContent=f.marca+' · '+f.sku;d.querySelector('.marcas').append(s);});
+    const cajaM=d.querySelector('.marcas');
+    if(elegible && fs.length>1){
+      cajaM.setAttribute('role','group'); cajaM.setAttribute('aria-label','Marca');
+      fs.forEach(f=>{const b=document.createElement('button');b.type='button';b.setAttribute('aria-pressed','false');b.textContent=f.marca+' · '+f.sku;
+        b.addEventListener('click',()=>{const ya=b.getAttribute('aria-pressed')==='true';cajaM.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed','false'));if(!ya)b.setAttribute('aria-pressed','true');d.dataset.marca=ya?'':f.marca+' · '+f.sku;});
+        cajaM.append(b);});
+    } else if(marca){ const s=document.createElement('span');s.className='elegida';s.textContent='✓ '+marca;cajaM.append(s); }
+    else { fs.forEach(f=>{const s=document.createElement('span');s.textContent=f.marca+' · '+f.sku;cajaM.append(s);}); if(fs.length>1&&!elegible){const n=document.createElement('p');n.className='desc';n.textContent='Beta manda la marca que tenga disponible.';d.append(n);} }
     fs.filter(f=>f.nota).forEach(f=>{const n=document.createElement('p');n.className='desc';n.textContent=f.nota+'.';d.append(n);});
     if(fuera.length){const n=document.createElement('p');n.className='desc';n.textContent=`Ojo: ${fuera.map(f=>f.marca).join(' y ')} es la misma pieza, pero su ficha dice ${fuera.map(f=>f.a[0]===f.a[1]?f.a[0]:f.a[0]+'-'+f.a[1]).join(' / ')}. Va en la lista para su equipo.`;d.append(n);}
     return d;
   }
-  function botonAgregar(c,estado,opciones){
+  function botonAgregar(c,estado,opciones,tarjeta){
     const b=document.createElement('button'); b.type='button'; b.className='boton'; b.textContent='Agregar al pedido';
-    b.addEventListener('click',()=>{E.pedido.push({c,estado,anio:E.anio,pos:E.pos,opciones}); pintarPedido(); ir(3);});
+    b.addEventListener('click',()=>{E.pedido.push({c,estado,anio:E.anio,pos:E.pos,opciones,marca:(tarjeta&&tarjeta.dataset.marca)||null}); pintarPedido(); ir(3);});
     return b;
   }
 
@@ -900,7 +912,7 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
     cont.innerHTML='';
     const titulo=estado==='ok'?'<h2>Es esta.</h2>':'<h2>Va con revisión.</h2><p class="sub">Un vendedor confirma cuál es antes de que salga. Te sugerimos esta:</p>';
     const p=porque?`<p class="nota">${esc(porque)}</p>`:'';
-    cont.append(hoja(titulo,p,tarjetaFamilia(c,estado),botonAgregar(c,estado,opciones)));
+    const tarj=tarjetaFamilia(c,estado,E.anio,E.pos,true); cont.append(hoja(titulo,p,tarj,botonAgregar(c,estado,opciones,tarj)));
   }
 
   /* ---------- Pantalla 3: pedido ---------- */
@@ -909,7 +921,7 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
     const lista=document.createElement('div'); lista.style.display='grid'; lista.style.gap='12px';
     E.pedido.forEach(it=>{
       let t;
-      if(it.c){ t=tarjetaFamilia(it.c,it.estado,it.anio,it.pos); }
+      if(it.c){ t=tarjetaFamilia(it.c,it.estado,it.anio,it.pos,false,it.marca); }
       else { t=document.createElement('div'); t.className='pieza';
         t.innerHTML=`<span class="sello rev"><i>!</i>Un vendedor la confirma antes de salir</span><h3></h3>`;
         t.querySelector('h3').textContent=`Balatas ${it.pos==='adelante'?'delanteras':'traseras'} · Nissan Versa ${it.anio}`; }
