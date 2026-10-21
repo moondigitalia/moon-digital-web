@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Ficha de Jason · MOON Digital">
+<meta property="og:description" content="Unos 10 minutos para que Jason hable como MOON Digital.">
+<meta property="og:url" content="https://moon-digital-web.vercel.app/examen/jason/">
+<meta property="og:image" content="https://moon-digital-web.vercel.app/img/logo.webp">
+<link rel="icon" href="/img/logo.webp">
+<title>Ficha de Jason MOON</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+html{color-scheme:light}body{margin:0}img{max-width:100%}[hidden]{display:none!important}
+/* Layout: una sola columna tipo expediente; cada bloque es una "hoja" con marco fino; envío fijo al final */
+:root{
+  --bg:#f4f6fa; --paper:#ffffff; --ink:#0b1220; --muted:#5a6578; --line:#d5dbe6;
+  --navy:#0f2a5c; --navy-soft:#e6ecf7; --ok:#1d6b45; --warn:#9a5b00;
+  --display:"Unbounded",system-ui,sans-serif; --body:"IBM Plex Sans",system-ui,-apple-system,sans-serif; --mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#070b14; --paper:#0e1524; --ink:#e9eef7; --muted:#9aa6bb; --line:#24314a;
+  --navy:#8fb0ff; --navy-soft:#16213a; --ok:#6fd3a0; --warn:#f0b35a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#070b14; --paper:#0e1524; --ink:#e9eef7; --muted:#9aa6bb; --line:#24314a;
+  --navy:#8fb0ff; --navy-soft:#16213a; --ok:#6fd3a0; --warn:#f0b35a; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55}
+.wrap{max-width:720px;margin:0 auto;padding-inline:16px;padding-block:40px 80px;display:grid;gap:20px}
+header{display:grid;gap:12px;padding-bottom:8px}
+.brand{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--navy)}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(28px,6vw,40px);line-height:1.1;margin:0;text-wrap:balance}
+.lead{color:var(--muted);margin:0;max-width:60ch}
+.meta{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-family:var(--mono);font-size:12px;border:1px solid var(--line);border-radius:999px;padding:4px 10px;color:var(--muted);background:var(--paper)}
+section{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:24px 20px;display:grid;gap:22px}
+section h2{font-family:var(--display);font-weight:500;font-size:18px;margin:0;display:flex;gap:10px;align-items:baseline}
+section h2 span{font-family:var(--mono);font-size:12px;color:var(--navy)}
+.why{margin:-12px 0 0;color:var(--muted);font-size:14px}
+.q{display:grid;gap:8px;min-width:0}
+.q > label,.q > .lbl{font-weight:600}
+.hint{font-size:13px;color:var(--muted);margin-top:-4px}
+.otro{margin-top:4px}
+input[type=text],input[type=number],textarea{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:10px 12px}
+textarea{min-height:84px;resize:vertical}
+input:focus-visible,textarea:focus-visible,button:focus-visible,.opt input:focus-visible+span{outline:2px solid var(--navy);outline-offset:2px}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.row .q label{font-weight:500;font-size:14px}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opt{position:relative}
+.opt input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.opt span{display:inline-block;border:1px solid var(--line);border-radius:4px;padding:8px 12px;font-size:14px;background:var(--bg);cursor:pointer}
+.opt input:checked+span{border-color:var(--navy);background:var(--navy-soft);color:var(--navy);font-weight:600}
+.send{display:grid;gap:14px}
+button{font:inherit;font-weight:600;border:0;border-radius:4px;padding:14px 20px;background:var(--navy);color:var(--paper);cursor:pointer}
+button.ghost{background:transparent;color:var(--navy);border:1px solid var(--navy)}
+button[disabled]{opacity:.6;cursor:default}
+.status{font-size:14px;margin:0}
+.status.ok{color:var(--ok)} .status.warn{color:var(--warn)}
+.ya{margin:0;padding:12px 14px;border:1px dashed var(--line);border-radius:4px;background:var(--bg);font-size:14px;color:var(--muted)}
+.ya b{color:var(--ink)}
+.ya ul{margin:6px 0 0;padding-left:18px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <header>
+    <div class="brand">MOON Digital · Jason</div>
+    <h1>Ficha de Jason</h1>
+    <p class="lead">Jason ya contesta, agenda y anota cada llamada. Con tus respuestas va a hablar exactamente como MOON Digital: qué ofrecer, qué decir del precio y qué preguntar antes de agendar. Esta misma ficha será la base de los recepcionistas que hagamos para clientes. No hay respuestas correctas: contesta lo que tengas claro y lo demás déjalo en blanco.</p>
+    <div class="meta"><span class="chip">Unos 10 minutos</span><span class="chip">Todo es opcional</span><span class="chip">Se guarda mientras escribes</span></div>
+  </header>
+
+  <form id="f" novalidate>
+    <input type="text" id="sitio" name="_sitio" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
+    <div style="display:grid;gap:20px">
+    <section>
+      <h2><span>01</span>Lo que ofrecemos</h2>
+      <p class="why">Jason solo ofrece lo que aquí marques. Lo que no esté, no lo promete.</p>
+      <div class="q"><span class="lbl">¿Qué servicios puede ofrecer Jason?</span><span class="hint">Puedes elegir varios.</span>
+        <div class="opts" data-name="Servicios que Jason puede ofrecer">
+          <label class="opt"><input type="checkbox" value="Recepcionista que contesta llamadas"><span>Recepcionista que contesta llamadas</span></label>
+          <label class="opt"><input type="checkbox" value="Asistente por WhatsApp"><span>Asistente por WhatsApp</span></label>
+          <label class="opt"><input type="checkbox" value="Asistente de voz o chat en la página web"><span>Asistente de voz o chat en la página web</span></label>
+          <label class="opt"><input type="checkbox" value="Sistemas para ordenar la administración (gastos, inventario, reportes)"><span>Sistemas para ordenar la administración (gastos, inventario, reportes)</span></label>
+          <label class="opt"><input type="checkbox" value="Páginas web"><span>Páginas web</span></label>
+          <label class="opt"><input type="checkbox" value="Contenido y redes sociales"><span>Contenido y redes sociales</span></label>
+          <label class="opt"><input type="checkbox" value="Campañas de anuncios"><span>Campañas de anuncios</span></label>
+          <label class="opt"><input type="checkbox" value="Programa de aliados que recomiendan o revenden"><span>Programa de aliados que recomiendan o revenden</span></label>
+          <label class="opt"><input type="checkbox" value="Otro"><span>Otro</span></label>
+        </div>
+        <input type="text" class="otro" aria-label="Escribe aquí qué otro servicio" placeholder="Escribe aquí qué otro servicio" hidden>
+      </div>
+      <div class="q"><span class="lbl">Si Jason tuviera que recomendar uno primero, ¿cuál es el que más les interesa vender hoy?</span>
+        <div class="opts" data-name="Servicio que más interesa vender hoy" data-single>
+          <label class="opt"><input type="radio" name="_g1" value="Recepcionista que contesta llamadas"><span>Recepcionista que contesta llamadas</span></label>
+          <label class="opt"><input type="radio" name="_g1" value="Asistente por WhatsApp"><span>Asistente por WhatsApp</span></label>
+          <label class="opt"><input type="radio" name="_g1" value="Sistemas para ordenar la administración"><span>Sistemas para ordenar la administración</span></label>
+          <label class="opt"><input type="radio" name="_g1" value="Páginas web"><span>Páginas web</span></label>
+          <label class="opt"><input type="radio" name="_g1" value="Contenido y campañas"><span>Contenido y campañas</span></label>
+          <label class="opt"><input type="radio" name="_g1" value="Otro"><span>Otro</span></label>
+        </div>
+        <input type="text" class="otro" aria-label="Escribe aquí cuál" placeholder="Escribe aquí cuál" hidden>
+      </div>
+      <div class="q"><label for="ideal">¿Para qué tipo de negocio es ideal MOON hoy?</label><textarea id="ideal" name="Negocio ideal para MOON" placeholder="Ej. clínicas, hoteles, restaurantes, inmobiliarias…"></textarea></div>
+      <div class="q"><label for="nohace">¿Hay algo que no hacemos y Jason debe decir con amabilidad que no?</label><textarea id="nohace" name="Lo que MOON no hace" placeholder="Ej. apps de celular, reparar computadoras…"></textarea></div>
+    </section>
+
+    <section>
+      <h2><span>02</span>Cuando preguntan el precio</h2>
+      <p class="why">En las tres llamadas reales de esta semana preguntaron "¿cuánto cuesta?". Hoy Jason solo dice que lo ve el equipo.</p>
+      <div class="q"><span class="lbl">¿Qué puede decir Jason cuando le preguntan el precio?</span>
+        <div class="opts" data-name="Qué puede decir Jason del precio" data-single>
+          <label class="opt"><input type="radio" name="_g2" value="Solo que el equipo da el precio exacto en la llamada"><span>Solo que el equipo da el precio exacto en la llamada</span></label>
+          <label class="opt"><input type="radio" name="_g2" value="Cómo se cobra, sin cifras (por ejemplo: un pago para hacerlo y una mensualidad)"><span>Cómo se cobra, sin cifras (por ejemplo: un pago para hacerlo y una mensualidad)</span></label>
+          <label class="opt"><input type="radio" name="_g2" value="Un precio "desde""><span>Un precio "desde"</span></label>
+          <label class="opt"><input type="radio" name="_g2" value="Prefiero platicarlo"><span>Prefiero platicarlo</span></label>
+        </div>
+      </div>
+      <div class="q"><label for="comocobra">Si elegiste "cómo se cobra" o "desde", escríbelo como lo diría Jason</label><textarea id="comocobra" name="Cómo se cobra o precio desde (palabras de Jason)" placeholder="Ej. "Se paga una vez para hacerlo y luego una mensualidad que incluye todo""></textarea></div>
+      <div class="q"><span class="lbl">La llamada con el equipo, ¿tiene costo?</span><span class="hint">Si es gratis, Jason lo dice y la gente agenda con más confianza.</span>
+        <div class="opts" data-name="La primera llamada tiene costo" data-single>
+          <label class="opt"><input type="radio" name="_g3" value="Es gratis y sin compromiso"><span>Es gratis y sin compromiso</span></label>
+          <label class="opt"><input type="radio" name="_g3" value="Tiene costo"><span>Tiene costo</span></label>
+          <label class="opt"><input type="radio" name="_g3" value="Prefiero platicarlo"><span>Prefiero platicarlo</span></label>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2><span>03</span>Lo que Jason pregunta antes de agendar</h2>
+      <p class="why">Jason ya hace dos preguntas cortas según el caso, para que el equipo llegue preparado a la llamada.</p>
+      <div class="ya"><b>Lo que ya pregunta:</b><ul><li>Asistente: por dónde lo contactan sus clientes y cuántos mensajes o llamadas recibe al día.</li><li>Ordenar su negocio: qué le quita más tiempo y cuántos negocios o sucursales tiene.</li><li>Página o redes: si ya tiene algo y qué quiere lograr.</li><li>Aliado que quiere revender: si ya tiene clientes y a qué se dedica su empresa.</li></ul></div>
+      <div class="q"><span class="lbl">¿Qué más necesita saber el equipo antes de la llamada?</span><span class="hint">Cada pregunta de más alarga la llamada; elige solo las que de verdad usen.</span>
+        <div class="opts" data-name="Qué más debe preguntar Jason">
+          <label class="opt"><input type="checkbox" value="Para cuándo lo necesita"><span>Para cuándo lo necesita</span></label>
+          <label class="opt"><input type="checkbox" value="Cómo se enteró de MOON"><span>Cómo se enteró de MOON</span></label>
+          <label class="opt"><input type="checkbox" value="Si tiene página o redes (para revisarlas antes)"><span>Si tiene página o redes (para revisarlas antes)</span></label>
+          <label class="opt"><input type="checkbox" value="Quién toma la decisión en su negocio"><span>Quién toma la decisión en su negocio</span></label>
+          <label class="opt"><input type="checkbox" value="Nada más, así está bien"><span>Nada más, así está bien</span></label>
+          <label class="opt"><input type="checkbox" value="Otro"><span>Otro</span></label>
+        </div>
+        <input type="text" class="otro" aria-label="Escribe aquí qué más preguntar" placeholder="Escribe aquí qué más preguntar" hidden>
+      </div>
+      <div class="q"><label for="nopreguntar">¿Hay alguna pregunta que no quieren que haga nunca?</label><textarea id="nopreguntar" name="Preguntas que Jason nunca debe hacer" placeholder="Ej. cuánto vende su negocio"></textarea></div>
+    </section>
+
+    <section>
+      <h2><span>04</span>La agenda</h2>
+      <p class="why">Hoy Jason agenda de lunes a viernes, de 11 a 3 (hora de Cancún), llamadas de 30 minutos, con al menos 1 hora de anticipación.</p>
+      <div class="q"><span class="lbl">¿Mantenemos ese horario?</span>
+        <div class="opts" data-name="Horario de citas" data-single>
+          <label class="opt"><input type="radio" name="_g4" value="Sí, así está bien"><span>Sí, así está bien</span></label>
+          <label class="opt"><input type="radio" name="_g4" value="Quiero cambiarlo"><span>Quiero cambiarlo</span></label>
+        </div>
+      </div>
+      <div class="q"><label for="horario">Si quieres cambiarlo, escribe días y horas</label><input type="text" id="horario" name="Horario nuevo de citas" placeholder="Ej. lunes a jueves de 10 a 2"></div>
+      <div class="q"><span class="lbl">¿Cuánto dura la llamada con el equipo?</span>
+        <div class="opts" data-name="Duración de la llamada" data-single>
+          <label class="opt"><input type="radio" name="_g5" value="30 minutos"><span>30 minutos</span></label>
+          <label class="opt"><input type="radio" name="_g5" value="45 minutos"><span>45 minutos</span></label>
+          <label class="opt"><input type="radio" name="_g5" value="1 hora"><span>1 hora</span></label>
+          <label class="opt"><input type="radio" name="_g5" value="Otro"><span>Otro</span></label>
+        </div>
+        <input type="text" class="otro" aria-label="Escribe aquí cuánto" placeholder="Escribe aquí cuánto" hidden>
+      </div>
+      <div class="q"><span class="lbl">¿Con cuánta anticipación mínimo se puede agendar?</span>
+        <div class="opts" data-name="Anticipación mínima" data-single>
+          <label class="opt"><input type="radio" name="_g6" value="1 hora"><span>1 hora</span></label>
+          <label class="opt"><input type="radio" name="_g6" value="Desde el día siguiente"><span>Desde el día siguiente</span></label>
+          <label class="opt"><input type="radio" name="_g6" value="2 días"><span>2 días</span></label>
+          <label class="opt"><input type="radio" name="_g6" value="Otro"><span>Otro</span></label>
+        </div>
+        <input type="text" class="otro" aria-label="Escribe aquí cuánto" placeholder="Escribe aquí cuánto" hidden>
+      </div>
+      <div class="q"><span class="lbl">¿Cómo es la llamada con el equipo?</span><span class="hint">Si es por videollamada, Jason tendría que pedir un correo para mandar el enlace.</span>
+        <div class="opts" data-name="Cómo es la llamada" data-single>
+          <label class="opt"><input type="radio" name="_g7" value="Por teléfono, el equipo le marca"><span>Por teléfono, el equipo le marca</span></label>
+          <label class="opt"><input type="radio" name="_g7" value="Por videollamada (Meet o Zoom)"><span>Por videollamada (Meet o Zoom)</span></label>
+          <label class="opt"><input type="radio" name="_g7" value="Lo que prefiera el cliente"><span>Lo que prefiera el cliente</span></label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="q"><label for="correo1">Correo de Daniel para recibir cada cita</label><input type="text" id="correo1" name="Correo de Daniel" placeholder="nombre@correo.com"></div>
+        <div class="q"><label for="correo2">Correo de Dan para recibir cada cita</label><input type="text" id="correo2" name="Correo de Dan" placeholder="nombre@correo.com"></div>
+      </div>
+      <div class="q"><span class="lbl">¿A quién le llega cada cita?</span>
+        <div class="opts" data-name="A quién le llega cada cita" data-single>
+          <label class="opt"><input type="radio" name="_g8" value="A los dos siempre"><span>A los dos siempre</span></label>
+          <label class="opt"><input type="radio" name="_g8" value="Depende del tema"><span>Depende del tema</span></label>
+        </div>
+      </div>
+      <div class="q"><label for="reparto">Si depende del tema, ¿qué temas son de quién?</label><input type="text" id="reparto" name="Reparto de temas" placeholder="Ej. páginas y redes con Dan; asistentes con Daniel"></div>
+    </section>
+
+    <section>
+      <h2><span>05</span>Lo que recibe el cliente</h2>
+      <p class="why">Hoy el cliente cuelga con su cita, pero no le llega nada por escrito. En una llamada real nos lo pidieron.</p>
+      <div class="q"><span class="lbl">¿Le mandamos su cita por escrito al cliente?</span>
+        <div class="opts" data-name="Confirmación al cliente" data-single>
+          <label class="opt"><input type="radio" name="_g9" value="Por WhatsApp"><span>Por WhatsApp</span></label>
+          <label class="opt"><input type="radio" name="_g9" value="Por mensaje de texto (SMS)"><span>Por mensaje de texto (SMS)</span></label>
+          <label class="opt"><input type="radio" name="_g9" value="Por correo (Jason le pide su correo)"><span>Por correo (Jason le pide su correo)</span></label>
+          <label class="opt"><input type="radio" name="_g9" value="No hace falta"><span>No hace falta</span></label>
+        </div>
+      </div>
+      <div class="q"><span class="lbl">¿Le recordamos su llamada antes?</span>
+        <div class="opts" data-name="Recordatorio al cliente" data-single>
+          <label class="opt"><input type="radio" name="_g10" value="Un día antes"><span>Un día antes</span></label>
+          <label class="opt"><input type="radio" name="_g10" value="Una hora antes"><span>Una hora antes</span></label>
+          <label class="opt"><input type="radio" name="_g10" value="Los dos"><span>Los dos</span></label>
+          <label class="opt"><input type="radio" name="_g10" value="No hace falta"><span>No hace falta</span></label>
+        </div>
+      </div>
+      <div class="q"><span class="lbl">Si un cliente quiere cambiar o cancelar su cita, ¿qué hace Jason?</span>
+        <div class="opts" data-name="Cambiar o cancelar cita" data-single>
+          <label class="opt"><input type="radio" name="_g11" value="Jason la mueve solo a otro horario libre"><span>Jason la mueve solo a otro horario libre</span></label>
+          <label class="opt"><input type="radio" name="_g11" value="Jason toma el recado y el equipo la mueve"><span>Jason toma el recado y el equipo la mueve</span></label>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2><span>06</span>Casos especiales</h2>
+      <p class="why">Lo que pasa poco, pero cuando pasa, Jason debe saber qué hacer.</p>
+      <div class="q"><span class="lbl">Si alguien insiste en hablar con una persona en ese momento:</span>
+        <div class="opts" data-name="Si piden hablar con una persona" data-single>
+          <label class="opt"><input type="radio" name="_g12" value="Jason le agenda lo antes posible"><span>Jason le agenda lo antes posible</span></label>
+          <label class="opt"><input type="radio" name="_g12" value="Jason pasa la llamada a un celular del equipo"><span>Jason pasa la llamada a un celular del equipo</span></label>
+          <label class="opt"><input type="radio" name="_g12" value="Jason toma el recado y le marcan hoy mismo"><span>Jason toma el recado y le marcan hoy mismo</span></label>
+        </div>
+      </div>
+      <div class="q"><span class="lbl">Si llama un vendedor o un proveedor ofreciendo algo:</span>
+        <div class="opts" data-name="Si llama un vendedor" data-single>
+          <label class="opt"><input type="radio" name="_g13" value="Jason toma el recado"><span>Jason toma el recado</span></label>
+          <label class="opt"><input type="radio" name="_g13" value="Jason agradece y dice que por ahora no"><span>Jason agradece y dice que por ahora no</span></label>
+        </div>
+      </div>
+      <div class="q"><label for="siempre">¿Hay algo que Jason deba decir siempre?</label><textarea id="siempre" name="Lo que Jason debe decir siempre" placeholder="Ej. que somos de Cancún, que trabajamos en todo México"></textarea></div>
+      <div class="q"><label for="nunca">¿Y algo que nunca deba decir?</label><textarea id="nunca" name="Lo que Jason nunca debe decir" placeholder=""></textarea></div>
+      <div class="q"><label for="preguntas">¿Algo más que quieras contarnos o preguntarnos?</label><textarea id="preguntas" name="Algo más" placeholder=""></textarea></div>
+      <div class="q"><span class="lbl">¿Quién contesta?</span>
+        <div class="opts" data-name="Contestó" data-single>
+          <label class="opt"><input type="radio" name="_g14" value="Daniel"><span>Daniel</span></label>
+          <label class="opt"><input type="radio" name="_g14" value="Dan"><span>Dan</span></label>
+          <label class="opt"><input type="radio" name="_g14" value="Los dos juntos"><span>Los dos juntos</span></label>
+        </div>
+      </div>
+    </section>
+
+    <section class="send">
+      <button type="submit" id="go">Enviar respuestas</button>
+      <p class="status" id="st" role="status" aria-live="polite"></p>
+    </section>
+    </div>
+  </form>
+
+</div>
+
+<script>
+(function(){
+  const f=document.getElementById('f'), st=document.getElementById('st'), go=document.getElementById('go');
+  const KEY='ficha-jason-borrador-v1';
+  function collect(){
+    const out=[];
+    f.querySelectorAll('.q').forEach(q=>{
+      const el=q.querySelector('input[type=text],input[type=number],textarea');
+      const grp=q.querySelector('.opts');
+      if(grp){
+        const otro=q.querySelector('.otro');
+        const v=[...grp.querySelectorAll('input:checked')].map(i=>i.value==='Otro'&&otro&&otro.value.trim()?'Otro: '+otro.value.trim():i.value).join(', ');
+        out.push([grp.dataset.name,v]);
+      } else if(el){ out.push([el.name,el.value.trim()]); }
+    });
+    return out;
+  }
+  function saveDraft(){
+    const d={};
+    f.querySelectorAll('input,textarea').forEach((el,i)=>{d[i]=(el.type==='checkbox'||el.type==='radio')?el.checked:el.value});
+    try{localStorage.setItem(KEY,JSON.stringify(d))}catch(e){}
+  }
+  try{
+    const d=JSON.parse(localStorage.getItem(KEY)||'null');
+    if(d) f.querySelectorAll('input,textarea').forEach((el,i)=>{ if(!(i in d))return; if(el.type==='checkbox'||el.type==='radio') el.checked=!!d[i]; else el.value=d[i]; });
+  }catch(e){}
+  function syncOtro(){
+    f.querySelectorAll('.otro').forEach(o=>{
+      const box=o.closest('.q').querySelector('input[value="Otro"]');
+      o.hidden=!(box&&box.checked);
+    });
+  }
+  syncOtro();
+  f.addEventListener('input',saveDraft); f.addEventListener('change',()=>{syncOtro();saveDraft();});
+
+  const CLIENTE='moon', CUESTIONARIO='ficha-recepcionista-v1';
+
+  const PEND='ficha-jason-pendiente';
+  const espera=ms=>new Promise(r=>setTimeout(r,ms));
+  async function mandar(payload){
+    try{
+      const ctrl=new AbortController(); const t=setTimeout(()=>ctrl.abort(),12000);
+      const r=await fetch('/api/cuestionario',{method:'POST',headers:{'Content-Type':'application/json'},signal:ctrl.signal,body:JSON.stringify(payload)});
+      clearTimeout(t);
+      const j=await r.json().catch(()=>({}));
+      return r.ok&&j.ok;
+    }catch(e){ return false; }
+  }
+  function listo(){
+    st.className='status ok'; st.textContent='Listo, tus respuestas ya llegaron. ¡Gracias! Con esto ajustamos a Jason.';
+    go.disabled=true; go.textContent='Enviado';
+    try{localStorage.removeItem(KEY);localStorage.removeItem(PEND)}catch(e){}
+  }
+  // Si algo falla de nuestro lado, la página lo vuelve a intentar sola: el cliente no hace nada más.
+  async function insistir(payload){
+    try{localStorage.setItem(PEND,JSON.stringify(payload))}catch(e){}
+    const pausas=[0,2000,5000,10000,20000,30000];
+    for(let i=0;;i++){
+      await espera(pausas[Math.min(i,pausas.length-1)]);
+      if(await mandar(payload)){ listo(); return; }
+      if(i===1){ st.className='status'; st.textContent='Un momento, seguimos enviando tus respuestas…'; }
+    }
+  }
+  // Si quedó algo sin enviar en una visita anterior, se manda solo al volver a abrir la página.
+  try{
+    const p=JSON.parse(localStorage.getItem(PEND)||'null');
+    if(p){ go.disabled=true; st.className='status'; st.textContent='Terminando de enviar tus respuestas…'; insistir(p); }
+  }catch(e){}
+
+  f.addEventListener('submit',e=>{
+    e.preventDefault();
+    if(go.disabled) return;
+    const pairs=collect();
+    if(!pairs.some(([,v])=>v)){st.className='status warn';st.textContent='Todavía no hay respuestas. Contesta al menos una pregunta.';return;}
+    go.disabled=true; st.className='status'; st.textContent='Enviando…';
+    insistir({cliente:CLIENTE,cuestionario:CUESTIONARIO,sitio:document.getElementById('sitio').value,respuestas:Object.fromEntries(pairs)});
+  });
+})();
+</script>
+
+</body>
+</html>
