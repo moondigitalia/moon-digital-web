@@ -118,6 +118,25 @@ module.exports = async (req, res) => {
   try {
     if (d.accion === 'registrar' && rol === 'sistema') { res.status(200).json(await registrar(d)); return; }
 
+    // La agenda manda cada 5 minutos las citas que vienen (por si el equipo movió o canceló alguna a mano).
+    if (d.accion === 'citas' && rol === 'sistema') {
+      const lista = Array.isArray(d.citas) ? d.citas.slice(0, 500) : [];
+      const ahora = new Date().toISOString();
+      const vistas = new Set();
+      for (const c of lista) {
+        const tel = clave10(c.tel); if (!tel || vistas.has(tel)) continue; vistas.add(tel);
+        const cita = t(c.cita, 120);
+        const hay = (await sql('SELECT tel FROM personas WHERE tel = ?', [tel]))[0];
+        if (hay) await sql("UPDATE personas SET proxima_cita = ?, etapa = CASE WHEN etapa IN ('nuevo','perdido','') THEN 'agendado' ELSE etapa END WHERE tel = ?", [cita, tel]);
+        else await sql("INSERT INTO personas (tel, telefono, nombre, etapa, origen, proxima_cita, creado, actualizado, ultimo_contacto, es_prueba) VALUES (?,?,?,'agendado','llamada',?,?,?,?,?)",
+          [tel, t(c.tel, 30), t(c.nombre, 80), cita, ahora, ahora, ahora, /prueba/i.test(c.nombre || '') ? 1 : 0]);
+      }
+      const marcas = [...vistas];
+      await sql("UPDATE personas SET proxima_cita = '' WHERE proxima_cita != ''" + (marcas.length ? ' AND tel NOT IN (' + marcas.map(() => '?').join(',') + ')' : ''), marcas);
+      res.status(200).json({ ok: true, citas: marcas.length });
+      return;
+    }
+
     if (d.accion === 'buscar') {
       const tel = clave10(d.tel);
       const p = tel ? (await sql('SELECT * FROM personas WHERE tel = ?', [tel]))[0] : null;

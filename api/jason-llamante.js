@@ -32,10 +32,11 @@ async function buscarEnLibreta(tel, signal) {
   const r = await fetch(`https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/d1/database/${LIBRETA}/query`, {
     method: 'POST',
     headers: { Authorization: `Bearer ${CF_D1_TOKEN}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ sql: 'SELECT nombre, negocio, giro, necesidad FROM personas WHERE tel = ?', params: [t10] }),
+    body: JSON.stringify({ sql: 'SELECT nombre, negocio, giro, necesidad, proxima_cita FROM personas WHERE tel = ?', params: [t10] }),
     signal,
   });
   const j = await r.json();
+  if (!r.ok || !j.success) throw new Error('libreta ' + r.status);
   return (j && j.result && j.result[0] && j.result[0].results && j.result[0].results[0]) || null;
 }
 
@@ -52,45 +53,34 @@ module.exports = async (req, res) => {
   const clave = req.headers['x-clave'];
   if (!clave || (d.agent_id && d.agent_id !== JASON) || !d.caller_id) { contestar(); return; }
 
-  // Diagnóstico temporal (solo con clave): mide cuánto tarda la agenda desde aquí.
-  if (d.diag) {
-    const t0 = Date.now(); let info = {};
-    try {
-      const r = await fetch(AGENDA, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ accion: 'llamante', clave, telefono: d.caller_id }), redirect: 'manual' });
-      info.paso1 = { status: r.status, ms: Date.now() - t0, loc: (r.headers.get('location') || '').slice(0, 60) };
-      const loc = r.headers.get('location');
-      if (loc) { const t1 = Date.now(); const r2 = await fetch(loc); info.paso2 = { status: r2.status, ms: Date.now() - t1, txt: (await r2.text()).slice(0, 120) }; }
-    } catch (e) { info.error = e.message; }
-    res.status(200).json(info); return;
-  }
-
-  // Se pregunta a la vez a la agenda (citas) y a la libreta central (todos los canales: llamadas, WhatsApp, cuestionarios).
+  // 1) La libreta central (rápida, todos los canales: llamadas, WhatsApp, cuestionarios, y las citas que manda la agenda).
+  // 2) Solo si la libreta no contesta, se pregunta a la agenda de Google (más lenta).
   const control = new AbortController();
   const reloj = setTimeout(() => control.abort(), ESPERA_MS);
-  const deAgenda = fetch(AGENDA, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ accion: 'llamante', clave, telefono: d.caller_id }),
-    redirect: 'follow',
-    signal: control.signal,
-  }).then(r => r.json()).catch(e => { console.log('JASON-LLAMANTE sin agenda:', e.name); return null; });
-  const deLibreta = buscarEnLibreta(d.caller_id, control.signal).catch(e => { console.log('JASON-LLAMANTE sin libreta:', e.message); return null; });
-  const [x, p] = await Promise.all([deAgenda, deLibreta]);
-  clearTimeout(reloj);
-
-  if (x && x.conocido === 'sí') {
-    vars.cliente_conocido = 'sí';
-    vars.cliente_nombre = limpio(x.nombre, 60);
-    vars.cliente_negocio = limpio(x.negocio, 120);
-    vars.cliente_necesidad = limpio(x.necesidad, 200);
-    vars.cliente_cita = limpio(x.cita, 120);
-  }
+  let p = null, libretaOk = false;
+  try { p = await buscarEnLibreta(d.caller_id, control.signal); libretaOk = true; }
+  catch (e) { console.log('JASON-LLAMANTE sin libreta:', e.message); }
   if (p && (p.nombre || p.negocio)) {
     vars.cliente_conocido = 'sí';
-    vars.cliente_nombre = vars.cliente_nombre || limpio(p.nombre, 60);
-    vars.cliente_negocio = vars.cliente_negocio || limpio(p.negocio || p.giro, 120);
-    vars.cliente_necesidad = vars.cliente_necesidad || limpio(p.necesidad, 200);
+    vars.cliente_nombre = limpio(p.nombre, 60);
+    vars.cliente_negocio = limpio(p.negocio || p.giro, 120);
+    vars.cliente_necesidad = limpio(p.necesidad, 200);
+    vars.cliente_cita = limpio(p.proxima_cita, 120);
+  } else if (!libretaOk) {
+    try {
+      const r = await fetch(AGENDA, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ accion: 'llamante', clave, telefono: d.caller_id }), redirect: 'follow', signal: control.signal });
+      const x = await r.json();
+      if (x && x.conocido === 'sí') {
+        vars.cliente_conocido = 'sí';
+        vars.cliente_nombre = limpio(x.nombre, 60);
+        vars.cliente_negocio = limpio(x.negocio, 120);
+        vars.cliente_necesidad = limpio(x.necesidad, 200);
+        vars.cliente_cita = limpio(x.cita, 120);
+      }
+    } catch (e) { console.log('JASON-LLAMANTE sin agenda:', e.name); }
   }
+  clearTimeout(reloj);
 
   const nombre = vars.cliente_nombre.split(' ')[0];
   if (vars.cliente_conocido === 'sí' && nombre) {
