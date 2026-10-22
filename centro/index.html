@@ -52,12 +52,11 @@ button{cursor:pointer}
 .ava.chico{width:26px;height:26px;font-size:11px;border:2px solid var(--tarjeta)}
 .avas{display:flex}.avas .ava.chico+.ava.chico{margin-left:-8px}
 .vista{min-height:0;min-width:0;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);gap:clamp(8px,calc(1.6 * var(--u)),14px);animation:entra .38s var(--ease) both}
-@keyframes entra{from{opacity:0;transform:scale(.985)}to{opacity:1;transform:none}}
+@keyframes entra{from{opacity:0}to{opacity:1}}
 /* Cambio de pantalla con fundido cruzado (la anterior se desvanece mientras entra la nueva): igual con o sin "reducir movimiento". */
-::view-transition-old(root){animation:sale .28s var(--ease) both}
-::view-transition-new(root){animation:entra .38s var(--ease) both}
-@keyframes sale{to{opacity:0}}
-.vt .vista{animation:none}
+::view-transition-group(root){animation-duration:.32s;animation-timing-function:cubic-bezier(.4,0,.2,1)}
+::view-transition-old(root),::view-transition-new(root){animation-duration:.32s;animation-timing-function:cubic-bezier(.4,0,.2,1)}
+.vt .vista,.quieto .vista,.quieto .entrada{animation:none!important}
 
 /* ---------- Inicio ---------- */
 .hola{font-size:clamp(22px,calc(6.4 * var(--w)),34px);font-weight:700;letter-spacing:-.02em;line-height:1.1}
@@ -511,24 +510,42 @@ function atrasada(x) { return x.estado !== 'hecha' && x.vence && x.vence < new D
 async function arrancar() {
   if (!sesionGuardada()) return pantallaQuien();
   if (!D) app.innerHTML = '<div class="top"><div class="marca"><span class="logo" role="img" aria-label="MOON Digital"></span><i>/</i>CENTRO</div></div><div class="entrada"><span class="mini">Cargando…</span></div>';
-  const r = await api('inicio');
+  // Datos y fotos llegan juntos ANTES de pintar: la pantalla aparece una sola vez, completa, sin repintarse después.
+  const [r, f] = await Promise.all([api('inicio'), Object.keys(FOTOS).length ? null : api('fotos')]);
+  if (f && f.ok) FOTOS = f.fotos;
   if (!r.ok) { if (r.error !== 'sesion' && !D) app.innerHTML = '<div class="entrada"><div class="caja"><h1>Sin conexión</h1><p>Revisa tu internet.</p><button class="boton" onclick="arrancar()">Reintentar</button></div></div>'; return; }
   D = r;
-  pinta();
-  if (!Object.keys(FOTOS).length) api('fotos').then(f => { if (f.ok) { FOTOS = f.fotos; pinta(true); } });
+  transicion(() => pinta());
 }
-async function recargar() { const r = await api('inicio'); if (r.ok) { D = r; pinta(true); } }
+// Solo se repinta si de verdad cambió algo: si no, la pantalla ni se toca.
+async function recargar() {
+  const r = await api('inicio'); if (!r.ok) return;
+  const antes = JSON.stringify(Object.assign({}, D, { yo: 0 })), ahora = JSON.stringify(Object.assign({}, r, { yo: 0 }));
+  D = r; if (antes !== ahora) pinta(true);
+}
 setInterval(() => { if (D && document.visibilityState === 'visible' && !document.querySelector('.editando') && !/INPUT|TEXTAREA|SELECT/.test((document.activeElement || {}).tagName || '')) recargar(); }, 60000);
 document.addEventListener('visibilitychange', () => { if (D && document.visibilityState === 'visible') recargar(); });
 
 // El botón "atrás" del celular cierra la capa en vez de salirse de la página.
-function abrir(capa) { pila.push(capa); try { history.pushState({ capa: pila.length }, ''); } catch (e) {} transicion(() => pinta()); }
+async function precargar(capa) {
+  const espera = p => Promise.race([p, new Promise(ok => setTimeout(ok, 1500))]);
+  if (capa.tipo === 'ficha' && !capa.cargado) await espera(api('ficha', { tel: capa.tel }).then(r => { if (r.ok) { capa.ext = r; capa.cargado = true; } }));
+  if (capa.tipo === 'proyecto' && capa.tab === 'uso' && !capa.uso) await espera(api('uso', { id: capa.id }).then(r => { if (r.ok) capa.uso = r; }));
+}
+let abriendo = false;
+async function abrir(capa) {
+  if (abriendo) return; abriendo = true;   // un doble toque no abre dos veces
+  try { await precargar(capa); } finally { abriendo = false; }
+  pila.push(capa); try { history.pushState({ capa: pila.length }, ''); } catch (e) {} transicion(() => pinta());
+}
 function reemplazar(capa) { pila[pila.length - 1] = capa; transicion(() => pinta()); }
 function cerrar() { if (history.state && history.state.capa) history.back(); else { pila.pop(); transicion(() => pinta()); } }
 addEventListener('popstate', () => { if (pila.length) { pila.pop(); transicion(() => pinta()); } });
 function pinta(silencioso) {
   // Una sola pantalla a la vez: la anterior se borra, nada queda escondido detrás.
+  // Si solo se actualizan datos (llegó la ficha, la foto o la recarga de cada minuto), se cambia sin animar nada.
   alCambiarTamano = null;
+  document.documentElement.classList.toggle('quieto', !!silencioso);
   const c = pila[pila.length - 1];
   if (!c) return pintaInicio(silencioso);
   ({ tareas: capaTareas, tarea: capaTarea, nuevaTarea: capaNuevaTarea, crm: capaCRM, ficha: capaFicha, nuevoCliente: capaNuevoCliente, proyectos: capaProyectos, proyecto: capaProyecto, nuevoProyecto: capaProyecto, equipo: capaEquipo, moon: capaMoon, lector: capaLector, nota: capaNota, editarProyecto: capaProyecto, cuenta: capaCuenta, frase: capaFrase, foto: capaFoto })[c.tipo](c, silencioso);
@@ -739,7 +756,7 @@ async function capaFicha(c, sil) {
   if (sil) app.querySelector('.vista').style.animation = 'none';
   // Llamar y WhatsApp viven arriba, siempre a la mano, sin ocupar espacio de la ficha.
   if (tel) app.querySelector('.cabeza').insertAdjacentHTML('beforeend', `<a class="redondo accion" href="tel:+52${tel.slice(-10)}" aria-label="Llamar">${I.tel}</a><a class="redondo" style="color:var(--verde)" href="https://wa.me/52${tel.slice(-10)}" target="_blank" rel="noopener" aria-label="WhatsApp">${I.wa}</a>`);
-  app.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => { c.tab = b.dataset.tab; c.p = 0; transicion(() => pinta(true)); });
+  app.querySelectorAll('[data-tab]').forEach(b => b.onclick = async () => { c.tab = b.dataset.tab; c.p = 0; await precargar(c); transicion(() => pinta(true)); });
   const guarda = async datos => { const r = await api('editar_persona', Object.assign({ tel: c.tel }, datos)); if (r.ok) { Object.assign(p, datos); if (c.ext && c.ext.persona) Object.assign(c.ext.persona, datos); } return r; };
   if (c.tab === 'estado') {
     app.querySelectorAll('#etapas [data-e]').forEach(b => b.onclick = async () => { await guarda({ etapa: b.dataset.e }); pinta(true); recargar(); });
@@ -864,7 +881,7 @@ function capaProyecto(c) {
       <div class="par"><span>Abierto</span><b>${cuando(p.creado)}</b></div>
       <button class="boton dos" id="editar">Editar datos</button></div>`;
   marco(p.nombre, '', `<div class="cuerpo" style="grid-template-rows:auto minmax(0,1fr)"><div class="tabs"><button data-tab="fase" class="${c.tab === 'fase' ? 'on' : ''}">Fase</button><button data-tab="tareas" class="${c.tab === 'tareas' ? 'on' : ''}">Tareas (${abiertas})</button><button data-tab="uso" class="${c.tab === 'uso' ? 'on' : ''}">Uso (${p.uso_mes || 0})</button><button data-tab="datos" class="${c.tab === 'datos' ? 'on' : ''}">Datos</button></div>${cuerpo}</div>`);
-  app.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => { c.tab = b.dataset.tab; c.p = 0; transicion(() => pinta(true)); });
+  app.querySelectorAll('[data-tab]').forEach(b => b.onclick = async () => { c.tab = b.dataset.tab; c.p = 0; await precargar(c); transicion(() => pinta(true)); });
   if (c.tab === 'fase') app.querySelectorAll('#fases [data-f]').forEach(b => b.onclick = async () => { const r = await api('proyecto', { id: p.id, fase: b.dataset.f }); if (r.ok) { p.fase = b.dataset.f; pinta(true); recargar(); } });
   if (c.tab === 'tareas') {
     document.getElementById('nt').onclick = () => abrir({ tipo: 'nuevaTarea', proyecto: p.id });
