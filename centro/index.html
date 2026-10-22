@@ -181,20 +181,29 @@ textarea.campo{height:auto;border-radius:22px;padding:14px 18px;resize:none}
 .actual{animation:latido 2.4s ease-in-out infinite}
 .icono{position:relative;flex:none;border-radius:50%;background:var(--c);color:#fff;font-weight:800;display:grid;place-items:center;overflow:hidden}
 .icono img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#fff}
-.demo{position:relative;min-height:0;border-radius:var(--r);overflow:hidden;background:var(--c);box-shadow:var(--sombra);display:flex;flex-direction:column;justify-content:flex-end;gap:12px;padding:clamp(14px,calc(2.4 * var(--u)),22px);color:#fff}
-.demo-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.demo-vivo{position:absolute;inset:0;overflow:hidden;background:#fff}
-.demo-vivo iframe{border:0;transform-origin:0 0;pointer-events:none;display:block}
-.demo-velo{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 30%,rgba(0,0,0,.62))}
-.demo-info{position:relative;display:flex;align-items:center;gap:12px}
-.demo-info b{display:block;font-size:clamp(20px,calc(3.4 * var(--u)),30px);font-weight:800;line-height:1.1}
-.demo-info span:last-child{font-size:13px;font-weight:700;opacity:.85}
-.demo-boton{position:relative;align-self:flex-start;display:inline-flex;align-items:center;gap:8px;background:#fff;color:#18204a}
+.icono img.logo-c{object-fit:contain;padding:7%}.icono img.en-color{background:var(--c);padding:0}
+.icono.duo{background:transparent;border-radius:0;overflow:visible;display:flex;align-items:flex-end;gap:2px;width:auto!important}
+.icono.duo img{position:static;width:auto;height:100%;object-fit:contain;background:none}
+.demo{position:relative;min-height:0;border-radius:var(--r);overflow:hidden;background:var(--c);box-shadow:var(--sombra);display:grid;grid-template-rows:auto auto;align-content:end;gap:10px;padding:clamp(16px,calc(2.6 * var(--u)),26px);color:#fff;container-type:size}
+.demo-logo{--lg:min(40cqh,36cqw,230px);position:absolute;width:var(--lg);height:var(--lg);right:max(18px,8cqw);top:max(16px,7cqh)}
+.ancho .demo-logo{--lg:min(56cqh,30cqw,260px);top:50%;margin-top:calc(var(--lg) * -.5);right:12cqw}
+.demo-logo::before,.demo-logo::after{content:"";position:absolute;left:50%;top:50%;border-radius:50%;border:1.5px solid rgba(255,255,255,.2);transform:translate(-50%,-50%);pointer-events:none}
+.demo-logo::before{width:calc(var(--lg) * 1.55);height:calc(var(--lg) * 1.55)}
+.demo-logo::after{width:calc(var(--lg) * 2.25);height:calc(var(--lg) * 2.25);border-color:rgba(255,255,255,.12)}
+.demo-logo .icono{width:var(--lg);height:var(--lg);font-size:calc(var(--lg) * .42);box-shadow:0 0 0 5px rgba(255,255,255,.22)}
+.demo-logo .icono.duo{box-shadow:none}
+.demo-info{position:relative;display:grid;gap:2px}
+.demo-info .eti{color:rgba(255,255,255,.78)}
+.demo-info b{display:block;font-size:clamp(22px,calc(3.6 * var(--u)),34px);font-weight:800;line-height:1.1}
+.demo-info span:last-child{font-size:13px;font-weight:700;opacity:.82}
+.demo-botones{position:relative;display:flex;align-items:center;gap:10px}
+.demo-boton{display:inline-flex;align-items:center;gap:8px;background:#fff;color:#18204a}
 .demo-boton svg{width:16px;height:16px}
+.demo-enviar{background:rgba(255,255,255,.18);color:#fff;box-shadow:none}
+.rects>:last-child:nth-child(odd),.lista.dos>:last-child:nth-child(odd):not(:only-child),.casa-filas>:last-child:nth-child(odd){grid-column:1/-1}
 .rects{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.ancho .rects{grid-template-columns:repeat(5,minmax(0,1fr))}
-.ancho .casa-rects{grid-template-columns:repeat(4,minmax(0,1fr))}
-.bajo .rect{padding:9px 12px}.bajo .casa .vision p{font-size:14px}.bajo .casa .vision{gap:6px}
+.ancho .rects{grid-template-columns:repeat(4,minmax(0,1fr))}
+.bajo .rect{padding:9px 12px}
 .rect{border-radius:22px;background:var(--tarjeta);box-shadow:var(--sombra-chica);padding:12px 14px;text-align:start;display:grid;gap:3px;align-content:start;transition:transform .25s var(--ease)}
 .rect:active{transform:scale(.98)}
 .rect b{font-size:15px;font-weight:800}
@@ -202,16 +211,43 @@ textarea.campo{height:auto;border-radius:22px;padding:14px 18px;resize:none}
 .rect.sin{background:transparent;box-shadow:inset 0 0 0 1.5px var(--linea);cursor:default}
 .rect.sin b{color:var(--suave)}.rect.sin span{color:var(--tenue)}
 .flecha-f{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--fondo);box-shadow:var(--hundido)}.flecha-f svg{width:14px;height:14px}
-.casa .vision{border-radius:var(--r);background:linear-gradient(150deg,#22306a,#141a3c);color:#fff;padding:clamp(14px,calc(2.6 * var(--u)),24px);display:grid;gap:10px;box-shadow:var(--sombra)}
-.casa .vision .logo{height:26px;color:#fff}
-.casa .vision p{font-size:clamp(15px,calc(2.4 * var(--u)),20px);font-weight:700;line-height:1.35}
-.casa-rects{align-content:stretch;grid-auto-rows:1fr;min-height:0}
-.casa-rects .rect{background:linear-gradient(150deg,#1d2757,#141a3c);color:#fff;box-shadow:var(--sombra);align-content:end;padding:16px}
-.casa-rects .rect b{font-size:clamp(16px,calc(2.6 * var(--u)),22px)}
-.casa-rects .rect span{color:rgba(255,255,255,.75)}
-.casa-rects .rect.sin{background:transparent;color:var(--suave)}
-.doc-html{position:absolute;inset:0;width:100%;height:100%;border:0;background:#fff;display:block}
-.hoja:has(>.doc-html){position:relative}
+.fila.chica{min-height:52px;padding-top:8px!important;padding-bottom:8px!important;gap:11px;border-radius:18px}
+.fila.chica .q b{font-size:14.5px}
+.fila.sin{opacity:.55;cursor:default}
+html:not(.ancho) .agenda{gap:0!important}
+html:not(.ancho) .agenda>.fila{border-radius:0;box-shadow:none;border-bottom:1px solid var(--linea)}
+html:not(.ancho) .agenda>.fila:first-child{border-radius:20px 20px 0 0}
+html:not(.ancho) .agenda>.fila:last-child{border-radius:0 0 20px 20px;border-bottom:0}
+html:not(.ancho) .agenda>.fila:only-child{border-radius:20px}
+.casa .vision{border-radius:22px;background:linear-gradient(150deg,#22306a,#141a3c);color:#fff;padding:12px 16px;display:flex;align-items:center;gap:14px;box-shadow:var(--sombra-chica)}
+.casa .vision .logo{height:22px;flex:none;color:#fff}
+.casa .vision p{font-size:13.5px;font-weight:700;line-height:1.35;opacity:.92}
+.jason{position:relative;min-height:0;overflow:hidden;border-radius:var(--r);background:#141a3c;background:radial-gradient(120% 100% at 100% 0%,#33449a 0%,#1b2457 45%,#11163a 100%);color:#fff;padding:clamp(14px,calc(2.4 * var(--u)),22px);display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:10px;box-shadow:var(--sombra)}
+.jason::before{content:"";position:absolute;width:260px;height:260px;border-radius:50%;right:-110px;top:-120px;border:1.5px solid rgba(201,214,255,.16);pointer-events:none}
+.j-cab{position:relative;display:flex;align-items:center;gap:12px}
+.j-cab .eti{color:#c9d6ff}
+.j-cab b{display:block;font-size:22px;font-weight:800;line-height:1.1}
+.j-cab div>span:last-child{display:block;font-size:13px;font-weight:600;opacity:.82;line-height:1.3;margin-top:2px}
+.j-centro{position:relative;min-height:0;display:grid;grid-template-rows:minmax(0,1fr) auto auto;align-content:center;justify-items:center;gap:10px;text-align:center;container-type:size}
+.j-orbe{position:relative;align-self:center;height:min(100%,170px);aspect-ratio:1;min-height:0;border-radius:50%;background:radial-gradient(circle at 38% 36%,#fff 0%,#e4eaff 30%,#8fa3d9 66%,#2a3b70 100%);box-shadow:0 0 0 12px rgba(201,214,255,.07),0 0 0 26px rgba(201,214,255,.04)}
+.j-probar{display:inline-flex;align-items:center;gap:10px;background:#fff;color:#141a3c;text-decoration:none;font-size:17px;min-height:56px;padding:0 28px}
+.j-probar svg{width:20px;height:20px}
+.j-num{font-size:12.5px;font-weight:700;opacity:.8;line-height:1.35}
+.j-mas{position:relative;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.j-mas button{border-radius:99px;background:rgba(255,255,255,.13);color:#fff;font-weight:800;font-size:13.5px;padding:11px 6px;transition:transform .25s var(--ease)}
+.j-mas button:active{transform:scale(.96)}.j-mas button:disabled{opacity:.4}
+.casa-filas{display:grid;gap:8px}
+.casa-ic{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(150deg,#22306a,#141a3c);color:#fff;flex:none}.casa-ic svg{width:18px;height:18px}
+.ancho .casa{grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);grid-template-rows:auto minmax(0,1fr)!important}
+.ancho .casa .vision{grid-column:2;grid-row:1}
+.ancho .casa .jason{grid-column:1;grid-row:1/3}
+.ancho .casa .casa-filas{grid-column:2;grid-row:2;grid-auto-rows:minmax(0,1fr)}
+.ancho .casa-filas>.fila{min-height:0}
+.ancho .casa-filas .q b{font-size:17px}.ancho .casa-filas .casa-ic{width:46px;height:46px}
+.hoja.visor{position:relative;padding:0;overflow:hidden}
+.doc-html{position:absolute;inset:0;width:100%;height:100%;border:0;background:transparent;display:block}
+#flotante{position:absolute;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));transform:translate(-50%,8px);opacity:0;pointer-events:none;z-index:60;background:#1d1d22;color:#fff;padding:12px 16px;border-radius:18px;font-weight:700;font-size:14px;line-height:1.35;width:max-content;max-width:min(92%,420px);text-align:center;overflow-wrap:anywhere;transition:opacity .25s var(--ease),transform .25s var(--ease)}
+#flotante.ve{opacity:1;transform:translate(-50%,0)}
 .hoja.md{display:block;overflow:hidden;line-height:1.5;font-weight:500}
 .hoja.md>*+*{margin-top:.7em}
 .hoja.md h1{font-size:22px;font-weight:800}.hoja.md h2{font-size:18px;font-weight:800}.hoja.md h3{font-size:16px;font-weight:800}
@@ -326,6 +362,7 @@ const I = {
   wa: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21l1.7-5A8.5 8.5 0 1 1 8 19.4L3 21"/></svg>',
   ojo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>',
   ojoNo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18M10.6 5.1A10.7 10.7 0 0 1 12 5c6.5 0 10 7 10 7a17 17 0 0 1-3.2 4.2M6.6 6.6C3.7 8.4 2 12 2 12s3.5 7 10 7c1.9 0 3.6-.6 5-1.5"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>',
+  enviar: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 8l5-5 5 5"/><path d="M5 13v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/></svg>',
   lupa: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>',
 };
 
@@ -407,7 +444,8 @@ function paginar(cont, items, pinta, opciones) {
     const total = paginas.length;
     pagina = Math.min(pagina, total - 1);
     lista.innerHTML = paginas[pagina].map(k => pinta(items[k])).join('');
-    pie.innerHTML = total > 1 ? `<button class="redondo" data-pag="-1" aria-label="Anterior">${I.izq}</button><span class="pag">${pagina + 1} de ${total}</span><button class="redondo" data-pag="1" aria-label="Siguiente">${I.der}</button>` : '';
+    const aqui = paginas[pagina], rango = aqui.length > 1 ? `${aqui[0] + 1}–${aqui[aqui.length - 1] + 1}` : `${aqui[0] + 1}`;
+    pie.innerHTML = total > 1 ? `<button class="redondo" data-pag="-1" aria-label="Anterior">${I.izq}</button><span class="pag">${rango} de ${items.length}</span><button class="redondo" data-pag="1" aria-label="Siguiente">${I.der}</button>` : '';
     pie.querySelectorAll('[data-pag]').forEach(b => b.onclick = () => { pagina = (pagina + Number(b.dataset.pag) + total) % total; recordar(); dibuja(); });
     let x0 = null;
     lista.ontouchstart = e => { x0 = e.touches[0].clientX; };
@@ -588,9 +626,16 @@ document.addEventListener('visibilitychange', () => { if (D && document.visibili
 // El botón "atrás" del celular cierra la capa en vez de salirse de la página.
 async function precargar(capa) {
   const espera = p => Promise.race([p, new Promise(ok => setTimeout(ok, 1500))]);
-  if (capa.tipo === 'ficha' && !capa.cargado) await espera(api('ficha', { tel: capa.tel }).then(r => { if (r.ok) { capa.ext = r; capa.cargado = true; } }));
+  if (capa.tipo === 'ficha' && !capa.cargado) await espera(traerFicha(capa.tel).then(r => { if (r && r.ok) { capa.ext = r; capa.cargado = true; } }));
   if (capa.tipo === 'documento' && !capa.doc) await espera(api('documento', { id: capa.id }).then(r => { if (r.ok) capa.doc = r.doc; }));
   if (capa.tipo === 'proyecto' && capa.tab === 'uso' && !capa.uso) await espera(api('uso', { id: capa.id }).then(r => { if (r.ok) capa.uso = r; }));
+}
+// Las fichas se piden una vez y se guardan un momento: si ya venía en camino, se usa esa misma respuesta.
+const FICHAS = {};
+function traerFicha(tel) {
+  const f = FICHAS[tel];
+  if (f && Date.now() - f.t < 60000) return f.p;
+  const p = api('ficha', { tel }).catch(() => null); FICHAS[tel] = { t: Date.now(), p }; return p;
 }
 let abriendo = false;
 async function abrir(capa) {
@@ -599,18 +644,25 @@ async function abrir(capa) {
   pila.push(capa); try { history.pushState({ capa: pila.length }, ''); } catch (e) {} transicion(() => pinta());
 }
 function reemplazar(capa) { pila[pila.length - 1] = capa; transicion(() => pinta()); }
-function cerrar() { if (history.state && history.state.capa) history.back(); else { pila.pop(); transicion(() => pinta()); } }
-addEventListener('popstate', () => { if (pila.length) { pila.pop(); transicion(() => pinta()); } });
+// Si un documento abierto (página de otro sitio) guardó pasos en el historial, "atrás" solo movería ese documento:
+// por eso, si la capa no se cerró sola en un momento, se cierra aquí. El botón Regresar siempre regresa.
+function cerrar() {
+  const capa = pila[pila.length - 1];
+  if (history.state && history.state.capa) { history.back(); setTimeout(() => { if (capa && pila[pila.length - 1] === capa) { pila.pop(); transicion(() => pinta()); } }, 400); }
+  else { pila.pop(); transicion(() => pinta()); }
+}
+// El historial dice en qué capa vamos: se regresa a ese nivel (si ya estábamos ahí, no pasa nada; nunca se cierran dos de golpe).
+addEventListener('popstate', () => { const nivel = (history.state && history.state.capa) || 0; if (pila.length > nivel) { pila.length = nivel; transicion(() => pinta()); } });
 function pinta(silencioso) {
   // Una sola pantalla a la vez: la anterior se borra, nada queda escondido detrás.
   // Si solo se actualizan datos (llegó la ficha, la foto o la recarga de cada minuto), se cambia sin animar nada.
   alCambiarTamano = null;
   const c = pila[pila.length - 1];
   if (!c) return pintaInicio(silencioso);
-  ({ tareas: capaTareas, tarea: capaTarea, nuevaTarea: capaNuevaTarea, crm: capaCRM, ficha: capaFicha, nuevoCliente: capaNuevoCliente, proyectos: capaProyectos, proyecto: capaProyecto, nuevoProyecto: capaProyecto, equipo: capaEquipo, moon: capaMoon, lector: capaLector, clientes: capaClientes, cliente: capaCliente, seccion: capaSeccion, documento: capaDocumento, casa: capaCasa, jason: capaJason, nota: capaNota, editarProyecto: capaProyecto, cuenta: capaCuenta, frase: capaFrase, foto: capaFoto })[c.tipo](c, silencioso);
+  ({ tareas: capaTareas, tarea: capaTarea, nuevaTarea: capaNuevaTarea, crm: capaCRM, ficha: capaFicha, nuevoCliente: capaNuevoCliente, proyectos: capaProyectos, proyecto: capaProyecto, nuevoProyecto: capaProyecto, equipo: capaEquipo, moon: capaMoon, lector: capaLector, clientes: capaClientes, cliente: capaCliente, seccion: capaSeccion, documento: capaDocumento, casa: capaCasa, nota: capaNota, editarProyecto: capaProyecto, cuenta: capaCuenta, frase: capaFrase, foto: capaFoto })[c.tipo](c, silencioso);
 }
-function marco(titulo, accion, cuerpo) {
-  app.innerHTML = `<div class="top"><button class="redondo" id="volver" aria-label="Regresar">${I.atras}</button><div class="cabeza" style="flex:1;min-width:0"><h2>${esc(titulo)}</h2>${accion ? `<button class="redondo accion" id="accion" aria-label="${esc(accion)}">${I.mas}</button>` : ''}</div></div><div class="vista" style="grid-template-rows:minmax(0,1fr)">${cuerpo}</div>`;
+function marco(titulo, accion, cuerpo, icono) {
+  app.innerHTML = `<div class="top"><button class="redondo" id="volver" aria-label="Regresar">${I.atras}</button><div class="cabeza" style="flex:1;min-width:0"><h2>${esc(titulo)}</h2>${accion ? `<button class="redondo accion" id="accion" aria-label="${esc(accion)}" title="${esc(accion)}">${icono || I.mas}</button>` : ''}</div></div><div class="vista" style="grid-template-rows:minmax(0,1fr)">${cuerpo}</div>`;
   document.getElementById('volver').onclick = cerrar;
   if (silencio) app.querySelector('.vista').style.animation = 'none';
 }
@@ -770,19 +822,20 @@ function capaCRM(c) {
     <label class="buscador">${I.lupa}<input id="busca" placeholder="Buscar cliente, teléfono o nota" value="${esc(c.busca || '')}" enterkeyhint="search"></label>
     <div class="pils">${pils}</div>
     <div class="desc" style="--c:${G.c};--cf:${G.cf}"><b>${G.n}:</b> ${esc(G.d)}</div>
-    <div class="lista dos"></div><div class="pie"></div></div>`);
+    <div class="lista dos agenda"></div><div class="pie"></div></div>`);
   app.querySelectorAll('[data-g]').forEach(b => b.onclick = () => { c.g = b.dataset.g; c.p = 0; transicion(() => pinta(true)); });
   document.getElementById('accion').onclick = () => abrir({ tipo: 'nuevoCliente', etapa: grupos.includes(c.g) ? c.g : 'pendiente' });
   const busca = document.getElementById('busca');
   let espera; busca.oninput = () => { clearTimeout(espera); espera = setTimeout(() => { c.busca = busca.value; c.p = 0; const pos = busca.selectionStart; silencio = true; pinta(true); silencio = false; const nb = document.getElementById('busca'); nb.focus(); nb.setSelectionRange(pos, pos); }, 250); };
-  alCambiarTamano = paginar(app.querySelector('.cuerpo'), items, p => filaPersona(p, c.g === 'todos' || c.g === 'pruebas' || !!q), { pagina: c.p, vacio: q ? '<b>Sin resultados</b>Prueba con otra palabra.' : `<b>Aún no hay nadie aquí</b>${esc(G.d)}`, alPintar: l => l.querySelectorAll('[data-p]').forEach(b => b.onclick = () => abrir({ tipo: 'ficha', tel: b.dataset.p })) });
+  alCambiarTamano = paginar(app.querySelector('.cuerpo'), items, p => filaPersona(p, c.g === 'todos' || c.g === 'pruebas' || !!q), { pagina: c.p, alto: 54, hueco: document.documentElement.classList.contains('ancho') ? 9 : 0, vacio: q ? '<b>Sin resultados</b>Prueba con otra palabra.' : `<b>Aún no hay nadie aquí</b>${esc(G.d)}`, alPintar: l => l.querySelectorAll('[data-p]').forEach(b => { b.onpointerdown = () => traerFicha(b.dataset.p); b.onclick = () => abrir({ tipo: 'ficha', tel: b.dataset.p }); }) });
 }
 function filaPersona(p, conEtapa) {
   const n = D.proyectos.filter(x => x.tel === p.tel).length;
   const E = ETAPA[p.etapa || 'pendiente'] || ETAPA.pendiente;
-  const sub = [p.proxima_cita ? `Cita: ${p.proxima_cita}` : '', quienDe(p), p.servicio, n ? `${n} proyecto${n === 1 ? '' : 's'}` : '', cuando(p.ultimo_contacto)].filter(Boolean).join(' · ');
-  const nota = p.notas_equipo ? (p.notas_equipo.length <= 140 ? `<span style="color:var(--tinta);font-weight:600;white-space:pre-line">${esc(p.notas_equipo)}</span>` : '<span>Tiene notas: tócalo para leerlas</span>') : '';
-  return `<button class="fila" data-p="${esc(p.tel)}"><span class="punto" style="--c:${TEMP[p.temperatura] || 'var(--niebla)'}" title="${esc(p.temperatura || 'sin temperatura')}"></span><span class="q"><b>${esc(nombreDe(p))}</b><span>${conEtapa ? `<em style="font-style:normal;font-weight:800;color:${E.c}">${E.n}</em>${sub ? ' · ' : ''}` : ''}${esc(sub)}</span>${nota}</span>${avas(p.encargados)}</button>`;
+  const pan = (D.paneles || []).find(x => x.tel === p.tel);
+  const sub = [p.proxima_cita ? `Cita: ${p.proxima_cita}` : '', quienDe(p), n ? `${n} proyecto${n === 1 ? '' : 's'}` : ''].filter(Boolean).join(' · ');
+  const cara = pan ? icono(pan, p, 36) : `<span class="icono" style="--c:${E.c};width:36px;height:36px;font-size:15px">${esc(nombreDe(p).slice(0, 1).toUpperCase())}</span>`;
+  return `<button class="fila chica" data-p="${esc(p.tel)}">${cara}<span class="q"><b>${esc(nombreDe(p))}</b><span>${conEtapa ? `<em style="font-style:normal;font-weight:800;color:${E.c}">${E.n}</em>${sub ? ' · ' : ''}` : ''}${esc(sub || (conEtapa ? '' : 'Tócalo para ver su ficha'))}</span></span><span class="flecha-f">${I.der}</span></button>`;
 }
 
 async function capaFicha(c, sil) {
@@ -794,18 +847,21 @@ async function capaFicha(c, sil) {
   const P = Object.assign({}, p, ext.persona || {});
   const proys = D.proyectos.filter(x => x.tel === c.tel);
   const tel = String(P.telefono || '').replace(/\D/g, '');
-  const tabs = [['estado', 'Estado'], ['datos', 'Datos'], ['proyectos', `Proyectos (${proys.length})`], ['historial', c.ext ? `Contacto (${(ext.contactos || []).length})` : 'Contacto']];
+  // Un cliente que dimos de alta nosotros (no llegó por Jason) no tiene llamadas: esa pestaña solo aparece si hay algo.
+  const deJason = !/^c-/.test(c.tel), nContactos = (ext.contactos || []).length;
+  const tabs = [['estado', 'Estado'], ['datos', 'Contacto']].concat(c.desdeCliente ? [] : [['proyectos', 'Proyectos']]).concat(deJason || nContactos ? [['historial', 'Historial']] : []);
+  if (!tabs.some(x => x[0] === c.tab)) c.tab = 'estado';
   let cuerpo = '';
   if (c.tab === 'estado') {
     cuerpo = `<div class="hoja" style="display:flex;flex-direction:column;gap:clamp(10px,calc(2 * var(--u)),16px)">
       <div><div class="eti" style="margin-bottom:8px">¿Dónde va?</div><div class="pils" id="etapas">${Object.keys(ETAPA).map(e => `<button class="pil${(P.etapa || 'pendiente') === e ? ' on' : ''}" data-e="${e}" style="--c:${ETAPA[e].c};--cf:${ETAPA[e].cf}"><i>${ETAPA[e].ic}</i>${ETAPA[e].n}</button>`).join('')}</div></div>
-      <div><div class="eti" style="margin-bottom:8px">Encargados</div><div class="quien" id="enc">${Object.keys(GENTE).map(id => `<button data-u="${id}" class="${String(P.encargados).split(',').includes(id) ? 'on' : ''}">${ava(id)}${GENTE[id].n}</button>`).join('')}</div></div>
       <div><div class="eti" style="margin-bottom:8px">Temperatura</div><div class="pils" id="temps">${['caliente', 'tibio', 'frio'].map(x => `<button class="pil solo${P.temperatura === x ? ' on' : ''}" data-x="${x}" style="--c:#fff;--cf:${TEMP[x]}">${x === 'frio' ? 'Frío' : x[0].toUpperCase() + x.slice(1)}</button>`).join('')}</div></div>
       ${P.proxima_cita ? `<div class="par"><span>Cita</span><b>${esc(P.proxima_cita)}</b></div>` : ''}
       <div><div class="eti" style="margin-bottom:8px">Notas del equipo</div>${P.notas_equipo ? `<div class="nota" id="nota" style="flex:none">${esc(P.notas_equipo)}</div>` : ''}<div class="botones" style="margin-top:8px"><button class="boton dos" id="escribir" style="height:44px">${P.notas_equipo ? 'Editar nota' : 'Escribir una nota'}</button></div></div>
       <label class="mini" style="display:flex;gap:8px;align-items:center;margin-top:auto"><input type="checkbox" id="prueba"${P.es_prueba ? ' checked' : ''}> Es una llamada de prueba (no cuenta como cliente)</label></div>`;
   } else if (c.tab === 'datos') {
-    const filas = [['Nombre', P.nombre], ['Negocio', P.negocio], ['Giro', P.giro], ['Teléfono', P.telefono], ['Correo', P.correo], ['Servicio', P.servicio], ['Llegó por', P.origen], ['Necesita', P.necesidad], ['Volumen', P.volumen], ['Urgencia', P.urgencia], ['Decide', P.decide], ['Primer contacto', cuando(P.creado)], ['Contactos', P.contactos]].filter(x => x[1] !== '' && x[1] != null);
+    const util = v => v !== '' && v != null && !/^otros?$/i.test(String(v).trim());
+    const filas = [['Nombre', P.nombre], ['Negocio', P.negocio], ['Giro', P.giro], ['Teléfono', P.telefono || 'Aún no lo tenemos'], ['Correo', P.correo || 'Aún no lo tenemos'], ['Servicio', P.servicio], ['Llegó por', P.origen], ['Necesita', P.necesidad], ['Volumen', P.volumen], ['Urgencia', P.urgencia], ['Decide', P.decide], deJason ? ['Nos llamó', cuando(P.creado)] : null].filter(x => x && util(x[1]));
     cuerpo = `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr) auto"><div class="lista"></div><div class="pie"></div></div>`;
     c._items = filas;
   } else if (c.tab === 'proyectos') {
@@ -822,7 +878,6 @@ async function capaFicha(c, sil) {
   if (c.tab === 'estado') {
     app.querySelectorAll('#etapas [data-e]').forEach(b => b.onclick = async () => { await guarda({ etapa: b.dataset.e }); pinta(true); recargar(); });
     app.querySelectorAll('#temps [data-x]').forEach(b => b.onclick = async () => { await guarda({ temperatura: p.temperatura === b.dataset.x ? '' : b.dataset.x }); pinta(true); });
-    app.querySelectorAll('#enc [data-u]').forEach(b => b.onclick = async () => { const s = new Set(String(p.encargados || '').split(',').filter(Boolean)); s.has(b.dataset.u) ? s.delete(b.dataset.u) : s.add(b.dataset.u); await guarda({ encargados: [...s].join(',') }); pinta(true); });
     document.getElementById('escribir').onclick = () => abrir({ tipo: 'nota', tel: c.tel });
     // Si la nota no cabe completa, se cambia por un botón para leerla entera.
     const nota = document.getElementById('nota'), hoja = app.querySelector('.vista .hoja');
@@ -835,7 +890,7 @@ async function capaFicha(c, sil) {
     alCambiarTamano = paginar(app.querySelector('.vista .cuerpo .cuerpo'), proys, filaProyecto, { pagina: c.p, vacio: '<b>Sin proyectos</b>Ábrele uno con el botón de abajo.', alPintar: l => l.querySelectorAll('[data-y]').forEach(b => b.onclick = () => abrir({ tipo: 'proyecto', id: Number(b.dataset.y) })) });
   } else if (c.tab === 'historial') {
     const h = (ext.contactos || []).map(x => ({ x }));
-    alCambiarTamano = paginar(app.querySelector('.vista .cuerpo .cuerpo'), h, ({ x }) => `<div class="fila"><span class="estado" style="--c:var(--cobalto);--cf:var(--azulf)">${esc(x.tipo)}</span><span class="q"><b style="font-weight:600">${esc(x.resumen || 'Sin resumen')}</b><span>${esc(x.canal)} · ${cuando(x.fecha)}</span></span><span></span></div>`, { pagina: c.p, vacio: c.ext ? '<b>Todavía no nos ha contactado</b>Aquí aparecen sus llamadas con Jason, sus citas y sus mensajes.' : 'Cargando…' });
+    alCambiarTamano = paginar(app.querySelector('.vista .cuerpo .cuerpo'), h, ({ x }) => `<div class="fila"><span class="estado" style="--c:var(--cobalto);--cf:var(--azulf)">${esc(x.tipo)}</span><span class="q"><b style="font-weight:600">${esc(x.resumen || 'Sin resumen')}</b><span>${esc(x.canal)} · ${cuando(x.fecha)}</span></span><span></span></div>`, { pagina: c.p, vacio: c.ext ? '<b>Sin llamadas todavía</b>Aquí aparece cada vez que nos llame o nos escriba.' : 'Cargando…' });
   }
 }
 function capaNota(c) {
@@ -871,7 +926,7 @@ function filaProyecto(p) {
   const i = Math.max(0, D.listas.fases.indexOf(p.fase));
   const cli = personaDe(p.tel);
   const abiertas = D.tareas.filter(x => x.proyecto == p.id && x.estado !== 'hecha').length;
-  return `<button class="fila" data-y="${p.id}"><span class="anillo" style="--p:${Math.round((i + 1) / D.listas.fases.length * 100)}"><b>${i + 1}/${D.listas.fases.length}</b></span><span class="q"><b>${esc(p.nombre)}</b><span>${esc(p.fase)} · ${esc(cli ? nombreDe(cli) : 'MOON')}${abiertas ? ` · ${abiertas} tarea${abiertas === 1 ? '' : 's'}` : ''}${p.uso_mes ? ` · ${p.uso_mes} uso${p.uso_mes === 1 ? '' : 's'} en 30 días` : ''}</span></span>${avas(p.encargados)}</button>`;
+  return `<button class="fila" data-y="${p.id}"><span class="anillo" style="--p:${Math.round((i + 1) / D.listas.fases.length * 100)}"><b>${i + 1}/${D.listas.fases.length}</b></span><span class="q"><b>${esc(p.nombre)}</b><span>${esc(p.fase)} · ${esc(cli ? nombreDe(cli) : 'MOON')}${abiertas ? ` · ${abiertas} tarea${abiertas === 1 ? '' : 's'}` : ''}${p.uso_mes ? ` · ${p.uso_mes} uso${p.uso_mes === 1 ? '' : 's'} en 30 días` : ''}</span></span><span class="flecha-f">${I.der}</span></button>`;
 }
 function capaProyectos(c) {
   c.f = c.f || 'activos';
@@ -985,40 +1040,58 @@ function pintaUso(c, p) {
 }
 
 /* ---------- Clientes: un panel por cliente con lo que se le enseña ---------- */
-const SECCIONES = [['presentacion', 'Presentación', 'Aún no hay presentación'], ['propuesta', 'Propuesta', 'Aún no hay propuesta'], ['contrato', 'Contrato', 'Aún no hay contrato'], ['material', 'Material', 'Aún no hay material'], ['avance', 'Avance', 'Aún no hay avance']];
+const SECCIONES = [['propuesta', 'Propuesta', 'Aún no hay propuesta'], ['contrato', 'Contrato', 'Aún no hay contrato'], ['material', 'Material', 'Aún no hay material'], ['avance', 'Avance', 'Aún no hay avance']];
 function nombreCorto(per) { return per ? (per.negocio || per.nombre || '').replace(/\s*\(.*\)\s*/g, ' ').trim() : ''; }
 function panelesCliente() { return (D.paneles || []).filter(p => p.tel !== 'moon').map(p => ({ p, per: personaDe(p.tel) })).filter(x => x.per); }
 const docsDe = (tel, sec) => (D.documentos || []).filter(d => d.tel === tel && (!sec || d.seccion === sec));
 const dominio = u => { try { return new URL(u).host.replace(/^www\./, ''); } catch (e) { return u; } };
 function icono(p, per, tam) {
-  const ini = esc(nombreCorto(per).slice(0, 1));
-  return `<span class="icono" style="--c:${p.color};width:${tam}px;height:${tam}px;font-size:${Math.round(tam * .42)}px">${p.icono ? `<img src="${esc(p.icono)}" alt="" onerror="this.remove()">` : ''}${ini}</span>`;
+  const ini = esc(nombreCorto(per).slice(0, 1)), imgs = String(p.icono || '').split('|').filter(Boolean);
+  const med = tam ? `width:${tam}px;height:${tam}px;font-size:${Math.round(tam * .42)}px` : '';
+  if (imgs.length > 1) return `<span class="icono duo" style="--c:${p.color};${med}">${imgs.map(u => `<img src="${esc(u)}" alt="" onerror="this.remove()">`).join('')}</span>`;
+  // Los logos de empresa se ven completos (nunca recortados): sobre blanco, o sobre su propio color si el logo ya lo trae (#color).
+  // #color = el logo trae su propio fondo y el círculo es de ese mismo color (se ve como una sola pieza); #llena = el logo llena el círculo.
+  const u = imgs[0] || '', clase = !/^\/centro\/logos\//.test(u) ? '' : /#color$/.test(u) ? ' class="logo-c en-color"' : /#llena$/.test(u) ? '' : ' class="logo-c"';
+  return `<span class="icono" style="--c:${p.color};${med}">${u ? `<img${clase} src="${esc(u.replace(/#(color|llena)$/, ''))}" alt="" onerror="this.remove()">` : ''}${ini}</span>`;
 }
+// Se puede mandar fuera lo del cliente y lo público de MOON; lo interno del equipo, no (la misma regla vive en el servidor).
+const sePuedeEnviar = d => d && d.formato === 'link' && /^https:\/\//.test(d.url || '') && !(d.tel === 'moon' && ['bienvenida', 'jason'].includes(d.seccion));
 function abrirDoc(d) {
-  if (d.formato === 'link') {
-    if (/^tel:/.test(d.url)) { location.href = d.url; return; }
-    window.open(d.url, '_blank', 'noopener'); return;
-  }
+  if (d.formato === 'link' && !/^https?:\/\//.test(d.url || '')) { location.href = d.url; return; }   // tel: (llamar a Jason)
   if (d.formato === 'centro') {   // algo que vive dentro del Centro (ej. las llamadas de Jason)
     const [, clave, tab] = String(d.url).split(':');
     const pr = D.proyectos.find(x => x.nombre && clave === 'jason' && /jason/i.test(x.nombre));
     if (pr) abrir({ tipo: 'proyecto', id: pr.id, tab: tab || 'fase' });
     return;
   }
-  abrir({ tipo: 'documento', id: d.id, titulo: d.titulo });
+  // Todo se ve aquí mismo, en el visor del Centro: nada abre otra página.
+  abrir({ tipo: 'documento', id: d.id, titulo: d.titulo, doc: d.formato === 'link' ? Object.assign({}, d, { compartir: sePuedeEnviar(d) ? d.url : '' }) : null });
+}
+// Mandar al cliente: el menú de compartir del celular (WhatsApp, correo…); en computadora, se copia el link.
+let avisoReloj = null;
+function avisoFlotante(txt) {
+  let a = document.getElementById('flotante');
+  if (!a) { a = document.createElement('div'); a.id = 'flotante'; a.setAttribute('role', 'status'); document.getElementById('marco').appendChild(a); }
+  a.textContent = txt; a.classList.add('ve'); clearTimeout(avisoReloj); avisoReloj = setTimeout(() => a.classList.remove('ve'), 3600);
+}
+async function compartir(titulo, url) {
+  if (!url) return;
+  if (navigator.share) { try { await navigator.share({ title: titulo, url }); return; } catch (e) { if (e && e.name === 'AbortError') return; } }
+  try { await navigator.clipboard.writeText(url); avisoFlotante('Link copiado. Pégalo en WhatsApp o en un correo para mandarlo.'); }
+  catch (e) { avisoFlotante(url); }
 }
 function capaClientes(c) {
   const lista = panelesCliente();
   marco('Clientes', '', `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr) auto"><div class="lista dos"></div><div class="pie"></div></div>`);
   alCambiarTamano = paginar(app.querySelector('.cuerpo'), lista, ({ p, per }) => {
     const E = ETAPA[per.etapa] || ETAPA.pendiente, n = docsDe(p.tel).length;
-    return `<button class="fila" data-c="${esc(p.tel)}">${icono(p, per, 44)}<span class="q"><b>${esc(nombreCorto(per))}</b><span><em style="font-style:normal;font-weight:800;color:${E.c}">${E.n}</em> · demo${n ? ` · ${n} documento${n === 1 ? '' : 's'}` : ''}</span></span>${avas(per.encargados)}</button>`;
+    return `<button class="fila" data-c="${esc(p.tel)}">${icono(p, per, 44)}<span class="q"><b>${esc(nombreCorto(per))}</b><span><em style="font-style:normal;font-weight:800;color:${E.c}">${E.n}</em> · demo${n ? ` · ${n} documento${n === 1 ? '' : 's'}` : ''}</span></span><span class="flecha-f">${I.der}</span></button>`;
   }, { pagina: c.p, alto: 64, vacio: '<b>Todavía no hay clientes con panel</b>', alPintar: l => l.querySelectorAll('[data-c]').forEach(b => b.onclick = () => abrir({ tipo: 'cliente', tel: b.dataset.c })) });
 }
 function rectangulos(tel, secciones) {
   return `<div class="rects">${secciones.map(([k, n, vacio]) => {
     const ds = docsDe(tel, k);
-    const frase = !ds.length ? vacio : ds.length === 1 ? (ds[0].frase || ds[0].titulo) : `${ds.length}: ${ds.map(d => d.titulo).join(' · ')}`;
+    const frase = !ds.length ? vacio : ds.length === 1 ? (ds[0].frase || ds[0].titulo) : ds.map(d => d.titulo).join(' · ');
     return `<button class="rect${ds.length ? '' : ' sin'}" data-s="${k}"${ds.length ? '' : ' aria-disabled="true"'}><b>${n}${ds.length > 1 ? ` (${ds.length})` : ''}</b><span>${esc(frase)}</span></button>`;
   }).join('')}</div>`;
 }
@@ -1035,27 +1108,21 @@ function capaCliente(c) {
   const proys = D.proyectos.filter(x => x.tel === c.tel);
   let cuerpo;
   if (c.tab === 'cliente') cuerpo = `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr) auto">
-      <div class="demo" style="--c:${p.color}">${p.imagen ? `<img class="demo-img" src="${esc(p.imagen)}" alt="" onerror="this.remove()">` : `<div class="demo-vivo"><iframe src="${esc(p.demo)}" title="Vista del demo" tabindex="-1" aria-hidden="true" loading="lazy" sandbox="allow-scripts allow-same-origin"></iframe></div>`}<div class="demo-velo"></div>
-        <div class="demo-info">${icono(p, per, 56)}<div><span class="eti" style="color:rgba(255,255,255,.8)">DEMO</span><b>${esc(nombreCorto(per))}</b><span>${esc(dominio(p.demo))}</span></div></div>
-        <button class="boton demo-boton" id="demo">Abrir demo ${I.abre}</button></div>
+      <div class="demo" style="--c:${p.color}"><div class="demo-logo">${icono(p.imagen ? Object.assign({}, p, { icono: p.imagen }) : p, per, 0)}</div>
+        <div class="demo-info"><span class="eti">DEMO</span><b>${esc(nombreCorto(per))}</b><span>${esc(dominio(p.demo))}</span></div>
+        <div class="demo-botones"><button class="boton demo-boton" id="demo">Abrir demo ${I.abre}</button><button class="redondo demo-enviar" id="demoEnviar" aria-label="Enviar el demo" title="Enviar el demo">${I.enviar}</button></div></div>
       ${rectangulos(c.tel, SECCIONES)}</div>`;
   else if (c.tab === 'proyectos') cuerpo = `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr) auto"><div class="lista"></div><div class="pie"></div></div>`;
-  marco(nombreCorto(per), '', `<div class="cuerpo" style="grid-template-rows:auto minmax(0,1fr)"><div class="tabs"><button data-tab="cliente" class="${c.tab === 'cliente' ? 'on' : ''}">Lo del cliente</button><button data-tab="proyectos" class="${c.tab === 'proyectos' ? 'on' : ''}">Proyectos (${proys.length})</button><button data-tab="ficha">Ficha</button></div>${cuerpo || ''}</div>`);
-  app.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => { if (b.dataset.tab === 'ficha') return abrir({ tipo: 'ficha', tel: c.tel }); c.tab = b.dataset.tab; c.p = 0; transicion(() => pinta(true)); });
-  if (c.tab === 'cliente') { escalarDemo(); alCambiarTamano = escalarDemo; document.getElementById('demo').onclick = () => window.open(p.demo, '_blank', 'noopener'); activarRects(c.tel, SECCIONES); }
+  marco(nombreCorto(per), '', `<div class="cuerpo" style="grid-template-rows:auto minmax(0,1fr)"><div class="tabs"><button data-tab="cliente" class="${c.tab === 'cliente' ? 'on' : ''}">Panel</button><button data-tab="proyectos" class="${c.tab === 'proyectos' ? 'on' : ''}">Proyectos</button><button data-tab="ficha">Ficha</button></div>${cuerpo || ''}</div>`);
+  app.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => { if (b.dataset.tab === 'ficha') return abrir({ tipo: 'ficha', tel: c.tel, desdeCliente: true }); c.tab = b.dataset.tab; c.p = 0; transicion(() => pinta(true)); });
+  traerFicha(c.tel);
+  if (c.tab === 'cliente') { document.getElementById('demo').onclick = () => window.open(p.demo, '_blank', 'noopener'); document.getElementById('demoEnviar').onclick = () => compartir('Demo · ' + nombreCorto(per), p.demo); activarRects(c.tel, SECCIONES); }
   if (c.tab === 'proyectos') alCambiarTamano = paginar(app.querySelector('.vista .cuerpo .cuerpo'), proys, filaProyecto, { pagina: c.p, vacio: '<b>Sin proyectos</b>', alPintar: l => l.querySelectorAll('[data-y]').forEach(b => b.onclick = () => abrir({ tipo: 'proyecto', id: Number(b.dataset.y) })) });
-}
-// La vista del demo es la página real en miniatura: se dibuja a 1280 de ancho (o 390 en celular) y se encoge a la tarjeta.
-function escalarDemo() {
-  const caja = app.querySelector('.demo-vivo'); if (!caja) return;
-  const f = caja.firstElementChild, W = caja.clientWidth, H = caja.clientHeight;
-  const ancho = W < 520 ? 390 : 1280, k = W / ancho;
-  f.style.width = ancho + 'px'; f.style.height = Math.ceil(H / k) + 'px'; f.style.transform = `scale(${k})`;
 }
 function capaSeccion(c) {
   const ds = docsDe(c.tel, c.seccion), per = personaDe(c.tel);
   marco(`${c.nombre || 'Documentos'} · ${nombreCorto(per) || 'MOON'}`, '', `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr) auto"><div class="lista dos"></div><div class="pie"></div></div>`);
-  alCambiarTamano = paginar(app.querySelector('.cuerpo'), ds, d => `<button class="fila" data-d="${esc(d.id)}" style="grid-template-columns:minmax(0,1fr) auto"><span class="q"><b>${esc(d.titulo)}</b><span>${esc(d.frase || (d.formato === 'link' ? dominio(d.url) : 'Se abre aquí mismo'))}</span></span><span class="flecha-f">${I.abre}</span></button>`,
+  alCambiarTamano = paginar(app.querySelector('.cuerpo'), ds, d => `<button class="fila" data-d="${esc(d.id)}" style="grid-template-columns:minmax(0,1fr) auto"><span class="q"><b>${esc(d.titulo)}</b><span>${esc(d.frase || 'Se abre aquí mismo')}</span></span><span class="flecha-f">${I.der}</span></button>`,
     { pagina: c.p, alPintar: l => l.querySelectorAll('[data-d]').forEach(b => b.onclick = () => abrirDoc(ds.find(x => x.id === b.dataset.d))) });
 }
 
@@ -1068,81 +1135,78 @@ function cargarMarked() {
 function capaDocumento(c) {
   const d = c.doc;
   if (!d) { marco(c.titulo || 'Documento', '', '<div class="vacio"><div><b>No se pudo abrir</b>Revisa tu internet y vuelve a intentar.</div></div>'); return; }
-  if (d.formato === 'html') {
-    // Su propio diseño, aislado del Centro (no puede leer ni tocar nada de aquí).
-    const laminas = /<section[\s>]/.test(d.contenido) && /section\{[^}]*width:\s*1920px/.test(d.contenido);
-    marco(d.titulo, '', `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr) auto"><div class="hoja" style="position:relative;padding:0;overflow:hidden${laminas ? ';background:#111' : ''}"><iframe class="doc-html" sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox" title="${esc(d.titulo)}"></iframe></div><div class="pie"></div></div>`);
+  const enviar = d.compartir ? 'Enviar' : '';
+  if (d.formato === 'html' || d.formato === 'link') {
+    // Su propio diseño, aislado del Centro (no puede leer ni tocar nada de aquí). El servidor ya lo dejó listo para verse completo:
+    // láminas y hojas una a la vez, del tamaño de la pantalla; lo demás ajustado al ancho (nunca deslizar a los lados).
+    const pasos = d.formato === 'html' && d.modo && d.modo !== 'ancho';
+    marco(d.titulo, enviar, `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr)${pasos ? ' auto' : ''}"><div class="hoja visor" style="background:${d.formato === 'html' ? esc(d.fondo || '#fff') : '#fff'}"><iframe class="doc-html" title="${esc(d.titulo)}" sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox${d.formato === 'link' ? ' allow-same-origin allow-forms' : ''}"></iframe></div>${pasos ? '<div class="pie"></div>' : ''}</div>`, I.enviar);
     const fr = app.querySelector('.doc-html'), pie = app.querySelector('.vista .pie');
-    if (!laminas) { fr.srcdoc = d.contenido; return; }
-    // Presentaciones: una lámina a la vez, del tamaño de la pantalla, con flechas (y deslizando el dedo). Nunca scroll.
-    fr.srcdoc = d.contenido.replace(/<\/head>/i, LAMINAS + '</head>');
-    c.lamina = c.lamina || 0;
-    const ir = n => fr.contentWindow && fr.contentWindow.postMessage({ lamina: n }, '*');
-    onmessage = e => {
-      if (e.source !== fr.contentWindow || !e.data || typeof e.data.total !== 'number') return;
-      c.lamina = e.data.lamina; const n = e.data.total;
-      pie.innerHTML = n > 1 ? `<button class="redondo" data-pag="-1" aria-label="Lámina anterior">${I.izq}</button><span class="pag">${c.lamina + 1} de ${n}</span><button class="redondo" data-pag="1" aria-label="Lámina siguiente">${I.der}</button>` : '';
-      pie.querySelectorAll('[data-pag]').forEach(b => b.onclick = () => ir((c.lamina + Number(b.dataset.pag) + n) % n));
-    };
-    fr.onload = () => ir(c.lamina);
-    return;
-  }
-  marco(d.titulo, '', `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr) auto"><div class="hoja md" id="hojaMd"></div><div class="pie"></div></div>`);
-  const hoja = document.getElementById('hojaMd'), pie = app.querySelector('.vista .pie');
-  cargarMarked().then(() => {
-    const temp = document.createElement('div'); temp.innerHTML = window.marked.parse(String(d.contenido || ''));
-    temp.querySelectorAll('a').forEach(a => { a.target = '_blank'; a.rel = 'noopener'; });
-    const bloques = [...temp.children].map(e => e.outerHTML);
-    function dibuja() {
-      // Páginas por bloques completos: un párrafo o una tabla nunca se cortan a la mitad.
-      const paginas = []; let actual = [];
-      hoja.innerHTML = '';
-      for (const b of bloques) {
-        hoja.insertAdjacentHTML('beforeend', b);
-        if (hoja.scrollHeight > hoja.clientHeight + 1 && actual.length) { hoja.lastElementChild.remove(); paginas.push(actual); actual = []; hoja.innerHTML = b; }
-        actual.push(b);
-      }
-      if (actual.length) paginas.push(actual);
-      c.p = Math.min(c.p || 0, paginas.length - 1);
-      hoja.innerHTML = paginas[c.p].join('');
-      pie.innerHTML = paginas.length > 1 ? `<button class="redondo" data-pag="-1" aria-label="Anterior">${I.izq}</button><span class="pag">${c.p + 1} de ${paginas.length}</span><button class="redondo" data-pag="1" aria-label="Siguiente">${I.der}</button>` : '';
-      pie.querySelectorAll('[data-pag]').forEach(b => b.onclick = () => { c.p = (c.p + Number(b.dataset.pag) + paginas.length) % paginas.length; dibuja(); });
-      let x0 = null; hoja.ontouchstart = e => { x0 = e.touches[0].clientX; };
-      hoja.ontouchend = e => { if (x0 == null || paginas.length < 2) return; const dx = e.changedTouches[0].clientX - x0; x0 = null; if (Math.abs(dx) > 50) { c.p = (c.p + (dx < 0 ? 1 : -1) + paginas.length) % paginas.length; dibuja(); } };
+    if (d.formato === 'link') fr.src = d.url; else fr.srcdoc = d.contenido;
+    if (pasos) {
+      c.lamina = c.lamina || 0;
+      const ir = n => fr.contentWindow && fr.contentWindow.postMessage({ lamina: n }, '*');
+      onmessage = e => {
+        if (e.source !== fr.contentWindow || !e.data || typeof e.data.total !== 'number') return;
+        c.lamina = e.data.lamina; const n = e.data.total;
+        pie.innerHTML = n > 1 ? `<button class="redondo" data-pag="-1" aria-label="Anterior">${I.izq}</button><span class="pag">${c.lamina + 1} de ${n}</span><button class="redondo" data-pag="1" aria-label="Siguiente">${I.der}</button>` : '';
+        pie.querySelectorAll('[data-pag]').forEach(b => b.onclick = () => ir((c.lamina + Number(b.dataset.pag) + n) % n));
+      };
+      fr.onload = () => ir(c.lamina);
     }
-    dibuja(); alCambiarTamano = dibuja;
-  }, () => { hoja.innerHTML = '<p>No se pudo mostrar el documento. Revisa tu internet.</p>'; });
+  } else {
+    marco(d.titulo, enviar, `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr) auto"><div class="hoja md" id="hojaMd"></div><div class="pie"></div></div>`, I.enviar);
+    const hoja = document.getElementById('hojaMd'), pie = app.querySelector('.vista .pie');
+    cargarMarked().then(() => {
+      const temp = document.createElement('div'); temp.innerHTML = window.marked.parse(String(d.contenido || ''));
+      temp.querySelectorAll('a').forEach(a => { a.target = '_blank'; a.rel = 'noopener'; });
+      const bloques = [...temp.children].map(e => e.outerHTML);
+      function dibuja() {
+        // Páginas por bloques completos: un párrafo o una tabla nunca se cortan a la mitad.
+        const paginas = []; let actual = [];
+        hoja.innerHTML = '';
+        for (const b of bloques) {
+          hoja.insertAdjacentHTML('beforeend', b);
+          if (hoja.scrollHeight > hoja.clientHeight + 1 && actual.length) { hoja.lastElementChild.remove(); paginas.push(actual); actual = []; hoja.innerHTML = b; }
+          actual.push(b);
+        }
+        if (actual.length) paginas.push(actual);
+        c.p = Math.min(c.p || 0, paginas.length - 1);
+        hoja.innerHTML = paginas[c.p].join('');
+        pie.innerHTML = paginas.length > 1 ? `<button class="redondo" data-pag="-1" aria-label="Anterior">${I.izq}</button><span class="pag">${c.p + 1} de ${paginas.length}</span><button class="redondo" data-pag="1" aria-label="Siguiente">${I.der}</button>` : '';
+        pie.querySelectorAll('[data-pag]').forEach(b => b.onclick = () => { c.p = (c.p + Number(b.dataset.pag) + paginas.length) % paginas.length; dibuja(); });
+        let x0 = null; hoja.ontouchstart = e => { x0 = e.touches[0].clientX; };
+        hoja.ontouchend = e => { if (x0 == null || paginas.length < 2) return; const dx = e.changedTouches[0].clientX - x0; x0 = null; if (Math.abs(dx) > 50) { c.p = (c.p + (dx < 0 ? 1 : -1) + paginas.length) % paginas.length; dibuja(); } };
+      }
+      dibuja(); alCambiarTamano = dibuja;
+    }, () => { hoja.innerHTML = '<p>No se pudo mostrar el documento. Revisa tu internet.</p>'; });
+  }
+  if (enviar) document.getElementById('accion').onclick = () => compartir(d.titulo, d.compartir);
 }
 
-// Se mete dentro de cada presentación: acomoda las láminas de 1920×1080 a la pantalla y muestra una a la vez.
-const LAMINAS = `<style>html,body{margin:0!important;height:100%;overflow:hidden!important;background:#111!important}
-section{position:absolute!important;left:50%!important;top:50%!important;margin:0!important;transform:translate(-50%,-50%) scale(var(--k,.5))!important;opacity:0;pointer-events:none;transition:opacity .3s ease}
-section.actual{opacity:1;pointer-events:auto}</style>
-<script>(function(){var L=[],i=0;function k(){document.documentElement.style.setProperty('--k',Math.min(innerWidth/1920,innerHeight/1080))}
-function ver(n){L=[].slice.call(document.querySelectorAll('section'));if(!L.length)return;i=Math.max(0,Math.min(L.length-1,n));L.forEach(function(s,j){s.classList.toggle('actual',j===i)});parent.postMessage({lamina:i,total:L.length},'*')}
-addEventListener('message',function(e){if(e.data&&typeof e.data.lamina==='number')ver(e.data.lamina)});
-addEventListener('resize',k);addEventListener('DOMContentLoaded',function(){k();ver(0)});
-var x0=null;addEventListener('touchstart',function(e){x0=e.touches[0].clientX},{passive:true});addEventListener('touchend',function(e){if(x0==null)return;var dx=e.changedTouches[0].clientX-x0;x0=null;if(Math.abs(dx)>50)ver(i+(dx<0?1:-1))});
-addEventListener('keydown',function(e){if(e.key==='ArrowRight')ver(i+1);if(e.key==='ArrowLeft')ver(i-1)});k();})();<\/script>`;
 /* ---------- Hecho en casa: lo nuestro (otro estilo) ---------- */
-const CASA = [['jason', 'Jason', 'Nuestro recepcionista: probarlo, su ficha, sus llamadas y la bienvenida'], ['pagina', 'Página web de MOON', 'moondigitalia.com'], ['presentacion', 'Presentación de MOON Digital', 'Quiénes somos y qué hacemos'], ['proyectos', 'Proyectos internos', 'Lo que construimos para nosotros']];
+const CASA_IC = {
+  presentacion: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="3"/><path d="M12 16v4M8 20h8"/></svg>',
+  pagina: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.2 3 14.8 0 18M12 3c-3 3.2-3 14.8 0 18"/></svg>',
+  proyectos: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>' };
+const CASA = [['presentacion', 'Presentación de MOON Digital', 'Quiénes somos y qué hacemos'], ['pagina', 'Página web de MOON', 'moondigitalia.com'], ['proyectos', 'Proyectos internos', 'Lo que construimos para nosotros']];
 function capaCasa() {
-  marco('Hecho en casa', '', `<div class="cuerpo casa" style="grid-template-rows:auto minmax(0,1fr)">
-    <div class="vision"><span class="logo"></span><p>Ser una empresa de inteligencia artificial muy fuerte, muy dinámica y muy intuitiva. Cada hora que invertimos es para agilizar, mejorar y hacer más inteligente la forma de trabajar.</p></div>
-    <div class="rects casa-rects">${CASA.map(([k, n, f]) => { const ds = k === 'jason' || k === 'proyectos' ? [1] : docsDe('moon', k); return `<button class="rect${ds.length ? '' : ' sin'}" data-k="${k}"><b>${n}</b><span>${ds.length ? f : 'Aún no está aquí'}</span></button>`; }).join('')}</div></div>`);
+  const jd = docsDe('moon', 'jason'), num = jd.find(d => d.id === 'jason-numero');
+  const JAS = [['ficha', 'Su ficha', jd.find(d => d.id === 'jason-ficha')], ['llamadas', 'Llamadas', jd.find(d => d.id === 'jason-llamadas') || { formato: 'centro', url: 'proyecto:jason:uso' }], ['bienvenida', 'Bienvenida', docsDe('moon', 'bienvenida')[0]]];
+  marco('Hecho en casa', '', `<div class="cuerpo casa" style="grid-template-rows:auto minmax(0,1fr) auto">
+    <div class="vision"><span class="logo"></span><p>Ser una empresa de inteligencia artificial muy fuerte, muy dinámica y muy intuitiva.</p></div>
+    <div class="jason">
+      <div class="j-cab"><div><span class="eti">RECEPCIONISTA</span><b>Jason</b><span>Contesta, agenda las llamadas con Dan y nos avisa.</span></div></div>
+      <div class="j-centro"><span class="j-orbe" aria-hidden="true"></span>${num ? `<a class="boton j-probar" href="${esc(num.url)}">${I.tel} Probar a Jason</a><span class="j-num">${esc(num.frase || '')}</span>` : '<span class="j-num">Aún no tiene número</span>'}</div>
+      <div class="j-mas">${JAS.map(([k, n, d]) => `<button data-j="${k}"${d ? '' : ' disabled'}>${n}</button>`).join('')}</div>
+    </div>
+    <div class="casa-filas">${CASA.map(([k, n, f]) => { const ok = k === 'proyectos' || docsDe('moon', k).length; return `<button class="fila chica${ok ? '' : ' sin'}" data-k="${k}"><span class="casa-ic">${CASA_IC[k]}</span><span class="q"><b>${n}</b><span>${ok ? f : 'Aún no está aquí'}</span></span><span class="flecha-f">${I.der}</span></button>`; }).join('')}</div></div>`);
+  app.querySelectorAll('[data-j]').forEach(b => b.onclick = () => { const d = (JAS.find(x => x[0] === b.dataset.j) || [])[2]; if (d) abrirDoc(d); });
   app.querySelectorAll('[data-k]').forEach(b => b.onclick = () => {
     const k = b.dataset.k;
-    if (k === 'jason') return abrir({ tipo: 'jason' });
     if (k === 'proyectos') return abrir({ tipo: 'proyectos', f: 'activos', soloMoon: true });
     const ds = docsDe('moon', k); if (ds.length) abrirDoc(ds[0]);
   });
-}
-const JASON = [['jason', 'Probar a Jason'], ['ficha', 'Su ficha'], ['llamadas', 'Sus llamadas'], ['bienvenida', 'Bienvenida']];
-function capaJason() {
-  const docs = docsDe('moon', 'jason');
-  const de = k => k === 'jason' ? docs.find(d => d.id === 'jason-numero') : k === 'ficha' ? docs.find(d => d.id === 'jason-ficha') : k === 'llamadas' ? { formato: 'centro', url: 'proyecto:jason:uso', frase: 'Cada llamada que ha contestado, en el Centro' } : docsDe('moon', 'bienvenida')[0];
-  marco('Jason', '', `<div class="cuerpo casa" style="grid-template-rows:minmax(0,1fr)"><div class="rects casa-rects">${JASON.map(([k, n]) => { const d = de(k); return `<button class="rect${d ? '' : ' sin'}" data-k="${k}"><b>${n}</b><span>${esc(d ? (d.frase || d.titulo) : 'Aún no está aquí')}</span></button>`; }).join('')}</div></div>`);
-  app.querySelectorAll('[data-k]').forEach(b => b.onclick = () => { const d = de(b.dataset.k); if (d) abrirDoc(d); });
 }
 
 /* ---------- Lector: texto largo completo, en páginas, nunca cortado ---------- */

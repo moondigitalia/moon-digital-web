@@ -6,16 +6,7 @@ const { crypto, ETAPAS, TEMPERATURAS, SERVICIOS, ORIGENES, FASES, igual, leer, s
 
 const AGENDA = 'https://script.google.com/macros/s/AKfycbzmjh39HaP39rdzK3PJdKMULk43T9uvQNwcriSdpzbIRgLC3Xppu9MezL4byJTb4kgX/exec';
 const USUARIOS = ['kid', 'dan', 'daniel'];
-function leerCifrado(id) {
-  try {
-    if (!/^[a-z0-9-]+$/.test(id) || !process.env.CENTRO_LLAVE_DOCS) return null;
-    const archivo = require('path').join(__dirname, '_docs', id + '.bin');
-    if (!require('fs').existsSync(archivo)) return null;
-    const b = require('fs').readFileSync(archivo), llave = Buffer.from(process.env.CENTRO_LLAVE_DOCS, 'base64');
-    const dc = crypto.createDecipheriv('aes-256-gcm', llave, b.subarray(0, 12)); dc.setAuthTag(b.subarray(12, 28));
-    return JSON.parse(require('zlib').gunzipSync(Buffer.concat([dc.update(b.subarray(28)), dc.final()])).toString());
-  } catch (e) { console.log('DOC-CIFRADO', id, e.message); return null; }
-}
+const { leerCifrado, preparar, enviable } = require('./_visor');
 const huella = s => crypto.createHash('sha256').update(String(s)).digest('hex');
 const ahora = () => new Date().toISOString();
 const ocultar = c => { const [u, d] = String(c).split('@'); return u.slice(0, 2) + '•••@' + d; };
@@ -115,7 +106,7 @@ async function inicio(yo) {
     sql('SELECT * FROM actividad ORDER BY id DESC LIMIT 12'),
     sql('SELECT proyecto, COUNT(*) n FROM uso WHERE fecha >= ? AND quien NOT IN (SELECT tel FROM personas WHERE es_prueba = 1) GROUP BY proyecto', [new Date(Date.now() - 30 * 864e5).toISOString()]),
     sql('SELECT tel, orden, demo, color, imagen, icono FROM paneles ORDER BY orden'),
-    sql('SELECT id, tel, seccion, orden, titulo, frase, url, formato FROM documentos ORDER BY tel, seccion, orden'),
+    sql("SELECT id, tel, seccion, orden, titulo, frase, url, formato FROM documentos WHERE seccion != 'oculto' ORDER BY tel, seccion, orden"),
   ]);
   const usos = Object.fromEntries(usoMes.map(x => [x.proyecto, x.n]));
   proyectos.forEach(p => { p.uso_mes = usos[p.id] || 0; });
@@ -154,11 +145,18 @@ async function conSesion(d, yo) {
 
   // Un documento guardado (copia de lo que se le enseña al cliente). Solo con sesión.
   if (d.accion === 'documento') {
-    const doc = (await sql('SELECT id, titulo, formato, contenido, url FROM documentos WHERE id = ?', [t(d.id, 80)]))[0];
+    const doc = (await sql('SELECT id, tel, seccion, titulo, frase, formato, contenido, url, enlace FROM documentos WHERE id = ?', [t(d.id, 80)]))[0];
     if (!doc) return { ok: false, error: 'no existe' };
     // Los documentos con imágenes viven cifrados dentro del proyecto (api/_docs); solo esta llave los abre.
     const cifrado = leerCifrado(doc.id);
     if (cifrado) Object.assign(doc, cifrado);
+    if (doc.formato === 'html') Object.assign(doc, preparar(doc.contenido));
+    // El link para mandárselo al cliente: el mismo documento, sin contraseña, en una dirección imposible de adivinar.
+    if (enviable(doc) && doc.formato !== 'link') {
+      if (!doc.enlace) { doc.enlace = crypto.randomBytes(16).toString('base64url'); await sql('UPDATE documentos SET enlace = ? WHERE id = ? AND enlace IS NULL', [doc.enlace, doc.id]); doc.enlace = ((await sql('SELECT enlace FROM documentos WHERE id = ?', [doc.id]))[0] || {}).enlace; }
+      doc.compartir = 'https://moondigitalia.com/ver/' + doc.enlace;
+    } else if (enviable(doc)) doc.compartir = doc.url;
+    delete doc.enlace;
     return { ok: true, doc };
   }
 

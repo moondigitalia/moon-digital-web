@@ -24,6 +24,6 @@ await paso('cliente',()=>p.click('[data-c]',{noWaitAfter:true}));
 await paso('documento',()=>p.click('.rect[data-s="material"]',{noWaitAfter:true}));
 await paso('volver6',()=>p.click('#volver',{noWaitAfter:true}));await paso('volver7',()=>p.click('#volver',{noWaitAfter:true}));await paso('volver8',()=>p.click('#volver',{noWaitAfter:true}));
 await paso('casa',()=>p.click('[data-ir="casa"]',{position:{x:12,y:12},noWaitAfter:true}));
-await paso('jason',()=>p.click('[data-k="jason"]',{noWaitAfter:true}));
+await paso('bienvenida',()=>p.click('[data-j="bienvenida"]',{noWaitAfter:true}));
 await c.close();}
 console.log(fallas.length?'PARPADEA: '+fallas.join(', '):'SIN PARPADEO');await b.close();})();
