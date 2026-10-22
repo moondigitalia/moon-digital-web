@@ -51,12 +51,10 @@ button{cursor:pointer}
 .ava{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:15px;color:#fff;flex:none;background:var(--c,var(--cobalto))}
 .ava.chico{width:26px;height:26px;font-size:11px;border:2px solid var(--tarjeta)}
 .avas{display:flex}.avas .ava.chico+.ava.chico{margin-left:-8px}
-.vista{min-height:0;min-width:0;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);gap:clamp(8px,calc(1.6 * var(--u)),14px);animation:entra .38s var(--ease) both}
-@keyframes entra{from{opacity:0}to{opacity:1}}
+.vista{min-height:0;min-width:0;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);gap:clamp(8px,calc(1.6 * var(--u)),14px)}
 /* Cambio de pantalla con fundido cruzado (la anterior se desvanece mientras entra la nueva): igual con o sin "reducir movimiento". */
-::view-transition-group(root){animation-duration:.32s;animation-timing-function:cubic-bezier(.4,0,.2,1)}
-::view-transition-old(root),::view-transition-new(root){animation-duration:.32s;animation-timing-function:cubic-bezier(.4,0,.2,1)}
-.vt .vista,.quieto .vista,.quieto .entrada{animation:none!important}
+/* Fundido propio: la pantalla anterior queda ENCIMA y se desvanece sobre la nueva, que ya está completa debajo. */
+.fantasma{position:absolute!important;top:0;left:0;right:0;pointer-events:none;z-index:5}
 
 /* ---------- Inicio ---------- */
 .hola{font-size:clamp(22px,calc(6.4 * var(--w)),34px);font-weight:700;letter-spacing:-.02em;line-height:1.1}
@@ -146,8 +144,7 @@ textarea.campo{height:auto;border-radius:22px;padding:14px 18px;resize:none}
 .mini{font-size:12px;color:var(--suave);font-weight:600}
 
 /* Entrada */
-.entrada{height:100%;min-height:0;display:grid;place-items:center;animation:entra .38s var(--ease) both}
-.vt .entrada{animation:none}
+.entrada{height:100%;min-height:0;display:grid;place-items:center}
 .entrada .caja{width:min(420px,100%);display:grid;gap:16px;justify-items:center;text-align:center}
 .entrada h1{font-size:clamp(22px,calc(6 * var(--w)),28px);font-weight:800;letter-spacing:-.01em}
 .entrada p{color:var(--suave);font-weight:600;font-size:14px}
@@ -312,6 +309,17 @@ async function api(accion, datos) {
 
 const CLAUDE = { n: 'Claude', c: '#c96442', i: 'C' };
 let FOTOS = {};   // caras del equipo: llegan solo después de entrar
+const FOTOS_LISTAS = [];   // se guardan aquí ya decodificadas para que cada pantalla nueva las muestre al instante
+async function prepararFotos(mapa) {
+  const out = {};
+  await Promise.all(Object.entries(mapa).map(async ([id, src]) => {
+    try {
+      const url = URL.createObjectURL(await (await fetch(src)).blob());
+      const im = new Image(); im.src = url; await im.decode(); FOTOS_LISTAS.push(im); out[id] = url;
+    } catch (e) { out[id] = src; }
+  }));
+  return out;
+}
 function ava(id, chico) { const g = GENTE[id] || (id === 'sistema' ? CLAUDE : { n: '?', c: 'var(--tenue)', i: '?' }); const f = FOTOS[id]; return `<span class="ava${chico ? ' chico' : ''}" style="--c:${g.c}${f ? `;background:var(--c) url(${f}) center 30%/cover` : ''}" title="${esc(g.n)}">${f ? '' : esc(g.i)}</span>`; }
 function avas(lista) { const ids = String(lista || '').split(',').filter(x => GENTE[x]); return ids.length ? `<span class="avas">${ids.map(x => ava(x, 1)).join('')}</span>` : ''; }
 function cuando(iso) {
@@ -411,12 +419,19 @@ addEventListener('orientationchange', () => setTimeout(alMedir, 250));
 document.addEventListener('gesturestart', e => { if (!e.target.closest || !e.target.closest('.recorte')) e.preventDefault(); });
 document.addEventListener('touchmove', e => { if (e.touches.length > 1 && !e.target.closest('.recorte')) e.preventDefault(); }, { passive: false });
 // Cambio de pantalla con fundido cruzado; se ve igual con o sin "reducir movimiento".
+let fantasmaVivo = null;
 function transicion(f) {
-  if (document.startViewTransition && document.visibilityState === 'visible') {
-    document.documentElement.classList.add('vt');
-    const t = document.startViewTransition(f);
-    t.finished.finally(() => document.documentElement.classList.remove('vt'));
-  } else f();
+  const marcoEl = document.getElementById('marco');
+  if (fantasmaVivo) { fantasmaVivo.remove(); fantasmaVivo = null; }
+  // 1) copia exacta de lo que se ve ahorita, encima; 2) se dibuja la pantalla nueva debajo (ya completa);
+  // 3) la copia se desvanece. Nunca hay un instante vacío, nada salta y se ve igual con o sin "reducir movimiento".
+  const viejo = app.cloneNode(true);
+  viejo.removeAttribute('id'); viejo.classList.add('fantasma'); viejo.setAttribute('aria-hidden', 'true'); viejo.inert = true;
+  marcoEl.appendChild(viejo);
+  fantasmaVivo = viejo;
+  f();
+  const a = viejo.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 240, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'forwards' });
+  a.finished.then(() => { viejo.remove(); if (fantasmaVivo === viejo) fantasmaVivo = null; }, () => {});
 }
 
 /* ---------- Entrada ---------- */
@@ -514,7 +529,7 @@ async function arrancar() {
   if (!D) app.innerHTML = '<div class="top"><div class="marca"><span class="logo" role="img" aria-label="MOON Digital"></span><i>/</i>CENTRO</div></div><div class="entrada"><span class="mini">Cargando…</span></div>';
   // Datos y fotos llegan juntos ANTES de pintar: la pantalla aparece una sola vez, completa, sin repintarse después.
   const [r, f] = await Promise.all([api('inicio'), Object.keys(FOTOS).length ? null : api('fotos')]);
-  if (f && f.ok) FOTOS = f.fotos;
+  if (f && f.ok) FOTOS = await prepararFotos(f.fotos);
   if (!r.ok) { if (r.error !== 'sesion' && !D) app.innerHTML = '<div class="entrada"><div class="caja"><h1>Sin conexión</h1><p>Revisa tu internet.</p><button class="boton" onclick="arrancar()">Reintentar</button></div></div>'; return; }
   D = r;
   transicion(() => pinta());
@@ -547,7 +562,6 @@ function pinta(silencioso) {
   // Una sola pantalla a la vez: la anterior se borra, nada queda escondido detrás.
   // Si solo se actualizan datos (llegó la ficha, la foto o la recarga de cada minuto), se cambia sin animar nada.
   alCambiarTamano = null;
-  document.documentElement.classList.toggle('quieto', !!silencioso);
   const c = pila[pila.length - 1];
   if (!c) return pintaInicio(silencioso);
   ({ tareas: capaTareas, tarea: capaTarea, nuevaTarea: capaNuevaTarea, crm: capaCRM, ficha: capaFicha, nuevoCliente: capaNuevoCliente, proyectos: capaProyectos, proyecto: capaProyecto, nuevoProyecto: capaProyecto, equipo: capaEquipo, moon: capaMoon, lector: capaLector, nota: capaNota, editarProyecto: capaProyecto, cuenta: capaCuenta, frase: capaFrase, foto: capaFoto })[c.tipo](c, silencioso);
@@ -1097,7 +1111,7 @@ function capaFoto(c) {
     cv.getContext('2d').drawImage(img, 180 + c.x * k - dw / 2, 225 + c.y * k - dh / 2, dw, dh);
     const foto = cv.toDataURL('image/jpeg', 0.85);
     const r = await api('mi_perfil', { foto });
-    if (r.ok) { FOTOS[yo()] = foto; URL.revokeObjectURL(c.src); cerrar(); }
+    if (r.ok) { Object.assign(FOTOS, await prepararFotos({ [yo()]: foto })); URL.revokeObjectURL(c.src); cerrar(); }
     else { b.disabled = false; b.textContent = 'Usar esta foto'; document.getElementById('aviso').textContent = 'No se pudo guardar. Intenta de nuevo.'; }
   };
 }
