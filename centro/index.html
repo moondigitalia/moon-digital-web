@@ -503,7 +503,7 @@ function transicion(f) {
   // 1) copia exacta de lo que se ve ahorita, encima; 2) se dibuja la pantalla nueva debajo (ya completa);
   // 3) la copia se desvanece. Nunca hay un instante vacío, nada salta y se ve igual con o sin "reducir movimiento".
   const viejo = app.cloneNode(true);
-  viejo.querySelectorAll('iframe').forEach(f => { const r = document.createElement('div'); r.style.cssText = 'position:absolute;inset:0;background:transparent';   // deja ver el fondo de la hoja (oscuro en presentaciones): nunca un destello blanco f.replaceWith(r); });
+  viejo.querySelectorAll('iframe').forEach(f => { const r = document.createElement('div'); r.style.cssText = 'position:absolute;inset:0;background:transparent'; /* deja ver el fondo de la hoja: nunca un destello blanco */ f.replaceWith(r); });
   viejo.removeAttribute('id'); viejo.classList.add('fantasma'); viejo.setAttribute('aria-hidden', 'true'); viejo.inert = true;
   marcoEl.appendChild(viejo);
   fantasmaVivo = viejo;

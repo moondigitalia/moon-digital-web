@@ -18,7 +18,7 @@ function leerCifrado(id) {
 function modoDe(html) {
   // Busca la regla de estilo que define una lámina (1920×1080) o una hoja de papel (A4/carta) y usa ESE selector.
   // Si la lámina viene "envuelta" (ej. <div class="lamina"><section>), el visor sube al envoltorio al abrir.
-  const css = (String(html).match(/<style[^>]*>[\s\S]*?<\/style>/gi) || []).join('\n');
+  const css = [...String(html).matchAll(/<style[^>]*>([\s\S]*?)<\/style>/gi)].map(m => m[1]).join('\n').replace(/\/\*[\s\S]*?\*\//g, '');
   const reglas = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)].map(m => ({ sel: m[1].trim().split(',').pop().trim(), cuerpo: m[2] }));
   const lam = reglas.find(r => /width:\s*1920px/.test(r.cuerpo) && /height:\s*1080px/.test(r.cuerpo) && !/^(html|body|\*|:root)/.test(r.sel));
   if (lam) return { modo: 'laminas', sel: lam.sel, fondo: '#111' };
@@ -41,7 +41,8 @@ addEventListener('DOMContentLoaded',aj);addEventListener('load',aj);addEventList
 var L=[],i=0,barra=null,txt=null,BAR=SUELTO&&!marco?68:0;
 function k(){if(!L.length)return;var w=L[0].offsetWidth,h=L[0].offsetHeight,m=Math.min(innerWidth,innerHeight)<600?8:24;
 var s=Math.min((innerWidth-m*2)/w,(innerHeight-BAR-m*2)/h);document.documentElement.style.setProperty('--k',s);document.documentElement.style.setProperty('--cy',((innerHeight-BAR)/2)+'px')}
-function unidades(){var v=[];[].slice.call(document.querySelectorAll(SEL)).forEach(function(e){var u=e;while(u.parentElement&&u.parentElement!==document.body&&u.parentElement.offsetWidth===e.offsetWidth&&u.parentElement.offsetHeight===e.offsetHeight)u=u.parentElement;if(v.indexOf(u)<0)v.push(u)});v.forEach(function(u){u.classList.add('visor-u')});return v}
+function todos(){try{return [].slice.call(document.querySelectorAll(SEL))}catch(e){return []}}
+function unidades(){var v=[];todos().forEach(function(e){var u=e;while(u.parentElement&&u.parentElement!==document.body&&u.parentElement.offsetWidth===e.offsetWidth&&u.parentElement.offsetHeight===e.offsetHeight)u=u.parentElement;if(v.indexOf(u)<0)v.push(u)});v.forEach(function(u){u.classList.add('visor-u')});return v}
 function ver(n){if(!L.length)L=unidades();if(!L.length)return;i=(n+L.length)%L.length;L.forEach(function(s,j){s.classList.toggle('actual',j===i)});k();
 if(marco)parent.postMessage({lamina:i,total:L.length},'*');if(txt)txt.textContent=(i+1)+' de '+L.length}
 function hazBarra(){if(!BAR||barra||L.length<2)return;barra=document.createElement('div');barra.id='visor-barra';
