@@ -78,7 +78,7 @@ async function registrar(d) {
     await sql(`INSERT INTO personas (tel, telefono, nombre, negocio, giro, correo, temperatura, etapa, servicio, origen, necesidad, volumen, urgencia, decide, proxima_cita, creado, actualizado, ultimo_contacto, contactos, es_prueba)
                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,0,?)`,
       [tel, t(d.tel, 30), val('nombre', 80), val('negocio', 120), val('giro', 120), val('correo', 120), temperatura, etapa, servicio, canal,
-       val('necesidad', 400), val('volumen', 80), val('urgencia', 80), val('decide', 120), val('cita', 120), ahora, ahora, fecha, d.es_prueba ? 1 : 0]);
+       val('necesidad', 400), val('volumen', 80), val('urgencia', 80), val('decide', 120), val('cita', 120), fecha, ahora, fecha, d.es_prueba ? 1 : 0]);
   } else {
     // Lo nuevo solo reemplaza si trae algo; nunca borra lo que ya sabíamos.
     const campos = { nombre: 80, negocio: 120, giro: 120, correo: 120, necesidad: 400, volumen: 80, urgencia: 80, decide: 120 };
@@ -104,7 +104,7 @@ async function registrar(d) {
   const resumen = t(d.resumen || x.resumen || x.necesidad || '', 400);
   await sql('INSERT OR REPLACE INTO contactos (id, tel, canal, tipo, fecha, resumen, datos) VALUES (?,?,?,?,?,?,?)',
     [id, tel, canal, tipoFinal, fecha, resumen || (viejo ? viejo.resumen || '' : ''), JSON.stringify(datos).slice(0, 8000)]);
-  await sql('UPDATE personas SET contactos = (SELECT COUNT(*) FROM contactos WHERE tel = ?) WHERE tel = ?', [tel, tel]);
+  await sql('UPDATE personas SET contactos = (SELECT COUNT(*) FROM contactos WHERE tel = ?), creado = MIN(COALESCE(creado, ?), ?) WHERE tel = ?', [tel, fecha, fecha, tel]);
   return { ok: true, tel, nueva: !prev, etapa };
 }
 
