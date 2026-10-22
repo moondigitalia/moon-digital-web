@@ -76,7 +76,6 @@ async function entrada(d, req) {
     const sal = crypto.randomBytes(16).toString('hex');
     await sql('UPDATE usuarios SET hash = ?, sal = ? WHERE id = ?', [await scrypt(clave, sal), sal, id]);
     await sql('DELETE FROM codigos WHERE usuario = ?', [id]);
-    await anotar(id, 'entró por primera vez en este aparato');
     return { ok: true, sesion: await nuevaSesion(id, req) };
   }
 
@@ -112,6 +111,7 @@ const listaUsuarios = v => (Array.isArray(v) ? v : String(v || '').split(',')).m
 
 async function conSesion(d, yo) {
   if (d.accion === 'inicio') return inicio(yo);
+  if (d.accion === 'fotos') return { ok: true, fotos: require('./_fotos') };
 
   if (d.accion === 'ficha') {
     const tel = llave(d.tel);

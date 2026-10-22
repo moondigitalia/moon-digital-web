@@ -37,8 +37,9 @@ button{cursor:pointer}
 .app{height:100vh;height:100dvh;max-width:1180px;margin:0 auto;padding:max(14px,env(safe-area-inset-top)) 16px max(14px,env(safe-area-inset-bottom));display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);gap:clamp(10px,1.8vh,16px)}
 .eti{font-size:11px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--suave)}
 .top{display:flex;align-items:center;gap:12px;min-height:44px}
-.marca{font-size:clamp(17px,4.6vw,22px);font-weight:800;letter-spacing:.24em;white-space:nowrap}
-.marca i{font-style:normal;color:var(--cobalto);font-weight:600;margin:0 .1em}
+.marca{display:flex;align-items:center;gap:10px;font-size:clamp(12px,3.4vw,15px);font-weight:800;letter-spacing:.3em;white-space:nowrap}
+.logo{display:inline-block;height:clamp(24px,6.6vw,32px);aspect-ratio:2496/682;background:currentColor;-webkit-mask:url(logo.svg) center/contain no-repeat;mask:url(logo.svg) center/contain no-repeat}
+.marca i{font-style:normal;color:var(--cobalto);font-weight:600;letter-spacing:0}
 .top .esp{flex:1}
 .redondo{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;color:inherit;text-decoration:none;background:var(--tarjeta);box-shadow:var(--sombra-chica);flex:none;transition:transform .25s var(--ease)}
 .redondo:active{transform:scale(.94)}
@@ -154,12 +155,63 @@ textarea.campo{height:auto;border-radius:22px;padding:14px 18px;resize:none}
 .codigo{letter-spacing:.5em;text-align:center;font-size:22px;font-weight:800}
 .enlace{font-weight:700;color:var(--cobalto);font-size:14px}
 
+/* Tarjetas del inicio que se llenan solas: lo que cabe se muestra; lo que no, se queda adentro de la capa */
+.t{cursor:pointer}
+.extra{flex:1 1 0;min-height:0;display:flex;flex-direction:column;gap:6px;overflow:hidden;margin-top:4px}
+.xi{display:flex;align-items:center;gap:8px;text-align:start;font-size:13.5px;font-weight:700;line-height:1.25;padding:7px 10px;border-radius:14px;background:var(--fondo);box-shadow:var(--hundido);flex:none}
+.xi small{font-weight:600;color:var(--suave);margin-left:auto;padding-left:6px;white-space:nowrap}
+.xi .punto{flex:none;width:10px;height:10px}
+.xi .q{min-width:0}
+.t-tuyo .xi{background:rgba(255,255,255,.14);box-shadow:none;color:#fff}
+.t-tuyo .xi small{color:rgba(255,255,255,.8)}
+.t-tuyo .xi.nueva{background:#fff;color:var(--cobalto)}
+.t-tuyo .xi.nueva small{color:var(--cobalto)}
+.xmas{font-size:12px;font-weight:800;color:var(--suave);flex:none}
+.t-tuyo .xmas{color:rgba(255,255,255,.85)}
+.xtxt{font-size:clamp(13px,1.9vh,16px);font-weight:700;line-height:1.35;color:var(--suave);flex:none}
+/* Anillo de fases */
+.avance{display:grid;justify-items:center;gap:clamp(6px,1.4vh,12px);text-align:center}
+.avance svg{width:min(230px,52vw,26vh);height:auto;overflow:visible}
+.avance .fase-n{font-size:clamp(22px,4vh,30px);font-weight:800;letter-spacing:-.01em}
+.avance .fase-m{font-weight:700;color:var(--suave);max-width:34ch}
+.actual{animation:latido 2.4s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){.actual{animation:none}}
+/* Credenciales del equipo */
+.creds{min-height:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(8px,2vw,18px)}
+.cred{container-type:inline-size;position:relative;min-height:0;border-radius:22px;background:linear-gradient(160deg,#f7f2e8,#ece4d4);color:#18171c;box-shadow:var(--sombra);padding:clamp(10px,7cqw,22px);display:flex;flex-direction:column;gap:clamp(4px,3cqw,10px);text-align:start;overflow:hidden}
+.cred .marca-c{display:flex;align-items:center;gap:6px;font-size:clamp(8px,6.2cqw,12px);font-weight:800;letter-spacing:.18em;color:#6b655a}
+.cred .nom{font-size:clamp(18px,19cqw,46px);font-weight:800;letter-spacing:-.03em;line-height:.95;overflow-wrap:anywhere}
+.cred .linea{border-top:2px dashed #b3ab9c}
+.cred .rol{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:clamp(10px,7.4cqw,15px);color:#3b3832;line-height:1.25}
+.cred .foto{flex:1 1 0;min-height:0;border-radius:16px;background:var(--c);display:grid;place-items:center;color:#fff;font-weight:800;font-size:clamp(22px,24cqw,64px);overflow:hidden;position:relative}
+.cred .foto img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 30%}
+.cred .datos{display:grid;gap:4px}
+.cred .dato{display:flex;justify-content:space-between;align-items:baseline;gap:6px;font-size:clamp(10px,7.2cqw,14px);font-weight:700;color:#4b473f}
+.cred .dato b{font-size:clamp(14px,11cqw,24px);color:#18171c}
+.cred .dato.ojo-n b{color:#0b4fd6}
+.cred .num-c{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:clamp(9px,6.4cqw,12px);color:#8a8375}
+.cred.yo{box-shadow:var(--sombra),inset 0 0 0 3px #0b4fd6}
+.desc{border-radius:20px;padding:10px 14px;background:var(--cf);color:var(--c);font-weight:700;font-size:13.5px;line-height:1.35}
+.desc b{font-weight:800}
+.nota{flex:1 1 0;min-height:0;overflow:hidden;border-radius:20px;background:var(--campo);box-shadow:var(--hundido);padding:12px 14px;font-weight:600;color:var(--suave);white-space:pre-line}
 @media (min-width:900px) and (min-height:560px){
   .mosaico{grid-template-columns:repeat(12,minmax(0,1fr));grid-template-rows:1fr 1fr minmax(64px,.32fr);grid-template-areas:"tuyo tuyo tuyo tuyo tuyo crm crm crm crm proy proy proy" "tuyo tuyo tuyo tuyo tuyo equipo equipo equipo equipo moon moon moon" "ultimo ultimo ultimo ultimo ultimo ultimo ultimo ultimo ultimo ultimo ultimo ultimo"}
   .lista.dos{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media (max-width:360px){.tabs button{font-size:12px}}
-@media (max-height:620px){.hoja{padding:12px;gap:8px!important}.pil{padding:5px 11px 5px 6px}.quien button{padding:3px 12px 3px 3px}.hoja .eti{margin-bottom:5px!important}}
+@media (max-width:599px){
+  .pils{gap:5px}.pil{padding:5px 10px 5px 5px;font-size:12.5px;gap:5px}.pil i{width:18px;height:18px;font-size:10px}.pil.solo{padding:5px 11px}
+  .desc{padding:8px 12px;font-size:12.5px}
+  .creds{grid-template-columns:minmax(0,1fr);grid-template-rows:repeat(3,minmax(0,1fr))}
+  .cred{display:grid;grid-template-columns:minmax(0,38%) minmax(0,1fr);grid-template-rows:auto auto auto minmax(0,1fr) auto;column-gap:12px;row-gap:4px;padding:10px}
+  .cred .foto{grid-column:1;grid-row:1/6;height:100%;font-size:32px}
+  .cred>:not(.foto){grid-column:2}
+  .cred .nom{font-size:clamp(20px,9cqw,30px)}
+  .cred .marca-c{font-size:10px}.cred .rol{font-size:12px}
+  .cred .datos{grid-template-columns:1fr 1fr;column-gap:10px;align-content:center}
+  .cred .dato{font-size:11.5px}.cred .dato b{font-size:16px}
+}
+@media (max-height:620px){.pista{display:none}.avance svg{width:min(200px,50vw,23vh)}.avance .fase-m{font-size:13px}.hoja{padding:12px;gap:8px!important}.pil{padding:5px 11px 5px 6px}.quien button{padding:3px 12px 3px 3px}.hoja .eti{margin-bottom:5px!important}}
 @media (max-height:600px) and (max-width:899px){
   .mosaico{grid-template-rows:1.1fr 1fr 1fr .55fr}
   .t .sub{display:none}
@@ -176,12 +228,23 @@ const API = '/api/centro';
 const LLAVE = 'centro.moon.sesion';
 const GENTE = { daniel: { n: 'Daniel', c: '#2b2b30', i: 'D' }, dan: { n: 'Dan', c: '#3f86ee', i: 'Dn' }, kid: { n: 'Kid', c: '#0b4fd6', i: 'K' } };
 const ETAPA = {
-  'pendiente':  { n: 'Pendientes', c: 'var(--naranja)', cf: 'var(--naranjaf)', ic: '◷', d: 'Todavía no firman' },
-  'en proceso': { n: 'En proceso', c: 'var(--cobalto)', cf: 'var(--azulf)',   ic: '↻', d: 'Negociando' },
-  'cerrado':    { n: 'Cerrados',   c: 'var(--verde)',   cf: 'var(--verdef)',  ic: '✓', d: 'Firmó y pagó; lo construimos' },
-  'en órbita':  { n: 'En órbita',  c: 'var(--morado)',  cf: 'var(--moradof)', ic: '◎', d: 'Pagan mantenimiento' },
-  'portafolio': { n: 'Portafolio', c: 'var(--suave)',   cf: 'var(--campo)',   ic: '★', d: 'Entregado, sin mantenimiento' },
-  'archivo':    { n: 'Archivo',    c: 'var(--rojo)',    cf: 'var(--rojof)',   ic: '×', d: 'Dijeron que no' },
+  'pendiente':  { n: 'Pendientes', c: 'var(--naranja)', cf: 'var(--naranjaf)', ic: '◷', d: 'Nos buscaron o los buscamos, pero todavía no hay trato.' },
+  'en proceso': { n: 'En proceso', c: 'var(--cobalto)', cf: 'var(--azulf)',   ic: '↻', d: 'Ya estamos platicando una propuesta con ellos.' },
+  'cerrado':    { n: 'Cerrados',   c: 'var(--verde)',   cf: 'var(--verdef)',  ic: '✓', d: 'Ya firmaron y pagaron. Estamos construyendo lo suyo.' },
+  'en órbita':  { n: 'En órbita',  c: 'var(--morado)',  cf: 'var(--moradof)', ic: '◎', d: 'Ya se lo entregamos y nos pagan mantenimiento cada mes. Hay que cuidarlos de cerca.' },
+  'portafolio': { n: 'Portafolio', c: 'var(--suave)',   cf: 'var(--campo)',   ic: '★', d: 'Ya se lo entregamos y no lleva mantenimiento. Es el registro de lo que hemos hecho.' },
+  'archivo':    { n: 'Archivo',    c: 'var(--rojo)',    cf: 'var(--rojof)',   ic: '×', d: 'Dijeron que no, por ahora. Se guardan por si regresan.' },
+};
+const GRUPO_TODOS = { n: 'Todos', c: 'var(--tinta)', cf: 'var(--campo)', ic: '●', d: 'Todas las personas y negocios que tenemos, estén en la etapa que estén.' };
+const GRUPO_PRUEBAS = { n: 'Pruebas', c: 'var(--suave)', cf: 'var(--campo)', ic: '⚙', d: 'Llamadas de prueba de nosotros mismos. No cuentan como clientes.' };
+const ROL = { daniel: 'Ideas y dirección', dan: 'Ventas y llamadas', kid: 'Construye y diseña' };
+const FASE_TXT = {
+  'por arrancar': 'Todo listo para arrancar. Lo primero: juntar la información.',
+  'información': 'Estamos entendiendo al cliente. Lo que sigue: el diseño.',
+  'diseño': 'Ya se está viendo cómo va a quedar. Lo que sigue: construirlo.',
+  'construcción': 'Manos a la obra. Lo que sigue: probarlo.',
+  'pruebas': '¡Ya casi! Solo falta entregarlo.',
+  'entregado': '¡Entregado! Uno más para MOON.',
 };
 const TEMP = { caliente: 'var(--rojo)', tibio: 'var(--naranja)', frio: 'var(--cielo)' };
 const I = {
@@ -215,7 +278,8 @@ async function api(accion, datos) {
 }
 
 const CLAUDE = { n: 'Claude', c: '#c96442', i: 'C' };
-function ava(id, chico) { const g = GENTE[id] || (id === 'sistema' ? CLAUDE : { n: '?', c: 'var(--tenue)', i: '?' }); return `<span class="ava${chico ? ' chico' : ''}" style="--c:${g.c}" title="${esc(g.n)}">${esc(g.i)}</span>`; }
+let FOTOS = {};   // caras del equipo: llegan solo después de entrar
+function ava(id, chico) { const g = GENTE[id] || (id === 'sistema' ? CLAUDE : { n: '?', c: 'var(--tenue)', i: '?' }); const f = FOTOS[id]; return `<span class="ava${chico ? ' chico' : ''}" style="--c:${g.c}${f ? `;background:var(--c) url(${f}) center 30%/cover` : ''}" title="${esc(g.n)}">${f ? '' : esc(g.i)}</span>`; }
 function avas(lista) { const ids = String(lista || '').split(',').filter(x => GENTE[x]); return ids.length ? `<span class="avas">${ids.map(x => ava(x, 1)).join('')}</span>` : ''; }
 function cuando(iso) {
   if (!iso) return '';
@@ -279,7 +343,7 @@ addEventListener('resize', () => { clearTimeout(reloj); reloj = setTimeout(() =>
 
 /* ---------- Entrada ---------- */
 async function pantallaQuien() {
-  app.innerHTML = `<div class="top"><div class="marca">CENTRO <i>/</i> MOON</div></div><div class="entrada"><div class="caja"><span class="eti">Bienvenido</span><h1>¿Quién eres?</h1><div class="gente" id="gente"><span class="mini">Cargando…</span></div></div></div>`;
+  app.innerHTML = `<div class="top"><div class="marca"><span class="logo" role="img" aria-label="MOON Digital"></span><i>/</i>CENTRO</div></div><div class="entrada"><div class="caja"><span class="eti">Bienvenido</span><h1>¿Quién eres?</h1><div class="gente" id="gente"><span class="mini">Cargando…</span></div></div></div>`;
   const r = await api('quienes');
   const g = document.getElementById('gente');
   if (!r.ok) { g.innerHTML = '<span class="aviso">No hay conexión. Revisa tu internet y vuelve a abrir.</span>'; return; }
@@ -300,7 +364,7 @@ function activarOjos() {
   });
 }
 function marcoEntrada(u, html) {
-  app.innerHTML = `<div class="top"><button class="redondo" id="volver" aria-label="Regresar">${I.atras}</button><div class="marca">CENTRO <i>/</i> MOON</div></div><div class="entrada"><div class="caja">${ava(u.id)}${html}</div></div>`;
+  app.innerHTML = `<div class="top"><button class="redondo" id="volver" aria-label="Regresar">${I.atras}</button><div class="marca"><span class="logo" role="img" aria-label="MOON Digital"></span><i>/</i>CENTRO</div></div><div class="entrada"><div class="caja">${ava(u.id)}${html}</div></div>`;
   document.getElementById('volver').onclick = pantallaQuien;
   activarOjos();
 }
@@ -369,11 +433,12 @@ function atrasada(x) { return x.estado !== 'hecha' && x.vence && x.vence < new D
 
 async function arrancar() {
   if (!sesionGuardada()) return pantallaQuien();
-  if (!D) app.innerHTML = '<div class="top"><div class="marca">CENTRO <i>/</i> MOON</div></div><div class="entrada"><span class="mini">Cargando…</span></div>';
+  if (!D) app.innerHTML = '<div class="top"><div class="marca"><span class="logo" role="img" aria-label="MOON Digital"></span><i>/</i>CENTRO</div></div><div class="entrada"><span class="mini">Cargando…</span></div>';
   const r = await api('inicio');
   if (!r.ok) { if (r.error !== 'sesion' && !D) app.innerHTML = '<div class="entrada"><div class="caja"><h1>Sin conexión</h1><p>Revisa tu internet.</p><button class="boton" onclick="arrancar()">Reintentar</button></div></div>'; return; }
   D = r;
   pinta();
+  if (!Object.keys(FOTOS).length) api('fotos').then(f => { if (f.ok) { FOTOS = f.fotos; pinta(true); } });
 }
 async function recargar() { const r = await api('inicio'); if (r.ok) { D = r; pinta(true); } }
 setInterval(() => { if (D && document.visibilityState === 'visible' && !document.querySelector('.editando') && !/INPUT|TEXTAREA|SELECT/.test((document.activeElement || {}).tagName || '')) recargar(); }, 60000);
@@ -389,7 +454,7 @@ function pinta(silencioso) {
   alCambiarTamano = null;
   const c = pila[pila.length - 1];
   if (!c) return pintaInicio(silencioso);
-  ({ tareas: capaTareas, tarea: capaTarea, nuevaTarea: capaNuevaTarea, crm: capaCRM, ficha: capaFicha, nuevoCliente: capaNuevoCliente, proyectos: capaProyectos, proyecto: capaProyecto, nuevoProyecto: capaProyecto, equipo: capaEquipo, moon: capaMoon, lector: capaLector })[c.tipo](c, silencioso);
+  ({ tareas: capaTareas, tarea: capaTarea, nuevaTarea: capaNuevaTarea, crm: capaCRM, ficha: capaFicha, nuevoCliente: capaNuevoCliente, proyectos: capaProyectos, proyecto: capaProyecto, nuevoProyecto: capaProyecto, equipo: capaEquipo, moon: capaMoon, lector: capaLector, nota: capaNota, editarProyecto: capaProyecto })[c.tipo](c, silencioso);
 }
 function marco(titulo, accion, cuerpo) {
   app.innerHTML = `<div class="top"><button class="redondo" id="volver" aria-label="Regresar">${I.atras}</button><div class="cabeza" style="flex:1;min-width:0"><h2>${esc(titulo)}</h2>${accion ? `<button class="redondo accion" id="accion" aria-label="${esc(accion)}">${I.mas}</button>` : ''}</div></div><div class="vista" style="grid-template-rows:minmax(0,1fr)">${cuerpo}</div>`;
@@ -400,36 +465,63 @@ let silencio = false;
 
 /* ---------- Inicio ---------- */
 function pintaInicio(sil) {
-  const mias = misTareas().filter(x => x.estado !== 'hecha');
+  const mias = misTareas().filter(x => x.estado !== 'hecha').sort((a, b) => (b.estado === 'nueva') - (a.estado === 'nueva') || b.id - a.id);
   const nuevas = mias.filter(x => x.estado === 'nueva').length;
   const vencen = mias.filter(atrasada).length;
   const r = reales();
-  const cuenta = e => r.filter(p => p.etapa === e).length;
+  const cuenta = e => r.filter(p => (p.etapa || 'pendiente') === e).length;
   const activos = D.proyectos.filter(p => p.fase !== 'entregado');
   const miosP = activos.filter(p => String(p.encargados).split(',').includes(yo())).length;
-  const atr = D.tareas.filter(atrasada).length;
   const sinVer = D.tareas.filter(x => x.estado === 'nueva').length;
   const ult = D.actividad[0];
   const hora = Number(new Date().toLocaleString('en-US', { hour: 'numeric', hour12: false, timeZone: 'America/Cancun' }));
   const saludo = hora < 12 ? 'Buenos días' : hora < 19 ? 'Buenas tardes' : 'Buenas noches';
   const barrita = ['pendiente', 'en proceso', 'cerrado', 'en órbita'].map(e => cuenta(e) ? `<i style="--n:${cuenta(e)};--c:${ETAPA[e].c}"></i>` : '').join('');
+  const xTareas = mias.map(x => { const p = proyectoDe(x.proyecto); return `<button class="xi${x.estado === 'nueva' ? ' nueva' : ''}" data-t="${x.id}"><span class="q">${esc(x.titulo)}</span><small>${esc(p ? p.nombre : 'General')}</small></button>`; }).join('');
+  const xCrm = Object.keys(ETAPA).filter(e => e !== 'archivo' && cuenta(e)).map(e => `<button class="xi" data-g="${e}"><span class="punto" style="--c:${ETAPA[e].c}"></span><span class="q">${ETAPA[e].n}</span><small>${cuenta(e)}</small></button>`).join('');
+  const xProy = activos.map(p => `<button class="xi" data-y="${p.id}"><span class="q">${esc(p.nombre)}</span><small>${esc(p.fase)}</small></button>`).join('');
+  const xEq = ['daniel', 'dan', 'kid'].map(id => { const ab = D.tareas.filter(x => x.para === id && x.estado !== 'hecha'); const nv = ab.filter(x => x.estado === 'nueva').length; return `<button class="xi" data-u="${id}">${ava(id, 1)}<span class="q">${GENTE[id].n}</span><small>${nv ? nv + ' sin ver' : ab.length + ' abiertas'}</small></button>`; }).join('');
+  const xMoon = `<p class="xtxt">Ser una empresa de inteligencia artificial muy fuerte, muy dinámica y muy intuitiva.</p>` + ['Agente de llamadas', 'Página web', 'Redes y campañas', 'Administración'].map(n => `<span class="xi">${n}</span>`).join('');
   app.innerHTML = `
-  <div class="top"><div class="marca">CENTRO <i>/</i> MOON</div><div class="esp"></div><button id="salir" aria-label="Mi cuenta">${ava(yo())}</button></div>
+  <div class="top"><div class="marca"><span class="logo" role="img" aria-label="MOON Digital"></span><i>/</i>CENTRO</div><div class="esp"></div><button id="salir" aria-label="Mi cuenta">${ava(yo())}</button></div>
   <div class="vista"${sil ? ' style="animation:none"' : ''}>
     <h1 class="hola">${saludo}, ${esc(GENTE[yo()] ? GENTE[yo()].n : D.yo.nombre)}<small>${mias.length ? `Tienes ${mias.length} tarea${mias.length === 1 ? '' : 's'} abierta${mias.length === 1 ? '' : 's'}` : 'No tienes tareas pendientes'}</small></h1>
     <main class="mosaico">
-      <button class="t t-tuyo" data-ir="tareas"><span class="flecha">${I.abre}</span><span class="eti">Lo tuyo</span>
+      <div class="t t-tuyo" role="button" tabindex="0" data-ir="tareas"><span class="flecha">${I.abre}</span><span class="eti">Lo tuyo</span>
         ${nuevas ? `<span class="brilla latido"><i>${nuevas}</i>nueva${nuevas === 1 ? '' : 's'} para ti</span>` : ''}
-        <span class="num">${mias.length}</span><span class="sub">${vencen ? `${vencen} atrasada${vencen === 1 ? '' : 's'} · ` : ''}tareas abiertas</span></button>
-      <button class="t t-crm" data-ir="crm"><span class="flecha">${I.abre}</span><span class="eti">CRM de MOON</span><span class="num">${cuenta('pendiente') + cuenta('en proceso')}</span><span class="sub">clientes por cerrar</span><span class="barrita">${barrita}</span></button>
-      <button class="t t-proy" data-ir="proyectos"><span class="flecha">${I.abre}</span><span class="eti">Proyectos</span><span class="num">${activos.length}</span><span class="sub">${miosP} con tu nombre</span></button>
-      <button class="t t-equipo" data-ir="equipo"><span class="flecha">${I.abre}</span><span class="eti">Equipo</span><span class="num">${sinVer}</span><span class="sub">${atr ? `${atr} atrasada${atr === 1 ? '' : 's'}` : 'sin ver en total'}</span></button>
-      <button class="t t-moon" data-ir="moon"><span class="flecha">${I.abre}</span><span class="eti">MOON</span><span class="num" style="font-size:clamp(20px,4.6vh,32px)">Quiénes somos</span><span class="sub">visión y servicios</span></button>
-      <div class="t t-ultimo">${ult ? ava(ult.quien, 1) : ''}<span class="txt">${ult ? `<b>${esc((GENTE[ult.quien] || CLAUDE).n)}</b> ${esc(ult.texto)} · ${cuando(ult.fecha)}` : 'Aquí aparece lo último que pasó en MOON.'}</span></div>
+        <div class="extra">${xTareas}</div>
+        <span class="num">${mias.length}</span><span class="sub">${vencen ? `${vencen} atrasada${vencen === 1 ? '' : 's'} · ` : ''}tareas abiertas</span></div>
+      <div class="t t-crm" role="button" tabindex="0" data-ir="crm"><span class="flecha">${I.abre}</span><span class="eti">CRM de MOON</span><div class="extra">${xCrm}</div><span class="num">${cuenta('pendiente') + cuenta('en proceso')}</span><span class="sub">clientes por cerrar</span><span class="barrita">${barrita}</span></div>
+      <div class="t t-proy" role="button" tabindex="0" data-ir="proyectos"><span class="flecha">${I.abre}</span><span class="eti">Proyectos</span><div class="extra">${xProy}</div><span class="num">${activos.length}</span><span class="sub">${miosP} con tu nombre</span></div>
+      <div class="t t-equipo" role="button" tabindex="0" data-ir="equipo"><span class="flecha">${I.abre}</span><span class="eti">Equipo</span><div class="extra">${xEq}</div><span class="num">${sinVer}</span><span class="sub">tareas sin ver</span></div>
+      <div class="t t-moon" role="button" tabindex="0" data-ir="moon"><span class="flecha">${I.abre}</span><span class="eti">MOON</span><div class="extra">${xMoon}</div><span class="num" style="font-size:clamp(20px,4.6vh,32px)">Quiénes somos</span><span class="sub">visión y servicios</span></div>
+      <div class="t t-ultimo">${ult ? ava(ult.quien, 1) : ''}<span class="txt">${ult ? `Lo último: <b>${esc((GENTE[ult.quien] || CLAUDE).n)}</b> ${esc(ult.texto)} · ${cuando(ult.fecha)}` : 'Aquí aparece lo último que pasó en MOON.'}</span></div>
     </main>
   </div>`;
-  app.querySelectorAll('[data-ir]').forEach(b => b.onclick = () => abrir({ tipo: b.dataset.ir }));
+  app.querySelectorAll('[data-ir]').forEach(b => { b.onclick = () => abrir({ tipo: b.dataset.ir }); b.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); b.click(); } }; });
+  const atajo = (sel, f) => app.querySelectorAll('.extra ' + sel).forEach(b => b.onclick = e => { e.stopPropagation(); f(b); });
+  atajo('[data-t]', b => abrir({ tipo: 'tarea', id: Number(b.dataset.t) }));
+  atajo('[data-g]', b => abrir({ tipo: 'crm', g: b.dataset.g }));
+  atajo('[data-y]', b => abrir({ tipo: 'proyecto', id: Number(b.dataset.y) }));
+  atajo('[data-u]', b => abrir({ tipo: 'tareas', persona: b.dataset.u }));
   document.getElementById('salir').onclick = () => abrir({ tipo: 'moon', cuenta: true });
+  llenarExtras();
+  alCambiarTamano = () => pintaInicio(true);
+}
+// Cada tarjeta muestra los renglones que le caben completos; los demás se resumen en "+N más" (están adentro de la tarjeta).
+function llenarExtras() {
+  app.querySelectorAll('.extra').forEach(x => {
+    const total = x.children.length; let quitados = 0;
+    while (x.lastElementChild && x.scrollHeight > x.clientHeight + 1) { x.lastElementChild.remove(); quitados++; }
+    if (quitados && total) {
+      const mas = document.createElement('span'); mas.className = 'xmas'; x.appendChild(mas);
+      const pon = () => { mas.textContent = `+ ${quitados} más adentro`; };
+      pon();
+      while (x.scrollHeight > x.clientHeight + 1 && x.children.length > 1) { x.children[x.children.length - 2].remove(); quitados++; pon(); }
+      if (x.scrollHeight > x.clientHeight + 1) mas.remove();
+    }
+    if (!x.children.length) x.style.display = 'none';   // vacía no ocupa lugar
+  });
 }
 
 /* ---------- Tareas ---------- */
@@ -485,11 +577,11 @@ async function capaTarea(c) {
 function capaNuevaTarea(c) {
   let para = c.para || yo();
   const proys = D.proyectos.filter(p => p.fase !== 'entregado');
-  marco('Nueva tarea', '', `<form class="hoja editando" id="f" style="grid-template-rows:auto auto auto minmax(0,1fr) auto">
+  marco('Nueva tarea', '', `<form class="hoja editando" id="f" style="align-self:start">
     <input class="campo" name="titulo" placeholder="¿Qué hay que hacer?" required maxlength="160">
     <div><div class="eti" style="margin-bottom:8px">Para</div><div class="quien" id="para">${Object.keys(GENTE).map(id => `<button type="button" data-u="${id}" class="${id === para ? 'on' : ''}">${ava(id)}${GENTE[id].n}</button>`).join('')}</div></div>
     <select class="campo" name="proyecto"><option value="0">General (sin proyecto)</option>${proys.map(p => `<option value="${p.id}"${p.id == c.proyecto ? ' selected' : ''}>${esc(p.nombre)}</option>`).join('')}</select>
-    <textarea class="campo" name="detalle" placeholder="Detalle (opcional)" style="height:100%;min-height:60px"></textarea>
+    <textarea class="campo" name="detalle" rows="3" placeholder="Detalle (opcional)"></textarea>
     <div class="botones"><input class="campo" name="vence" type="date" style="flex:1 1 140px" aria-label="Fecha límite"><button class="boton">Dejar tarea</button></div><div class="aviso" id="aviso"></div></form>`);
   app.querySelectorAll('#para button').forEach(b => b.onclick = () => { para = b.dataset.u; app.querySelectorAll('#para button').forEach(x => x.classList.toggle('on', x === b)); });
   const f = document.getElementById('f');
@@ -501,30 +593,35 @@ function capaNuevaTarea(c) {
 }
 
 /* ---------- CRM ---------- */
+function grupoDe(k) { return k === 'todos' ? GRUPO_TODOS : k === 'pruebas' ? GRUPO_PRUEBAS : ETAPA[k]; }
 function capaCRM(c) {
   const base = reales();
   const pruebas = D.personas.filter(p => p.es_prueba);
   const grupos = Object.keys(ETAPA);
-  c.g = c.g || 'pendiente';
+  c.g = c.g || 'todos';
   const q = (c.busca || '').toLowerCase();
-  let items = c.g === 'pruebas' ? pruebas : base.filter(p => (p.etapa || 'pendiente') === c.g);
-  if (q) items = (c.g === 'pruebas' ? pruebas : base).filter(p => [p.nombre, p.negocio, p.telefono, p.giro, p.necesidad].join(' ').toLowerCase().includes(q));
-  const pils = grupos.map(e => { const n = base.filter(p => (p.etapa || 'pendiente') === e).length; if (e === 'archivo' && !n && c.g !== e) return ''; return `<button class="pil${c.g === e && !q ? ' on' : ''}" data-g="${e}" style="--c:${ETAPA[e].c};--cf:${ETAPA[e].cf}"><i>${n}</i>${ETAPA[e].n}</button>`; }).join('')
-    + (pruebas.length ? `<button class="pil${c.g === 'pruebas' ? ' on' : ''}" data-g="pruebas" style="--c:var(--suave);--cf:var(--campo)"><i>${pruebas.length}</i>Pruebas</button>` : '');
-  marco('CRM de MOON', 'Nuevo cliente', `<div class="cuerpo" style="grid-template-rows:auto auto minmax(0,1fr) auto">
-    <label class="buscador">${I.lupa}<input id="busca" placeholder="Buscar nombre, negocio o teléfono" value="${esc(c.busca || '')}" enterkeyhint="search"></label>
-    <div class="pils">${pils}</div><div class="lista dos"></div><div class="pie"></div></div>`);
-  app.querySelectorAll('[data-g]').forEach(b => b.onclick = () => { c.g = b.dataset.g; c.busca = ''; c.p = 0; pinta(true); });
+  let items = c.g === 'pruebas' ? pruebas : c.g === 'todos' ? base : base.filter(p => (p.etapa || 'pendiente') === c.g);
+  if (q) items = (c.g === 'pruebas' ? pruebas : base).filter(p => [p.nombre, p.negocio, p.telefono, p.giro, p.necesidad, p.notas_equipo].join(' ').toLowerCase().includes(q));
+  const pil = (k, n) => { const G = grupoDe(k); return `<button class="pil${c.g === k ? ' on' : ''}" data-g="${k}" style="--c:${G.c};--cf:${G.cf}"><i>${n}</i>${G.n}</button>`; };
+  const pils = pil('todos', base.length) + grupos.map(e => { const n = base.filter(p => (p.etapa || 'pendiente') === e).length; return e === 'archivo' && !n && c.g !== e ? '' : pil(e, n); }).join('') + (pruebas.length ? pil('pruebas', pruebas.length) : '');
+  const G = grupoDe(c.g);
+  marco('CRM de MOON', 'Nuevo cliente', `<div class="cuerpo" style="grid-template-rows:auto auto auto minmax(0,1fr) auto">
+    <label class="buscador">${I.lupa}<input id="busca" placeholder="Buscar cliente, teléfono o nota" value="${esc(c.busca || '')}" enterkeyhint="search"></label>
+    <div class="pils">${pils}</div>
+    <div class="desc" style="--c:${G.c};--cf:${G.cf}"><b>${G.n}:</b> ${esc(G.d)}</div>
+    <div class="lista dos"></div><div class="pie"></div></div>`);
+  app.querySelectorAll('[data-g]').forEach(b => b.onclick = () => { c.g = b.dataset.g; c.p = 0; pinta(true); });
   document.getElementById('accion').onclick = () => abrir({ tipo: 'nuevoCliente', etapa: grupos.includes(c.g) ? c.g : 'pendiente' });
   const busca = document.getElementById('busca');
   let espera; busca.oninput = () => { clearTimeout(espera); espera = setTimeout(() => { c.busca = busca.value; c.p = 0; const pos = busca.selectionStart; silencio = true; pinta(true); silencio = false; const nb = document.getElementById('busca'); nb.focus(); nb.setSelectionRange(pos, pos); }, 250); };
-  const d = grupos.includes(c.g) ? ETAPA[c.g].d : 'Llamadas de prueba de la familia';
-  alCambiarTamano = paginar(app.querySelector('.cuerpo'), items, filaPersona, { pagina: c.p, vacio: q ? '<b>Sin resultados</b>Prueba con otra palabra.' : `<b>${esc(grupos.includes(c.g) ? ETAPA[c.g].n : 'Pruebas')}</b>${esc(d)}. Aún no hay nadie aquí.`, alPintar: l => l.querySelectorAll('[data-p]').forEach(b => b.onclick = () => abrir({ tipo: 'ficha', tel: b.dataset.p })) });
+  alCambiarTamano = paginar(app.querySelector('.cuerpo'), items, p => filaPersona(p, c.g === 'todos' || c.g === 'pruebas' || !!q), { pagina: c.p, vacio: q ? '<b>Sin resultados</b>Prueba con otra palabra.' : `<b>Aún no hay nadie aquí</b>${esc(G.d)}`, alPintar: l => l.querySelectorAll('[data-p]').forEach(b => b.onclick = () => abrir({ tipo: 'ficha', tel: b.dataset.p })) });
 }
-function filaPersona(p) {
+function filaPersona(p, conEtapa) {
   const n = D.proyectos.filter(x => x.tel === p.tel).length;
-  const sub = p.proxima_cita ? `Cita: ${p.proxima_cita}` : [quienDe(p), p.servicio, n ? `${n} proyecto${n === 1 ? '' : 's'}` : '', cuando(p.ultimo_contacto)].filter(Boolean).join(' · ');
-  return `<button class="fila" data-p="${esc(p.tel)}"><span class="punto" style="--c:${TEMP[p.temperatura] || 'var(--niebla)'}" title="${esc(p.temperatura || 'sin temperatura')}"></span><span class="q"><b>${esc(nombreDe(p))}</b><span>${esc(sub)}</span></span>${avas(p.encargados)}</button>`;
+  const E = ETAPA[p.etapa || 'pendiente'] || ETAPA.pendiente;
+  const sub = [p.proxima_cita ? `Cita: ${p.proxima_cita}` : '', quienDe(p), p.servicio, n ? `${n} proyecto${n === 1 ? '' : 's'}` : '', cuando(p.ultimo_contacto)].filter(Boolean).join(' · ');
+  const nota = p.notas_equipo ? (p.notas_equipo.length <= 140 ? `<span style="color:var(--tinta);font-weight:600;white-space:pre-line">${esc(p.notas_equipo)}</span>` : '<span>Tiene notas: tócalo para leerlas</span>') : '';
+  return `<button class="fila" data-p="${esc(p.tel)}"><span class="punto" style="--c:${TEMP[p.temperatura] || 'var(--niebla)'}" title="${esc(p.temperatura || 'sin temperatura')}"></span><span class="q"><b>${esc(nombreDe(p))}</b><span>${conEtapa ? `<em style="font-style:normal;font-weight:800;color:${E.c}">${E.n}</em>${sub ? ' · ' : ''}` : ''}${esc(sub)}</span>${nota}</span>${avas(p.encargados)}</button>`;
 }
 
 async function capaFicha(c, sil) {
@@ -536,7 +633,7 @@ async function capaFicha(c, sil) {
   const P = Object.assign({}, p, ext.persona || {});
   const proys = D.proyectos.filter(x => x.tel === c.tel);
   const tel = String(P.telefono || '').replace(/\D/g, '');
-  const tabs = [['estado', 'Estado'], ['datos', 'Datos'], ['proyectos', 'Proyectos'], ['historial', 'Historial']];
+  const tabs = [['estado', 'Estado'], ['datos', 'Datos'], ['proyectos', `Proyectos (${proys.length})`], ['historial', c.ext ? `Contacto (${(ext.contactos || []).length})` : 'Contacto']];
   let cuerpo = '';
   if (c.tab === 'estado') {
     cuerpo = `<div class="hoja" style="display:flex;flex-direction:column;gap:clamp(10px,2vh,16px)">
@@ -544,8 +641,8 @@ async function capaFicha(c, sil) {
       <div><div class="eti" style="margin-bottom:8px">Encargados</div><div class="quien" id="enc">${Object.keys(GENTE).map(id => `<button data-u="${id}" class="${String(P.encargados).split(',').includes(id) ? 'on' : ''}">${ava(id)}${GENTE[id].n}</button>`).join('')}</div></div>
       <div><div class="eti" style="margin-bottom:8px">Temperatura</div><div class="pils" id="temps">${['caliente', 'tibio', 'frio'].map(x => `<button class="pil solo${P.temperatura === x ? ' on' : ''}" data-x="${x}" style="--c:#fff;--cf:${TEMP[x]}">${x === 'frio' ? 'Frío' : x[0].toUpperCase() + x.slice(1)}</button>`).join('')}</div></div>
       ${P.proxima_cita ? `<div class="par"><span>Cita</span><b>${esc(P.proxima_cita)}</b></div>` : ''}
-      <textarea class="campo" id="notas" style="flex:1 1 0;min-height:48px" placeholder="Notas del equipo sobre este cliente">${esc(P.notas_equipo || '')}</textarea>
-      <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap"><label class="mini" style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="prueba"${P.es_prueba ? ' checked' : ''}> Es una llamada de prueba</label><span class="aviso bien" id="aviso" style="min-height:0"></span></div></div>`;
+      <div><div class="eti" style="margin-bottom:8px">Notas del equipo</div>${P.notas_equipo ? `<div class="nota" id="nota" style="flex:none">${esc(P.notas_equipo)}</div>` : ''}<div class="botones" style="margin-top:8px"><button class="boton dos" id="escribir" style="height:44px">${P.notas_equipo ? 'Editar nota' : 'Escribir una nota'}</button></div></div>
+      <label class="mini" style="display:flex;gap:8px;align-items:center;margin-top:auto"><input type="checkbox" id="prueba"${P.es_prueba ? ' checked' : ''}> Es una llamada de prueba (no cuenta como cliente)</label></div>`;
   } else if (c.tab === 'datos') {
     const filas = [['Nombre', P.nombre], ['Negocio', P.negocio], ['Giro', P.giro], ['Teléfono', P.telefono], ['Correo', P.correo], ['Servicio', P.servicio], ['Llegó por', P.origen], ['Necesita', P.necesidad], ['Volumen', P.volumen], ['Urgencia', P.urgencia], ['Decide', P.decide], ['Primer contacto', cuando(P.creado)], ['Contactos', P.contactos]].filter(x => x[1] !== '' && x[1] != null);
     cuerpo = `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr) auto"><div class="lista"></div><div class="pie"></div></div>`;
@@ -565,8 +662,10 @@ async function capaFicha(c, sil) {
     app.querySelectorAll('#etapas [data-e]').forEach(b => b.onclick = async () => { await guarda({ etapa: b.dataset.e }); pinta(true); recargar(); });
     app.querySelectorAll('#temps [data-x]').forEach(b => b.onclick = async () => { await guarda({ temperatura: p.temperatura === b.dataset.x ? '' : b.dataset.x }); pinta(true); });
     app.querySelectorAll('#enc [data-u]').forEach(b => b.onclick = async () => { const s = new Set(String(p.encargados || '').split(',').filter(Boolean)); s.has(b.dataset.u) ? s.delete(b.dataset.u) : s.add(b.dataset.u); await guarda({ encargados: [...s].join(',') }); pinta(true); });
-    const n = document.getElementById('notas'), av = document.getElementById('aviso');
-    let espera; n.oninput = () => { av.textContent = ''; n.closest('.hoja').classList.add('editando'); clearTimeout(espera); espera = setTimeout(async () => { const r = await guarda({ notas_equipo: n.value }); av.textContent = r.ok ? 'Notas guardadas' : ''; n.closest('.hoja').classList.remove('editando'); }, 700); };
+    document.getElementById('escribir').onclick = () => abrir({ tipo: 'nota', tel: c.tel });
+    // Si la nota no cabe completa, se cambia por un botón para leerla entera.
+    const nota = document.getElementById('nota'), hoja = app.querySelector('.vista .hoja');
+    if (nota && hoja.scrollHeight > hoja.clientHeight + 1) { nota.outerHTML = '<button class="boton dos" id="leerNota" style="height:44px;width:100%">Leer la nota completa</button>'; document.getElementById('leerNota').onclick = () => abrir({ tipo: 'lector', titulo: 'Nota de ' + nombreDe(P), texto: P.notas_equipo }); }
     document.getElementById('prueba').onchange = async e => { await guarda({ es_prueba: e.target.checked }); recargar(); };
   } else if (c.tab === 'datos') {
     alCambiarTamano = paginar(app.querySelector('.vista .cuerpo .cuerpo'), c._items, ([k, v]) => `<div class="fila" style="grid-template-columns:110px minmax(0,1fr)"><span class="eti" style="letter-spacing:.12em">${esc(k)}</span><span class="q"><b style="font-weight:600">${esc(v)}</b></span></div>`, { pagina: c.p, alto: 58, hueco: 7 });
@@ -575,11 +674,18 @@ async function capaFicha(c, sil) {
     alCambiarTamano = paginar(app.querySelector('.vista .cuerpo .cuerpo'), proys, filaProyecto, { pagina: c.p, vacio: '<b>Sin proyectos</b>Ábrele uno con el botón de abajo.', alPintar: l => l.querySelectorAll('[data-y]').forEach(b => b.onclick = () => abrir({ tipo: 'proyecto', id: Number(b.dataset.y) })) });
   } else if (c.tab === 'historial') {
     const h = (ext.contactos || []).map(x => ({ x }));
-    alCambiarTamano = paginar(app.querySelector('.vista .cuerpo .cuerpo'), h, ({ x }) => `<div class="fila"><span class="estado" style="--c:var(--cobalto);--cf:var(--azulf)">${esc(x.tipo)}</span><span class="q"><b style="font-weight:600">${esc(x.resumen || 'Sin resumen')}</b><span>${esc(x.canal)} · ${cuando(x.fecha)}</span></span><span></span></div>`, { pagina: c.p, vacio: c.ext ? '<b>Sin contactos</b>Aquí aparecen sus llamadas, citas y mensajes.' : 'Cargando…' });
+    alCambiarTamano = paginar(app.querySelector('.vista .cuerpo .cuerpo'), h, ({ x }) => `<div class="fila"><span class="estado" style="--c:var(--cobalto);--cf:var(--azulf)">${esc(x.tipo)}</span><span class="q"><b style="font-weight:600">${esc(x.resumen || 'Sin resumen')}</b><span>${esc(x.canal)} · ${cuando(x.fecha)}</span></span><span></span></div>`, { pagina: c.p, vacio: c.ext ? '<b>Todavía no nos ha contactado</b>Aquí aparecen sus llamadas con Jason, sus citas y sus mensajes.' : 'Cargando…' });
   }
 }
+function capaNota(c) {
+  const p = personaDe(c.tel); if (!p) return cerrar();
+  marco('Nota de ' + nombreDe(p), '', `<form class="hoja editando" id="f" style="align-self:start"><textarea class="campo" id="txt" rows="7" placeholder="Lo que el equipo debe saber de este cliente">${esc(p.notas_equipo || '')}</textarea><button class="boton">Guardar nota</button><div class="aviso" id="aviso"></div></form>`);
+  const f = document.getElementById('f');
+  setTimeout(() => document.getElementById('txt').focus(), 300);
+  f.onsubmit = async e => { e.preventDefault(); const v = document.getElementById('txt').value; const r = await api('editar_persona', { tel: c.tel, notas_equipo: v }); if (r.ok) { p.notas_equipo = v; cerrar(); } else document.getElementById('aviso').textContent = 'No se pudo guardar.'; };
+}
 function capaNuevoCliente(c) {
-  marco('Nuevo cliente', '', `<form class="hoja editando" id="f" style="grid-template-rows:auto auto auto auto minmax(0,1fr) auto">
+  marco('Nuevo cliente', '', `<form class="hoja editando" id="f" style="align-self:start">
     <input class="campo" name="negocio" placeholder="Negocio (ej. Grupo Beta)" maxlength="120">
     <input class="campo" name="nombre" placeholder="Nombre de la persona" maxlength="80">
     <input class="campo" name="telefono" placeholder="Teléfono (opcional)" inputmode="tel" maxlength="30">
@@ -619,44 +725,68 @@ function capaProyectos(c) {
   document.getElementById('accion').onclick = () => abrir({ tipo: 'nuevoProyecto' });
   alCambiarTamano = paginar(app.querySelector('.cuerpo'), fil[c.f], filaProyecto, { pagina: c.p, vacio: '<b>Sin proyectos aquí</b>Ábrelos con el botón +.', alPintar: l => l.querySelectorAll('[data-y]').forEach(b => b.onclick = () => abrir({ tipo: 'proyecto', id: Number(b.dataset.y) })) });
 }
+function anilloFases(fi) {
+  const n = 6, R = 80, cx = 100, cy = 100, hueco = 0.12, arcos = [];
+  for (let i = 0; i < n; i++) {
+    const a0 = -Math.PI / 2 + i * 2 * Math.PI / n + hueco / 2, a1 = a0 + 2 * Math.PI / n - hueco;
+    const x0 = cx + R * Math.cos(a0), y0 = cy + R * Math.sin(a0), x1 = cx + R * Math.cos(a1), y1 = cy + R * Math.sin(a1);
+    const col = i < fi ? 'var(--cobalto)' : i === fi ? 'var(--cielo)' : 'var(--niebla)';
+    arcos.push(`<path${i === fi ? ' class="actual"' : ''} d="M${x0.toFixed(1)} ${y0.toFixed(1)} A${R} ${R} 0 0 1 ${x1.toFixed(1)} ${y1.toFixed(1)}" stroke="${col}" stroke-width="18" fill="none" stroke-linecap="round"/>`);
+  }
+  const pct = Math.round(fi / (n - 1) * 100);
+  return `<svg viewBox="0 0 200 200" role="img" aria-label="Avance ${pct}%">${arcos.join('')}<text x="100" y="98" text-anchor="middle" font-size="40" font-weight="800" fill="var(--tinta)" font-family="inherit">${pct}%</text><text x="100" y="124" text-anchor="middle" font-size="13" font-weight="700" fill="var(--suave)" font-family="inherit">fase ${fi + 1} de ${n}</text></svg>`;
+}
 function capaProyecto(c) {
+  const editar = c.tipo === 'nuevoProyecto' || c.tipo === 'editarProyecto';
   const nuevo = c.tipo === 'nuevoProyecto';
   const p = nuevo ? { nombre: '', fase: 'por arrancar', encargados: yo(), tel: c.tel || '', nota: '' } : proyectoDe(c.id);
   if (!p) return cerrar();
-  c.tab = c.tab || (nuevo ? 'datos' : 'fase');
-  const fases = D.listas.fases, fi = fases.indexOf(p.fase);
+  const fases = D.listas.fases, fi = Math.max(0, fases.indexOf(p.fase));
   const clientes = reales().filter(x => x.etapa !== 'archivo');
-  const tareas = nuevo ? [] : D.tareas.filter(x => x.proyecto == p.id);
-  const formDatos = `<form class="hoja editando" id="f" style="grid-template-rows:auto auto auto minmax(0,1fr) auto">
+  const cli = personaDe(p.tel);
+  if (editar) {
+    marco(nuevo ? 'Nuevo proyecto' : 'Editar proyecto', '', `<form class="hoja editando" id="f" style="align-self:start">
       <input class="campo" name="nombre" placeholder="Nombre del proyecto" value="${esc(p.nombre)}" required maxlength="100">
       <select class="campo" name="tel"><option value="">MOON (proyecto interno)</option>${clientes.map(x => `<option value="${esc(x.tel)}"${x.tel === p.tel ? ' selected' : ''}>${esc(nombreDe(x))}</option>`).join('')}</select>
       <div><div class="eti" style="margin-bottom:8px">Encargados</div><div class="quien" id="enc">${Object.keys(GENTE).map(id => `<button type="button" data-u="${id}" class="${String(p.encargados).split(',').includes(id) ? 'on' : ''}">${ava(id)}${GENTE[id].n}</button>`).join('')}</div></div>
-      <textarea class="campo" name="nota" placeholder="Nota corta: de qué trata" style="height:100%;min-height:60px">${esc(p.nota)}</textarea>
-      <button class="boton">${nuevo ? 'Abrir proyecto' : 'Guardar'}</button><div class="aviso" id="aviso"></div></form>`;
-  let cuerpo;
-  if (nuevo) cuerpo = formDatos;
-  else cuerpo = `<div class="cuerpo" style="grid-template-rows:auto minmax(0,1fr)"><div class="tabs"><button data-tab="fase" class="${c.tab === 'fase' ? 'on' : ''}">Fase</button><button data-tab="tareas" class="${c.tab === 'tareas' ? 'on' : ''}">Tareas ${tareas.filter(x => x.estado !== 'hecha').length || ''}</button><button data-tab="datos" class="${c.tab === 'datos' ? 'on' : ''}">Datos</button></div>
-    ${c.tab === 'fase' ? `<div class="hoja" style="align-content:center;gap:clamp(10px,2vh,18px)"><div class="eti" style="text-align:center">${esc(personaDe(p.tel) ? nombreDe(personaDe(p.tel)) : 'MOON')}</div><div class="fases" id="fases">${fases.map((f, i) => `<button data-f="${esc(f)}" class="${i < fi ? 'hecha' : i === fi ? 'on' : ''}"><i>${i < fi ? "✓" : i + 1}</i>${esc(f[0].toUpperCase() + f.slice(1))}</button>`).join('')}</div><p style="text-align:center;color:var(--suave);font-weight:600">${esc(p.nota || 'Toca una fase para moverlo.')}</p><div style="display:flex;justify-content:center">${avas(p.encargados)}</div></div>`
-      : c.tab === 'tareas' ? `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr) auto auto"><div class="lista"></div><div class="pie"></div><button class="boton dos" id="nt">Dejar una tarea de este proyecto</button></div>` : formDatos}</div>`;
-  marco(nuevo ? 'Nuevo proyecto' : p.nombre, '', cuerpo);
-  app.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => { c.tab = b.dataset.tab; c.p = 0; pinta(true); });
-  if (c.tab === 'fase' && !nuevo) app.querySelectorAll('#fases [data-f]').forEach(b => b.onclick = async () => { const r = await api('proyecto', { id: p.id, fase: b.dataset.f }); if (r.ok) { p.fase = b.dataset.f; pinta(true); recargar(); } });
-  if (c.tab === 'tareas' && !nuevo) {
-    document.getElementById('nt').onclick = () => abrir({ tipo: 'nuevaTarea', proyecto: p.id });
-    alCambiarTamano = paginar(app.querySelector('.vista .cuerpo .cuerpo'), tareas.sort((a, b) => (a.estado === 'hecha') - (b.estado === 'hecha') || b.id - a.id), x => filaTarea(x).replace(ava(x.de, 1), ava(x.para, 1)), { pagina: c.p, vacio: '<b>Sin tareas</b>Deja la primera con el botón de abajo.', alPintar: l => l.querySelectorAll('[data-t]').forEach(b => b.onclick = () => abrir({ tipo: 'tarea', id: Number(b.dataset.t) })) });
-  }
-  const f = document.getElementById('f');
-  if (f) {
+      <textarea class="campo" name="nota" rows="3" placeholder="En una o dos frases: de qué trata">${esc(p.nota)}</textarea>
+      <button class="boton">${nuevo ? 'Abrir proyecto' : 'Guardar'}</button><div class="aviso" id="aviso"></div></form>`);
     app.querySelectorAll('#enc button').forEach(b => b.onclick = () => b.classList.toggle('on'));
+    const f = document.getElementById('f');
     f.onsubmit = async e => {
       e.preventDefault(); const fd = new FormData(f);
       const datos = { nombre: fd.get('nombre'), tel: fd.get('tel'), nota: fd.get('nota'), encargados: [...app.querySelectorAll('#enc button.on')].map(b => b.dataset.u).join(',') };
       if (!nuevo) datos.id = p.id;
       const r = await api('proyecto', datos);
-      if (r.ok) { await recargar(); if (nuevo) { reemplazar({ tipo: 'proyecto', id: r.id }); } else { c.tab = 'fase'; pinta(true); } }
+      if (r.ok) { await recargar(); nuevo ? reemplazar({ tipo: 'proyecto', id: r.id }) : cerrar(); }
       else document.getElementById('aviso').textContent = 'No se pudo guardar.';
     };
+    return;
   }
+  c.tab = c.tab || 'fase';
+  const tareas = D.tareas.filter(x => x.proyecto == p.id);
+  const abiertas = tareas.filter(x => x.estado !== 'hecha').length;
+  let cuerpo;
+  if (c.tab === 'fase') cuerpo = `<div class="hoja" style="align-content:center;justify-items:center;gap:clamp(8px,1.8vh,16px)">
+      <span class="eti">${esc(cli ? nombreDe(cli) : 'Proyecto de MOON')}</span>
+      <div class="avance">${anilloFases(fi)}<div class="fase-n">${esc(fases[fi][0].toUpperCase() + fases[fi].slice(1))}</div><div class="fase-m">${esc(FASE_TXT[fases[fi]] || '')}</div></div>
+      <div class="pils" id="fases" style="justify-content:center">${fases.map((f, i) => `<button class="pil solo${i === fi ? ' on' : ''}" data-f="${esc(f)}" style="--c:#fff;--cf:${i < fi ? 'var(--cielo)' : 'var(--cobalto)'}">${esc(f[0].toUpperCase() + f.slice(1))}</button>`).join('')}</div>
+      <span class="mini pista">Toca una fase para mover el proyecto</span></div>`;
+  else if (c.tab === 'tareas') cuerpo = `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr) auto auto"><div class="lista"></div><div class="pie"></div><button class="boton dos" id="nt">Dejar una tarea de este proyecto</button></div>`;
+  else cuerpo = `<div class="hoja" style="align-self:start">
+      <div class="par"><span>Cliente</span><b>${esc(cli ? nombreDe(cli) : 'MOON (interno)')}</b></div>
+      <div class="par"><span>Encargados</span><b>${String(p.encargados || '').split(',').filter(x => GENTE[x]).map(x => GENTE[x].n).join(', ') || 'Nadie todavía'}</b></div>
+      <div class="par"><span>De qué trata</span><b style="white-space:pre-line">${esc(p.nota || 'Sin descripción todavía')}</b></div>
+      <div class="par"><span>Abierto</span><b>${cuando(p.creado)}</b></div>
+      <button class="boton dos" id="editar">Editar datos</button></div>`;
+  marco(p.nombre, '', `<div class="cuerpo" style="grid-template-rows:auto minmax(0,1fr)"><div class="tabs"><button data-tab="fase" class="${c.tab === 'fase' ? 'on' : ''}">Fase</button><button data-tab="tareas" class="${c.tab === 'tareas' ? 'on' : ''}">Tareas (${abiertas})</button><button data-tab="datos" class="${c.tab === 'datos' ? 'on' : ''}">Datos</button></div>${cuerpo}</div>`);
+  app.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => { c.tab = b.dataset.tab; c.p = 0; pinta(true); });
+  if (c.tab === 'fase') app.querySelectorAll('#fases [data-f]').forEach(b => b.onclick = async () => { const r = await api('proyecto', { id: p.id, fase: b.dataset.f }); if (r.ok) { p.fase = b.dataset.f; pinta(true); recargar(); } });
+  if (c.tab === 'tareas') {
+    document.getElementById('nt').onclick = () => abrir({ tipo: 'nuevaTarea', proyecto: p.id });
+    alCambiarTamano = paginar(app.querySelector('.vista .cuerpo .cuerpo'), tareas.sort((a, b) => (a.estado === 'hecha') - (b.estado === 'hecha') || b.id - a.id), x => filaTarea(x).replace(ava(x.de, 1), ava(x.para, 1)), { pagina: c.p, vacio: '<b>Sin tareas</b>Deja la primera con el botón de abajo.', alPintar: l => l.querySelectorAll('[data-t]').forEach(b => b.onclick = () => abrir({ tipo: 'tarea', id: Number(b.dataset.t) })) });
+  }
+  if (c.tab === 'datos') document.getElementById('editar').onclick = () => abrir({ tipo: 'editarProyecto', id: p.id });
 }
 
 /* ---------- Lector: texto largo completo, en páginas, nunca cortado ---------- */
@@ -680,16 +810,19 @@ function capaLector(c) {
   dibuja(); alCambiarTamano = dibuja;
 }
 
-/* ---------- Equipo ---------- */
+/* ---------- Equipo: credenciales como las de Aliados de Kidviniflo ---------- */
 function capaEquipo() {
   const ids = ['daniel', 'dan', 'kid'];
-  marco('Equipo', '', `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr)"><div class="lista" style="grid-template-rows:repeat(3,minmax(0,1fr))">${ids.map(id => {
+  marco('Equipo', '', `<div class="creds">${ids.map((id, k) => {
     const t = D.tareas.filter(x => x.para === id), ab = t.filter(x => x.estado !== 'hecha');
     const nv = ab.filter(x => x.estado === 'nueva').length, at = ab.filter(atrasada).length, he = t.filter(x => x.estado === 'hecha').length;
     const pr = D.proyectos.filter(p => p.fase !== 'entregado' && String(p.encargados).split(',').includes(id)).length;
-    return `<button class="t" data-u="${id}" style="flex-direction:row;align-items:center;gap:14px">${ava(id)}<span style="min-width:0;flex:1;display:grid;gap:4px"><b style="font-size:17px">${GENTE[id].n}${id === yo() ? ' (tú)' : ''}</b><span class="pils">
-      <span class="estado" style="--c:#fff;--cf:var(--cobalto)">${nv} sin ver</span><span class="estado" style="--c:var(--suave);--cf:var(--campo)">${ab.length} abiertas</span>${at ? `<span class="estado" style="--c:var(--rojo);--cf:var(--rojof)">${at} atrasadas</span>` : ''}<span class="estado" style="--c:var(--verde);--cf:var(--verdef)">${he} hechas</span></span><span class="mini">${pr} proyecto${pr === 1 ? '' : 's'} a su cargo</span></span></button>`;
-  }).join('')}</div></div>`);
+    // La foto sale de api/_fotos.js (privada); si falta, sale su inicial.
+    return `<button class="cred${id === yo() ? ' yo' : ''}" data-u="${id}" style="--c:${GENTE[id].c}"><span class="marca-c"><span class="logo" style="height:1.5em"></span> · EQUIPO</span><span class="nom">${GENTE[id].n}</span><span class="linea"></span><span class="rol">${ROL[id]}</span>
+      <span class="foto">${FOTOS[id] ? `<img src="${FOTOS[id]}" alt="Foto de ${GENTE[id].n}">` : GENTE[id].i}</span>
+      <span class="datos"><span class="dato ojo-n"><span>sin ver</span><b>${nv}</b></span><span class="dato"><span>abiertas</span><b>${ab.length}</b></span>${at ? `<span class="dato" style="color:#c0392b"><span>atrasadas</span><b style="color:#c0392b">${at}</b></span>` : ''}<span class="dato"><span>hechas</span><b>${he}</b></span><span class="dato"><span>proyectos</span><b>${pr}</b></span></span>
+      <span class="num-c">#00${k + 1}${id === yo() ? ' · tú' : ''}</span></button>`;
+  }).join('')}</div>`);
   app.querySelectorAll('[data-u]').forEach(b => b.onclick = () => abrir({ tipo: 'tareas', persona: b.dataset.u }));
 }
 
