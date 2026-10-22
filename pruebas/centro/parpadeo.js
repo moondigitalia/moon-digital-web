@@ -6,9 +6,9 @@ await p.goto('http://localhost:8765/');await p.click('[data-u="kid"]');await p.f
 await p.evaluate(()=>{window.__rep=0;new MutationObserver(m=>{if(m.some(x=>x.type==='childList'&&x.target.id==='app'))window.__rep++}).observe(document.getElementById('app'),{childList:true});});
 const paso=async(nom,f)=>{await p.evaluate(()=>window.__rep=0);await f();await p.waitForTimeout(1800);const n=await p.evaluate(()=>window.__rep);console.log(nom,'repintadas:',n);if(n>1)fallas.push(nom+' '+n);};
 await paso('crm',()=>p.click('[data-ir="crm"]',{position:{x:12,y:12}}));
-await paso('ficha',()=>p.click('[data-p]'));
+await paso('lista',()=>p.click('[data-g="todos"]'));await paso('ficha',()=>p.click('[data-p]'));
 await paso('tab datos',()=>p.click('[data-tab="datos"]'));
-await paso('volver',()=>p.click('#volver'));await paso('volver2',()=>p.click('#volver'));
+await paso('volver',()=>p.click('#volver'));await paso('volver2',()=>p.click('#volver'));await paso('volver3',()=>p.click('#volver'));
 await paso('clientes',()=>p.click('[data-ir="clientes"]',{position:{x:12,y:12}}));
 await paso('cliente',()=>p.click('[data-c]'));
 await paso('tab proyectos',()=>p.click('[data-tab="proyectos"]'));
