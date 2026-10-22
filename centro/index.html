@@ -147,6 +147,10 @@ textarea.campo{height:auto;border-radius:22px;padding:14px 18px;resize:none}
 .gente button{display:grid;justify-items:center;gap:8px;font-weight:800;font-size:15px}
 .gente .ava{width:clamp(72px,21vw,92px);height:clamp(72px,21vw,92px);font-size:26px;box-shadow:var(--sombra);transition:transform .3s var(--ease)}
 .gente button:active .ava{transform:scale(.95)}
+.conojo{position:relative;display:block;width:100%}
+.conojo .campo{padding-right:54px}
+.ojo{position:absolute;right:5px;top:50%;transform:translateY(-50%);width:38px;height:38px;border-radius:50%;display:grid;place-items:center;color:var(--suave)}
+.ojo svg{width:20px;height:20px}
 .codigo{letter-spacing:.5em;text-align:center;font-size:22px;font-weight:800}
 .enlace{font-weight:700;color:var(--cobalto);font-size:14px}
 
@@ -188,6 +192,8 @@ const I = {
   der: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>',
   tel: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>',
   wa: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21l1.7-5A8.5 8.5 0 1 1 8 19.4L3 21"/></svg>',
+  ojo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>',
+  ojoNo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18M10.6 5.1A10.7 10.7 0 0 1 12 5c6.5 0 10 7 10 7a17 17 0 0 1-3.2 4.2M6.6 6.6C3.7 8.4 2 12 2 12s3.5 7 10 7c1.9 0 3.6-.6 5-1.5"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>',
   lupa: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>',
 };
 
@@ -281,14 +287,27 @@ async function pantallaQuien() {
   g.querySelectorAll('button').forEach(b => b.onclick = () => { const u = r.usuarios.find(x => x.id === b.dataset.u); u.tieneClave ? pantallaClave(u) : pantallaCodigo(u); });
 }
 
+// Campo de contraseña con ojito para ver lo que se escribe (por ejemplo, para tomarle captura).
+function campoClave(id, ph, ac) {
+  return `<label class="conojo"><input class="campo" id="${id}" type="password" autocomplete="${ac}" placeholder="${ph}" required minlength="${ac === 'new-password' ? 6 : 1}"><button type="button" class="ojo" data-ojo="${id}" aria-label="Mostrar contraseña">${I.ojo}</button></label>`;
+}
+function activarOjos() {
+  app.querySelectorAll('[data-ojo]').forEach(b => b.onclick = () => {
+    const i = document.getElementById(b.dataset.ojo), ver = i.type === 'password';
+    i.type = ver ? 'text' : 'password';
+    b.innerHTML = ver ? I.ojoNo : I.ojo; b.setAttribute('aria-label', ver ? 'Ocultar contraseña' : 'Mostrar contraseña');
+    i.focus();
+  });
+}
 function marcoEntrada(u, html) {
   app.innerHTML = `<div class="top"><button class="redondo" id="volver" aria-label="Regresar">${I.atras}</button><div class="marca">CENTRO <i>/</i> MOON</div></div><div class="entrada"><div class="caja">${ava(u.id)}${html}</div></div>`;
   document.getElementById('volver').onclick = pantallaQuien;
+  activarOjos();
 }
 
 function pantallaClave(u) {
   marcoEntrada(u, `<h1>Hola, ${esc(u.nombre)}</h1><p>Escribe tu contraseña. Solo te la pedimos esta vez en este aparato.</p>
-    <form id="f" style="display:grid;gap:12px;width:100%"><input class="campo" id="clave" type="password" autocomplete="current-password" placeholder="Tu contraseña" required>
+    <form id="f" style="display:grid;gap:12px;width:100%">${campoClave('clave', 'Tu contraseña', 'current-password')}
     <button class="boton">Entrar</button><div class="aviso" id="aviso"></div></form><button class="enlace" id="olvide">Olvidé mi contraseña</button>`);
   const f = document.getElementById('f'), av = document.getElementById('aviso');
   setTimeout(() => document.getElementById('clave').focus(), 300);
@@ -326,8 +345,8 @@ async function pantallaCodigo(u) {
 
 function pantallaNueva(u, codigo) {
   marcoEntrada(u, `<h1>Crea tu contraseña</h1><p>Mínimo 6 letras o números. Este aparato quedará recordado.</p>
-    <form id="f" style="display:grid;gap:12px;width:100%"><input class="campo" id="c1" type="password" autocomplete="new-password" placeholder="Contraseña nueva" required minlength="6">
-    <input class="campo" id="c2" type="password" autocomplete="new-password" placeholder="Repítela" required minlength="6">
+    <form id="f" style="display:grid;gap:12px;width:100%">${campoClave('c1', 'Contraseña nueva', 'new-password')}
+    ${campoClave('c2', 'Repítela', 'new-password')}
     <button class="boton">Entrar al Centro</button><div class="aviso" id="aviso"></div></form>`);
   const f = document.getElementById('f'), av = document.getElementById('aviso');
   f.onsubmit = async e => {
