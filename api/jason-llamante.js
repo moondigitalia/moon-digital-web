@@ -52,6 +52,18 @@ module.exports = async (req, res) => {
   const clave = req.headers['x-clave'];
   if (!clave || (d.agent_id && d.agent_id !== JASON) || !d.caller_id) { contestar(); return; }
 
+  // Diagnóstico temporal (solo con clave): mide cuánto tarda la agenda desde aquí.
+  if (d.diag) {
+    const t0 = Date.now(); let info = {};
+    try {
+      const r = await fetch(AGENDA, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ accion: 'llamante', clave, telefono: d.caller_id }), redirect: 'manual' });
+      info.paso1 = { status: r.status, ms: Date.now() - t0, loc: (r.headers.get('location') || '').slice(0, 60) };
+      const loc = r.headers.get('location');
+      if (loc) { const t1 = Date.now(); const r2 = await fetch(loc); info.paso2 = { status: r2.status, ms: Date.now() - t1, txt: (await r2.text()).slice(0, 120) }; }
+    } catch (e) { info.error = e.message; }
+    res.status(200).json(info); return;
+  }
+
   // Se pregunta a la vez a la agenda (citas) y a la libreta central (todos los canales: llamadas, WhatsApp, cuestionarios).
   const control = new AbortController();
   const reloj = setTimeout(() => control.abort(), ESPERA_MS);
