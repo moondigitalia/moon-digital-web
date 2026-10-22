@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <meta name="robots" content="noindex, nofollow">
 <title>Centro MOON</title>
 <meta name="color-scheme" content="light dark">
@@ -30,15 +30,19 @@
   --naranja:#f2a052; --naranjaf:#3a2a1a; --verde:#5cc283; --verdef:#183026; --rojo:#ef7b72; --rojof:#3a1f1d; --azulf:#1c2740; --moradof:#272241; --morado:#a493ff;
 }}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0}
-html,body{height:100%;overflow:hidden;background:var(--fondo);color:var(--tinta);font-family:Manrope,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;font-size:15px;line-height:1.35;-webkit-font-smoothing:antialiased}
+html,body{position:fixed;inset:0;width:100%;height:100%;overflow:hidden;overscroll-behavior:none;touch-action:manipulation;-webkit-text-size-adjust:100%;text-size-adjust:100%;background:var(--fondo);color:var(--tinta);font-family:Manrope,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;font-size:15px;line-height:1.35;-webkit-font-smoothing:antialiased}
 button,input,select,textarea{font:inherit;color:inherit;border:0;background:none}
+input,select,textarea{font-size:16px;min-width:0}
+.buscador input{width:0}   /* 16px o más: el iPhone ya no hace zoom solo al tocar un campo */
 button{cursor:pointer}
 [hidden]{display:none!important}
-.app{height:100vh;height:100dvh;max-width:1180px;margin:0 auto;padding:max(14px,env(safe-area-inset-top)) 16px max(14px,env(safe-area-inset-bottom));display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);gap:clamp(10px,1.8vh,16px)}
+/* La página nunca se mueve: el marco ocupa exactamente lo que se ve (y se encoge cuando sube el teclado). */
+#marco{position:fixed;left:0;right:0;top:var(--vt,0px);height:var(--vh,100%);overflow:hidden}
+.app{zoom:var(--z,1);height:calc(var(--vh,100vh) / var(--z,1));max-width:1180px;margin:0 auto;padding:max(14px,env(safe-area-inset-top)) 16px max(14px,env(safe-area-inset-bottom));display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);gap:clamp(10px,calc(1.8 * var(--u)),16px)}
 .eti{font-size:11px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--suave)}
 .top{display:flex;align-items:center;gap:12px;min-height:44px}
-.marca{display:flex;align-items:center;gap:10px;font-size:clamp(12px,3.4vw,15px);font-weight:800;letter-spacing:.3em;white-space:nowrap}
-.logo{display:inline-block;height:clamp(24px,6.6vw,32px);aspect-ratio:2496/682;background:currentColor;-webkit-mask:url(logo.svg) center/contain no-repeat;mask:url(logo.svg) center/contain no-repeat}
+.marca{display:flex;align-items:center;gap:10px;font-size:clamp(12px,calc(3.4 * var(--w)),15px);font-weight:800;letter-spacing:.3em;white-space:nowrap}
+.logo{display:inline-block;height:clamp(24px,calc(6.6 * var(--w)),32px);aspect-ratio:2496/682;background:currentColor;-webkit-mask:url(logo.svg) center/contain no-repeat;mask:url(logo.svg) center/contain no-repeat}
 .marca i{font-style:normal;color:var(--cobalto);font-weight:600;letter-spacing:0}
 .top .esp{flex:1}
 .redondo{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;color:inherit;text-decoration:none;background:var(--tarjeta);box-shadow:var(--sombra-chica);flex:none;transition:transform .25s var(--ease)}
@@ -47,17 +51,21 @@ button{cursor:pointer}
 .ava{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:15px;color:#fff;flex:none;background:var(--c,var(--cobalto))}
 .ava.chico{width:26px;height:26px;font-size:11px;border:2px solid var(--tarjeta)}
 .avas{display:flex}.avas .ava.chico+.ava.chico{margin-left:-8px}
-.vista{min-height:0;min-width:0;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);gap:clamp(8px,1.6vh,14px);animation:entra .45s var(--ease) both}
-@keyframes entra{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-@media (prefers-reduced-motion:reduce){.vista{animation:fundido .3s ease both}@keyframes fundido{from{opacity:0}to{opacity:1}}.redondo,.t,.fila,.pil{transition:none!important}}
+.vista{min-height:0;min-width:0;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);gap:clamp(8px,calc(1.6 * var(--u)),14px);animation:entra .38s var(--ease) both}
+@keyframes entra{from{opacity:0;transform:scale(.985)}to{opacity:1;transform:none}}
+/* Cambio de pantalla con fundido cruzado (la anterior se desvanece mientras entra la nueva): igual con o sin "reducir movimiento". */
+::view-transition-old(root){animation:sale .28s var(--ease) both}
+::view-transition-new(root){animation:entra .38s var(--ease) both}
+@keyframes sale{to{opacity:0}}
+.vt .vista{animation:none}
 
 /* ---------- Inicio ---------- */
-.hola{font-size:clamp(22px,6.4vw,34px);font-weight:700;letter-spacing:-.02em;line-height:1.1}
+.hola{font-size:clamp(22px,calc(6.4 * var(--w)),34px);font-weight:700;letter-spacing:-.02em;line-height:1.1}
 .hola small{display:block;font-size:13px;font-weight:600;color:var(--suave);letter-spacing:0;margin-top:4px}
-.mosaico{min-height:0;display:grid;gap:clamp(9px,1.5vh,14px);grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:1.35fr 1fr 1fr .5fr;grid-template-areas:"tuyo tuyo" "crm proy" "equipo moon" "ultimo ultimo"}
-.t{position:relative;min-height:0;border-radius:var(--r);background:var(--tarjeta);box-shadow:var(--sombra);padding:clamp(12px,2vh,18px) 16px;text-align:start;display:flex;flex-direction:column;gap:6px;overflow:hidden;transition:transform .3s var(--ease)}
+.mosaico{min-height:0;display:grid;gap:clamp(9px,calc(1.5 * var(--u)),14px);grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:1.35fr 1fr 1fr .5fr;grid-template-areas:"tuyo tuyo" "crm proy" "equipo moon" "ultimo ultimo"}
+.t{position:relative;min-height:0;border-radius:var(--r);background:var(--tarjeta);box-shadow:var(--sombra);padding:clamp(12px,calc(2 * var(--u)),18px) 16px;text-align:start;display:flex;flex-direction:column;gap:6px;overflow:hidden;transition:transform .3s var(--ease)}
 .t:active{transform:scale(.985)}
-.t .num{font-size:clamp(28px,7.5vh,52px);font-weight:800;letter-spacing:-.03em;line-height:1;margin-top:auto}
+.t .num{font-size:clamp(28px,calc(7.5 * var(--u)),52px);font-weight:800;letter-spacing:-.03em;line-height:1;margin-top:auto}
 .t .sub{font-size:13px;line-height:1.25;color:var(--suave);font-weight:600}
 .t>.eti{padding-right:34px;line-height:1.3}
 .t .flecha{position:absolute;top:12px;right:12px;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:var(--fondo);box-shadow:var(--hundido)}
@@ -73,15 +81,14 @@ button{cursor:pointer}
 .brilla i{width:18px;height:18px;border-radius:50%;background:var(--cobalto);color:#fff;display:grid;place-items:center;font-style:normal;font-size:11px}
 .latido{animation:latido 2.4s ease-in-out infinite}
 @keyframes latido{0%,100%{opacity:1}50%{opacity:.55}}
-@media (prefers-reduced-motion:reduce){.latido{animation:none}}
 .barrita{display:flex;gap:4px;height:6px;margin-top:4px}
 .barrita i{flex:var(--n);border-radius:9px;background:var(--c)}
 
 /* ---------- Capas ---------- */
 .cabeza{display:flex;align-items:center;gap:12px;min-height:44px}
-.cabeza h2{font-size:clamp(17px,5vw,26px);line-height:1.15;font-weight:800;letter-spacing:-.01em;flex:1;min-width:0;overflow-wrap:anywhere}
+.cabeza h2{font-size:clamp(17px,calc(5 * var(--w)),26px);line-height:1.15;font-weight:800;letter-spacing:-.01em;flex:1;min-width:0;overflow-wrap:anywhere}
 .cabeza .accion{background:var(--cobalto);color:#fff;box-shadow:0 10px 18px -8px rgba(11,79,214,.6)}
-.cuerpo{min-height:0;display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:10px}
+.cuerpo{min-height:0;min-width:0;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto;gap:10px}
 .pils{display:flex;gap:7px;flex-wrap:wrap}
 .pil{display:inline-flex;align-items:center;gap:7px;border-radius:99px;padding:7px 13px 7px 8px;font-size:13px;font-weight:700;background:var(--tarjeta);box-shadow:var(--sombra-chica);color:var(--suave);transition:background .25s,color .25s}
 .pil i{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:11px;font-weight:800;color:#fff;background:var(--c,var(--tenue))}
@@ -123,7 +130,7 @@ textarea.campo{height:auto;border-radius:22px;padding:14px 18px;resize:none}
 .quien button{display:flex;align-items:center;gap:8px;border-radius:99px;padding:5px 14px 5px 5px;background:var(--tarjeta);box-shadow:var(--sombra-chica);font-weight:700;font-size:14px;opacity:.6;transition:opacity .25s,box-shadow .25s}
 .quien button .ava{width:30px;height:30px;font-size:12px}
 .quien button.on{opacity:1;box-shadow:var(--sombra-chica),inset 0 0 0 2px var(--cobalto)}
-.fases{display:grid;gap:clamp(4px,1vh,10px);justify-self:center;width:min(100%,320px)}
+.fases{display:grid;gap:clamp(4px,calc(1 * var(--u)),10px);justify-self:center;width:min(100%,320px)}
 .fases button{display:flex;align-items:center;gap:12px;font-size:15px;font-weight:700;color:var(--tenue);text-align:start}
 .fases button i{width:30px;height:30px;border-radius:50%;background:var(--campo);box-shadow:var(--hundido);display:grid;place-items:center;font-style:normal;font-size:12px;font-weight:800}
 .fases button.hecha i{background:var(--cielo);color:#fff;box-shadow:none}
@@ -140,13 +147,14 @@ textarea.campo{height:auto;border-radius:22px;padding:14px 18px;resize:none}
 .mini{font-size:12px;color:var(--suave);font-weight:600}
 
 /* Entrada */
-.entrada{height:100%;display:grid;place-items:center}
+.entrada{height:100%;min-height:0;display:grid;place-items:center;animation:entra .38s var(--ease) both}
+.vt .entrada{animation:none}
 .entrada .caja{width:min(420px,100%);display:grid;gap:16px;justify-items:center;text-align:center}
-.entrada h1{font-size:clamp(22px,6vw,28px);font-weight:800;letter-spacing:-.01em}
+.entrada h1{font-size:clamp(22px,calc(6 * var(--w)),28px);font-weight:800;letter-spacing:-.01em}
 .entrada p{color:var(--suave);font-weight:600;font-size:14px}
-.gente{display:flex;gap:clamp(12px,4vw,22px);justify-content:center}
+.gente{display:flex;gap:clamp(12px,calc(4 * var(--w)),22px);justify-content:center}
 .gente button{display:grid;justify-items:center;gap:8px;font-weight:800;font-size:15px}
-.gente .ava{width:clamp(72px,21vw,92px);height:clamp(72px,21vw,92px);font-size:26px;box-shadow:var(--sombra);transition:transform .3s var(--ease)}
+.gente .ava{width:clamp(72px,calc(21 * var(--w)),92px);height:clamp(72px,calc(21 * var(--w)),92px);font-size:26px;box-shadow:var(--sombra);transition:transform .3s var(--ease)}
 .gente button:active .ava{transform:scale(.95)}
 .conojo{position:relative;display:block;width:100%}
 .conojo .campo{padding-right:54px}
@@ -168,59 +176,83 @@ textarea.campo{height:auto;border-radius:22px;padding:14px 18px;resize:none}
 .t-tuyo .xi.nueva small{color:var(--cobalto)}
 .xmas{font-size:12px;font-weight:800;color:var(--suave);flex:none}
 .t-tuyo .xmas{color:rgba(255,255,255,.85)}
-.xtxt{font-size:clamp(13px,1.9vh,16px);font-weight:700;line-height:1.35;color:var(--suave);flex:none}
+.xtxt{font-size:clamp(13px,calc(1.9 * var(--u)),16px);font-weight:700;line-height:1.35;color:var(--suave);flex:none}
 /* Anillo de fases */
-.avance{display:grid;justify-items:center;gap:clamp(6px,1.4vh,12px);text-align:center}
-.avance svg{width:min(230px,52vw,26vh);height:auto;overflow:visible}
-.avance .fase-n{font-size:clamp(22px,4vh,30px);font-weight:800;letter-spacing:-.01em}
+.avance{display:grid;justify-items:center;gap:clamp(6px,calc(1.4 * var(--u)),12px);text-align:center}
+.avance svg{width:min(230px,calc(52 * var(--w)),calc(26 * var(--u)));height:auto;overflow:visible}
+.avance .fase-n{font-size:clamp(22px,calc(4 * var(--u)),30px);font-weight:800;letter-spacing:-.01em}
 .avance .fase-m{font-weight:700;color:var(--suave);max-width:34ch}
 .actual{animation:latido 2.4s ease-in-out infinite}
-@media (prefers-reduced-motion:reduce){.actual{animation:none}}
-/* Credenciales del equipo */
-.creds{min-height:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(8px,2vw,18px)}
-.cred{container-type:inline-size;position:relative;min-height:0;border-radius:22px;background:linear-gradient(160deg,#f7f2e8,#ece4d4);color:#18171c;box-shadow:var(--sombra);padding:clamp(10px,7cqw,22px);display:flex;flex-direction:column;gap:clamp(4px,3cqw,10px);text-align:start;overflow:hidden}
-.cred .marca-c{display:flex;align-items:center;gap:6px;font-size:clamp(8px,6.2cqw,12px);font-weight:800;letter-spacing:.18em;color:#6b655a}
-.cred .nom{font-size:clamp(18px,19cqw,46px);font-weight:800;letter-spacing:-.03em;line-height:.95;overflow-wrap:anywhere}
-.cred .linea{border-top:2px dashed #b3ab9c}
-.cred .rol{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:clamp(10px,7.4cqw,15px);color:#3b3832;line-height:1.25}
-.cred .foto{flex:1 1 0;min-height:0;border-radius:16px;background:var(--c);display:grid;place-items:center;color:#fff;font-weight:800;font-size:clamp(22px,24cqw,64px);overflow:hidden;position:relative}
-.cred .foto img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 30%}
-.cred .datos{display:grid;gap:4px}
-.cred .dato{display:flex;justify-content:space-between;align-items:baseline;gap:6px;font-size:clamp(10px,7.2cqw,14px);font-weight:700;color:#4b473f}
-.cred .dato b{font-size:clamp(14px,11cqw,24px);color:#18171c}
-.cred .dato.ojo-n b{color:#0b4fd6}
-.cred .num-c{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:clamp(9px,6.4cqw,12px);color:#8a8375}
-.cred.yo{box-shadow:var(--sombra),inset 0 0 0 3px #0b4fd6}
+.cifras{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.cifra{border-radius:20px;background:var(--tarjeta);box-shadow:var(--sombra-chica);padding:clamp(8px,calc(1.4 * var(--u)),12px) 10px;text-align:center}
+.cifra b{display:block;font-size:clamp(22px,calc(3.6 * var(--u)),32px);font-weight:800;letter-spacing:-.02em;line-height:1.05}
+.cifra span{font-size:11.5px;font-weight:700;color:var(--suave)}
+.barras{border-radius:20px;background:var(--tarjeta);box-shadow:var(--sombra-chica);padding:10px 12px 6px}
+.barras-in{height:clamp(44px,calc(9 * var(--u)),90px);display:flex;align-items:flex-end;gap:3px}
+.barras-in i{flex:1;height:var(--h);border-radius:4px 4px 2px 2px;background:var(--c,var(--cielo));transition:height .5s var(--ease)}
+.barras-pie{display:flex;justify-content:space-between;font-size:11px;font-weight:700;color:var(--tenue);margin-top:4px}
 .desc{border-radius:20px;padding:10px 14px;background:var(--cf);color:var(--c);font-weight:700;font-size:13.5px;line-height:1.35}
 .desc b{font-weight:800}
 .nota{flex:1 1 0;min-height:0;overflow:hidden;border-radius:20px;background:var(--campo);box-shadow:var(--hundido);padding:12px 14px;font-weight:600;color:var(--suave);white-space:pre-line}
-@media (min-width:900px) and (min-height:560px){
-  .mosaico{grid-template-columns:repeat(12,minmax(0,1fr));grid-template-rows:1fr 1fr minmax(64px,.32fr);grid-template-areas:"tuyo tuyo tuyo tuyo tuyo crm crm crm crm proy proy proy" "tuyo tuyo tuyo tuyo tuyo equipo equipo equipo equipo moon moon moon" "ultimo ultimo ultimo ultimo ultimo ultimo ultimo ultimo ultimo ultimo ultimo ultimo"}
-  .lista.dos{grid-template-columns:repeat(2,minmax(0,1fr))}
-}
-@media (max-width:360px){.tabs button{font-size:12px}}
-@media (max-width:599px){
-  .pils{gap:5px}.pil{padding:5px 10px 5px 5px;font-size:12.5px;gap:5px}.pil i{width:18px;height:18px;font-size:10px}.pil.solo{padding:5px 11px}
-  .desc{padding:8px 12px;font-size:12.5px}
-  .creds{grid-template-columns:minmax(0,1fr);grid-template-rows:repeat(3,minmax(0,1fr))}
-  .cred{display:grid;grid-template-columns:minmax(0,38%) minmax(0,1fr);grid-template-rows:auto auto auto minmax(0,1fr) auto;column-gap:12px;row-gap:4px;padding:10px}
-  .cred .foto{grid-column:1;grid-row:1/6;height:100%;font-size:32px}
-  .cred>:not(.foto){grid-column:2}
-  .cred .nom{font-size:clamp(20px,9cqw,30px)}
-  .cred .marca-c{font-size:10px}.cred .rol{font-size:12px}
-  .cred .datos{grid-template-columns:1fr 1fr;column-gap:10px;align-content:center}
-  .cred .dato{font-size:11.5px}.cred .dato b{font-size:16px}
-}
-@media (max-height:620px){.pista{display:none}.avance svg{width:min(200px,50vw,23vh)}.avance .fase-m{font-size:13px}.hoja{padding:12px;gap:8px!important}.pil{padding:5px 11px 5px 6px}.quien button{padding:3px 12px 3px 3px}.hoja .eti{margin-bottom:5px!important}}
-@media (max-height:600px) and (max-width:899px){
-  .mosaico{grid-template-rows:1.1fr 1fr 1fr .55fr}
-  .t .sub{display:none}
-  .hola small{display:none}
-}
+/* Tamaños según el espacio que DE VERDAD se ve (ya con el tamaño de letra elegido y el teclado): clases que pone medir() */
+.ancho .mosaico{grid-template-columns:repeat(12,minmax(0,1fr));grid-template-rows:1fr 1fr minmax(64px,.32fr);grid-template-areas:"tuyo tuyo tuyo tuyo tuyo crm crm crm crm proy proy proy" "tuyo tuyo tuyo tuyo tuyo equipo equipo equipo equipo moon moon moon" "ultimo ultimo ultimo ultimo ultimo ultimo ultimo ultimo ultimo ultimo ultimo ultimo"}
+.ancho .lista.dos{grid-template-columns:repeat(2,minmax(0,1fr))}
+.mini .tabs button{font-size:12px}
+.angosto .pils{gap:5px}.angosto .pil{padding:5px 10px 5px 5px;font-size:12.5px;gap:5px}.angosto .pil i{width:18px;height:18px;font-size:10px}.angosto .pil.solo{padding:5px 11px}
+.angosto .desc{padding:8px 12px;font-size:12.5px}
+.bajo .pista{display:none}.bajo .avance svg{width:min(200px,calc(50 * var(--w)),calc(23 * var(--u)))}.bajo .avance .fase-m{font-size:13px}.bajo .hoja{padding:12px;gap:8px!important}.bajo .pil{padding:5px 11px 5px 6px}.bajo .quien button{padding:3px 12px 3px 3px}.bajo .hoja .eti{margin-bottom:5px!important}
+.bajo2 .mosaico{grid-template-rows:1.1fr 1fr 1fr .55fr}.bajo2 .t .sub{display:none}.bajo2 .hola small{display:none}
+/* Con el teclado arriba: la entrada se compacta para que el campo quede a la vista */
+.teclado .top{display:none}.teclado .entrada .caja{gap:8px}.teclado .aviso:empty{display:none}.teclado .enlace{min-height:0}.teclado .entrada p,.teclado .entrada .eti{display:none}.teclado .entrada .ava{width:36px;height:36px;font-size:13px}.teclado .entrada h1{font-size:20px}
+.teclado .gente .ava{width:56px;height:56px}
+
+/* ---------- Credencial horizontal (como una credencial de verdad: 86 × 54) ---------- */
+.creds{min-height:0;position:relative;display:flex;flex-wrap:wrap;align-content:center;justify-content:center;gap:var(--hc,12px)}
+.cred{container-type:size;width:var(--cw,320px);height:calc(var(--cw,320px) * 54 / 86);flex:none;position:relative;perspective:1400px;text-align:start;color:#18171c;padding:0;border-radius:calc(var(--cw,320px) * .055)}
+.cred .gira{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .7s var(--ease)}
+.cred.volteada .gira{transform:rotateY(180deg)}
+.cara{position:absolute;inset:0;border-radius:calc(var(--cw,320px) * .055);background:linear-gradient(150deg,#22306a,#18204a 60%,#141a3c);color:#fff;box-shadow:var(--sombra);overflow:hidden;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.cara::before{content:"";position:absolute;inset:0;background:radial-gradient(120% 80% at 0% 0%,rgba(255,255,255,.10),transparent 55%);pointer-events:none}
+.cred.yo .cara{box-shadow:var(--sombra),inset 0 0 0 .6cqw #5b9cf5}
+/* Frente: foto enmarcada, nombre en "estampas", datos y franja de abajo */
+.cara.frente{display:grid;grid-template-columns:31cqw minmax(0,1fr);grid-template-rows:minmax(0,1fr) 13cqh;column-gap:5cqw;padding:6cqh 5cqw 0}
+.cara .foto{grid-row:1;align-self:stretch;margin-bottom:5cqh;border-radius:3cqw;border:1.2cqw solid #ece4d8;background:var(--c);display:grid;place-items:center;color:#fff;font-weight:800;font-size:16cqh;overflow:hidden;position:relative;box-shadow:0 1cqh 2.5cqh rgba(0,0,0,.35)}
+.cara .foto img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 30%}
+.cara .info{min-width:0;display:flex;flex-direction:column;justify-content:space-between;padding-bottom:5cqh}
+.estampas{display:flex;flex-wrap:wrap;align-items:center;gap:1.2cqh .8cqw}
+.estampa{display:inline-block;font-weight:800;letter-spacing:-.02em;line-height:1;padding:1.6cqh 2cqw 1.8cqh;border-radius:.8cqw;box-shadow:0 .8cqh 1.6cqh rgba(0,0,0,.3)}
+.estampa.nom{font-size:15cqh;background:#0b4fd6;color:#fff;transform:rotate(-2.5deg)}
+.estampa.moon{font-size:8cqh;background:#fff;color:#18204a;transform:rotate(2deg);letter-spacing:.06em}
+.estampa.rolx{font-size:6.4cqh;background:#ece4d8;color:#18204a;transform:rotate(-1deg);font-weight:800}
+.campos{display:grid;grid-template-columns:1fr 1fr;gap:1.6cqh 4cqw}
+.campo-c small{display:block;font-size:4.2cqh;font-style:italic;font-weight:600;color:rgba(255,255,255,.66)}
+.campo-c b{display:block;font-size:8.6cqh;font-weight:800;line-height:1.05}
+.campo-c.azul b{color:#8fbbff}.campo-c.rojo b{color:#ff9a8f}
+.franja{grid-column:1/-1;margin:0 -5cqw;padding:0 5cqw;background:#ece4d8;color:#18204a;display:flex;align-items:center;justify-content:space-between;font-weight:800;font-size:5cqh;border-top:.5cqh solid #5b9cf5}
+.franja .logo{height:7.4cqh;color:#18204a}
+/* Vuelta: banda magnética, firma, proyectos y frase */
+.cara.atras{transform:rotateY(180deg);display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);grid-template-rows:15cqh auto minmax(0,1fr);column-gap:5cqw;row-gap:5cqh;padding:7cqh 5cqw 6cqh}
+.banda{grid-column:1/-1;margin:0 -5cqw;background:#0b0f26}
+.firma{align-self:center;height:16cqh;border-radius:.8cqw;background:repeating-linear-gradient(-12deg,#f4efe6 0 1.2cqh,#e3dccf 1.2cqh 1.6cqh);color:#141a3c;display:flex;align-items:center;padding:0 3cqw;font-family:"Segoe Script","Brush Script MT","Snell Roundhand",cursive;font-size:10cqh;transform:rotate(-1deg);overflow:hidden;white-space:nowrap}
+.historial{min-width:0}
+.historial small{display:block;font-size:4.8cqh;font-weight:800;color:#fff;margin-bottom:.8cqh}
+.historial span{display:block;font-size:4.4cqh;font-weight:600;color:rgba(255,255,255,.82);line-height:1.3}
+.frase{grid-column:1/-1;display:flex;flex-wrap:wrap;align-content:center;gap:.6cqh 3cqw;font-weight:800;font-size:8.4cqh;line-height:1.02;color:#ffd27a;text-shadow:0 .5cqh 0 #b47b16;min-height:0;overflow:hidden}
+.frase.sin{color:rgba(255,255,255,.55);text-shadow:none;font-size:5.4cqh;font-weight:700}
+.sello{position:absolute;right:3cqw;bottom:4cqh;width:30cqh;height:30cqh;border-radius:50%;border:.8cqh solid rgba(91,156,245,.28);display:grid;place-items:center;pointer-events:none}
+.sello .logo{height:6cqh;color:rgba(91,156,245,.35)}
+.pista-cred{font-size:12.5px;font-weight:700;color:var(--suave);text-align:center}
+/* Recortar foto */
+.recorte{position:relative;justify-self:center;aspect-ratio:4/5;height:100%;max-width:100%;border-radius:22px;overflow:hidden;background:#000;touch-action:none;cursor:grab;box-shadow:var(--sombra)}
+.recorte img{position:absolute;left:50%;top:50%;transform-origin:center;user-select:none;-webkit-user-drag:none;pointer-events:none;max-width:none}
+.recorte::after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 0 0 2px rgba(255,255,255,.6);pointer-events:none}
+.segmento{display:flex;gap:4px;background:var(--campo);box-shadow:var(--hundido);border-radius:99px;padding:4px}
+.segmento button{flex:1 1 0;min-height:40px;border-radius:99px;font-weight:800;color:var(--suave);transition:background .25s,color .25s}
+.segmento button.on{background:var(--tarjeta);color:var(--cobalto);box-shadow:var(--sombra-chica)}
 </style>
 </head>
 <body>
-<div class="app" id="app"></div>
+<div id="marco"><div class="app" id="app"></div></div>
 
 <script>
 'use strict';
@@ -311,8 +343,9 @@ function paginar(cont, items, pinta, opciones) {
     m.className = lista.className;
     m.style.cssText = `position:absolute;left:0;top:0;visibility:hidden;width:${lista.clientWidth}px;height:auto;--alto:${o.alto}px;--hueco:${o.hueco}px`;
     m.innerHTML = items.map(pinta).join('');
-    document.body.appendChild(m);
-    const altos = [...m.children].map(e => e.getBoundingClientRect().height);
+    cont.style.position = 'relative';
+    cont.appendChild(m);
+    const altos = [...m.children].map(e => e.offsetHeight);
     m.remove();
     const paginas = []; let actual = [], usado = 0;
     for (let i = 0; i < items.length; i += cols) {
@@ -339,7 +372,51 @@ function paginar(cont, items, pinta, opciones) {
 }
 let alCambiarTamano = null;
 let reloj = null;
-addEventListener('resize', () => { clearTimeout(reloj); reloj = setTimeout(() => alCambiarTamano && alCambiarTamano(), 120); });
+
+/* ---------- La pantalla: fija, del tamaño de lo que se ve, con tamaño de letra propio ---------- */
+const LETRA = 'centro.moon.letra';
+const TAMANOS = [['Normal', 1], ['Grande', 1.15], ['Muy grande', 1.3]];
+function letraElegida() { try { const v = Number(localStorage.getItem(LETRA)); return TAMANOS.some(t => t[1] === v) ? v : 1; } catch (e) { return 1; } }
+// Cuánto se puede agrandar sin que nada deje de caber: el espacio útil nunca baja de 320 × 540 (lo que ya probamos).
+function letraMax() { const vv = window.visualViewport, W0 = vv ? vv.width : innerWidth; return Math.max(1, Math.min(W0 / 320, Math.max(altoMax, innerHeight) / 540)); }
+function tamanosQueCaben() { const m = letraMax(); return TAMANOS.filter(t => t[1] <= m + 0.001); }
+function letra() { return Math.min(letraElegida(), letraMax()); }
+let altoMax = 0, anchoAntes = 0;
+function medir() {
+  const vv = window.visualViewport;
+  const W0 = vv ? vv.width : innerWidth, H0 = vv ? vv.height : innerHeight, top = vv ? vv.offsetTop : 0;
+  if (Math.abs(W0 - anchoAntes) > 40) { altoMax = 0; anchoAntes = W0; }   // giró el celular
+  altoMax = Math.max(altoMax, H0);
+  const z = Math.min(letraElegida(), Math.max(1, Math.min(W0 / 320, altoMax / 540))), W = W0 / z, H = H0 / z, raiz = document.documentElement;
+  raiz.style.setProperty('--vt', top + 'px');
+  raiz.style.setProperty('--vh', H0 + 'px');
+  raiz.style.setProperty('--z', z);
+  raiz.style.setProperty('--u', (H / 100) + 'px');
+  raiz.style.setProperty('--w', (W / 100) + 'px');
+  const cl = raiz.classList;
+  cl.toggle('ancho', W >= 900 && H >= 560);
+  cl.toggle('mini', W <= 360);
+  cl.toggle('angosto', W <= 599);
+  cl.toggle('bajo', H <= 620);
+  cl.toggle('bajo2', H <= 600 && W <= 899);
+  cl.toggle('teclado', H0 < altoMax * 0.78);
+}
+function alMedir() { medir(); clearTimeout(reloj); reloj = setTimeout(() => { if (alCambiarTamano) alCambiarTamano(); else if (D && !pila.length) pinta(true); }, 90); }
+medir();
+addEventListener('resize', alMedir);
+if (window.visualViewport) { visualViewport.addEventListener('resize', alMedir); visualViewport.addEventListener('scroll', medir); }
+addEventListener('orientationchange', () => setTimeout(alMedir, 250));
+// Nada de zoom con los dedos sobre la página (el tamaño se elige en tu credencial); solo se pellizca para acomodar tu foto.
+document.addEventListener('gesturestart', e => { if (!e.target.closest || !e.target.closest('.recorte')) e.preventDefault(); });
+document.addEventListener('touchmove', e => { if (e.touches.length > 1 && !e.target.closest('.recorte')) e.preventDefault(); }, { passive: false });
+// Cambio de pantalla con fundido cruzado; se ve igual con o sin "reducir movimiento".
+function transicion(f) {
+  if (document.startViewTransition && document.visibilityState === 'visible') {
+    document.documentElement.classList.add('vt');
+    const t = document.startViewTransition(f);
+    t.finished.finally(() => document.documentElement.classList.remove('vt'));
+  } else f();
+}
 
 /* ---------- Entrada ---------- */
 async function pantallaQuien() {
@@ -348,7 +425,7 @@ async function pantallaQuien() {
   const g = document.getElementById('gente');
   if (!r.ok) { g.innerHTML = '<span class="aviso">No hay conexión. Revisa tu internet y vuelve a abrir.</span>'; return; }
   g.innerHTML = r.usuarios.map(u => `<button data-u="${u.id}">${ava(u.id)}<span>${esc(u.nombre)}</span></button>`).join('');
-  g.querySelectorAll('button').forEach(b => b.onclick = () => { const u = r.usuarios.find(x => x.id === b.dataset.u); u.tieneClave ? pantallaClave(u) : pantallaCodigo(u); });
+  g.querySelectorAll('button').forEach(b => b.onclick = () => { const u = r.usuarios.find(x => x.id === b.dataset.u); transicion(() => u.tieneClave ? pantallaClave(u) : pantallaCodigo(u)); });
 }
 
 // Campo de contraseña con ojito para ver lo que se escribe (por ejemplo, para tomarle captura).
@@ -365,12 +442,12 @@ function activarOjos() {
 }
 function marcoEntrada(u, html) {
   app.innerHTML = `<div class="top"><button class="redondo" id="volver" aria-label="Regresar">${I.atras}</button><div class="marca"><span class="logo" role="img" aria-label="MOON Digital"></span><i>/</i>CENTRO</div></div><div class="entrada"><div class="caja">${ava(u.id)}${html}</div></div>`;
-  document.getElementById('volver').onclick = pantallaQuien;
+  document.getElementById('volver').onclick = () => transicion(pantallaQuien);
   activarOjos();
 }
 
 function pantallaClave(u) {
-  marcoEntrada(u, `<h1>Hola, ${esc(u.nombre)}</h1><p>Escribe tu contraseña. Solo te la pedimos esta vez en este aparato.</p>
+  marcoEntrada(u, `<h1>Hola, ${esc(u.nombre)}</h1><p>Escribe tu contraseña. Solo te la pedimos esta vez en este dispositivo.</p>
     <form id="f" style="display:grid;gap:12px;width:100%">${campoClave('clave', 'Tu contraseña', 'current-password')}
     <button class="boton">Entrar</button><div class="aviso" id="aviso"></div></form><button class="enlace" id="olvide">Olvidé mi contraseña</button>`);
   const f = document.getElementById('f'), av = document.getElementById('aviso');
@@ -408,7 +485,7 @@ async function pantallaCodigo(u) {
 }
 
 function pantallaNueva(u, codigo) {
-  marcoEntrada(u, `<h1>Crea tu contraseña</h1><p>Mínimo 6 letras o números. Este aparato quedará recordado.</p>
+  marcoEntrada(u, `<h1>Crea tu contraseña</h1><p>Mínimo 6 letras o números. Este dispositivo quedará recordado.</p>
     <form id="f" style="display:grid;gap:12px;width:100%">${campoClave('c1', 'Contraseña nueva', 'new-password')}
     ${campoClave('c2', 'Repítela', 'new-password')}
     <button class="boton">Entrar al Centro</button><div class="aviso" id="aviso"></div></form>`);
@@ -445,16 +522,16 @@ setInterval(() => { if (D && document.visibilityState === 'visible' && !document
 document.addEventListener('visibilitychange', () => { if (D && document.visibilityState === 'visible') recargar(); });
 
 // El botón "atrás" del celular cierra la capa en vez de salirse de la página.
-function abrir(capa) { pila.push(capa); try { history.pushState({ capa: pila.length }, ''); } catch (e) {} pinta(); }
-function reemplazar(capa) { pila[pila.length - 1] = capa; pinta(); }
-function cerrar() { if (history.state && history.state.capa) history.back(); else { pila.pop(); pinta(); } }
-addEventListener('popstate', () => { if (pila.length) { pila.pop(); pinta(); } });
+function abrir(capa) { pila.push(capa); try { history.pushState({ capa: pila.length }, ''); } catch (e) {} transicion(() => pinta()); }
+function reemplazar(capa) { pila[pila.length - 1] = capa; transicion(() => pinta()); }
+function cerrar() { if (history.state && history.state.capa) history.back(); else { pila.pop(); transicion(() => pinta()); } }
+addEventListener('popstate', () => { if (pila.length) { pila.pop(); transicion(() => pinta()); } });
 function pinta(silencioso) {
   // Una sola pantalla a la vez: la anterior se borra, nada queda escondido detrás.
   alCambiarTamano = null;
   const c = pila[pila.length - 1];
   if (!c) return pintaInicio(silencioso);
-  ({ tareas: capaTareas, tarea: capaTarea, nuevaTarea: capaNuevaTarea, crm: capaCRM, ficha: capaFicha, nuevoCliente: capaNuevoCliente, proyectos: capaProyectos, proyecto: capaProyecto, nuevoProyecto: capaProyecto, equipo: capaEquipo, moon: capaMoon, lector: capaLector, nota: capaNota, editarProyecto: capaProyecto })[c.tipo](c, silencioso);
+  ({ tareas: capaTareas, tarea: capaTarea, nuevaTarea: capaNuevaTarea, crm: capaCRM, ficha: capaFicha, nuevoCliente: capaNuevoCliente, proyectos: capaProyectos, proyecto: capaProyecto, nuevoProyecto: capaProyecto, equipo: capaEquipo, moon: capaMoon, lector: capaLector, nota: capaNota, editarProyecto: capaProyecto, cuenta: capaCuenta, frase: capaFrase, foto: capaFoto })[c.tipo](c, silencioso);
 }
 function marco(titulo, accion, cuerpo) {
   app.innerHTML = `<div class="top"><button class="redondo" id="volver" aria-label="Regresar">${I.atras}</button><div class="cabeza" style="flex:1;min-width:0"><h2>${esc(titulo)}</h2>${accion ? `<button class="redondo accion" id="accion" aria-label="${esc(accion)}">${I.mas}</button>` : ''}</div></div><div class="vista" style="grid-template-rows:minmax(0,1fr)">${cuerpo}</div>`;
@@ -494,7 +571,7 @@ function pintaInicio(sil) {
       <div class="t t-crm" role="button" tabindex="0" data-ir="crm"><span class="flecha">${I.abre}</span><span class="eti">CRM de MOON</span><div class="extra">${xCrm}</div><span class="num">${cuenta('pendiente') + cuenta('en proceso')}</span><span class="sub">clientes por cerrar</span><span class="barrita">${barrita}</span></div>
       <div class="t t-proy" role="button" tabindex="0" data-ir="proyectos"><span class="flecha">${I.abre}</span><span class="eti">Proyectos</span><div class="extra">${xProy}</div><span class="num">${activos.length}</span><span class="sub">${miosP} con tu nombre</span></div>
       <div class="t t-equipo" role="button" tabindex="0" data-ir="equipo"><span class="flecha">${I.abre}</span><span class="eti">Equipo</span><div class="extra">${xEq}</div><span class="num">${sinVer}</span><span class="sub">tareas sin ver</span></div>
-      <div class="t t-moon" role="button" tabindex="0" data-ir="moon"><span class="flecha">${I.abre}</span><span class="eti">MOON</span><div class="extra">${xMoon}</div><span class="num" style="font-size:clamp(20px,4.6vh,32px)">Quiénes somos</span><span class="sub">visión y servicios</span></div>
+      <div class="t t-moon" role="button" tabindex="0" data-ir="moon"><span class="flecha">${I.abre}</span><span class="eti">MOON</span><div class="extra">${xMoon}</div><span class="num" style="font-size:clamp(20px,calc(4.6 * var(--u)),32px)">Quiénes somos</span><span class="sub">visión y servicios</span></div>
       <div class="t t-ultimo">${ult ? ava(ult.quien, 1) : ''}<span class="txt">${ult ? `Lo último: <b>${esc((GENTE[ult.quien] || CLAUDE).n)}</b> ${esc(ult.texto)} · ${cuando(ult.fecha)}` : 'Aquí aparece lo último que pasó en MOON.'}</span></div>
     </main>
   </div>`;
@@ -504,7 +581,7 @@ function pintaInicio(sil) {
   atajo('[data-g]', b => abrir({ tipo: 'crm', g: b.dataset.g }));
   atajo('[data-y]', b => abrir({ tipo: 'proyecto', id: Number(b.dataset.y) }));
   atajo('[data-u]', b => abrir({ tipo: 'tareas', persona: b.dataset.u }));
-  document.getElementById('salir').onclick = () => abrir({ tipo: 'moon', cuenta: true });
+  document.getElementById('salir').onclick = () => abrir({ tipo: 'cuenta' });
   llenarExtras();
   alCambiarTamano = () => pintaInicio(true);
 }
@@ -521,6 +598,12 @@ function llenarExtras() {
       if (x.scrollHeight > x.clientHeight + 1) mas.remove();
     }
     if (!x.children.length) x.style.display = 'none';   // vacía no ocupa lugar
+  });
+  app.querySelectorAll('.mosaico .t').forEach(t => {
+    for (const sel of ['.extra', '.barrita', '.sub', '.brilla']) {
+      if (t.scrollHeight <= t.clientHeight + 1) break;
+      const e = t.querySelector(sel); if (e) e.style.display = 'none';
+    }
   });
 }
 
@@ -553,7 +636,7 @@ async function capaTarea(c) {
   const p = proyectoDe(x.proyecto);
   marco('Tarea', '', `<div class="hoja" style="grid-template-rows:auto auto minmax(0,1fr) auto">
     <div class="eti">${esc(p ? p.nombre : 'General')}</div>
-    <h3 style="font-size:clamp(19px,5vw,24px);font-weight:800;line-height:1.2">${esc(x.titulo)}</h3>
+    <h3 style="font-size:clamp(19px,calc(5 * var(--w)),24px);font-weight:800;line-height:1.2">${esc(x.titulo)}</h3>
     <div id="caja" style="min-height:0;overflow:hidden;display:grid;align-content:start;gap:10px">
       ${x.detalle ? `<p id="detalle" style="color:var(--suave);font-weight:600;white-space:pre-line">${esc(x.detalle)}</p>` : ''}
       <div class="par"><span>Para</span><b>${esc(GENTE[x.para] ? GENTE[x.para].n : x.para)}</b></div>
@@ -610,7 +693,7 @@ function capaCRM(c) {
     <div class="pils">${pils}</div>
     <div class="desc" style="--c:${G.c};--cf:${G.cf}"><b>${G.n}:</b> ${esc(G.d)}</div>
     <div class="lista dos"></div><div class="pie"></div></div>`);
-  app.querySelectorAll('[data-g]').forEach(b => b.onclick = () => { c.g = b.dataset.g; c.p = 0; pinta(true); });
+  app.querySelectorAll('[data-g]').forEach(b => b.onclick = () => { c.g = b.dataset.g; c.p = 0; transicion(() => pinta(true)); });
   document.getElementById('accion').onclick = () => abrir({ tipo: 'nuevoCliente', etapa: grupos.includes(c.g) ? c.g : 'pendiente' });
   const busca = document.getElementById('busca');
   let espera; busca.oninput = () => { clearTimeout(espera); espera = setTimeout(() => { c.busca = busca.value; c.p = 0; const pos = busca.selectionStart; silencio = true; pinta(true); silencio = false; const nb = document.getElementById('busca'); nb.focus(); nb.setSelectionRange(pos, pos); }, 250); };
@@ -636,7 +719,7 @@ async function capaFicha(c, sil) {
   const tabs = [['estado', 'Estado'], ['datos', 'Datos'], ['proyectos', `Proyectos (${proys.length})`], ['historial', c.ext ? `Contacto (${(ext.contactos || []).length})` : 'Contacto']];
   let cuerpo = '';
   if (c.tab === 'estado') {
-    cuerpo = `<div class="hoja" style="display:flex;flex-direction:column;gap:clamp(10px,2vh,16px)">
+    cuerpo = `<div class="hoja" style="display:flex;flex-direction:column;gap:clamp(10px,calc(2 * var(--u)),16px)">
       <div><div class="eti" style="margin-bottom:8px">¿Dónde va?</div><div class="pils" id="etapas">${Object.keys(ETAPA).map(e => `<button class="pil${(P.etapa || 'pendiente') === e ? ' on' : ''}" data-e="${e}" style="--c:${ETAPA[e].c};--cf:${ETAPA[e].cf}"><i>${ETAPA[e].ic}</i>${ETAPA[e].n}</button>`).join('')}</div></div>
       <div><div class="eti" style="margin-bottom:8px">Encargados</div><div class="quien" id="enc">${Object.keys(GENTE).map(id => `<button data-u="${id}" class="${String(P.encargados).split(',').includes(id) ? 'on' : ''}">${ava(id)}${GENTE[id].n}</button>`).join('')}</div></div>
       <div><div class="eti" style="margin-bottom:8px">Temperatura</div><div class="pils" id="temps">${['caliente', 'tibio', 'frio'].map(x => `<button class="pil solo${P.temperatura === x ? ' on' : ''}" data-x="${x}" style="--c:#fff;--cf:${TEMP[x]}">${x === 'frio' ? 'Frío' : x[0].toUpperCase() + x.slice(1)}</button>`).join('')}</div></div>
@@ -656,7 +739,7 @@ async function capaFicha(c, sil) {
   if (sil) app.querySelector('.vista').style.animation = 'none';
   // Llamar y WhatsApp viven arriba, siempre a la mano, sin ocupar espacio de la ficha.
   if (tel) app.querySelector('.cabeza').insertAdjacentHTML('beforeend', `<a class="redondo accion" href="tel:+52${tel.slice(-10)}" aria-label="Llamar">${I.tel}</a><a class="redondo" style="color:var(--verde)" href="https://wa.me/52${tel.slice(-10)}" target="_blank" rel="noopener" aria-label="WhatsApp">${I.wa}</a>`);
-  app.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => { c.tab = b.dataset.tab; c.p = 0; pinta(true); });
+  app.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => { c.tab = b.dataset.tab; c.p = 0; transicion(() => pinta(true)); });
   const guarda = async datos => { const r = await api('editar_persona', Object.assign({ tel: c.tel }, datos)); if (r.ok) { Object.assign(p, datos); if (c.ext && c.ext.persona) Object.assign(c.ext.persona, datos); } return r; };
   if (c.tab === 'estado') {
     app.querySelectorAll('#etapas [data-e]').forEach(b => b.onclick = async () => { await guarda({ etapa: b.dataset.e }); pinta(true); recargar(); });
@@ -710,7 +793,7 @@ function filaProyecto(p) {
   const i = Math.max(0, D.listas.fases.indexOf(p.fase));
   const cli = personaDe(p.tel);
   const abiertas = D.tareas.filter(x => x.proyecto == p.id && x.estado !== 'hecha').length;
-  return `<button class="fila" data-y="${p.id}"><span class="anillo" style="--p:${Math.round((i + 1) / D.listas.fases.length * 100)}"><b>${i + 1}/${D.listas.fases.length}</b></span><span class="q"><b>${esc(p.nombre)}</b><span>${esc(p.fase)} · ${esc(cli ? nombreDe(cli) : 'MOON')}${abiertas ? ` · ${abiertas} tarea${abiertas === 1 ? '' : 's'}` : ''}</span></span>${avas(p.encargados)}</button>`;
+  return `<button class="fila" data-y="${p.id}"><span class="anillo" style="--p:${Math.round((i + 1) / D.listas.fases.length * 100)}"><b>${i + 1}/${D.listas.fases.length}</b></span><span class="q"><b>${esc(p.nombre)}</b><span>${esc(p.fase)} · ${esc(cli ? nombreDe(cli) : 'MOON')}${abiertas ? ` · ${abiertas} tarea${abiertas === 1 ? '' : 's'}` : ''}${p.uso_mes ? ` · ${p.uso_mes} uso${p.uso_mes === 1 ? '' : 's'} en 30 días` : ''}</span></span>${avas(p.encargados)}</button>`;
 }
 function capaProyectos(c) {
   c.f = c.f || 'activos';
@@ -767,26 +850,60 @@ function capaProyecto(c) {
   const tareas = D.tareas.filter(x => x.proyecto == p.id);
   const abiertas = tareas.filter(x => x.estado !== 'hecha').length;
   let cuerpo;
-  if (c.tab === 'fase') cuerpo = `<div class="hoja" style="align-content:center;justify-items:center;gap:clamp(8px,1.8vh,16px)">
+  if (c.tab === 'fase') cuerpo = `<div class="hoja" style="align-content:center;justify-items:center;gap:clamp(8px,calc(1.8 * var(--u)),16px)">
       <span class="eti">${esc(cli ? nombreDe(cli) : 'Proyecto de MOON')}</span>
       <div class="avance">${anilloFases(fi)}<div class="fase-n">${esc(fases[fi][0].toUpperCase() + fases[fi].slice(1))}</div><div class="fase-m">${esc(FASE_TXT[fases[fi]] || '')}</div></div>
       <div class="pils" id="fases" style="justify-content:center">${fases.map((f, i) => `<button class="pil solo${i === fi ? ' on' : ''}" data-f="${esc(f)}" style="--c:#fff;--cf:${i < fi ? 'var(--cielo)' : 'var(--cobalto)'}">${esc(f[0].toUpperCase() + f.slice(1))}</button>`).join('')}</div>
       <span class="mini pista">Toca una fase para mover el proyecto</span></div>`;
   else if (c.tab === 'tareas') cuerpo = `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr) auto auto"><div class="lista"></div><div class="pie"></div><button class="boton dos" id="nt">Dejar una tarea de este proyecto</button></div>`;
+  else if (c.tab === 'uso') cuerpo = `<div class="cuerpo" style="grid-template-rows:auto auto minmax(0,1fr) auto"><div class="cifras" id="cifras"></div><div class="barras" id="barras"></div><div class="lista"></div><div class="pie"></div></div>`;
   else cuerpo = `<div class="hoja" style="align-self:start">
       <div class="par"><span>Cliente</span><b>${esc(cli ? nombreDe(cli) : 'MOON (interno)')}</b></div>
       <div class="par"><span>Encargados</span><b>${String(p.encargados || '').split(',').filter(x => GENTE[x]).map(x => GENTE[x].n).join(', ') || 'Nadie todavía'}</b></div>
       <div class="par"><span>De qué trata</span><b style="white-space:pre-line">${esc(p.nota || 'Sin descripción todavía')}</b></div>
       <div class="par"><span>Abierto</span><b>${cuando(p.creado)}</b></div>
       <button class="boton dos" id="editar">Editar datos</button></div>`;
-  marco(p.nombre, '', `<div class="cuerpo" style="grid-template-rows:auto minmax(0,1fr)"><div class="tabs"><button data-tab="fase" class="${c.tab === 'fase' ? 'on' : ''}">Fase</button><button data-tab="tareas" class="${c.tab === 'tareas' ? 'on' : ''}">Tareas (${abiertas})</button><button data-tab="datos" class="${c.tab === 'datos' ? 'on' : ''}">Datos</button></div>${cuerpo}</div>`);
-  app.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => { c.tab = b.dataset.tab; c.p = 0; pinta(true); });
+  marco(p.nombre, '', `<div class="cuerpo" style="grid-template-rows:auto minmax(0,1fr)"><div class="tabs"><button data-tab="fase" class="${c.tab === 'fase' ? 'on' : ''}">Fase</button><button data-tab="tareas" class="${c.tab === 'tareas' ? 'on' : ''}">Tareas (${abiertas})</button><button data-tab="uso" class="${c.tab === 'uso' ? 'on' : ''}">Uso (${p.uso_mes || 0})</button><button data-tab="datos" class="${c.tab === 'datos' ? 'on' : ''}">Datos</button></div>${cuerpo}</div>`);
+  app.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => { c.tab = b.dataset.tab; c.p = 0; transicion(() => pinta(true)); });
   if (c.tab === 'fase') app.querySelectorAll('#fases [data-f]').forEach(b => b.onclick = async () => { const r = await api('proyecto', { id: p.id, fase: b.dataset.f }); if (r.ok) { p.fase = b.dataset.f; pinta(true); recargar(); } });
   if (c.tab === 'tareas') {
     document.getElementById('nt').onclick = () => abrir({ tipo: 'nuevaTarea', proyecto: p.id });
     alCambiarTamano = paginar(app.querySelector('.vista .cuerpo .cuerpo'), tareas.sort((a, b) => (a.estado === 'hecha') - (b.estado === 'hecha') || b.id - a.id), x => filaTarea(x).replace(ava(x.de, 1), ava(x.para, 1)), { pagina: c.p, vacio: '<b>Sin tareas</b>Deja la primera con el botón de abajo.', alPintar: l => l.querySelectorAll('[data-t]').forEach(b => b.onclick = () => abrir({ tipo: 'tarea', id: Number(b.dataset.t) })) });
   }
+  if (c.tab === 'uso') pintaUso(c, p);
   if (c.tab === 'datos') document.getElementById('editar').onclick = () => abrir({ tipo: 'editarProyecto', id: p.id });
+}
+
+/* ---------- Uso: cuántas personas usan lo que construimos ---------- */
+const CANAL = { llamada: 'Llamada', whatsapp: 'WhatsApp', chat: 'Chat', voz: 'Voz', avatar: 'Avatar', cuestionario: 'Cuestionario', web: 'Página', otro: 'Uso' };
+function pintaUso(c, p) {
+  const cont = app.querySelector('.vista .cuerpo .cuerpo');
+  if (!c.uso) {
+    cont.querySelector('.lista').innerHTML = '<div class="vacio"><div>Cargando…</div></div>';
+    api('uso', { id: p.id }).then(r => { if (r.ok && pila[pila.length - 1] === c) { c.uso = r; pinta(true); } });
+    return;
+  }
+  const U = c.uso, k = U.cifras || {};
+  cont.querySelector('#cifras').innerHTML = [['Hoy', k.hoy], ['7 días', k.semana], ['30 días', k.mes], ['Personas', k.personas]]
+    .map(([n, v]) => `<div class="cifra"><b>${v || 0}</b><span>${n}</span></div>`).join('');
+  // Una barrita por día de las últimas 4 semanas (hora de Cancún); la de hoy va en cobalto.
+  const mapa = Object.fromEntries((U.porDia || []).map(x => [x.d, x.n]));
+  const dias = [];
+  for (let i = 27; i >= 0; i--) { const d = new Date(Date.now() - 5 * 36e5 - i * 864e5).toISOString().slice(0, 10); dias.push([d, mapa[d] || 0]); }
+  const max = Math.max(1, ...dias.map(x => x[1]));
+  cont.querySelector('#barras').innerHTML = `<div class="barras-in">${dias.map(([d, n], i) => `<i title="${d}: ${n}" style="--h:${Math.max(4, Math.round(n / max * 100))}%${i === 27 ? ';--c:var(--cobalto)' : n ? '' : ';--c:var(--niebla)'}"></i>`).join('')}</div><div class="barras-pie"><span>hace 4 semanas</span><span>hoy</span></div>`;
+  const vacio = U.conectado
+    ? '<b>Todavía nadie lo ha usado</b>En cuanto alguien lo use, aparece aquí al momento.'
+    : '<b>Este proyecto todavía no avisa cuando alguien lo usa</b>Pídele a Claude: "conecta el uso de este proyecto". Es una sola vez.';
+  alCambiarTamano = paginar(cont, U.ultimos || [], x => {
+    const per = personaDe(x.quien);
+    const quien = per ? nombreDe(per) : x.quien && /^\d{10}$/.test(x.quien) ? x.quien : 'Alguien';
+    return `<button class="fila" data-u="${x.id}"><span class="estado" style="--c:var(--cobalto);--cf:var(--azulf)">${esc(CANAL[x.canal] || x.canal || 'Uso')}</span><span class="q"><b style="font-weight:700">${esc(quien)}</b><span>${esc(x.resumen || 'Sin resumen')} · ${cuando(x.fecha)}</span></span><span></span></button>`;
+  }, { pagina: c.p, vacio, alPintar: l => l.querySelectorAll('[data-u]').forEach(b => b.onclick = () => {
+    const x = U.ultimos.find(y => y.id == b.dataset.u); if (!x) return;
+    let det = ''; try { const o = JSON.parse(x.datos || '{}'); det = Object.entries(o).filter(([, v]) => v !== '' && v != null).map(([k2, v]) => `${k2[0].toUpperCase() + k2.slice(1)}: ${v}`).join('\n'); } catch (e) { det = x.datos || ''; }
+    abrir({ tipo: 'lector', titulo: `${CANAL[x.canal] || 'Uso'} · ${cuando(x.fecha)}`, texto: [x.resumen, det].filter(Boolean).join('\n\n') || 'Sin detalle.' });
+  }) });
 }
 
 /* ---------- Lector: texto largo completo, en páginas, nunca cortado ---------- */
@@ -810,32 +927,162 @@ function capaLector(c) {
   dibuja(); alCambiarTamano = dibuja;
 }
 
-/* ---------- Equipo: credenciales como las de Aliados de Kidviniflo ---------- */
+/* ---------- Credencial del equipo (horizontal, con vuelta) ---------- */
+const usuario = id => (D && D.usuarios || []).find(u => u.id === id) || {};
+function credencial(id) {
+  const g = GENTE[id], u = usuario(id), k = ['daniel', 'dan', 'kid'].indexOf(id) + 1;
+  const t = D.tareas.filter(x => x.para === id), ab = t.filter(x => x.estado !== 'hecha');
+  const nv = ab.filter(x => x.estado === 'nueva').length, at = ab.filter(atrasada).length, he = t.filter(x => x.estado === 'hecha').length;
+  const proys = D.proyectos.filter(p => p.fase !== 'entregado' && String(p.encargados).split(',').includes(id));
+  const desde = u.creado ? new Date(u.creado).toLocaleDateString('es-MX', { month: 'short', year: 'numeric', timeZone: 'America/Cancun' }) : '';
+  const lema = String(u.lema || '').trim();
+  return `<div class="cred${id === yo() ? ' yo' : ''}" data-u="${id}" role="button" tabindex="0" aria-label="Credencial de ${g.n}" style="--c:${g.c}"><div class="gira">
+    <div class="cara frente">
+      <span class="foto">${FOTOS[id] ? `<img src="${FOTOS[id]}" alt="">` : g.i}</span>
+      <div class="info">
+        <div class="estampas"><span class="estampa nom">${esc(g.n)}</span><span class="estampa moon">MOON</span>${u.rol ? `<span class="estampa rolx">${esc(u.rol)}</span>` : ''}</div>
+        <div class="campos"><span class="campo-c azul"><small>Sin ver</small><b>${nv}</b></span><span class="campo-c"><small>Abiertas</small><b>${ab.length}</b></span>
+          ${at ? `<span class="campo-c rojo"><small>Atrasadas</small><b>${at}</b></span>` : `<span class="campo-c"><small>Hechas</small><b>${he}</b></span>`}<span class="campo-c"><small>Proyectos</small><b>${proys.length}</b></span></div>
+      </div>
+      <div class="franja"><span class="logo" role="img" aria-label="MOON Digital"></span><span>#00${k}${id === yo() ? ' · tú' : ''}</span></div>
+    </div>
+    <div class="cara atras">
+      <span class="banda"></span>
+      <span class="firma">${esc(g.n)}</span>
+      <div class="historial"><small>A su cargo:</small>${proys.slice(0, 3).map(p => `<span>${esc(p.nombre)}</span>`).join('') || '<span>Ningún proyecto todavía</span>'}${desde ? `<span style="margin-top:.8cqh;opacity:.7">Desde ${esc(desde)}</span>` : ''}</div>
+      <div class="frase${lema ? '' : ' sin'}">${lema ? lema.split(/\s+/).map(w => `<span>${esc(w)}</span>`).join('') : 'Toca "Mi frase" para poner la tuya aquí'}</div>
+      <span class="sello"><span class="logo"></span></span>
+    </div>
+  </div></div>`;
+}
+// Acomoda las credenciales al tamaño más grande que quepa completo, sin scroll (1, 2 o 3 por renglón).
+function acomodarCreds(cont) {
+  const n = cont.children.length, gap = 12, W = cont.clientWidth, H = cont.clientHeight;
+  let mejor = 0;
+  for (let cols = 1; cols <= n; cols++) {
+    const filas = Math.ceil(n / cols);
+    const w = Math.min((W - (cols - 1) * gap) / cols, (H - (filas - 1) * gap) / filas * 86 / 54, 560);
+    if (w > mejor) mejor = w;
+  }
+  cont.style.setProperty('--cw', Math.max(120, Math.floor(mejor)) + 'px');
+  cont.style.setProperty('--hc', gap + 'px');
+}
+
+/* ---------- Equipo ---------- */
 function capaEquipo() {
-  const ids = ['daniel', 'dan', 'kid'];
-  marco('Equipo', '', `<div class="creds">${ids.map((id, k) => {
-    const t = D.tareas.filter(x => x.para === id), ab = t.filter(x => x.estado !== 'hecha');
-    const nv = ab.filter(x => x.estado === 'nueva').length, at = ab.filter(atrasada).length, he = t.filter(x => x.estado === 'hecha').length;
-    const pr = D.proyectos.filter(p => p.fase !== 'entregado' && String(p.encargados).split(',').includes(id)).length;
-    // La foto sale de api/_fotos.js (privada); si falta, sale su inicial.
-    return `<button class="cred${id === yo() ? ' yo' : ''}" data-u="${id}" style="--c:${GENTE[id].c}"><span class="marca-c"><span class="logo" style="height:1.5em"></span> · EQUIPO</span><span class="nom">${GENTE[id].n}</span><span class="linea"></span><span class="rol">${ROL[id]}</span>
-      <span class="foto">${FOTOS[id] ? `<img src="${FOTOS[id]}" alt="Foto de ${GENTE[id].n}">` : GENTE[id].i}</span>
-      <span class="datos"><span class="dato ojo-n"><span>sin ver</span><b>${nv}</b></span><span class="dato"><span>abiertas</span><b>${ab.length}</b></span>${at ? `<span class="dato" style="color:#c0392b"><span>atrasadas</span><b style="color:#c0392b">${at}</b></span>` : ''}<span class="dato"><span>hechas</span><b>${he}</b></span><span class="dato"><span>proyectos</span><b>${pr}</b></span></span>
-      <span class="num-c">#00${k + 1}${id === yo() ? ' · tú' : ''}</span></button>`;
-  }).join('')}</div>`);
-  app.querySelectorAll('[data-u]').forEach(b => b.onclick = () => abrir({ tipo: 'tareas', persona: b.dataset.u }));
+  marco('Equipo', '', `<div class="creds" id="creds">${['daniel', 'dan', 'kid'].map(credencial).join('')}</div>`);
+  const cont = document.getElementById('creds');
+  acomodarCreds(cont);
+  alCambiarTamano = () => acomodarCreds(cont);
+  cont.querySelectorAll('[data-u]').forEach(b => b.onclick = () => abrir({ tipo: 'tareas', persona: b.dataset.u }));
+}
+
+/* ---------- Tu credencial: la abre tu foto de arriba ---------- */
+function capaCuenta(c) {
+  const z = letra();
+  marco('Tu credencial', '', `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr) auto auto auto auto">
+    <div class="creds" id="creds">${credencial(yo())}</div>
+    <span class="pista-cred">Tócala para darle vuelta</span>
+    <div class="botones"><button class="boton" id="foto">Cambiar foto</button><button class="boton dos" id="frase">Mi frase</button></div>
+    <div><div class="eti" style="margin-bottom:6px">Tamaño de letra en este dispositivo</div><div class="segmento" id="letra">${tamanosQueCaben().map(([n, v], i, todos) => `<button data-z="${v}" class="${v === z || (i === todos.length - 1 && z > v) ? 'on' : ''}" style="font-size:${Math.round(13 * v)}px">${n}</button>`).join('')}</div>${tamanosQueCaben().length < TAMANOS.length ? '<div class="mini" style="margin-top:4px">En esta pantalla no cabe más grande sin cortar cosas.</div>' : ''}</div>
+    <button class="enlace" id="cerrar" style="justify-self:center;min-height:36px">Cerrar sesión en este dispositivo</button>
+    <input type="file" id="archivo" accept="image/*" hidden></div>`);
+  const cont = document.getElementById('creds');
+  acomodarCreds(cont);
+  alCambiarTamano = () => acomodarCreds(cont);
+  if (c.volteada) cont.firstElementChild.classList.add('volteada');
+  cont.firstElementChild.onclick = () => { c.volteada = !c.volteada; cont.firstElementChild.classList.toggle('volteada', c.volteada); };
+  const arch = document.getElementById('archivo');
+  document.getElementById('foto').onclick = () => arch.click();
+  arch.onchange = () => { const f = arch.files[0]; if (f) abrir({ tipo: 'foto', src: URL.createObjectURL(f) }); arch.value = ''; };
+  document.getElementById('frase').onclick = () => abrir({ tipo: 'frase' });
+  app.querySelectorAll('#letra [data-z]').forEach(b => b.onclick = () => {
+    try { localStorage.setItem(LETRA, b.dataset.z); } catch (e) {}
+    transicion(() => { medir(); pinta(true); });
+  });
+  document.getElementById('cerrar').onclick = async () => { await api('salir'); guardarSesion(''); D = null; pila = []; transicion(pantallaQuien); };
+}
+
+function capaFrase() {
+  const u = usuario(yo());
+  marco('Mi frase', '', `<form class="hoja editando" id="f" style="align-self:start">
+    <label class="eti" for="rol">Lo que hago en MOON</label><input class="campo" id="rol" maxlength="40" value="${esc(u.rol || '')}" placeholder="Ej. Construye y diseña">
+    <label class="eti" for="lema">Mi frase (sale atrás de la credencial)</label><input class="campo" id="lema" maxlength="90" value="${esc(u.lema || '')}" placeholder="Una frase que te represente">
+    <button class="boton">Guardar</button><div class="aviso" id="aviso"></div></form>`);
+  document.getElementById('f').onsubmit = async e => {
+    e.preventDefault();
+    const datos = { rol: document.getElementById('rol').value, lema: document.getElementById('lema').value };
+    const r = await api('mi_perfil', datos);
+    if (r.ok) { Object.assign(u, datos); cerrar(); } else document.getElementById('aviso').textContent = 'No se pudo guardar. Intenta de nuevo.';
+  };
+}
+
+// Acomodar la foto nueva: se arrastra con un dedo y se acerca pellizcando o con la barrita.
+function capaFoto(c) {
+  marco('Acomoda tu foto', '', `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr) auto auto auto">
+    <div class="recorte" id="rec"><img id="img" alt="Tu foto nueva"></div>
+    <label class="mini" style="display:flex;align-items:center;gap:10px">Acercar<input type="range" id="zoom" min="1" max="3" step="0.01" value="${c.s || 1}" style="flex:1;accent-color:var(--cobalto)"></label>
+    <div class="botones"><button class="boton dos" id="cancelar">Cancelar</button><button class="boton" id="guardar">Usar esta foto</button></div>
+    <div class="aviso" id="aviso" style="text-align:center"></div></div>`);
+  const rec = document.getElementById('rec'), img = document.getElementById('img'), zoom = document.getElementById('zoom');
+  c.s = c.s || 1; c.x = c.x || 0; c.y = c.y || 0;
+  let base = 1;
+  function limites() {
+    const fw = rec.clientWidth, fh = rec.clientHeight, iw = img.naturalWidth * base * c.s, ih = img.naturalHeight * base * c.s;
+    c.x = Math.max(-(iw - fw) / 2, Math.min((iw - fw) / 2, c.x));
+    c.y = Math.max(-(ih - fh) / 2, Math.min((ih - fh) / 2, c.y));
+  }
+  function dibuja() {
+    if (!img.naturalWidth) return;
+    base = Math.max(rec.clientWidth / img.naturalWidth, rec.clientHeight / img.naturalHeight);
+    limites();
+    img.style.width = img.naturalWidth + 'px';
+    img.style.transform = `translate(-50%,-50%) translate(${c.x}px,${c.y}px) scale(${base * c.s})`;
+    zoom.value = c.s;
+  }
+  img.onload = dibuja; img.src = c.src;
+  alCambiarTamano = dibuja;
+  zoom.oninput = () => { c.s = Number(zoom.value); dibuja(); };
+  const dedos = new Map(); let inicio = null;
+  const escala = () => rec.offsetWidth / rec.getBoundingClientRect().width;   // de la pantalla al tamaño elegido
+  rec.onpointerdown = e => { rec.setPointerCapture(e.pointerId); dedos.set(e.pointerId, [e.clientX, e.clientY]); inicio = null; };
+  rec.onpointermove = e => {
+    if (!dedos.has(e.pointerId)) return;
+    const antes = dedos.get(e.pointerId); dedos.set(e.pointerId, [e.clientX, e.clientY]);
+    const k = escala();
+    if (dedos.size === 1) { c.x += (e.clientX - antes[0]) * k; c.y += (e.clientY - antes[1]) * k; }
+    else if (dedos.size === 2) {
+      const [a, b] = [...dedos.values()], d = Math.hypot(a[0] - b[0], a[1] - b[1]);
+      if (!inicio) inicio = { d, s: c.s }; else c.s = Math.max(1, Math.min(3, inicio.s * d / inicio.d));
+    }
+    dibuja();
+  };
+  rec.onpointerup = rec.onpointercancel = e => { dedos.delete(e.pointerId); inicio = null; };
+  rec.onwheel = e => { e.preventDefault(); c.s = Math.max(1, Math.min(3, c.s * (e.deltaY < 0 ? 1.06 : 0.94))); dibuja(); };
+  document.getElementById('cancelar').onclick = cerrar;
+  document.getElementById('guardar').onclick = async () => {
+    if (!img.naturalWidth) return;
+    const b = document.getElementById('guardar'); b.disabled = true; b.textContent = 'Guardando…';
+    const cv = document.createElement('canvas'); cv.width = 360; cv.height = 450;
+    const k = 360 / rec.clientWidth, dw = img.naturalWidth * base * c.s * k, dh = img.naturalHeight * base * c.s * k;
+    cv.getContext('2d').drawImage(img, 180 + c.x * k - dw / 2, 225 + c.y * k - dh / 2, dw, dh);
+    const foto = cv.toDataURL('image/jpeg', 0.85);
+    const r = await api('mi_perfil', { foto });
+    if (r.ok) { FOTOS[yo()] = foto; URL.revokeObjectURL(c.src); cerrar(); }
+    else { b.disabled = false; b.textContent = 'Usar esta foto'; document.getElementById('aviso').textContent = 'No se pudo guardar. Intenta de nuevo.'; }
+  };
 }
 
 /* ---------- MOON ---------- */
 function capaMoon(c) {
   if (c.cuenta) {
-    marco('Tu cuenta', '', `<div class="hoja" style="align-content:center;justify-items:center;text-align:center;gap:16px">${ava(yo())}<h3 style="font-size:22px;font-weight:800">${esc(GENTE[yo()].n)}</h3><p class="mini">Este aparato está recordado. Solo cierra sesión si es un aparato prestado.</p><button class="boton dos" id="cerrar">Cerrar sesión en este aparato</button></div>`);
+    marco('Tu cuenta', '', `<div class="hoja" style="align-content:center;justify-items:center;text-align:center;gap:16px">${ava(yo())}<h3 style="font-size:22px;font-weight:800">${esc(GENTE[yo()].n)}</h3><p class="mini">Este dispositivo está recordado. Solo cierra sesión si es un dispositivo prestado.</p><button class="boton dos" id="cerrar">Cerrar sesión en este dispositivo</button></div>`);
     document.getElementById('cerrar').onclick = async () => { await api('salir'); guardarSesion(''); D = null; pila = []; pantallaQuien(); };
     return;
   }
   const serv = [['Agente de llamadas', 'Jason contesta, filtra y agenda', 'var(--cobalto)'], ['Página web', 'Que se sienta cara y funcione', 'var(--cielo)'], ['Redes y campañas', 'Que lleguen clientes', 'var(--morado)'], ['Administración', 'Orden, inventario y números', 'var(--verde)']];
   marco('MOON Digital', '', `<div class="cuerpo" style="grid-template-rows:auto minmax(0,1fr)">
-    <div class="hoja" style="gap:8px"><span class="eti">Nuestra visión</span><p style="font-size:clamp(15px,4.2vw,19px);font-weight:700;line-height:1.35">Ser una empresa de inteligencia artificial muy fuerte, muy dinámica y muy intuitiva. Cada hora que invertimos es para agilizar, mejorar y hacer más inteligente la forma de trabajar.</p></div>
+    <div class="hoja" style="gap:8px"><span class="eti">Nuestra visión</span><p style="font-size:clamp(15px,calc(4.2 * var(--w)),19px);font-weight:700;line-height:1.35">Ser una empresa de inteligencia artificial muy fuerte, muy dinámica y muy intuitiva. Cada hora que invertimos es para agilizar, mejorar y hacer más inteligente la forma de trabajar.</p></div>
     <div class="lista dos" style="grid-auto-rows:minmax(0,1fr)">${serv.map(([n, d, col]) => `<div class="fila" style="height:auto;grid-template-columns:auto minmax(0,1fr)"><span class="punto" style="--c:${col};width:14px;height:14px"></span><span class="q"><b>${n}</b><span>${d}</span></span></div>`).join('')}</div></div>`);
 }
 

@@ -60,6 +60,11 @@ async function registrar(d) {
   await sql('INSERT OR REPLACE INTO contactos (id, tel, canal, tipo, fecha, resumen, datos) VALUES (?,?,?,?,?,?,?)',
     [id, tel, canal, tipoFinal, fecha, resumen || (viejo ? viejo.resumen || '' : ''), JSON.stringify(datos).slice(0, 8000)]);
   await sql('UPDATE personas SET contactos = (SELECT COUNT(*) FROM contactos WHERE tel = ?), creado = MIN(COALESCE(creado, ?), ?) WHERE tel = ?', [tel, fecha, fecha, tel]);
+  // Cada contacto con Jason también es "uso" del proyecto de Jason (pestaña Uso del Centro).
+  await sql(`INSERT INTO uso (proyecto, fecha, quien, canal, resumen, datos, ref)
+             SELECT id, ?, ?, ?, ?, ?, ? FROM proyectos WHERE clave = 'jason' LIMIT 1
+             ON CONFLICT(ref) DO UPDATE SET resumen = excluded.resumen, datos = excluded.datos`,
+    [fecha, tel, canal, resumen || (viejo ? viejo.resumen || '' : ''), JSON.stringify(datos).slice(0, 6000), 'contacto:' + id]).catch(e => console.log('USO-JASON', e.message));
   return { ok: true, tel, nueva: !prev, etapa };
 }
 

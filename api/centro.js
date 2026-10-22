@@ -97,13 +97,16 @@ async function entrada(d, req) {
 
 // ---------- Con sesión ----------
 async function inicio(yo) {
-  const [usuarios, personas, proyectos, tareas, actividad] = await Promise.all([
-    sql('SELECT id, nombre, color FROM usuarios'),
-    sql('SELECT tel, telefono, nombre, negocio, giro, temperatura, etapa, servicio, origen, necesidad, proxima_cita, encargados, ultimo_contacto, contactos, es_prueba FROM personas ORDER BY ultimo_contacto DESC LIMIT 1000'),
-    sql('SELECT * FROM proyectos ORDER BY actualizado DESC'),
+  const [usuarios, personas, proyectos, tareas, actividad, usoMes] = await Promise.all([
+    sql('SELECT id, nombre, color, rol, lema, creado FROM usuarios'),
+    sql('SELECT tel, telefono, nombre, negocio, giro, temperatura, etapa, servicio, origen, necesidad, proxima_cita, encargados, notas_equipo, ultimo_contacto, contactos, es_prueba FROM personas ORDER BY ultimo_contacto DESC LIMIT 1000'),
+    sql("SELECT id, tel, nombre, fase, encargados, nota, creado, actualizado, (clave != '' OR llave_uso != '') AS conectado FROM proyectos ORDER BY actualizado DESC"),
     sql("SELECT * FROM tareas WHERE estado != 'hecha' OR hecho > ? ORDER BY id DESC", [new Date(Date.now() - 14 * 864e5).toISOString()]),
     sql('SELECT * FROM actividad ORDER BY id DESC LIMIT 12'),
+    sql('SELECT proyecto, COUNT(*) n FROM uso WHERE fecha >= ? AND quien NOT IN (SELECT tel FROM personas WHERE es_prueba = 1) GROUP BY proyecto', [new Date(Date.now() - 30 * 864e5).toISOString()]),
   ]);
+  const usos = Object.fromEntries(usoMes.map(x => [x.proyecto, x.n]));
+  proyectos.forEach(p => { p.uso_mes = usos[p.id] || 0; });
   return { ok: true, yo, usuarios, personas, proyectos, tareas, actividad, listas: { etapas: ETAPAS, temperaturas: TEMPERATURAS, servicios: SERVICIOS, origenes: ORIGENES, fases: FASES } };
 }
 
@@ -111,7 +114,55 @@ const listaUsuarios = v => (Array.isArray(v) ? v : String(v || '').split(',')).m
 
 async function conSesion(d, yo) {
   if (d.accion === 'inicio') return inicio(yo);
-  if (d.accion === 'fotos') return { ok: true, fotos: require('./_fotos') };
+  if (d.accion === 'fotos') {
+    // Foto que cada quien subió; si no ha subido, la de su credencial.
+    const fotos = Object.assign({}, require('./_fotos'));
+    (await sql("SELECT id, foto FROM usuarios WHERE foto != ''")).forEach(u => { fotos[u.id] = u.foto; });
+    return { ok: true, fotos };
+  }
+
+  // Cada quien solo cambia SU credencial: foto, frase y lo que hace.
+  if (d.accion === 'mi_perfil') {
+    if (!USUARIOS.includes(yo.id)) return { ok: false, error: 'permiso' };
+    const set = [], params = [];
+    if (d.foto !== undefined) {
+      const f = String(d.foto || '');
+      if (f && (!/^data:image\/(jpeg|webp|png);base64,[A-Za-z0-9+/=]+$/.test(f) || f.length > 400000)) return { ok: false, error: 'foto' };
+      set.push('foto = ?'); params.push(f);
+    }
+    if (d.lema !== undefined) { set.push('lema = ?'); params.push(t(d.lema, 90)); }
+    if (d.rol !== undefined) { set.push('rol = ?'); params.push(t(d.rol, 40)); }
+    if (!set.length) return { ok: false };
+    params.push(yo.id);
+    await sql('UPDATE usuarios SET ' + set.join(', ') + ' WHERE id = ?', params);
+    if (d.foto !== undefined) await anotar(yo.id, 'cambió su foto de credencial');
+    return { ok: true };
+  }
+
+  if (d.accion === 'uso') {
+    const id = Number(d.id) || 0;
+    // Las llamadas de prueba de la familia no cuentan como uso real.
+    const real = "proyecto = ? AND quien NOT IN (SELECT tel FROM personas WHERE es_prueba = 1)";
+    const dia = n => new Date(Date.now() - n * 864e5).toISOString();
+    // Cancún vive en UTC-5 todo el año (sin horario de verano): el día empieza a las 05:00 UTC.
+    const inicioHoy = new Date(Math.floor((Date.now() - 5 * 36e5) / 864e5) * 864e5 + 5 * 36e5).toISOString();
+    const [cifras, porDia, ultimos, conectado] = await Promise.all([
+      sql(`SELECT SUM(fecha >= ?) hoy, SUM(fecha >= ?) semana, SUM(fecha >= ?) mes, COUNT(DISTINCT CASE WHEN fecha >= ? THEN quien END) personas, COUNT(*) total FROM uso WHERE ${real}`, [inicioHoy, dia(7), dia(30), dia(30), id]),
+      sql(`SELECT substr(datetime(fecha, '-5 hours'), 1, 10) d, COUNT(*) n FROM uso WHERE ${real} AND fecha >= ? GROUP BY d`, [id, dia(28)]),
+      sql(`SELECT id, fecha, quien, canal, resumen, datos FROM uso WHERE ${real} ORDER BY fecha DESC LIMIT 300`, [id]),
+      sql('SELECT clave, llave_uso FROM proyectos WHERE id = ?', [id]),
+    ]);
+    const c = conectado[0] || {};
+    return { ok: true, cifras: cifras[0] || {}, porDia, ultimos, conectado: !!(c.clave || c.llave_uso) };
+  }
+
+  // Solo Claude (clave interna) genera la llave de un proyecto, para conectarlo. Se muestra una sola vez.
+  if (d.accion === 'llave_uso') {
+    if (yo.id !== 'sistema') return { ok: false, error: 'permiso' };
+    const llave = 'uso_' + crypto.randomBytes(24).toString('base64url');
+    await sql('UPDATE proyectos SET llave_uso = ? WHERE id = ?', [huella(llave), Number(d.id) || 0]);
+    return { ok: true, llave };
+  }
 
   if (d.accion === 'ficha') {
     const tel = llave(d.tel);
