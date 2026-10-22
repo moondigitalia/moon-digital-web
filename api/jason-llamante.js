@@ -8,6 +8,7 @@
 const AGENDA = 'https://script.google.com/macros/s/AKfycbzmjh39HaP39rdzK3PJdKMULk43T9uvQNwcriSdpzbIRgLC3Xppu9MezL4byJTb4kgX/exec';
 const JASON = 'agent_3301m5axkdjpe7wtaqd082bze9fc';
 const ESPERA_MS = 3500;
+const LIBRETA = '3badeaa5-4933-42e1-89fd-7f06dd087b5b'; // moon-crm
 
 function vacio() {
   return { cliente_conocido: 'no', cliente_nombre: '', cliente_negocio: '', cliente_necesidad: '', cliente_cita: '' };
@@ -23,6 +24,21 @@ function leer(req) {
   });
 }
 
+// Libreta central (moon-crm en Cloudflare D1): lo que sabemos de este número por cualquier canal.
+async function buscarEnLibreta(tel, signal) {
+  const { CF_ACCOUNT_ID, CF_D1_TOKEN } = process.env;
+  const t10 = String(tel || '').replace(/\D/g, '').slice(-10);
+  if (!CF_ACCOUNT_ID || !CF_D1_TOKEN || t10.length < 10) return null;
+  const r = await fetch(`https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/d1/database/${LIBRETA}/query`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${CF_D1_TOKEN}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ sql: 'SELECT nombre, negocio, giro, necesidad FROM personas WHERE tel = ?', params: [t10] }),
+    signal,
+  });
+  const j = await r.json();
+  return (j && j.result && j.result[0] && j.result[0].results && j.result[0].results[0]) || null;
+}
+
 function limpio(t, max) {
   return String(t || '').replace(/[{}<>]/g, '').trim().slice(0, max);
 }
@@ -36,28 +52,32 @@ module.exports = async (req, res) => {
   const clave = req.headers['x-clave'];
   if (!clave || (d.agent_id && d.agent_id !== JASON) || !d.caller_id) { contestar(); return; }
 
+  // Se pregunta a la vez a la agenda (citas) y a la libreta central (todos los canales: llamadas, WhatsApp, cuestionarios).
   const control = new AbortController();
   const reloj = setTimeout(() => control.abort(), ESPERA_MS);
-  try {
-    const r = await fetch(AGENDA, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ accion: 'llamante', clave, telefono: d.caller_id }),
-      redirect: 'follow',
-      signal: control.signal,
-    });
-    const x = await r.json();
-    if (x && x.conocido === 'sí') {
-      vars.cliente_conocido = 'sí';
-      vars.cliente_nombre = limpio(x.nombre, 60);
-      vars.cliente_negocio = limpio(x.negocio, 120);
-      vars.cliente_necesidad = limpio(x.necesidad, 200);
-      vars.cliente_cita = limpio(x.cita, 120);
-    }
-  } catch (e) {
-    console.log('JASON-LLAMANTE sin respuesta de la agenda:', e.name);
-  } finally {
-    clearTimeout(reloj);
+  const deAgenda = fetch(AGENDA, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ accion: 'llamante', clave, telefono: d.caller_id }),
+    redirect: 'follow',
+    signal: control.signal,
+  }).then(r => r.json()).catch(e => { console.log('JASON-LLAMANTE sin agenda:', e.name); return null; });
+  const deLibreta = buscarEnLibreta(d.caller_id, control.signal).catch(e => { console.log('JASON-LLAMANTE sin libreta:', e.message); return null; });
+  const [x, p] = await Promise.all([deAgenda, deLibreta]);
+  clearTimeout(reloj);
+
+  if (x && x.conocido === 'sí') {
+    vars.cliente_conocido = 'sí';
+    vars.cliente_nombre = limpio(x.nombre, 60);
+    vars.cliente_negocio = limpio(x.negocio, 120);
+    vars.cliente_necesidad = limpio(x.necesidad, 200);
+    vars.cliente_cita = limpio(x.cita, 120);
+  }
+  if (p && (p.nombre || p.negocio)) {
+    vars.cliente_conocido = 'sí';
+    vars.cliente_nombre = vars.cliente_nombre || limpio(p.nombre, 60);
+    vars.cliente_negocio = vars.cliente_negocio || limpio(p.negocio || p.giro, 120);
+    vars.cliente_necesidad = vars.cliente_necesidad || limpio(p.necesidad, 200);
   }
 
   const nombre = vars.cliente_nombre.split(' ')[0];

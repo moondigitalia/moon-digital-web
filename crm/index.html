@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Libreta MOON</title>
+<meta name="theme-color" content="#0b1f3a">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0b1f3a; --navy2:#13305a; --ink:#0b0b0c; --gris:#6b7280; --linea:#e6e8ec; --fondo:#f4f5f7; --blanco:#fff;
+  --cal:#b42318; --calf:#fde8e8; --tib:#b54708; --tibf:#fff4e0; --fri:#1d4ed8; --frif:#e8f1fd;
+  --ok:#067647; --okf:#e7f6ee;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--fondo);color:var(--ink);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;font-size:15px;line-height:1.4}
+button,input,select,textarea{font:inherit;color:inherit}
+.oculto{display:none!important}
+
+/* Entrada */
+#entrada{min-height:100vh;display:grid;place-items:center;padding:24px;background:var(--navy)}
+#entrada .caja{width:100%;max-width:360px;text-align:center;color:#fff}
+.luna{width:72px;height:72px;border-radius:50%;margin:0 auto 18px;background:radial-gradient(circle at 35% 35%,#fff 0 30%,#c9d6ea 31% 100%);box-shadow:inset -10px -6px 0 #9fb3d1}
+#entrada h1{font-size:22px;margin:0 0 6px;font-weight:600;letter-spacing:.2px}
+#entrada p{margin:0 0 22px;opacity:.75;font-size:14px}
+#entrada input{width:100%;padding:14px 18px;border-radius:999px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff;outline:none;text-align:center}
+#entrada input::placeholder{color:rgba(255,255,255,.55)}
+#entrada button{margin-top:12px;width:100%;padding:14px;border-radius:999px;border:0;background:#fff;color:var(--navy);font-weight:600;cursor:pointer}
+#entrada .error{color:#ffb4ab;font-size:13px;min-height:18px;margin-top:10px}
+
+/* Barra */
+header{position:sticky;top:0;z-index:5;background:var(--navy);color:#fff;padding:14px 16px 12px;padding-top:max(14px,env(safe-area-inset-top))}
+.fila-top{display:flex;align-items:center;gap:10px;max-width:1100px;margin:0 auto}
+.fila-top .luna{width:30px;height:30px;margin:0;box-shadow:inset -4px -3px 0 #9fb3d1}
+.fila-top h1{font-size:17px;font-weight:600;margin:0;flex:1}
+.fila-top .total{font-size:13px;opacity:.75}
+.buscar{max-width:1100px;margin:12px auto 0;position:relative}
+.buscar input{width:100%;padding:12px 18px;border-radius:999px;border:0;background:rgba(255,255,255,.1);color:#fff;outline:none}
+.buscar input::placeholder{color:rgba(255,255,255,.55)}
+
+main{max-width:1100px;margin:0 auto;padding:14px 16px 60px}
+.resumen{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.resumen::-webkit-scrollbar{display:none}
+.cifra{flex:0 0 auto;min-width:92px;background:#fff;border:1px solid var(--linea);border-radius:20px;padding:10px 14px}
+.cifra b{display:block;font-size:20px;font-weight:700}
+.cifra span{font-size:12px;color:var(--gris)}
+
+.filtros{margin-top:14px}
+.grupo{display:flex;align-items:center;gap:6px;overflow-x:auto;padding:4px 0;scrollbar-width:none}
+.grupo::-webkit-scrollbar{display:none}
+.grupo .tit{flex:0 0 auto;font-size:12px;color:var(--gris);width:84px}
+.chip{flex:0 0 auto;border:1px solid var(--linea);background:#fff;border-radius:999px;padding:7px 13px;font-size:13px;cursor:pointer;transition:background .18s,color .18s,border-color .18s}
+.chip.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+.interruptor{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--gris);margin-top:8px;cursor:pointer;user-select:none}
+.interruptor input{accent-color:var(--navy);width:16px;height:16px}
+
+.lista{display:grid;gap:10px;margin-top:14px;grid-template-columns:1fr}
+@media(min-width:720px){.lista{grid-template-columns:1fr 1fr}}
+@media(min-width:1040px){.lista{grid-template-columns:1fr 1fr 1fr}}
+.tarjeta{background:#fff;border:1px solid var(--linea);border-radius:22px;padding:14px;display:flex;gap:12px;align-items:flex-start;cursor:pointer;transition:border-color .18s,transform .18s}
+.tarjeta:hover{border-color:#c9cfd8}
+.tarjeta:active{transform:scale(.99)}
+.ini{flex:0 0 auto;width:44px;height:44px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font-weight:600;font-size:16px}
+.cuerpo{flex:1;min-width:0}
+.nom{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sub{font-size:13px;color:var(--gris);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pildoras{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.p{font-size:11.5px;padding:3px 9px;border-radius:999px;background:var(--fondo);color:#344054;font-weight:500}
+.p.caliente{background:var(--calf);color:var(--cal)} .p.tibio{background:var(--tibf);color:var(--tib)} .p.frio{background:var(--frif);color:var(--fri)}
+.p.cita{background:var(--okf);color:var(--ok)}
+.cuando{flex:0 0 auto;font-size:12px;color:var(--gris);text-align:right}
+.vacio{text-align:center;color:var(--gris);padding:50px 10px}
+
+/* Ficha */
+#velo{position:fixed;inset:0;background:rgba(11,31,58,.35);opacity:0;pointer-events:none;transition:opacity .22s;z-index:9}
+#velo.on{opacity:1;pointer-events:auto}
+#ficha{position:fixed;top:0;right:0;bottom:0;width:100%;max-width:520px;background:var(--fondo);z-index:10;transform:translateX(100%);transition:transform .26s cubic-bezier(.2,.8,.2,1);overflow-y:auto;overscroll-behavior:contain}
+#ficha.on{transform:none}
+@media (prefers-reduced-motion: reduce){#ficha,#velo,.chip,.tarjeta{transition-duration:.26s}}
+.ficha-top{background:var(--navy);color:#fff;padding:16px 18px 20px;padding-top:max(16px,env(safe-area-inset-top))}
+.cerrar{background:rgba(255,255,255,.12);border:0;color:#fff;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:18px}
+.ficha-top .ini{width:56px;height:56px;font-size:20px;background:#fff;color:var(--navy);margin-top:14px}
+.ficha-top h2{margin:12px 0 2px;font-size:20px;font-weight:600}
+.ficha-top .sub{color:rgba(255,255,255,.75)}
+.acciones{display:flex;gap:8px;margin-top:14px}
+.acciones a{flex:1;text-align:center;text-decoration:none;color:var(--navy);background:#fff;border-radius:999px;padding:10px;font-weight:600;font-size:14px}
+.seccion{background:#fff;border:1px solid var(--linea);border-radius:22px;margin:12px 14px;padding:14px 16px}
+.seccion h3{margin:0 0 10px;font-size:13px;color:var(--gris);font-weight:600;letter-spacing:.3px;text-transform:uppercase}
+.dato{display:flex;gap:12px;padding:7px 0;border-top:1px solid var(--fondo);font-size:14px}
+.dato:first-of-type{border-top:0}
+.dato span{flex:0 0 132px;color:var(--gris);font-size:13px}
+.dato b{font-weight:500;flex:1;word-break:break-word}
+.selectores{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.selectores label{font-size:12px;color:var(--gris);display:block}
+.selectores select{width:100%;margin-top:4px;padding:10px 12px;border-radius:14px;border:1px solid var(--linea);background:#fff}
+textarea{width:100%;min-height:90px;border-radius:16px;border:1px solid var(--linea);padding:12px;resize:vertical;outline:none}
+.guardado{font-size:12px;color:var(--ok);min-height:16px;margin-top:6px}
+.hist{position:relative;padding-left:18px}
+.hist:before{content:"";position:absolute;left:5px;top:6px;bottom:6px;width:2px;background:var(--linea)}
+.ev{position:relative;padding:4px 0 14px}
+.ev:before{content:"";position:absolute;left:-17px;top:7px;width:10px;height:10px;border-radius:50%;background:var(--navy)}
+.ev .cab{font-size:13px;font-weight:600}
+.ev .cab small{font-weight:400;color:var(--gris)}
+.ev .txt{font-size:13.5px;color:#344054;margin-top:2px}
+.prueba-chk{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--gris);cursor:pointer}
+.prueba-chk input{accent-color:var(--navy)}
+</style>
+</head>
+<body>
+
+<section id="entrada">
+  <div class="caja">
+    <div class="luna"></div>
+    <h1>Libreta de MOON</h1>
+    <p>Todas las personas que nos han contactado, en un solo lugar.</p>
+    <input id="clave" type="password" placeholder="Clave del equipo" autocomplete="current-password">
+    <button id="entrar">Entrar</button>
+    <div class="error" id="err"></div>
+  </div>
+</section>
+
+<section id="app" class="oculto">
+  <header>
+    <div class="fila-top"><div class="luna"></div><h1>Libreta de MOON</h1><span class="total" id="total"></span></div>
+    <div class="buscar"><input id="q" type="search" placeholder="Buscar por nombre, negocio o teléfono"></div>
+  </header>
+  <main>
+    <div class="resumen" id="resumen"></div>
+    <div class="filtros" id="filtros"></div>
+    <label class="interruptor"><input type="checkbox" id="verPruebas"> Mostrar contactos de prueba</label>
+    <div class="lista" id="lista"></div>
+  </main>
+</section>
+
+<div id="velo"></div>
+<aside id="ficha" aria-hidden="true"></aside>
+
+<script>
+const API = '/api/crm';
+const NOMBRES = { temperatura: 'Temperatura', etapa: 'Etapa', servicio: 'Servicio', origen: 'Llegó por' };
+let CLAVE = '', DATOS = { personas: [] }, FILTRO = { temperatura: '', etapa: '', servicio: '', origen: '' };
+
+function guardarClave(c) { try { localStorage.setItem('moon-crm-clave', c); } catch (e) {} }
+function leerClave() { try { return localStorage.getItem('moon-crm-clave') || ''; } catch (e) { return ''; } }
+function borrarClave() { try { localStorage.removeItem('moon-crm-clave'); } catch (e) {} }
+
+async function llamar(cuerpo) {
+  const r = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-clave': CLAVE }, body: JSON.stringify(cuerpo) });
+  if (r.status === 401) throw new Error('clave');
+  const j = await r.json();
+  if (!j.ok) throw new Error(j.error || 'error');
+  return j;
+}
+
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const inicial = p => (p.nombre || p.negocio || '#').trim().charAt(0).toUpperCase();
+const tempTxt = { caliente: 'Caliente', tibio: 'Tibio', frio: 'Frío' };
+function hace(iso) {
+  if (!iso) return '';
+  const d = new Date(iso), s = (Date.now() - d) / 1000;
+  if (s < 60) return 'ahora';
+  if (s < 3600) return 'hace ' + Math.floor(s / 60) + ' min';
+  if (s < 86400) return 'hace ' + Math.floor(s / 3600) + ' h';
+  if (s < 86400 * 7) return 'hace ' + Math.floor(s / 86400) + ' d';
+  return d.toLocaleDateString('es-MX', { day: 'numeric', month: 'short', timeZone: 'America/Cancun' });
+}
+function fechaLarga(iso) {
+  if (!iso) return '';
+  return new Date(iso).toLocaleString('es-MX', { weekday: 'short', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit', timeZone: 'America/Cancun' });
+}
+
+async function entrar(c) {
+  CLAVE = c;
+  try {
+    DATOS = await llamar({ accion: 'lista' });
+    guardarClave(c);
+    document.getElementById('entrada').classList.add('oculto');
+    document.getElementById('app').classList.remove('oculto');
+    pintar();
+  } catch (e) {
+    borrarClave();
+    document.getElementById('err').textContent = e.message === 'clave' ? 'Esa clave no es correcta.' : 'No pude abrir la libreta. Intenta de nuevo.';
+  }
+}
+
+function visibles() {
+  const q = document.getElementById('q').value.trim().toLowerCase();
+  const pruebas = document.getElementById('verPruebas').checked;
+  return DATOS.personas.filter(p => {
+    if (!pruebas && p.es_prueba) return false;
+    for (const k in FILTRO) if (FILTRO[k] && p[k] !== FILTRO[k]) return false;
+    if (q) {
+      const t = [p.nombre, p.negocio, p.giro, p.telefono, p.tel, p.necesidad].join(' ').toLowerCase();
+      if (!t.includes(q)) return false;
+    }
+    return true;
+  });
+}
+
+function pintarFiltros() {
+  const listas = { temperatura: DATOS.temperaturas, etapa: DATOS.etapas, servicio: DATOS.servicios, origen: DATOS.origenes };
+  document.getElementById('filtros').innerHTML = Object.keys(listas).map(k =>
+    '<div class="grupo"><span class="tit">' + NOMBRES[k] + '</span>' +
+    '<button class="chip' + (FILTRO[k] ? '' : ' on') + '" data-k="' + k + '" data-v="">Todos</button>' +
+    (listas[k] || []).map(v => '<button class="chip' + (FILTRO[k] === v ? ' on' : '') + '" data-k="' + k + '" data-v="' + esc(v) + '">' + esc(k === 'temperatura' ? tempTxt[v] : v.charAt(0).toUpperCase() + v.slice(1)) + '</button>').join('') +
+    '</div>').join('');
+}
+
+function pintar() {
+  pintarFiltros();
+  const base = DATOS.personas.filter(p => document.getElementById('verPruebas').checked || !p.es_prueba);
+  const cuenta = f => base.filter(f).length;
+  document.getElementById('resumen').innerHTML = [
+    ['Personas', base.length], ['Calientes', cuenta(p => p.temperatura === 'caliente')], ['Agendados', cuenta(p => p.etapa === 'agendado')],
+    ['En propuesta', cuenta(p => p.etapa === 'en propuesta')], ['Clientes', cuenta(p => p.etapa === 'cliente')]
+  ].map(x => '<div class="cifra"><b>' + x[1] + '</b><span>' + x[0] + '</span></div>').join('');
+  const v = visibles();
+  document.getElementById('total').textContent = v.length + ' de ' + base.length;
+  document.getElementById('lista').innerHTML = v.length ? v.map(p =>
+    '<article class="tarjeta" data-tel="' + esc(p.tel) + '"><div class="ini">' + esc(inicial(p)) + '</div><div class="cuerpo">' +
+    '<div class="nom">' + esc(p.nombre || 'Sin nombre') + '</div>' +
+    '<div class="sub">' + esc([p.negocio, p.giro].filter(Boolean).filter((x, i, a) => a.indexOf(x) === i).join(' · ') || p.telefono || p.tel) + '</div>' +
+    '<div class="pildoras">' +
+      (p.temperatura ? '<span class="p ' + p.temperatura + '">' + tempTxt[p.temperatura] + '</span>' : '') +
+      '<span class="p">' + esc(p.etapa || 'nuevo') + '</span>' +
+      (p.servicio ? '<span class="p">' + esc(p.servicio) + '</span>' : '') +
+      (p.proxima_cita && p.etapa === 'agendado' ? '<span class="p cita">Cita: ' + esc(p.proxima_cita.replace(/, hora de Cancún$/, '')) + '</span>' : '') +
+    '</div></div><div class="cuando">' + esc(hace(p.ultimo_contacto)) + '<br>' + (p.contactos || 0) + ' contacto' + (p.contactos == 1 ? '' : 's') + '</div></article>'
+  ).join('') : '<div class="vacio">Nadie coincide con estos filtros.</div>';
+}
+
+async function abrir(tel) {
+  const f = document.getElementById('ficha');
+  f.innerHTML = '<div class="ficha-top"><button class="cerrar" data-cerrar>×</button><h2>Cargando…</h2></div>';
+  f.classList.add('on'); f.setAttribute('aria-hidden', 'false'); document.getElementById('velo').classList.add('on');
+  let j;
+  try { j = await llamar({ accion: 'ficha', tel }); } catch (e) { f.innerHTML = '<div class="ficha-top"><button class="cerrar" data-cerrar>×</button><h2>No pude abrir la ficha</h2></div>'; return; }
+  const p = j.persona, num = (p.telefono || p.tel).replace(/[^\d+]/g, '');
+  const wa = num.replace(/\D/g, '');
+  const sel = (k, lista) => '<label>' + NOMBRES[k] + '<select data-campo="' + k + '"><option value="">—</option>' +
+    lista.map(v => '<option value="' + esc(v) + '"' + (p[k] === v ? ' selected' : '') + '>' + esc(k === 'temperatura' ? tempTxt[v] : v.charAt(0).toUpperCase() + v.slice(1)) + '</option>').join('') + '</select></label>';
+  const dato = (n, v) => v ? '<div class="dato"><span>' + n + '</span><b>' + esc(v) + '</b></div>' : '';
+  const tipoTxt = { cita: 'Agendó cita', recado: 'Dejó recado', llamada: 'Llamada', mensaje: 'Mensaje' };
+  f.innerHTML =
+    '<div class="ficha-top"><button class="cerrar" data-cerrar aria-label="Cerrar">×</button>' +
+    '<div class="ini">' + esc(inicial(p)) + '</div><h2>' + esc(p.nombre || 'Sin nombre') + '</h2>' +
+    '<div class="sub">' + esc([p.negocio, p.telefono || p.tel].filter(Boolean).join(' · ')) + '</div>' +
+    '<div class="acciones"><a href="tel:' + esc(num) + '">Llamar</a><a href="https://wa.me/' + esc(wa) + '" target="_blank" rel="noopener">WhatsApp</a></div></div>' +
+    '<div class="seccion"><h3>Categorías</h3><div class="selectores">' +
+      sel('temperatura', DATOS.temperaturas) + sel('etapa', DATOS.etapas) + sel('servicio', DATOS.servicios) + sel('origen', DATOS.origenes) +
+    '</div><div class="guardado" id="g1"></div></div>' +
+    '<div class="seccion"><h3>Lo que sabemos</h3>' +
+      dato('A qué se dedica', p.giro) + dato('Negocio', p.negocio) + dato('Problema', p.necesidad) + dato('Llamadas al día', p.volumen) +
+      dato('Qué tan pronto', p.urgencia) + dato('Quién decide', p.decide) + dato('Correo', p.correo) + dato('Próxima cita', p.proxima_cita) +
+      dato('Primer contacto', fechaLarga(p.creado)) +
+    '</div>' +
+    '<div class="seccion"><h3>Notas del equipo</h3><textarea id="notas" placeholder="Lo que platicaron, acuerdos, siguiente paso…">' + esc(p.notas_equipo || '') + '</textarea><div class="guardado" id="g2"></div>' +
+      '<label class="prueba-chk"><input type="checkbox" id="esPrueba"' + (p.es_prueba ? ' checked' : '') + '> Es un contacto de prueba (ocultarlo de la libreta)</label></div>' +
+    '<div class="seccion"><h3>Historial (' + j.contactos.length + ')</h3><div class="hist">' +
+      j.contactos.map(c => {
+        let x = {}; try { x = JSON.parse(c.datos || '{}'); } catch (e) {}
+        return '<div class="ev"><div class="cab">' + esc(tipoTxt[c.tipo] || c.tipo) + ' · ' + esc(c.canal) + ' <small>' + esc(fechaLarga(c.fecha)) + '</small></div>' +
+          '<div class="txt">' + esc(c.resumen || x.necesidad || '') + (x.cita ? '<br>Cita: ' + esc(x.cita) : '') + (x.duracion ? '<br>Duración: ' + esc(x.duracion) : '') + '</div></div>';
+      }).join('') +
+    '</div></div>';
+  f.dataset.tel = p.tel;
+}
+
+function cerrar() {
+  document.getElementById('ficha').classList.remove('on'); document.getElementById('ficha').setAttribute('aria-hidden', 'true');
+  document.getElementById('velo').classList.remove('on');
+}
+
+async function editar(cambio, aviso) {
+  const tel = document.getElementById('ficha').dataset.tel;
+  const el = document.getElementById(aviso);
+  try {
+    await llamar(Object.assign({ accion: 'editar', tel }, cambio));
+    const p = DATOS.personas.find(x => x.tel === tel); if (p) Object.assign(p, cambio);
+    if (el) el.textContent = 'Guardado';
+    setTimeout(() => { if (el) el.textContent = ''; }, 1800);
+    pintar();
+  } catch (e) { if (el) { el.style.color = '#b42318'; el.textContent = 'No se guardó, intenta de nuevo.'; } }
+}
+
+document.getElementById('entrar').onclick = () => entrar(document.getElementById('clave').value.trim());
+document.getElementById('clave').onkeydown = e => { if (e.key === 'Enter') entrar(e.target.value.trim()); };
+document.getElementById('q').oninput = pintar;
+document.getElementById('verPruebas').onchange = pintar;
+document.getElementById('filtros').onclick = e => { const b = e.target.closest('.chip'); if (!b) return; FILTRO[b.dataset.k] = b.dataset.v; pintar(); };
+document.getElementById('lista').onclick = e => { const t = e.target.closest('.tarjeta'); if (t) abrir(t.dataset.tel); };
+document.getElementById('velo').onclick = cerrar;
+document.getElementById('ficha').onclick = e => { if (e.target.closest('[data-cerrar]')) cerrar(); };
+document.getElementById('ficha').onchange = e => {
+  if (e.target.dataset.campo) editar({ [e.target.dataset.campo]: e.target.value }, 'g1');
+  if (e.target.id === 'esPrueba') editar({ es_prueba: e.target.checked ? 1 : 0 }, 'g2');
+};
+let tNotas;
+document.getElementById('ficha').oninput = e => {
+  if (e.target.id !== 'notas') return;
+  clearTimeout(tNotas); tNotas = setTimeout(() => editar({ notas_equipo: e.target.value }, 'g2'), 900);
+};
+document.addEventListener('keydown', e => { if (e.key === 'Escape') cerrar(); });
+// Se actualiza sola cada minuto mientras está abierta.
+setInterval(async () => { if (!CLAVE || document.hidden) return; try { DATOS = await llamar({ accion: 'lista' }); pintar(); } catch (e) {} }, 60000);
+
+const guardada = leerClave();
+if (guardada) entrar(guardada);
+</script>
+</body>
+</html>
