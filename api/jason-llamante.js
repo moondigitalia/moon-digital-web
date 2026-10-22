@@ -62,7 +62,7 @@ module.exports = async (req, res) => {
 
   const nombre = vars.cliente_nombre.split(' ')[0];
   if (vars.cliente_conocido === 'sí' && nombre) {
-    contestar({ conversation_config_override: { agent: { first_message: `MOON Digital, te atiende Jason. ¿Hablo con ${nombre}?` } } });
+    contestar({ conversation_config_override: { agent: { first_message: `Hola, soy Jason, el asistente virtual de MOON Digital. ¿Hablo con ${nombre}?` } } });
     return;
   }
   contestar();
