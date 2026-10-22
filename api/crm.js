@@ -1,59 +1,13 @@
-// LIBRETA CENTRAL DE MOON DIGITAL (CRM propio) — 22-oct-2026
+// CRM DE MOON — entrada del sistema (Jason y su agenda). 22-oct-2026
 // Una sola ficha por persona, identificada por su teléfono (últimos 10 dígitos).
 // Cada contacto (llamada, cita, recado y después WhatsApp o cuestionario) se suma a su historial:
 // nadie aparece como "cliente nuevo" dos veces aunque cambie de canal.
-// Vive en la base moon-crm (Cloudflare D1) de MOON. Variables propias de MOON en Vercel:
-//   CF_ACCOUNT_ID, CF_D1_TOKEN  → acceso a la base (las mismas del buzón de cuestionarios)
-//   JASON_CLAVE                 → la clave interna con la que Jason y su agenda escriben aquí
-//   CRM_CLAVE                   → la clave con la que Kid, Dan y papá abren la página /crm
-const BASE = '3badeaa5-4933-42e1-89fd-7f06dd087b5b'; // moon-crm
-const crypto = require('crypto');
-
-const ETAPAS = ['nuevo', 'agendado', 'en propuesta', 'cliente', 'perdido'];
-const TEMPERATURAS = ['caliente', 'tibio', 'frio'];
-const SERVICIOS = ['agente de llamadas', 'página web', 'redes y campañas', 'administración', 'otro'];
-const ORIGENES = ['llamada', 'whatsapp', 'cuestionario', 'referido', 'otro'];
-
-function igual(a, b) {
-  if (!a || !b) return false;
-  const x = Buffer.from(String(a)), y = Buffer.from(String(b));
-  return x.length === y.length && crypto.timingSafeEqual(x, y);
-}
+// El equipo ya no entra por aquí: entra al Centro MOON (api/centro.js) con su usuario.
+// Variables de MOON en Vercel: CF_ACCOUNT_ID, CF_D1_TOKEN (base) y JASON_CLAVE (clave interna de Jason).
+const { ETAPAS, TEMPERATURAS, SERVICIOS, ORIGENES, igual, leer, sql, t, clave10, normal } = require('./_base');
 
 function quien(req) {
-  const c = req.headers['x-clave'];
-  if (igual(c, process.env.JASON_CLAVE)) return 'sistema';
-  if (igual(c, process.env.CRM_CLAVE)) return 'equipo';
-  return null;
-}
-
-function leer(req) {
-  if (req.body && typeof req.body === 'object') return Promise.resolve(req.body);
-  return new Promise(ok => {
-    let s = '';
-    req.on('data', c => { s += c; if (s.length > 200000) req.destroy(); });
-    req.on('end', () => { try { ok(JSON.parse(s || '{}')); } catch (e) { ok({}); } });
-    req.on('error', () => ok({}));
-  });
-}
-
-async function sql(q, params) {
-  const { CF_ACCOUNT_ID, CF_D1_TOKEN } = process.env;
-  const r = await fetch(`https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/d1/database/${BASE}/query`, {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${CF_D1_TOKEN}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ sql: q, params: params || [] }),
-  });
-  const j = await r.json().catch(() => ({}));
-  if (!r.ok || !j.success) throw new Error('base ' + r.status + ' ' + JSON.stringify(j.errors || '').slice(0, 200));
-  return (j.result && j.result[0] && j.result[0].results) || [];
-}
-
-const t = (v, max) => String(v == null ? '' : v).replace(/[<>]/g, '').trim().slice(0, max || 500);
-function clave10(tel) { const d = String(tel || '').replace(/\D/g, ''); return d.length >= 10 ? d.slice(-10) : ''; }
-function normal(v, lista) {
-  const s = t(v, 40).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
-  return lista.find(x => x.normalize('NFD').replace(/[̀-ͯ]/g, '') === s) || '';
+  return igual(req.headers['x-clave'], process.env.JASON_CLAVE) ? 'sistema' : null;
 }
 
 // --- Registrar un contacto (lo usa la agenda de Jason; después WhatsApp y cuestionarios) ---
@@ -71,8 +25,9 @@ async function registrar(d) {
   const val = (k, max) => t(x[k], max);
   const temperatura = normal(x.temperatura || x.etiqueta, TEMPERATURAS);
   const servicio = normal(x.servicio, SERVICIOS);
-  let etapa = prev ? prev.etapa : 'nuevo';
-  if (tipo === 'cita' && (etapa === 'nuevo' || etapa === 'perdido' || !etapa)) etapa = 'agendado';
+  // Quien vuelve a llamar después de archivado regresa a pendientes; los demás conservan su etapa.
+  let etapa = prev ? (normal(prev.etapa, ETAPAS) || 'pendiente') : 'pendiente';
+  if (etapa === 'archivo') etapa = 'pendiente';
 
   if (!prev) {
     await sql(`INSERT INTO personas (tel, telefono, nombre, negocio, giro, correo, temperatura, etapa, servicio, origen, necesidad, volumen, urgencia, decide, proxima_cita, creado, actualizado, ultimo_contacto, contactos, es_prueba)
@@ -127,8 +82,8 @@ module.exports = async (req, res) => {
         const tel = clave10(c.tel); if (!tel || vistas.has(tel)) continue; vistas.add(tel);
         const cita = t(c.cita, 120);
         const hay = (await sql('SELECT tel FROM personas WHERE tel = ?', [tel]))[0];
-        if (hay) await sql("UPDATE personas SET proxima_cita = ?, etapa = CASE WHEN etapa IN ('nuevo','perdido','') THEN 'agendado' ELSE etapa END WHERE tel = ?", [cita, tel]);
-        else await sql("INSERT INTO personas (tel, telefono, nombre, etapa, origen, proxima_cita, creado, actualizado, ultimo_contacto, es_prueba) VALUES (?,?,?,'agendado','llamada',?,?,?,?,?)",
+        if (hay) await sql("UPDATE personas SET proxima_cita = ?, etapa = CASE WHEN etapa IN ('archivo','') THEN 'pendiente' ELSE etapa END WHERE tel = ?", [cita, tel]);
+        else await sql("INSERT INTO personas (tel, telefono, nombre, etapa, origen, proxima_cita, creado, actualizado, ultimo_contacto, es_prueba) VALUES (?,?,?,'pendiente','llamada',?,?,?,?,?)",
           [tel, t(c.tel, 30), t(c.nombre, 80), cita, ahora, ahora, ahora, /prueba/i.test(c.nombre || '') ? 1 : 0]);
       }
       const marcas = [...vistas];
@@ -141,35 +96,6 @@ module.exports = async (req, res) => {
       const tel = clave10(d.tel);
       const p = tel ? (await sql('SELECT * FROM personas WHERE tel = ?', [tel]))[0] : null;
       res.status(200).json({ ok: true, persona: p || null });
-      return;
-    }
-
-    if (d.accion === 'lista') {
-      const personas = await sql('SELECT * FROM personas ORDER BY ultimo_contacto DESC LIMIT 1000');
-      res.status(200).json({ ok: true, personas, etapas: ETAPAS, temperaturas: TEMPERATURAS, servicios: SERVICIOS, origenes: ORIGENES });
-      return;
-    }
-
-    if (d.accion === 'ficha') {
-      const tel = clave10(d.tel);
-      const p = (await sql('SELECT * FROM personas WHERE tel = ?', [tel]))[0];
-      const contactos = await sql('SELECT * FROM contactos WHERE tel = ? ORDER BY fecha DESC LIMIT 200', [tel]);
-      res.status(200).json({ ok: true, persona: p || null, contactos });
-      return;
-    }
-
-    if (d.accion === 'editar') {
-      const tel = clave10(d.tel);
-      if (!tel) { res.status(400).json({ ok: false }); return; }
-      const set = [], params = [];
-      const listas = { etapa: ETAPAS, temperatura: TEMPERATURAS, servicio: SERVICIOS, origen: ORIGENES };
-      for (const k in listas) if (d[k] !== undefined) { const v = d[k] === '' ? '' : normal(d[k], listas[k]); if (v || d[k] === '') { set.push(k + ' = ?'); params.push(v); } }
-      for (const k of ['nombre', 'negocio', 'notas_equipo']) if (d[k] !== undefined) { set.push(k + ' = ?'); params.push(t(d[k], k === 'notas_equipo' ? 4000 : 120)); }
-      if (d.es_prueba !== undefined) { set.push('es_prueba = ?'); params.push(d.es_prueba ? 1 : 0); }
-      if (!set.length) { res.status(400).json({ ok: false }); return; }
-      set.push('actualizado = ?'); params.push(new Date().toISOString(), tel);
-      await sql('UPDATE personas SET ' + set.join(', ') + ' WHERE tel = ?', params);
-      res.status(200).json({ ok: true });
       return;
     }
 

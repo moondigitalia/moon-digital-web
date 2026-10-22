@@ -1,0 +1,694 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<meta name="robots" content="noindex, nofollow">
+<title>Centro MOON</title>
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f3efe9" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16171b" media="(prefers-color-scheme: dark)">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --fondo:#f3efe9; --tarjeta:#f6f3ee; --campo:#ece7e0; --tinta:#1d1d22; --suave:#5d5d66; --tenue:#8b8a92; --linea:rgba(29,29,34,.08);
+  --cobalto:#0b4fd6; --cobalto2:#0a44b8; --cielo:#5b9cf5; --niebla:#cfd6e2; --marfil:#ece4d8; --carbon:#2b2b30;
+  --sombra:0 14px 28px -12px rgba(120,105,85,.35),0 2px 6px rgba(120,105,85,.10),inset 0 1px 0 rgba(255,255,255,.85);
+  --sombra-chica:0 6px 14px -6px rgba(120,105,85,.35),inset 0 1px 0 rgba(255,255,255,.8);
+  --hundido:inset 0 2px 5px rgba(120,105,85,.22),inset 0 -1px 0 rgba(255,255,255,.7);
+  --naranja:#e8892f; --naranjaf:#fdf0e3; --verde:#2f9e5a; --verdef:#e6f4ea; --rojo:#d9534a; --rojof:#fbe9e7; --azulf:#e4ecfb; --moradof:#ece9fb; --morado:#6a55d8;
+  --ease:cubic-bezier(.22,.8,.24,1); --r:28px;
+}
+@media (prefers-color-scheme:dark){:root{
+  --fondo:#16171b; --tarjeta:#1d1e23; --campo:#25262c; --tinta:#efedea; --suave:#b3b1b8; --tenue:#85848c; --linea:rgba(255,255,255,.07);
+  --cobalto:#3a78ff; --cobalto2:#2f69eb; --cielo:#78aefc; --niebla:#3a3f4a; --marfil:#3a3631; --carbon:#d9d7d3;
+  --sombra:0 14px 28px -12px rgba(0,0,0,.7),0 2px 6px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.05);
+  --sombra-chica:0 6px 14px -6px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.05);
+  --hundido:inset 0 2px 5px rgba(0,0,0,.45),inset 0 -1px 0 rgba(255,255,255,.04);
+  --naranja:#f2a052; --naranjaf:#3a2a1a; --verde:#5cc283; --verdef:#183026; --rojo:#ef7b72; --rojof:#3a1f1d; --azulf:#1c2740; --moradof:#272241; --morado:#a493ff;
+}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0}
+html,body{height:100%;overflow:hidden;background:var(--fondo);color:var(--tinta);font-family:Manrope,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;font-size:15px;line-height:1.35;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit;border:0;background:none}
+button{cursor:pointer}
+[hidden]{display:none!important}
+.app{height:100vh;height:100dvh;max-width:1180px;margin:0 auto;padding:max(14px,env(safe-area-inset-top)) 16px max(14px,env(safe-area-inset-bottom));display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);gap:clamp(10px,1.8vh,16px)}
+.eti{font-size:11px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--suave)}
+.top{display:flex;align-items:center;gap:12px;min-height:44px}
+.marca{font-size:clamp(17px,4.6vw,22px);font-weight:800;letter-spacing:.24em;white-space:nowrap}
+.marca i{font-style:normal;color:var(--cobalto);font-weight:600;margin:0 .1em}
+.top .esp{flex:1}
+.redondo{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;color:inherit;text-decoration:none;background:var(--tarjeta);box-shadow:var(--sombra-chica);flex:none;transition:transform .25s var(--ease)}
+.redondo:active{transform:scale(.94)}
+.redondo svg{width:20px;height:20px}
+.ava{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:15px;color:#fff;flex:none;background:var(--c,var(--cobalto))}
+.ava.chico{width:26px;height:26px;font-size:11px;border:2px solid var(--tarjeta)}
+.avas{display:flex}.avas .ava.chico+.ava.chico{margin-left:-8px}
+.vista{min-height:0;min-width:0;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);gap:clamp(8px,1.6vh,14px);animation:entra .45s var(--ease) both}
+@keyframes entra{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.vista{animation:fundido .3s ease both}@keyframes fundido{from{opacity:0}to{opacity:1}}.redondo,.t,.fila,.pil{transition:none!important}}
+
+/* ---------- Inicio ---------- */
+.hola{font-size:clamp(22px,6.4vw,34px);font-weight:700;letter-spacing:-.02em;line-height:1.1}
+.hola small{display:block;font-size:13px;font-weight:600;color:var(--suave);letter-spacing:0;margin-top:4px}
+.mosaico{min-height:0;display:grid;gap:clamp(9px,1.5vh,14px);grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:1.35fr 1fr 1fr .5fr;grid-template-areas:"tuyo tuyo" "crm proy" "equipo moon" "ultimo ultimo"}
+.t{position:relative;min-height:0;border-radius:var(--r);background:var(--tarjeta);box-shadow:var(--sombra);padding:clamp(12px,2vh,18px) 16px;text-align:start;display:flex;flex-direction:column;gap:6px;overflow:hidden;transition:transform .3s var(--ease)}
+.t:active{transform:scale(.985)}
+.t .num{font-size:clamp(28px,7.5vh,52px);font-weight:800;letter-spacing:-.03em;line-height:1;margin-top:auto}
+.t .sub{font-size:13px;line-height:1.25;color:var(--suave);font-weight:600}
+.t>.eti{padding-right:34px;line-height:1.3}
+.t .flecha{position:absolute;top:12px;right:12px;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:var(--fondo);box-shadow:var(--hundido)}
+.t .flecha svg{width:15px;height:15px}
+.t-tuyo{grid-area:tuyo;background:var(--cobalto);color:#fff;box-shadow:0 18px 30px -14px rgba(11,79,214,.65),inset 0 1px 0 rgba(255,255,255,.25)}
+.t-tuyo .eti,.t-tuyo .sub{color:rgba(255,255,255,.82)}
+.t-tuyo .flecha{background:rgba(255,255,255,.16);box-shadow:none}
+.t-crm{grid-area:crm}.t-proy{grid-area:proy}.t-equipo{grid-area:equipo}.t-moon{grid-area:moon}
+.t-ultimo{grid-area:ultimo;flex-direction:row;align-items:center;gap:12px;padding:10px 16px}
+.t-ultimo .txt{min-width:0;font-size:13px;line-height:1.3;font-weight:600;color:var(--suave)}
+.t-ultimo .txt b{color:var(--tinta)}
+.brilla{display:inline-flex;align-items:center;gap:6px;align-self:flex-start;background:#fff;color:var(--cobalto);font-weight:800;font-size:12px;border-radius:99px;padding:5px 11px 5px 6px}
+.brilla i{width:18px;height:18px;border-radius:50%;background:var(--cobalto);color:#fff;display:grid;place-items:center;font-style:normal;font-size:11px}
+.latido{animation:latido 2.4s ease-in-out infinite}
+@keyframes latido{0%,100%{opacity:1}50%{opacity:.55}}
+@media (prefers-reduced-motion:reduce){.latido{animation:none}}
+.barrita{display:flex;gap:4px;height:6px;margin-top:4px}
+.barrita i{flex:var(--n);border-radius:9px;background:var(--c)}
+
+/* ---------- Capas ---------- */
+.cabeza{display:flex;align-items:center;gap:12px;min-height:44px}
+.cabeza h2{font-size:clamp(17px,5vw,26px);line-height:1.15;font-weight:800;letter-spacing:-.01em;flex:1;min-width:0;overflow-wrap:anywhere}
+.cabeza .accion{background:var(--cobalto);color:#fff;box-shadow:0 10px 18px -8px rgba(11,79,214,.6)}
+.cuerpo{min-height:0;display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:10px}
+.pils{display:flex;gap:7px;flex-wrap:wrap}
+.pil{display:inline-flex;align-items:center;gap:7px;border-radius:99px;padding:7px 13px 7px 8px;font-size:13px;font-weight:700;background:var(--tarjeta);box-shadow:var(--sombra-chica);color:var(--suave);transition:background .25s,color .25s}
+.pil i{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:11px;font-weight:800;color:#fff;background:var(--c,var(--tenue))}
+.pil.on{background:var(--cf,var(--cobalto));color:var(--c,#fff)}
+.pil.on i{background:var(--c,#fff);color:var(--cf,var(--cobalto))}
+.pil.solo{padding:7px 13px}
+.lista{min-height:0;display:grid;align-content:start;gap:var(--hueco,9px);grid-template-columns:minmax(0,1fr)}
+.fila{min-height:var(--alto,64px);padding-top:10px!important;padding-bottom:10px!important;border-radius:22px;background:var(--tarjeta);box-shadow:var(--sombra-chica);display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:12px;padding:0 14px;text-align:start;width:100%;transition:transform .25s var(--ease)}
+.fila:active{transform:scale(.985)}
+.fila .q{min-width:0}
+.fila .q b{display:block;font-size:15px;line-height:1.25;font-weight:700;overflow-wrap:anywhere}
+.fila .q span{display:block;font-size:12.5px;line-height:1.3;color:var(--suave);font-weight:600;overflow-wrap:anywhere;margin-top:2px}
+.punto{width:12px;height:12px;border-radius:50%;background:var(--c,var(--niebla))}
+.nueva{background:var(--azulf);box-shadow:var(--sombra-chica),inset 0 0 0 2px var(--cobalto)}
+.estado{font-size:11.5px;font-weight:800;border-radius:99px;padding:4px 10px;background:var(--cf);color:var(--c);white-space:nowrap}
+.pie{display:flex;align-items:center;justify-content:center;gap:12px;min-height:44px}
+.pie .pag{font-size:13px;font-weight:700;color:var(--suave);min-width:56px;text-align:center}
+.vacio{display:grid;place-items:center;text-align:center;color:var(--suave);font-weight:600;padding:20px;border-radius:var(--r);background:var(--tarjeta);box-shadow:var(--hundido);height:100%}
+.vacio b{display:block;color:var(--tinta);font-size:17px;margin-bottom:4px}
+.buscador{display:flex;align-items:center;gap:10px;height:44px;border-radius:99px;background:var(--campo);box-shadow:var(--hundido);padding:0 16px}
+.buscador input{flex:1;min-width:0;outline:none;height:100%}
+.buscador svg{width:18px;height:18px;color:var(--tenue)}
+
+/* Ficha / formularios */
+.hoja{min-height:0;border-radius:var(--r);background:var(--tarjeta);box-shadow:var(--sombra);padding:16px;display:grid;align-content:start;gap:12px;overflow:hidden}
+.par{display:grid;grid-template-columns:96px minmax(0,1fr);gap:10px;align-items:center;font-size:14px}
+.par>span{font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--tenue)}
+.par>b{font-weight:600;overflow-wrap:anywhere}
+.campo{width:100%;height:46px;border-radius:99px;background:var(--campo);box-shadow:var(--hundido);padding:0 18px;outline:none}
+textarea.campo{height:auto;border-radius:22px;padding:14px 18px;resize:none}
+.campo:focus{box-shadow:var(--hundido),0 0 0 2px var(--cielo)}
+.boton{height:50px;border-radius:99px;font-weight:800;font-size:15px;padding:0 24px;background:var(--cobalto);color:#fff;box-shadow:0 12px 20px -10px rgba(11,79,214,.7),inset 0 1px 0 rgba(255,255,255,.25);transition:transform .25s var(--ease),opacity .25s}
+.boton:active{transform:scale(.97)}
+.boton.dos{background:var(--tarjeta);color:var(--tinta);box-shadow:var(--sombra-chica)}
+.boton[disabled]{opacity:.55}
+.botones{display:flex;gap:10px;flex-wrap:wrap}
+.botones .boton{flex:1 1 140px}
+.quien{display:flex;gap:10px;flex-wrap:wrap}
+.quien button{display:flex;align-items:center;gap:8px;border-radius:99px;padding:5px 14px 5px 5px;background:var(--tarjeta);box-shadow:var(--sombra-chica);font-weight:700;font-size:14px;opacity:.6;transition:opacity .25s,box-shadow .25s}
+.quien button .ava{width:30px;height:30px;font-size:12px}
+.quien button.on{opacity:1;box-shadow:var(--sombra-chica),inset 0 0 0 2px var(--cobalto)}
+.fases{display:grid;gap:clamp(4px,1vh,10px);justify-self:center;width:min(100%,320px)}
+.fases button{display:flex;align-items:center;gap:12px;font-size:15px;font-weight:700;color:var(--tenue);text-align:start}
+.fases button i{width:30px;height:30px;border-radius:50%;background:var(--campo);box-shadow:var(--hundido);display:grid;place-items:center;font-style:normal;font-size:12px;font-weight:800}
+.fases button.hecha i{background:var(--cielo);color:#fff;box-shadow:none}
+.fases button.on{color:var(--tinta)}
+.fases button.on i{background:var(--cobalto);color:#fff;box-shadow:0 8px 14px -6px rgba(11,79,214,.7)}
+.anillo{--p:0;width:40px;height:40px;border-radius:50%;background:conic-gradient(var(--cobalto) calc(var(--p)*1%),var(--niebla) 0);display:grid;place-items:center;flex:none}
+.anillo b{width:30px;height:30px;border-radius:50%;background:var(--tarjeta);display:grid;place-items:center;font-size:11px;font-weight:800}
+.aviso{font-size:13px;font-weight:700;color:var(--rojo);min-height:18px}
+.aviso.bien{color:var(--verde)}
+.tabs{display:flex;gap:4px;background:var(--campo);box-shadow:var(--hundido);border-radius:99px;padding:4px}
+.tabs button{flex:1 1 auto;min-width:0;padding:0 6px;min-height:36px;line-height:1.1;border-radius:99px;font-weight:700;font-size:13px;color:var(--suave);transition:background .25s,color .25s}
+.tabs button.on{background:var(--tarjeta);color:var(--cobalto);box-shadow:var(--sombra-chica)}
+.ancho{grid-column:1/-1}
+.mini{font-size:12px;color:var(--suave);font-weight:600}
+
+/* Entrada */
+.entrada{height:100%;display:grid;place-items:center}
+.entrada .caja{width:min(420px,100%);display:grid;gap:16px;justify-items:center;text-align:center}
+.entrada h1{font-size:clamp(22px,6vw,28px);font-weight:800;letter-spacing:-.01em}
+.entrada p{color:var(--suave);font-weight:600;font-size:14px}
+.gente{display:flex;gap:clamp(12px,4vw,22px);justify-content:center}
+.gente button{display:grid;justify-items:center;gap:8px;font-weight:800;font-size:15px}
+.gente .ava{width:clamp(72px,21vw,92px);height:clamp(72px,21vw,92px);font-size:26px;box-shadow:var(--sombra);transition:transform .3s var(--ease)}
+.gente button:active .ava{transform:scale(.95)}
+.codigo{letter-spacing:.5em;text-align:center;font-size:22px;font-weight:800}
+.enlace{font-weight:700;color:var(--cobalto);font-size:14px}
+
+@media (min-width:900px) and (min-height:560px){
+  .mosaico{grid-template-columns:repeat(12,minmax(0,1fr));grid-template-rows:1fr 1fr minmax(64px,.32fr);grid-template-areas:"tuyo tuyo tuyo tuyo tuyo crm crm crm crm proy proy proy" "tuyo tuyo tuyo tuyo tuyo equipo equipo equipo equipo moon moon moon" "ultimo ultimo ultimo ultimo ultimo ultimo ultimo ultimo ultimo ultimo ultimo ultimo"}
+  .lista.dos{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:360px){.tabs button{font-size:12px}}
+@media (max-height:620px){.hoja{padding:12px;gap:8px!important}.pil{padding:5px 11px 5px 6px}.quien button{padding:3px 12px 3px 3px}.hoja .eti{margin-bottom:5px!important}}
+@media (max-height:600px) and (max-width:899px){
+  .mosaico{grid-template-rows:1.1fr 1fr 1fr .55fr}
+  .t .sub{display:none}
+  .hola small{display:none}
+}
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+
+<script>
+'use strict';
+const API = '/api/centro';
+const LLAVE = 'centro.moon.sesion';
+const GENTE = { daniel: { n: 'Daniel', c: '#2b2b30', i: 'D' }, dan: { n: 'Dan', c: '#3f86ee', i: 'Dn' }, kid: { n: 'Kid', c: '#0b4fd6', i: 'K' } };
+const ETAPA = {
+  'pendiente':  { n: 'Pendientes', c: 'var(--naranja)', cf: 'var(--naranjaf)', ic: '◷', d: 'Todavía no firman' },
+  'en proceso': { n: 'En proceso', c: 'var(--cobalto)', cf: 'var(--azulf)',   ic: '↻', d: 'Negociando' },
+  'cerrado':    { n: 'Cerrados',   c: 'var(--verde)',   cf: 'var(--verdef)',  ic: '✓', d: 'Firmó y pagó; lo construimos' },
+  'en órbita':  { n: 'En órbita',  c: 'var(--morado)',  cf: 'var(--moradof)', ic: '◎', d: 'Pagan mantenimiento' },
+  'portafolio': { n: 'Portafolio', c: 'var(--suave)',   cf: 'var(--campo)',   ic: '★', d: 'Entregado, sin mantenimiento' },
+  'archivo':    { n: 'Archivo',    c: 'var(--rojo)',    cf: 'var(--rojof)',   ic: '×', d: 'Dijeron que no' },
+};
+const TEMP = { caliente: 'var(--rojo)', tibio: 'var(--naranja)', frio: 'var(--cielo)' };
+const I = {
+  atras: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>',
+  mas: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+  abre: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M9 7h8v8"/></svg>',
+  izq: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>',
+  der: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>',
+  tel: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>',
+  wa: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21l1.7-5A8.5 8.5 0 1 1 8 19.4L3 21"/></svg>',
+  lupa: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>',
+};
+
+let D = null;           // todo lo que manda el servidor
+let pila = [];          // capas abiertas: [{tipo, ...}]
+let estado = { tareas: 'mias', crm: 'pendiente', proy: 'todos', busca: '' };
+const app = document.getElementById('app');
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const sesionGuardada = () => { try { return localStorage.getItem(LLAVE) || ''; } catch (e) { return ''; } };
+const guardarSesion = v => { try { v ? localStorage.setItem(LLAVE, v) : localStorage.removeItem(LLAVE); } catch (e) {} };
+
+async function api(accion, datos) {
+  const r = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-sesion': sesionGuardada() }, body: JSON.stringify(Object.assign({ accion }, datos || {})) })
+    .catch(() => null);
+  if (!r) return { ok: false, error: 'red' };
+  const j = await r.json().catch(() => ({ ok: false, error: 'red' }));
+  if (r.status === 401 && j.error === 'sesion') { guardarSesion(''); D = null; pila = []; pantallaQuien(); }
+  return j;
+}
+
+const CLAUDE = { n: 'Claude', c: '#c96442', i: 'C' };
+function ava(id, chico) { const g = GENTE[id] || (id === 'sistema' ? CLAUDE : { n: '?', c: 'var(--tenue)', i: '?' }); return `<span class="ava${chico ? ' chico' : ''}" style="--c:${g.c}" title="${esc(g.n)}">${esc(g.i)}</span>`; }
+function avas(lista) { const ids = String(lista || '').split(',').filter(x => GENTE[x]); return ids.length ? `<span class="avas">${ids.map(x => ava(x, 1)).join('')}</span>` : ''; }
+function cuando(iso) {
+  if (!iso) return '';
+  const d = new Date(iso); if (isNaN(d)) return String(iso);
+  const min = (Date.now() - d) / 6e4;
+  if (min < 2) return 'ahora';
+  if (min < 60) return `hace ${Math.round(min)} min`;
+  if (min < 1440) return `hace ${Math.round(min / 60)} h`;
+  if (min < 2880) return 'ayer';
+  return d.toLocaleDateString('es-MX', { day: 'numeric', month: 'short', timeZone: 'America/Cancun' });
+}
+const nombreDe = p => p ? (p.negocio || p.nombre || p.telefono || 'Sin nombre') : '';
+const quienDe = p => p ? (p.negocio && p.nombre ? p.nombre : '') : '';
+
+/* ---------- Paginado: nunca scroll. Lo que no cabe pasa a la siguiente página. ---------- */
+function paginar(cont, items, pinta, opciones) {
+  const o = Object.assign({ alto: 64, hueco: 9, vacio: '<b>Nada por aquí</b>Todo en orden.' }, opciones || {});
+  const lista = cont.querySelector('.lista'), pie = cont.querySelector('.pie');
+  lista.style.setProperty('--alto', o.alto + 'px'); lista.style.setProperty('--hueco', o.hueco + 'px');
+  const clave = o.clave || 'p';
+  let pagina = o.pagina || 0;
+  function dibuja() {
+    if (!items.length) { lista.innerHTML = `<div class="vacio"><div>${o.vacio}</div></div>`; pie.innerHTML = ''; return; }
+    lista.innerHTML = '';
+    const H = lista.clientHeight;
+    const cols = getComputedStyle(lista).gridTemplateColumns.split(' ').length || 1;
+    // Se mide cada renglón ya con su texto completo (nada se corta) y se reparten en páginas que sí caben.
+    const m = document.createElement('div');
+    m.className = lista.className;
+    m.style.cssText = `position:absolute;left:0;top:0;visibility:hidden;width:${lista.clientWidth}px;height:auto;--alto:${o.alto}px;--hueco:${o.hueco}px`;
+    m.innerHTML = items.map(pinta).join('');
+    document.body.appendChild(m);
+    const altos = [...m.children].map(e => e.getBoundingClientRect().height);
+    m.remove();
+    const paginas = []; let actual = [], usado = 0;
+    for (let i = 0; i < items.length; i += cols) {
+      const fila = altos.slice(i, i + cols), alto = Math.max(...fila);
+      let suma = alto + (actual.length ? o.hueco : 0);
+      if (actual.length && usado + suma > H + 0.5) { paginas.push(actual); actual = []; usado = 0; suma = alto; }
+      for (let k = i; k < Math.min(i + cols, items.length); k++) actual.push(k);
+      usado += suma;
+    }
+    if (actual.length) paginas.push(actual);
+    const total = paginas.length;
+    pagina = Math.min(pagina, total - 1);
+    lista.innerHTML = paginas[pagina].map(k => pinta(items[k])).join('');
+    pie.innerHTML = total > 1 ? `<button class="redondo" data-pag="-1" aria-label="Anterior">${I.izq}</button><span class="pag">${pagina + 1} de ${total}</span><button class="redondo" data-pag="1" aria-label="Siguiente">${I.der}</button>` : '';
+    pie.querySelectorAll('[data-pag]').forEach(b => b.onclick = () => { pagina = (pagina + Number(b.dataset.pag) + total) % total; recordar(); dibuja(); });
+    let x0 = null;
+    lista.ontouchstart = e => { x0 = e.touches[0].clientX; };
+    lista.ontouchend = e => { if (x0 == null || total < 2) return; const dx = e.changedTouches[0].clientX - x0; x0 = null; if (Math.abs(dx) > 50) { pagina = (pagina + (dx < 0 ? 1 : -1) + total) % total; recordar(); dibuja(); } };
+    o.alPintar && o.alPintar(lista);
+  }
+  function recordar() { const c = pila[pila.length - 1]; if (c) c[clave] = pagina; }
+  dibuja();
+  return dibuja;
+}
+let alCambiarTamano = null;
+let reloj = null;
+addEventListener('resize', () => { clearTimeout(reloj); reloj = setTimeout(() => alCambiarTamano && alCambiarTamano(), 120); });
+
+/* ---------- Entrada ---------- */
+async function pantallaQuien() {
+  app.innerHTML = `<div class="top"><div class="marca">CENTRO <i>/</i> MOON</div></div><div class="entrada"><div class="caja"><span class="eti">Bienvenido</span><h1>¿Quién eres?</h1><div class="gente" id="gente"><span class="mini">Cargando…</span></div></div></div>`;
+  const r = await api('quienes');
+  const g = document.getElementById('gente');
+  if (!r.ok) { g.innerHTML = '<span class="aviso">No hay conexión. Revisa tu internet y vuelve a abrir.</span>'; return; }
+  g.innerHTML = r.usuarios.map(u => `<button data-u="${u.id}">${ava(u.id)}<span>${esc(u.nombre)}</span></button>`).join('');
+  g.querySelectorAll('button').forEach(b => b.onclick = () => { const u = r.usuarios.find(x => x.id === b.dataset.u); u.tieneClave ? pantallaClave(u) : pantallaCodigo(u); });
+}
+
+function marcoEntrada(u, html) {
+  app.innerHTML = `<div class="top"><button class="redondo" id="volver" aria-label="Regresar">${I.atras}</button><div class="marca">CENTRO <i>/</i> MOON</div></div><div class="entrada"><div class="caja">${ava(u.id)}${html}</div></div>`;
+  document.getElementById('volver').onclick = pantallaQuien;
+}
+
+function pantallaClave(u) {
+  marcoEntrada(u, `<h1>Hola, ${esc(u.nombre)}</h1><p>Escribe tu contraseña. Solo te la pedimos esta vez en este aparato.</p>
+    <form id="f" style="display:grid;gap:12px;width:100%"><input class="campo" id="clave" type="password" autocomplete="current-password" placeholder="Tu contraseña" required>
+    <button class="boton">Entrar</button><div class="aviso" id="aviso"></div></form><button class="enlace" id="olvide">Olvidé mi contraseña</button>`);
+  const f = document.getElementById('f'), av = document.getElementById('aviso');
+  setTimeout(() => document.getElementById('clave').focus(), 300);
+  document.getElementById('olvide').onclick = () => pantallaCodigo(u);
+  f.onsubmit = async e => {
+    e.preventDefault(); const b = f.querySelector('button'); b.disabled = true; av.textContent = '';
+    const r = await api('entrar', { usuario: u.id, clave: document.getElementById('clave').value });
+    b.disabled = false;
+    if (r.ok) { guardarSesion(r.sesion); return arrancar(); }
+    av.textContent = { clave: 'Esa no es. Intenta otra vez.', pausa: 'Muchos intentos. Espera 15 minutos o usa "Olvidé mi contraseña".', red: 'Sin conexión. Intenta de nuevo.' }[r.error] || 'No se pudo. Intenta de nuevo.';
+  };
+}
+
+async function pantallaCodigo(u) {
+  marcoEntrada(u, `<h1>Te mandamos un código</h1><p id="txt">Enviando a tu correo…</p>
+    <form id="f" style="display:grid;gap:12px;width:100%"><input class="campo codigo" id="cod" inputmode="numeric" autocomplete="one-time-code" maxlength="7" placeholder="••••••" required>
+    <button class="boton">Seguir</button><div class="aviso" id="aviso"></div></form><button class="enlace" id="otra">Mandar otro código</button>`);
+  const txt = document.getElementById('txt'), av = document.getElementById('aviso'), f = document.getElementById('f');
+  async function mandar() {
+    txt.textContent = 'Enviando a tu correo…'; av.textContent = '';
+    const r = await api('pedir_codigo', { usuario: u.id });
+    if (r.ok) txt.textContent = `Revisa ${r.correo} (también en "no deseado"). Vale 10 minutos.`;
+    else txt.textContent = r.error === 'muchos' ? 'Ya se mandaron varios códigos. Espera una hora.' : 'No se pudo mandar. Toca "Mandar otro código".';
+  }
+  document.getElementById('otra').onclick = mandar;
+  mandar();
+  f.onsubmit = async e => {
+    e.preventDefault(); const codigo = document.getElementById('cod').value.replace(/\D/g, '');
+    if (codigo.length !== 6) { av.textContent = 'Son 6 números.'; return; }
+    const r = await api('revisar_codigo', { usuario: u.id, codigo });
+    if (r.ok) return pantallaNueva(u, codigo);
+    av.textContent = r.error === 'vencido' ? 'Ese código ya venció. Pide otro.' : 'No coincide. Revisa el correo.';
+  };
+}
+
+function pantallaNueva(u, codigo) {
+  marcoEntrada(u, `<h1>Crea tu contraseña</h1><p>Mínimo 6 letras o números. Este aparato quedará recordado.</p>
+    <form id="f" style="display:grid;gap:12px;width:100%"><input class="campo" id="c1" type="password" autocomplete="new-password" placeholder="Contraseña nueva" required minlength="6">
+    <input class="campo" id="c2" type="password" autocomplete="new-password" placeholder="Repítela" required minlength="6">
+    <button class="boton">Entrar al Centro</button><div class="aviso" id="aviso"></div></form>`);
+  const f = document.getElementById('f'), av = document.getElementById('aviso');
+  f.onsubmit = async e => {
+    e.preventDefault(); const c1 = document.getElementById('c1').value, c2 = document.getElementById('c2').value;
+    if (c1.length < 6) { av.textContent = 'Mínimo 6.'; return; }
+    if (c1 !== c2) { av.textContent = 'No son iguales.'; return; }
+    const r = await api('crear_clave', { usuario: u.id, codigo, clave: c1 });
+    if (r.ok) { guardarSesion(r.sesion); return arrancar(); }
+    av.textContent = r.error === 'vencido' ? 'El código venció. Regresa y pide otro.' : 'No se pudo. Intenta de nuevo.';
+  };
+}
+
+/* ---------- Datos ---------- */
+const yo = () => D.yo.id;
+const misTareas = () => D.tareas.filter(x => x.para === yo());
+const proyectoDe = id => D.proyectos.find(p => p.id == id);
+const personaDe = tel => D.personas.find(p => p.tel === tel);
+const reales = () => D.personas.filter(p => !p.es_prueba);
+function atrasada(x) { return x.estado !== 'hecha' && x.vence && x.vence < new Date().toISOString().slice(0, 10); }
+
+async function arrancar() {
+  if (!sesionGuardada()) return pantallaQuien();
+  if (!D) app.innerHTML = '<div class="top"><div class="marca">CENTRO <i>/</i> MOON</div></div><div class="entrada"><span class="mini">Cargando…</span></div>';
+  const r = await api('inicio');
+  if (!r.ok) { if (r.error !== 'sesion' && !D) app.innerHTML = '<div class="entrada"><div class="caja"><h1>Sin conexión</h1><p>Revisa tu internet.</p><button class="boton" onclick="arrancar()">Reintentar</button></div></div>'; return; }
+  D = r;
+  pinta();
+}
+async function recargar() { const r = await api('inicio'); if (r.ok) { D = r; pinta(true); } }
+setInterval(() => { if (D && document.visibilityState === 'visible' && !document.querySelector('.editando') && !/INPUT|TEXTAREA|SELECT/.test((document.activeElement || {}).tagName || '')) recargar(); }, 60000);
+document.addEventListener('visibilitychange', () => { if (D && document.visibilityState === 'visible') recargar(); });
+
+// El botón "atrás" del celular cierra la capa en vez de salirse de la página.
+function abrir(capa) { pila.push(capa); try { history.pushState({ capa: pila.length }, ''); } catch (e) {} pinta(); }
+function reemplazar(capa) { pila[pila.length - 1] = capa; pinta(); }
+function cerrar() { if (history.state && history.state.capa) history.back(); else { pila.pop(); pinta(); } }
+addEventListener('popstate', () => { if (pila.length) { pila.pop(); pinta(); } });
+function pinta(silencioso) {
+  // Una sola pantalla a la vez: la anterior se borra, nada queda escondido detrás.
+  alCambiarTamano = null;
+  const c = pila[pila.length - 1];
+  if (!c) return pintaInicio(silencioso);
+  ({ tareas: capaTareas, tarea: capaTarea, nuevaTarea: capaNuevaTarea, crm: capaCRM, ficha: capaFicha, nuevoCliente: capaNuevoCliente, proyectos: capaProyectos, proyecto: capaProyecto, nuevoProyecto: capaProyecto, equipo: capaEquipo, moon: capaMoon, lector: capaLector })[c.tipo](c, silencioso);
+}
+function marco(titulo, accion, cuerpo) {
+  app.innerHTML = `<div class="top"><button class="redondo" id="volver" aria-label="Regresar">${I.atras}</button><div class="cabeza" style="flex:1;min-width:0"><h2>${esc(titulo)}</h2>${accion ? `<button class="redondo accion" id="accion" aria-label="${esc(accion)}">${I.mas}</button>` : ''}</div></div><div class="vista" style="grid-template-rows:minmax(0,1fr)">${cuerpo}</div>`;
+  document.getElementById('volver').onclick = cerrar;
+  if (silencio) app.querySelector('.vista').style.animation = 'none';
+}
+let silencio = false;
+
+/* ---------- Inicio ---------- */
+function pintaInicio(sil) {
+  const mias = misTareas().filter(x => x.estado !== 'hecha');
+  const nuevas = mias.filter(x => x.estado === 'nueva').length;
+  const vencen = mias.filter(atrasada).length;
+  const r = reales();
+  const cuenta = e => r.filter(p => p.etapa === e).length;
+  const activos = D.proyectos.filter(p => p.fase !== 'entregado');
+  const miosP = activos.filter(p => String(p.encargados).split(',').includes(yo())).length;
+  const atr = D.tareas.filter(atrasada).length;
+  const sinVer = D.tareas.filter(x => x.estado === 'nueva').length;
+  const ult = D.actividad[0];
+  const hora = Number(new Date().toLocaleString('en-US', { hour: 'numeric', hour12: false, timeZone: 'America/Cancun' }));
+  const saludo = hora < 12 ? 'Buenos días' : hora < 19 ? 'Buenas tardes' : 'Buenas noches';
+  const barrita = ['pendiente', 'en proceso', 'cerrado', 'en órbita'].map(e => cuenta(e) ? `<i style="--n:${cuenta(e)};--c:${ETAPA[e].c}"></i>` : '').join('');
+  app.innerHTML = `
+  <div class="top"><div class="marca">CENTRO <i>/</i> MOON</div><div class="esp"></div><button id="salir" aria-label="Mi cuenta">${ava(yo())}</button></div>
+  <div class="vista"${sil ? ' style="animation:none"' : ''}>
+    <h1 class="hola">${saludo}, ${esc(GENTE[yo()] ? GENTE[yo()].n : D.yo.nombre)}<small>${mias.length ? `Tienes ${mias.length} tarea${mias.length === 1 ? '' : 's'} abierta${mias.length === 1 ? '' : 's'}` : 'No tienes tareas pendientes'}</small></h1>
+    <main class="mosaico">
+      <button class="t t-tuyo" data-ir="tareas"><span class="flecha">${I.abre}</span><span class="eti">Lo tuyo</span>
+        ${nuevas ? `<span class="brilla latido"><i>${nuevas}</i>nueva${nuevas === 1 ? '' : 's'} para ti</span>` : ''}
+        <span class="num">${mias.length}</span><span class="sub">${vencen ? `${vencen} atrasada${vencen === 1 ? '' : 's'} · ` : ''}tareas abiertas</span></button>
+      <button class="t t-crm" data-ir="crm"><span class="flecha">${I.abre}</span><span class="eti">CRM de MOON</span><span class="num">${cuenta('pendiente') + cuenta('en proceso')}</span><span class="sub">clientes por cerrar</span><span class="barrita">${barrita}</span></button>
+      <button class="t t-proy" data-ir="proyectos"><span class="flecha">${I.abre}</span><span class="eti">Proyectos</span><span class="num">${activos.length}</span><span class="sub">${miosP} con tu nombre</span></button>
+      <button class="t t-equipo" data-ir="equipo"><span class="flecha">${I.abre}</span><span class="eti">Equipo</span><span class="num">${sinVer}</span><span class="sub">${atr ? `${atr} atrasada${atr === 1 ? '' : 's'}` : 'sin ver en total'}</span></button>
+      <button class="t t-moon" data-ir="moon"><span class="flecha">${I.abre}</span><span class="eti">MOON</span><span class="num" style="font-size:clamp(20px,4.6vh,32px)">Quiénes somos</span><span class="sub">visión y servicios</span></button>
+      <div class="t t-ultimo">${ult ? ava(ult.quien, 1) : ''}<span class="txt">${ult ? `<b>${esc((GENTE[ult.quien] || CLAUDE).n)}</b> ${esc(ult.texto)} · ${cuando(ult.fecha)}` : 'Aquí aparece lo último que pasó en MOON.'}</span></div>
+    </main>
+  </div>`;
+  app.querySelectorAll('[data-ir]').forEach(b => b.onclick = () => abrir({ tipo: b.dataset.ir }));
+  document.getElementById('salir').onclick = () => abrir({ tipo: 'moon', cuenta: true });
+}
+
+/* ---------- Tareas ---------- */
+function capaTareas(c) {
+  const de = c.persona || yo();
+  const ajena = de !== yo();
+  const todas = D.tareas.filter(x => x.para === de);
+  const grupos = { abiertas: todas.filter(x => x.estado !== 'hecha'), hechas: todas.filter(x => x.estado === 'hecha') };
+  c.grupo = c.grupo || 'abiertas';
+  const titulo = ajena ? `Tareas de ${GENTE[de].n}` : 'Lo tuyo';
+  marco(titulo, 'Nueva tarea', `<div class="cuerpo"><div class="pils">
+    <button class="pil${c.grupo === 'abiertas' ? ' on' : ''}" data-g="abiertas" style="--c:var(--cobalto);--cf:var(--azulf)"><i>${grupos.abiertas.length}</i>Abiertas</button>
+    <button class="pil${c.grupo === 'hechas' ? ' on' : ''}" data-g="hechas" style="--c:var(--verde);--cf:var(--verdef)"><i>${grupos.hechas.length}</i>Hechas</button></div>
+    <div class="lista dos"></div><div class="pie"></div></div>`);
+  app.querySelectorAll('[data-g]').forEach(b => b.onclick = () => { c.grupo = b.dataset.g; c.p = 0; pinta(true); });
+  document.getElementById('accion').onclick = () => abrir({ tipo: 'nuevaTarea', para: de });
+  const items = grupos[c.grupo].sort((a, b) => (a.estado === 'nueva' ? -1 : 0) - (b.estado === 'nueva' ? -1 : 0) || b.id - a.id);
+  alCambiarTamano = paginar(app.querySelector('.cuerpo'), items, filaTarea, { pagina: c.p, vacio: c.grupo === 'abiertas' ? '<b>Nada pendiente</b>Cuando alguien te deje algo, aparece aquí brillando.' : '<b>Aún nada</b>Lo terminado en las últimas 2 semanas.', alPintar: l => l.querySelectorAll('[data-t]').forEach(b => b.onclick = () => abrir({ tipo: 'tarea', id: Number(b.dataset.t) })) });
+}
+function filaTarea(x) {
+  const p = proyectoDe(x.proyecto);
+  const st = x.estado === 'hecha' ? ['Hecha', 'var(--verde)', 'var(--verdef)'] : x.estado === 'nueva' ? ['Nueva', '#fff', 'var(--cobalto)'] : atrasada(x) ? ['Atrasada', 'var(--rojo)', 'var(--rojof)'] : ['Vista', 'var(--suave)', 'var(--campo)'];
+  return `<button class="fila${x.estado === 'nueva' ? ' nueva' : ''}" data-t="${x.id}">${ava(x.de, 1)}<span class="q"><b>${esc(x.titulo)}</b><span>${esc(p ? p.nombre : 'General')} · ${cuando(x.creado)}</span></span><span class="estado" style="--c:${st[1]};--cf:${st[2]}">${st[0]}</span></button>`;
+}
+async function capaTarea(c) {
+  const x = D.tareas.find(t => t.id === c.id);
+  if (!x) return cerrar();
+  if (x.para === yo() && x.estado === 'nueva') { x.estado = 'vista'; x.visto = new Date().toISOString(); api('tarea_vista', { id: x.id }); }
+  const p = proyectoDe(x.proyecto);
+  marco('Tarea', '', `<div class="hoja" style="grid-template-rows:auto auto minmax(0,1fr) auto">
+    <div class="eti">${esc(p ? p.nombre : 'General')}</div>
+    <h3 style="font-size:clamp(19px,5vw,24px);font-weight:800;line-height:1.2">${esc(x.titulo)}</h3>
+    <div id="caja" style="min-height:0;overflow:hidden;display:grid;align-content:start;gap:10px">
+      ${x.detalle ? `<p id="detalle" style="color:var(--suave);font-weight:600;white-space:pre-line">${esc(x.detalle)}</p>` : ''}
+      <div class="par"><span>Para</span><b>${esc(GENTE[x.para] ? GENTE[x.para].n : x.para)}</b></div>
+      <div class="par"><span>La dejó</span><b>${esc(GENTE[x.de] ? GENTE[x.de].n : 'Claude')} · ${cuando(x.creado)}</b></div>
+      ${x.vence ? `<div class="par"><span>Para el</span><b>${esc(x.vence)}</b></div>` : ''}
+      <div class="par"><span>La vio</span><b>${x.visto ? cuando(x.visto) : 'Todavía no'}</b></div>
+    </div>
+    <div class="botones">${x.estado === 'hecha' ? '<button class="boton dos" id="hecho">Volver a abrir</button>' : '<button class="boton" id="hecho">Ya lo hice</button>'}</div></div>`);
+  // Si el detalle no cabe completo, se esconde y aparece un botón para leerlo entero.
+  const caja = document.getElementById('caja'), det = document.getElementById('detalle');
+  if (det && caja.scrollHeight > caja.clientHeight + 1) {
+    det.outerHTML = '<button class="boton dos" id="leer" style="justify-self:start">Leer el detalle completo</button>';
+    document.getElementById('leer').onclick = () => abrir({ tipo: 'lector', titulo: x.titulo, texto: x.detalle });
+  }
+  document.getElementById('hecho').onclick = async () => {
+    const hecha = x.estado !== 'hecha';
+    const r = await api('tarea_hecha', { id: x.id, hecha });
+    if (r.ok) { await recargar(); cerrar(); }
+  };
+}
+function capaNuevaTarea(c) {
+  let para = c.para || yo();
+  const proys = D.proyectos.filter(p => p.fase !== 'entregado');
+  marco('Nueva tarea', '', `<form class="hoja editando" id="f" style="grid-template-rows:auto auto auto minmax(0,1fr) auto">
+    <input class="campo" name="titulo" placeholder="¿Qué hay que hacer?" required maxlength="160">
+    <div><div class="eti" style="margin-bottom:8px">Para</div><div class="quien" id="para">${Object.keys(GENTE).map(id => `<button type="button" data-u="${id}" class="${id === para ? 'on' : ''}">${ava(id)}${GENTE[id].n}</button>`).join('')}</div></div>
+    <select class="campo" name="proyecto"><option value="0">General (sin proyecto)</option>${proys.map(p => `<option value="${p.id}"${p.id == c.proyecto ? ' selected' : ''}>${esc(p.nombre)}</option>`).join('')}</select>
+    <textarea class="campo" name="detalle" placeholder="Detalle (opcional)" style="height:100%;min-height:60px"></textarea>
+    <div class="botones"><input class="campo" name="vence" type="date" style="flex:1 1 140px" aria-label="Fecha límite"><button class="boton">Dejar tarea</button></div><div class="aviso" id="aviso"></div></form>`);
+  app.querySelectorAll('#para button').forEach(b => b.onclick = () => { para = b.dataset.u; app.querySelectorAll('#para button').forEach(x => x.classList.toggle('on', x === b)); });
+  const f = document.getElementById('f');
+  f.onsubmit = async e => {
+    e.preventDefault(); const fd = new FormData(f);
+    const r = await api('tarea', { titulo: fd.get('titulo'), detalle: fd.get('detalle'), proyecto: fd.get('proyecto'), vence: fd.get('vence'), para });
+    if (r.ok) { await recargar(); cerrar(); } else document.getElementById('aviso').textContent = 'No se pudo guardar. Intenta de nuevo.';
+  };
+}
+
+/* ---------- CRM ---------- */
+function capaCRM(c) {
+  const base = reales();
+  const pruebas = D.personas.filter(p => p.es_prueba);
+  const grupos = Object.keys(ETAPA);
+  c.g = c.g || 'pendiente';
+  const q = (c.busca || '').toLowerCase();
+  let items = c.g === 'pruebas' ? pruebas : base.filter(p => (p.etapa || 'pendiente') === c.g);
+  if (q) items = (c.g === 'pruebas' ? pruebas : base).filter(p => [p.nombre, p.negocio, p.telefono, p.giro, p.necesidad].join(' ').toLowerCase().includes(q));
+  const pils = grupos.map(e => { const n = base.filter(p => (p.etapa || 'pendiente') === e).length; if (e === 'archivo' && !n && c.g !== e) return ''; return `<button class="pil${c.g === e && !q ? ' on' : ''}" data-g="${e}" style="--c:${ETAPA[e].c};--cf:${ETAPA[e].cf}"><i>${n}</i>${ETAPA[e].n}</button>`; }).join('')
+    + (pruebas.length ? `<button class="pil${c.g === 'pruebas' ? ' on' : ''}" data-g="pruebas" style="--c:var(--suave);--cf:var(--campo)"><i>${pruebas.length}</i>Pruebas</button>` : '');
+  marco('CRM de MOON', 'Nuevo cliente', `<div class="cuerpo" style="grid-template-rows:auto auto minmax(0,1fr) auto">
+    <label class="buscador">${I.lupa}<input id="busca" placeholder="Buscar nombre, negocio o teléfono" value="${esc(c.busca || '')}" enterkeyhint="search"></label>
+    <div class="pils">${pils}</div><div class="lista dos"></div><div class="pie"></div></div>`);
+  app.querySelectorAll('[data-g]').forEach(b => b.onclick = () => { c.g = b.dataset.g; c.busca = ''; c.p = 0; pinta(true); });
+  document.getElementById('accion').onclick = () => abrir({ tipo: 'nuevoCliente', etapa: grupos.includes(c.g) ? c.g : 'pendiente' });
+  const busca = document.getElementById('busca');
+  let espera; busca.oninput = () => { clearTimeout(espera); espera = setTimeout(() => { c.busca = busca.value; c.p = 0; const pos = busca.selectionStart; silencio = true; pinta(true); silencio = false; const nb = document.getElementById('busca'); nb.focus(); nb.setSelectionRange(pos, pos); }, 250); };
+  const d = grupos.includes(c.g) ? ETAPA[c.g].d : 'Llamadas de prueba de la familia';
+  alCambiarTamano = paginar(app.querySelector('.cuerpo'), items, filaPersona, { pagina: c.p, vacio: q ? '<b>Sin resultados</b>Prueba con otra palabra.' : `<b>${esc(grupos.includes(c.g) ? ETAPA[c.g].n : 'Pruebas')}</b>${esc(d)}. Aún no hay nadie aquí.`, alPintar: l => l.querySelectorAll('[data-p]').forEach(b => b.onclick = () => abrir({ tipo: 'ficha', tel: b.dataset.p })) });
+}
+function filaPersona(p) {
+  const n = D.proyectos.filter(x => x.tel === p.tel).length;
+  const sub = p.proxima_cita ? `Cita: ${p.proxima_cita}` : [quienDe(p), p.servicio, n ? `${n} proyecto${n === 1 ? '' : 's'}` : '', cuando(p.ultimo_contacto)].filter(Boolean).join(' · ');
+  return `<button class="fila" data-p="${esc(p.tel)}"><span class="punto" style="--c:${TEMP[p.temperatura] || 'var(--niebla)'}" title="${esc(p.temperatura || 'sin temperatura')}"></span><span class="q"><b>${esc(nombreDe(p))}</b><span>${esc(sub)}</span></span>${avas(p.encargados)}</button>`;
+}
+
+async function capaFicha(c, sil) {
+  const p = personaDe(c.tel);
+  if (!p) return cerrar();
+  c.tab = c.tab || 'estado';
+  if (!c.cargado) { c.cargado = true; api('ficha', { tel: c.tel }).then(r => { if (r.ok && pila[pila.length - 1] === c) { c.ext = r; pinta(true); } }); }
+  const ext = c.ext || { persona: p, contactos: [] };
+  const P = Object.assign({}, p, ext.persona || {});
+  const proys = D.proyectos.filter(x => x.tel === c.tel);
+  const tel = String(P.telefono || '').replace(/\D/g, '');
+  const tabs = [['estado', 'Estado'], ['datos', 'Datos'], ['proyectos', 'Proyectos'], ['historial', 'Historial']];
+  let cuerpo = '';
+  if (c.tab === 'estado') {
+    cuerpo = `<div class="hoja" style="display:flex;flex-direction:column;gap:clamp(10px,2vh,16px)">
+      <div><div class="eti" style="margin-bottom:8px">¿Dónde va?</div><div class="pils" id="etapas">${Object.keys(ETAPA).map(e => `<button class="pil${(P.etapa || 'pendiente') === e ? ' on' : ''}" data-e="${e}" style="--c:${ETAPA[e].c};--cf:${ETAPA[e].cf}"><i>${ETAPA[e].ic}</i>${ETAPA[e].n}</button>`).join('')}</div></div>
+      <div><div class="eti" style="margin-bottom:8px">Encargados</div><div class="quien" id="enc">${Object.keys(GENTE).map(id => `<button data-u="${id}" class="${String(P.encargados).split(',').includes(id) ? 'on' : ''}">${ava(id)}${GENTE[id].n}</button>`).join('')}</div></div>
+      <div><div class="eti" style="margin-bottom:8px">Temperatura</div><div class="pils" id="temps">${['caliente', 'tibio', 'frio'].map(x => `<button class="pil solo${P.temperatura === x ? ' on' : ''}" data-x="${x}" style="--c:#fff;--cf:${TEMP[x]}">${x === 'frio' ? 'Frío' : x[0].toUpperCase() + x.slice(1)}</button>`).join('')}</div></div>
+      ${P.proxima_cita ? `<div class="par"><span>Cita</span><b>${esc(P.proxima_cita)}</b></div>` : ''}
+      <textarea class="campo" id="notas" style="flex:1 1 0;min-height:48px" placeholder="Notas del equipo sobre este cliente">${esc(P.notas_equipo || '')}</textarea>
+      <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap"><label class="mini" style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="prueba"${P.es_prueba ? ' checked' : ''}> Es una llamada de prueba</label><span class="aviso bien" id="aviso" style="min-height:0"></span></div></div>`;
+  } else if (c.tab === 'datos') {
+    const filas = [['Nombre', P.nombre], ['Negocio', P.negocio], ['Giro', P.giro], ['Teléfono', P.telefono], ['Correo', P.correo], ['Servicio', P.servicio], ['Llegó por', P.origen], ['Necesita', P.necesidad], ['Volumen', P.volumen], ['Urgencia', P.urgencia], ['Decide', P.decide], ['Primer contacto', cuando(P.creado)], ['Contactos', P.contactos]].filter(x => x[1] !== '' && x[1] != null);
+    cuerpo = `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr) auto"><div class="lista"></div><div class="pie"></div></div>`;
+    c._items = filas;
+  } else if (c.tab === 'proyectos') {
+    cuerpo = `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr) auto auto"><div class="lista"></div><div class="pie"></div><button class="boton dos" id="np">Nuevo proyecto para este cliente</button></div>`;
+  } else if (c.tab === 'historial') {
+    cuerpo = `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr) auto"><div class="lista"></div><div class="pie"></div></div>`;
+  }
+  marco(nombreDe(P), '', `<div class="cuerpo" style="grid-template-rows:auto minmax(0,1fr)"><div class="tabs" role="tablist">${tabs.map(([k, n]) => `<button data-tab="${k}" class="${c.tab === k ? 'on' : ''}">${n}</button>`).join('')}</div>${cuerpo}</div>`);
+  if (sil) app.querySelector('.vista').style.animation = 'none';
+  // Llamar y WhatsApp viven arriba, siempre a la mano, sin ocupar espacio de la ficha.
+  if (tel) app.querySelector('.cabeza').insertAdjacentHTML('beforeend', `<a class="redondo accion" href="tel:+52${tel.slice(-10)}" aria-label="Llamar">${I.tel}</a><a class="redondo" style="color:var(--verde)" href="https://wa.me/52${tel.slice(-10)}" target="_blank" rel="noopener" aria-label="WhatsApp">${I.wa}</a>`);
+  app.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => { c.tab = b.dataset.tab; c.p = 0; pinta(true); });
+  const guarda = async datos => { const r = await api('editar_persona', Object.assign({ tel: c.tel }, datos)); if (r.ok) { Object.assign(p, datos); if (c.ext && c.ext.persona) Object.assign(c.ext.persona, datos); } return r; };
+  if (c.tab === 'estado') {
+    app.querySelectorAll('#etapas [data-e]').forEach(b => b.onclick = async () => { await guarda({ etapa: b.dataset.e }); pinta(true); recargar(); });
+    app.querySelectorAll('#temps [data-x]').forEach(b => b.onclick = async () => { await guarda({ temperatura: p.temperatura === b.dataset.x ? '' : b.dataset.x }); pinta(true); });
+    app.querySelectorAll('#enc [data-u]').forEach(b => b.onclick = async () => { const s = new Set(String(p.encargados || '').split(',').filter(Boolean)); s.has(b.dataset.u) ? s.delete(b.dataset.u) : s.add(b.dataset.u); await guarda({ encargados: [...s].join(',') }); pinta(true); });
+    const n = document.getElementById('notas'), av = document.getElementById('aviso');
+    let espera; n.oninput = () => { av.textContent = ''; n.closest('.hoja').classList.add('editando'); clearTimeout(espera); espera = setTimeout(async () => { const r = await guarda({ notas_equipo: n.value }); av.textContent = r.ok ? 'Notas guardadas' : ''; n.closest('.hoja').classList.remove('editando'); }, 700); };
+    document.getElementById('prueba').onchange = async e => { await guarda({ es_prueba: e.target.checked }); recargar(); };
+  } else if (c.tab === 'datos') {
+    alCambiarTamano = paginar(app.querySelector('.vista .cuerpo .cuerpo'), c._items, ([k, v]) => `<div class="fila" style="grid-template-columns:110px minmax(0,1fr)"><span class="eti" style="letter-spacing:.12em">${esc(k)}</span><span class="q"><b style="font-weight:600">${esc(v)}</b></span></div>`, { pagina: c.p, alto: 58, hueco: 7 });
+  } else if (c.tab === 'proyectos') {
+    document.getElementById('np').onclick = () => abrir({ tipo: 'nuevoProyecto', tel: c.tel });
+    alCambiarTamano = paginar(app.querySelector('.vista .cuerpo .cuerpo'), proys, filaProyecto, { pagina: c.p, vacio: '<b>Sin proyectos</b>Ábrele uno con el botón de abajo.', alPintar: l => l.querySelectorAll('[data-y]').forEach(b => b.onclick = () => abrir({ tipo: 'proyecto', id: Number(b.dataset.y) })) });
+  } else if (c.tab === 'historial') {
+    const h = (ext.contactos || []).map(x => ({ x }));
+    alCambiarTamano = paginar(app.querySelector('.vista .cuerpo .cuerpo'), h, ({ x }) => `<div class="fila"><span class="estado" style="--c:var(--cobalto);--cf:var(--azulf)">${esc(x.tipo)}</span><span class="q"><b style="font-weight:600">${esc(x.resumen || 'Sin resumen')}</b><span>${esc(x.canal)} · ${cuando(x.fecha)}</span></span><span></span></div>`, { pagina: c.p, vacio: c.ext ? '<b>Sin contactos</b>Aquí aparecen sus llamadas, citas y mensajes.' : 'Cargando…' });
+  }
+}
+function capaNuevoCliente(c) {
+  marco('Nuevo cliente', '', `<form class="hoja editando" id="f" style="grid-template-rows:auto auto auto auto minmax(0,1fr) auto">
+    <input class="campo" name="negocio" placeholder="Negocio (ej. Grupo Beta)" maxlength="120">
+    <input class="campo" name="nombre" placeholder="Nombre de la persona" maxlength="80">
+    <input class="campo" name="telefono" placeholder="Teléfono (opcional)" inputmode="tel" maxlength="30">
+    <div><div class="eti" style="margin-bottom:8px">Encargados</div><div class="quien" id="enc">${Object.keys(GENTE).map(id => `<button type="button" data-u="${id}" class="${id === yo() ? 'on' : ''}">${ava(id)}${GENTE[id].n}</button>`).join('')}</div></div>
+    <div class="pils" style="align-content:start">${Object.keys(ETAPA).filter(e => e !== 'archivo').map(e => `<button type="button" class="pil${(c.etapa || 'pendiente') === e ? ' on' : ''}" data-e="${e}" style="--c:${ETAPA[e].c};--cf:${ETAPA[e].cf}"><i>${ETAPA[e].ic}</i>${ETAPA[e].n}</button>`).join('')}</div>
+    <button class="boton">Agregar al CRM</button><div class="aviso" id="aviso"></div></form>`);
+  let etapa = c.etapa || 'pendiente';
+  app.querySelectorAll('[data-e]').forEach(b => b.onclick = () => { etapa = b.dataset.e; app.querySelectorAll('[data-e]').forEach(x => x.classList.toggle('on', x === b)); });
+  app.querySelectorAll('#enc button').forEach(b => b.onclick = () => b.classList.toggle('on'));
+  const f = document.getElementById('f');
+  f.onsubmit = async e => {
+    e.preventDefault(); const fd = new FormData(f);
+    if (!fd.get('negocio') && !fd.get('nombre')) { document.getElementById('aviso').textContent = 'Escribe al menos el negocio o el nombre.'; return; }
+    const encargados = [...app.querySelectorAll('#enc button.on')].map(b => b.dataset.u).join(',');
+    const r = await api('nuevo_cliente', { negocio: fd.get('negocio'), nombre: fd.get('nombre'), telefono: fd.get('telefono'), etapa, encargados });
+    if (r.ok) { await recargar(); reemplazar({ tipo: 'ficha', tel: r.tel }); } else document.getElementById('aviso').textContent = 'No se pudo guardar.';
+  };
+}
+
+/* ---------- Proyectos ---------- */
+function filaProyecto(p) {
+  const i = Math.max(0, D.listas.fases.indexOf(p.fase));
+  const cli = personaDe(p.tel);
+  const abiertas = D.tareas.filter(x => x.proyecto == p.id && x.estado !== 'hecha').length;
+  return `<button class="fila" data-y="${p.id}"><span class="anillo" style="--p:${Math.round((i + 1) / D.listas.fases.length * 100)}"><b>${i + 1}/${D.listas.fases.length}</b></span><span class="q"><b>${esc(p.nombre)}</b><span>${esc(p.fase)} · ${esc(cli ? nombreDe(cli) : 'MOON')}${abiertas ? ` · ${abiertas} tarea${abiertas === 1 ? '' : 's'}` : ''}</span></span>${avas(p.encargados)}</button>`;
+}
+function capaProyectos(c) {
+  c.f = c.f || 'activos';
+  const todos = D.proyectos;
+  const fil = { activos: todos.filter(p => p.fase !== 'entregado'), mios: todos.filter(p => p.fase !== 'entregado' && String(p.encargados).split(',').includes(yo())), entregados: todos.filter(p => p.fase === 'entregado') };
+  marco('Proyectos', 'Nuevo proyecto', `<div class="cuerpo"><div class="pils">
+    <button class="pil${c.f === 'activos' ? ' on' : ''}" data-f="activos" style="--c:var(--cobalto);--cf:var(--azulf)"><i>${fil.activos.length}</i>Activos</button>
+    <button class="pil${c.f === 'mios' ? ' on' : ''}" data-f="mios" style="--c:var(--cobalto);--cf:var(--azulf)"><i>${fil.mios.length}</i>Míos</button>
+    <button class="pil${c.f === 'entregados' ? ' on' : ''}" data-f="entregados" style="--c:var(--verde);--cf:var(--verdef)"><i>${fil.entregados.length}</i>Entregados</button></div>
+    <div class="lista dos"></div><div class="pie"></div></div>`);
+  app.querySelectorAll('[data-f]').forEach(b => b.onclick = () => { c.f = b.dataset.f; c.p = 0; pinta(true); });
+  document.getElementById('accion').onclick = () => abrir({ tipo: 'nuevoProyecto' });
+  alCambiarTamano = paginar(app.querySelector('.cuerpo'), fil[c.f], filaProyecto, { pagina: c.p, vacio: '<b>Sin proyectos aquí</b>Ábrelos con el botón +.', alPintar: l => l.querySelectorAll('[data-y]').forEach(b => b.onclick = () => abrir({ tipo: 'proyecto', id: Number(b.dataset.y) })) });
+}
+function capaProyecto(c) {
+  const nuevo = c.tipo === 'nuevoProyecto';
+  const p = nuevo ? { nombre: '', fase: 'por arrancar', encargados: yo(), tel: c.tel || '', nota: '' } : proyectoDe(c.id);
+  if (!p) return cerrar();
+  c.tab = c.tab || (nuevo ? 'datos' : 'fase');
+  const fases = D.listas.fases, fi = fases.indexOf(p.fase);
+  const clientes = reales().filter(x => x.etapa !== 'archivo');
+  const tareas = nuevo ? [] : D.tareas.filter(x => x.proyecto == p.id);
+  const formDatos = `<form class="hoja editando" id="f" style="grid-template-rows:auto auto auto minmax(0,1fr) auto">
+      <input class="campo" name="nombre" placeholder="Nombre del proyecto" value="${esc(p.nombre)}" required maxlength="100">
+      <select class="campo" name="tel"><option value="">MOON (proyecto interno)</option>${clientes.map(x => `<option value="${esc(x.tel)}"${x.tel === p.tel ? ' selected' : ''}>${esc(nombreDe(x))}</option>`).join('')}</select>
+      <div><div class="eti" style="margin-bottom:8px">Encargados</div><div class="quien" id="enc">${Object.keys(GENTE).map(id => `<button type="button" data-u="${id}" class="${String(p.encargados).split(',').includes(id) ? 'on' : ''}">${ava(id)}${GENTE[id].n}</button>`).join('')}</div></div>
+      <textarea class="campo" name="nota" placeholder="Nota corta: de qué trata" style="height:100%;min-height:60px">${esc(p.nota)}</textarea>
+      <button class="boton">${nuevo ? 'Abrir proyecto' : 'Guardar'}</button><div class="aviso" id="aviso"></div></form>`;
+  let cuerpo;
+  if (nuevo) cuerpo = formDatos;
+  else cuerpo = `<div class="cuerpo" style="grid-template-rows:auto minmax(0,1fr)"><div class="tabs"><button data-tab="fase" class="${c.tab === 'fase' ? 'on' : ''}">Fase</button><button data-tab="tareas" class="${c.tab === 'tareas' ? 'on' : ''}">Tareas ${tareas.filter(x => x.estado !== 'hecha').length || ''}</button><button data-tab="datos" class="${c.tab === 'datos' ? 'on' : ''}">Datos</button></div>
+    ${c.tab === 'fase' ? `<div class="hoja" style="align-content:center;gap:clamp(10px,2vh,18px)"><div class="eti" style="text-align:center">${esc(personaDe(p.tel) ? nombreDe(personaDe(p.tel)) : 'MOON')}</div><div class="fases" id="fases">${fases.map((f, i) => `<button data-f="${esc(f)}" class="${i < fi ? 'hecha' : i === fi ? 'on' : ''}"><i>${i < fi ? "✓" : i + 1}</i>${esc(f[0].toUpperCase() + f.slice(1))}</button>`).join('')}</div><p style="text-align:center;color:var(--suave);font-weight:600">${esc(p.nota || 'Toca una fase para moverlo.')}</p><div style="display:flex;justify-content:center">${avas(p.encargados)}</div></div>`
+      : c.tab === 'tareas' ? `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr) auto auto"><div class="lista"></div><div class="pie"></div><button class="boton dos" id="nt">Dejar una tarea de este proyecto</button></div>` : formDatos}</div>`;
+  marco(nuevo ? 'Nuevo proyecto' : p.nombre, '', cuerpo);
+  app.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => { c.tab = b.dataset.tab; c.p = 0; pinta(true); });
+  if (c.tab === 'fase' && !nuevo) app.querySelectorAll('#fases [data-f]').forEach(b => b.onclick = async () => { const r = await api('proyecto', { id: p.id, fase: b.dataset.f }); if (r.ok) { p.fase = b.dataset.f; pinta(true); recargar(); } });
+  if (c.tab === 'tareas' && !nuevo) {
+    document.getElementById('nt').onclick = () => abrir({ tipo: 'nuevaTarea', proyecto: p.id });
+    alCambiarTamano = paginar(app.querySelector('.vista .cuerpo .cuerpo'), tareas.sort((a, b) => (a.estado === 'hecha') - (b.estado === 'hecha') || b.id - a.id), x => filaTarea(x).replace(ava(x.de, 1), ava(x.para, 1)), { pagina: c.p, vacio: '<b>Sin tareas</b>Deja la primera con el botón de abajo.', alPintar: l => l.querySelectorAll('[data-t]').forEach(b => b.onclick = () => abrir({ tipo: 'tarea', id: Number(b.dataset.t) })) });
+  }
+  const f = document.getElementById('f');
+  if (f) {
+    app.querySelectorAll('#enc button').forEach(b => b.onclick = () => b.classList.toggle('on'));
+    f.onsubmit = async e => {
+      e.preventDefault(); const fd = new FormData(f);
+      const datos = { nombre: fd.get('nombre'), tel: fd.get('tel'), nota: fd.get('nota'), encargados: [...app.querySelectorAll('#enc button.on')].map(b => b.dataset.u).join(',') };
+      if (!nuevo) datos.id = p.id;
+      const r = await api('proyecto', datos);
+      if (r.ok) { await recargar(); if (nuevo) { reemplazar({ tipo: 'proyecto', id: r.id }); } else { c.tab = 'fase'; pinta(true); } }
+      else document.getElementById('aviso').textContent = 'No se pudo guardar.';
+    };
+  }
+}
+
+/* ---------- Lector: texto largo completo, en páginas, nunca cortado ---------- */
+function capaLector(c) {
+  marco(c.titulo, '', `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr) auto"><div class="hoja" id="hoja"><p id="txt" style="font-weight:600;white-space:pre-line;line-height:1.5"></p></div><div class="pie"></div></div>`);
+  const hoja = document.getElementById('hoja'), txt = document.getElementById('txt'), pie = app.querySelector('.pie');
+  function dibuja() {
+    const palabras = String(c.texto || '').split(/(\s+)/);
+    const paginas = []; let i = 0;
+    txt.style.fontSize = '16px';
+    while (i < palabras.length) {
+      let j = i; txt.textContent = '';
+      while (j < palabras.length) { txt.textContent += palabras[j]; if (hoja.scrollHeight > hoja.clientHeight + 1 && j > i) { txt.textContent = txt.textContent.slice(0, -palabras[j].length); break; } j++; }
+      paginas.push(txt.textContent); i = j === i ? i + 1 : j;
+    }
+    c.p = Math.min(c.p || 0, paginas.length - 1);
+    txt.textContent = paginas[c.p];
+    pie.innerHTML = paginas.length > 1 ? `<button class="redondo" data-pag="-1" aria-label="Anterior">${I.izq}</button><span class="pag">${c.p + 1} de ${paginas.length}</span><button class="redondo" data-pag="1" aria-label="Siguiente">${I.der}</button>` : '';
+    pie.querySelectorAll('[data-pag]').forEach(b => b.onclick = () => { c.p = (c.p + Number(b.dataset.pag) + paginas.length) % paginas.length; dibuja(); });
+  }
+  dibuja(); alCambiarTamano = dibuja;
+}
+
+/* ---------- Equipo ---------- */
+function capaEquipo() {
+  const ids = ['daniel', 'dan', 'kid'];
+  marco('Equipo', '', `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr)"><div class="lista" style="grid-template-rows:repeat(3,minmax(0,1fr))">${ids.map(id => {
+    const t = D.tareas.filter(x => x.para === id), ab = t.filter(x => x.estado !== 'hecha');
+    const nv = ab.filter(x => x.estado === 'nueva').length, at = ab.filter(atrasada).length, he = t.filter(x => x.estado === 'hecha').length;
+    const pr = D.proyectos.filter(p => p.fase !== 'entregado' && String(p.encargados).split(',').includes(id)).length;
+    return `<button class="t" data-u="${id}" style="flex-direction:row;align-items:center;gap:14px">${ava(id)}<span style="min-width:0;flex:1;display:grid;gap:4px"><b style="font-size:17px">${GENTE[id].n}${id === yo() ? ' (tú)' : ''}</b><span class="pils">
+      <span class="estado" style="--c:#fff;--cf:var(--cobalto)">${nv} sin ver</span><span class="estado" style="--c:var(--suave);--cf:var(--campo)">${ab.length} abiertas</span>${at ? `<span class="estado" style="--c:var(--rojo);--cf:var(--rojof)">${at} atrasadas</span>` : ''}<span class="estado" style="--c:var(--verde);--cf:var(--verdef)">${he} hechas</span></span><span class="mini">${pr} proyecto${pr === 1 ? '' : 's'} a su cargo</span></span></button>`;
+  }).join('')}</div></div>`);
+  app.querySelectorAll('[data-u]').forEach(b => b.onclick = () => abrir({ tipo: 'tareas', persona: b.dataset.u }));
+}
+
+/* ---------- MOON ---------- */
+function capaMoon(c) {
+  if (c.cuenta) {
+    marco('Tu cuenta', '', `<div class="hoja" style="align-content:center;justify-items:center;text-align:center;gap:16px">${ava(yo())}<h3 style="font-size:22px;font-weight:800">${esc(GENTE[yo()].n)}</h3><p class="mini">Este aparato está recordado. Solo cierra sesión si es un aparato prestado.</p><button class="boton dos" id="cerrar">Cerrar sesión en este aparato</button></div>`);
+    document.getElementById('cerrar').onclick = async () => { await api('salir'); guardarSesion(''); D = null; pila = []; pantallaQuien(); };
+    return;
+  }
+  const serv = [['Agente de llamadas', 'Jason contesta, filtra y agenda', 'var(--cobalto)'], ['Página web', 'Que se sienta cara y funcione', 'var(--cielo)'], ['Redes y campañas', 'Que lleguen clientes', 'var(--morado)'], ['Administración', 'Orden, inventario y números', 'var(--verde)']];
+  marco('MOON Digital', '', `<div class="cuerpo" style="grid-template-rows:auto minmax(0,1fr)">
+    <div class="hoja" style="gap:8px"><span class="eti">Nuestra visión</span><p style="font-size:clamp(15px,4.2vw,19px);font-weight:700;line-height:1.35">Ser una empresa de inteligencia artificial muy fuerte, muy dinámica y muy intuitiva. Cada hora que invertimos es para agilizar, mejorar y hacer más inteligente la forma de trabajar.</p></div>
+    <div class="lista dos" style="grid-auto-rows:minmax(0,1fr)">${serv.map(([n, d, col]) => `<div class="fila" style="height:auto;grid-template-columns:auto minmax(0,1fr)"><span class="punto" style="--c:${col};width:14px;height:14px"></span><span class="q"><b>${n}</b><span>${d}</span></span></div>`).join('')}</div></div>`);
+}
+
+if ('serviceWorker' in navigator) {/* sin caché fuera de línea: siempre la versión más nueva */}
+arrancar();
+</script>
+</body>
+</html>
