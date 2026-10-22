@@ -199,8 +199,8 @@ textarea.campo{height:auto;border-radius:22px;padding:14px 18px;resize:none}
 .rect:active{transform:scale(.98)}
 .rect b{font-size:15px;font-weight:800}
 .rect span{font-size:12.5px;font-weight:600;color:var(--suave);line-height:1.3}
-.rect.vacio{background:transparent;box-shadow:inset 0 0 0 1.5px var(--linea);cursor:default}
-.rect.vacio b{color:var(--suave)}.rect.vacio span{color:var(--tenue)}
+.rect.sin{background:transparent;box-shadow:inset 0 0 0 1.5px var(--linea);cursor:default}
+.rect.sin b{color:var(--suave)}.rect.sin span{color:var(--tenue)}
 .flecha-f{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--fondo);box-shadow:var(--hundido)}.flecha-f svg{width:14px;height:14px}
 .casa .vision{border-radius:var(--r);background:linear-gradient(150deg,#22306a,#141a3c);color:#fff;padding:clamp(14px,calc(2.6 * var(--u)),24px);display:grid;gap:10px;box-shadow:var(--sombra)}
 .casa .vision .logo{height:26px;color:#fff}
@@ -209,7 +209,7 @@ textarea.campo{height:auto;border-radius:22px;padding:14px 18px;resize:none}
 .casa-rects .rect{background:linear-gradient(150deg,#1d2757,#141a3c);color:#fff;box-shadow:var(--sombra);align-content:end;padding:16px}
 .casa-rects .rect b{font-size:clamp(16px,calc(2.6 * var(--u)),22px)}
 .casa-rects .rect span{color:rgba(255,255,255,.75)}
-.casa-rects .rect.vacio{background:transparent;color:var(--suave)}
+.casa-rects .rect.sin{background:transparent;color:var(--suave)}
 .doc-html{width:100%;height:100%;border:0;background:#fff;display:block}
 .hoja.md{display:block;overflow:hidden;line-height:1.5;font-weight:500}
 .hoja.md>*+*{margin-top:.7em}
@@ -468,9 +468,11 @@ function transicion(f) {
   viejo.removeAttribute('id'); viejo.classList.add('fantasma'); viejo.setAttribute('aria-hidden', 'true'); viejo.inert = true;
   marcoEl.appendChild(viejo);
   fantasmaVivo = viejo;
-  f();
+  // Pase lo que pase al dibujar, la copia de encima SIEMPRE se desvanece y se quita (nunca se queda pegada).
+  try { f(); } finally {
   const a = viejo.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 240, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'forwards' });
-  a.finished.then(() => { viejo.remove(); if (fantasmaVivo === viejo) fantasmaVivo = null; }, () => {});
+  a.finished.then(() => { viejo.remove(); if (fantasmaVivo === viejo) fantasmaVivo = null; }, () => { viejo.remove(); });
+  }
 }
 
 /* ---------- Entrada ---------- */
@@ -1016,7 +1018,7 @@ function rectangulos(tel, secciones) {
   return `<div class="rects">${secciones.map(([k, n, vacio]) => {
     const ds = docsDe(tel, k);
     const frase = !ds.length ? vacio : ds.length === 1 ? (ds[0].frase || ds[0].titulo) : `${ds.length}: ${ds.map(d => d.titulo).join(' · ')}`;
-    return `<button class="rect${ds.length ? '' : ' vacio'}" data-s="${k}"${ds.length ? '' : ' aria-disabled="true"'}><b>${n}${ds.length > 1 ? ` (${ds.length})` : ''}</b><span>${esc(frase)}</span></button>`;
+    return `<button class="rect${ds.length ? '' : ' sin'}" data-s="${k}"${ds.length ? '' : ' aria-disabled="true"'}><b>${n}${ds.length > 1 ? ` (${ds.length})` : ''}</b><span>${esc(frase)}</span></button>`;
   }).join('')}</div>`;
 }
 function activarRects(tel, secciones) {
@@ -1103,7 +1105,7 @@ const CASA = [['jason', 'Jason', 'Nuestro recepcionista: probarlo, su ficha, sus
 function capaCasa() {
   marco('Hecho en casa', '', `<div class="cuerpo casa" style="grid-template-rows:auto minmax(0,1fr)">
     <div class="vision"><span class="logo"></span><p>Ser una empresa de inteligencia artificial muy fuerte, muy dinámica y muy intuitiva. Cada hora que invertimos es para agilizar, mejorar y hacer más inteligente la forma de trabajar.</p></div>
-    <div class="rects casa-rects">${CASA.map(([k, n, f]) => { const ds = k === 'jason' || k === 'proyectos' ? [1] : docsDe('moon', k); return `<button class="rect${ds.length ? '' : ' vacio'}" data-k="${k}"><b>${n}</b><span>${ds.length ? f : 'Aún no está aquí'}</span></button>`; }).join('')}</div></div>`);
+    <div class="rects casa-rects">${CASA.map(([k, n, f]) => { const ds = k === 'jason' || k === 'proyectos' ? [1] : docsDe('moon', k); return `<button class="rect${ds.length ? '' : ' sin'}" data-k="${k}"><b>${n}</b><span>${ds.length ? f : 'Aún no está aquí'}</span></button>`; }).join('')}</div></div>`);
   app.querySelectorAll('[data-k]').forEach(b => b.onclick = () => {
     const k = b.dataset.k;
     if (k === 'jason') return abrir({ tipo: 'jason' });
@@ -1115,7 +1117,7 @@ const JASON = [['jason', 'Probar a Jason'], ['ficha', 'Su ficha'], ['llamadas', 
 function capaJason() {
   const docs = docsDe('moon', 'jason');
   const de = k => k === 'jason' ? docs.find(d => d.id === 'jason-numero') : k === 'ficha' ? docs.find(d => d.id === 'jason-ficha') : k === 'llamadas' ? { formato: 'centro', url: 'proyecto:jason:uso', frase: 'Cada llamada que ha contestado, en el Centro' } : docsDe('moon', 'bienvenida')[0];
-  marco('Jason', '', `<div class="cuerpo casa" style="grid-template-rows:minmax(0,1fr)"><div class="rects casa-rects">${JASON.map(([k, n]) => { const d = de(k); return `<button class="rect${d ? '' : ' vacio'}" data-k="${k}"><b>${n}</b><span>${esc(d ? (d.frase || d.titulo) : 'Aún no está aquí')}</span></button>`; }).join('')}</div></div>`);
+  marco('Jason', '', `<div class="cuerpo casa" style="grid-template-rows:minmax(0,1fr)"><div class="rects casa-rects">${JASON.map(([k, n]) => { const d = de(k); return `<button class="rect${d ? '' : ' sin'}" data-k="${k}"><b>${n}</b><span>${esc(d ? (d.frase || d.titulo) : 'Aún no está aquí')}</span></button>`; }).join('')}</div></div>`);
   app.querySelectorAll('[data-k]').forEach(b => b.onclick = () => { const d = de(b.dataset.k); if (d) abrirDoc(d); });
 }
 

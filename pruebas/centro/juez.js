@@ -14,6 +14,8 @@ const tam=[[320,568],[375,667],[390,844],[430,932],[768,1024],[1280,800]];
     scrollTo(0,400);if(scrollY||scrollX)o.push('la pagina se mueve '+scrollY);const ap=document.getElementById('app');if(ap&&ap.scrollHeight>ap.clientHeight+1)o.push('app desborda '+ap.scrollHeight+'>'+ap.clientHeight);
     if(document.documentElement.scrollHeight>H+1)o.push('scroll vertical '+document.documentElement.scrollHeight);
     document.querySelectorAll('body *').forEach(e=>{const b=e.getBoundingClientRect();if(b.width&&(b.right>W+1||b.bottom>H+1)&&getComputedStyle(e).position!=='fixed'&&!e.closest('.recorte')&&!e.closest('.volteada .frente')&&!e.closest('.cred:not(.volteada) .atras'))o.push('se sale: '+e.tagName+'.'+e.className+' '+Math.round(b.right)+'x'+Math.round(b.bottom))});
+    document.querySelectorAll('.rect').forEach(r=>{if(getComputedStyle(r).justifyItems==='center')o.push('rectangulo centrado (choque de estilos): '+r.textContent.slice(0,20))});
+    if(document.querySelector('.fantasma')&&!document.getAnimations().length)o.push('copia del fundido pegada');
     document.querySelectorAll('.cred').forEach(c=>{const vis=[...c.querySelectorAll('.cara')].filter(x=>getComputedStyle(x).display!=='none');if(vis.length!==1)o.push('credencial con '+vis.length+' caras visibles');if(!c.classList.contains('volteada')&&!vis[0].classList.contains('frente'))o.push('credencial de reversa')});
     document.querySelectorAll('.hoja,.t,.lista,.cuerpo').forEach(e=>{if(e.scrollHeight>e.clientHeight+2)o.push('cortado: '+e.className+' '+e.scrollHeight+'>'+e.clientHeight)});
     return o.slice(0,4)});
