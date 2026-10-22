@@ -42,6 +42,7 @@ async function entrada(d, req) {
     const us = await sql('SELECT id, nombre, correo, hash FROM usuarios ORDER BY CASE id WHEN \'daniel\' THEN 1 WHEN \'dan\' THEN 2 ELSE 3 END');
     return { ok: true, usuarios: us.map(u => ({ id: u.id, nombre: u.nombre, correo: ocultar(u.correo), tieneClave: !!u.hash })) };
   }
+  if (!['pedir_codigo', 'revisar_codigo', 'crear_clave', 'entrar'].includes(d.accion)) return null;
   const id = USUARIOS.includes(d.usuario) ? d.usuario : '';
   if (!id) return { ok: false, error: 'usuario' };
   const u = (await sql('SELECT * FROM usuarios WHERE id = ?', [id]))[0];
