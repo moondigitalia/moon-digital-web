@@ -207,10 +207,12 @@ textarea.campo{height:auto;border-radius:22px;padding:14px 18px;resize:none}
 
 /* ---------- Credencial horizontal (como una credencial de verdad: 86 × 54) ---------- */
 .creds{min-height:0;position:relative;display:flex;flex-wrap:wrap;align-content:center;justify-content:center;gap:var(--hc,12px)}
-.cred{container-type:size;width:var(--cw,320px);height:calc(var(--cw,320px) * 54 / 86);flex:none;position:relative;perspective:1400px;text-align:start;color:#18171c;padding:0;border-radius:calc(var(--cw,320px) * .055)}
-.cred .gira{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .7s var(--ease)}
-.cred.volteada .gira{transform:rotateY(180deg)}
-.cara{position:absolute;inset:0;border-radius:calc(var(--cw,320px) * .055);background:linear-gradient(150deg,#22306a,#18204a 60%,#141a3c);color:#fff;box-shadow:var(--sombra);overflow:hidden;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.cred{container-type:size;width:var(--cw,320px);height:calc(var(--cw,320px) * 54 / 86);flex:none;position:relative;text-align:start;color:#18171c;padding:0;border-radius:calc(var(--cw,320px) * .055)}
+/* Solo existe la cara que se ve: la otra no se dibuja (nada en 3D, así ninguna foto ni captura la muestra al revés). */
+.cred .gira{position:absolute;inset:0;transform-origin:center}
+.cred .atras,.cred.volteada .frente{display:none!important}
+.cred.volteada .atras{display:grid!important}
+.cara{position:absolute;inset:0;border-radius:calc(var(--cw,320px) * .055);background:linear-gradient(150deg,#22306a,#18204a 60%,#141a3c);color:#fff;box-shadow:var(--sombra);overflow:hidden;}
 .cara::before{content:"";position:absolute;inset:0;background:radial-gradient(120% 80% at 0% 0%,rgba(255,255,255,.10),transparent 55%);pointer-events:none}
 .cred.yo .cara{box-shadow:var(--sombra),inset 0 0 0 .6cqw #5b9cf5}
 /* Frente: foto enmarcada, nombre en "estampas", datos y franja de abajo */
@@ -230,7 +232,7 @@ textarea.campo{height:auto;border-radius:22px;padding:14px 18px;resize:none}
 .franja{grid-column:1/-1;margin:0 -5cqw;padding:0 5cqw;background:#ece4d8;color:#18204a;display:flex;align-items:center;justify-content:space-between;font-weight:800;font-size:5cqh;border-top:.5cqh solid #5b9cf5}
 .franja .logo{height:7.4cqh;color:#18204a}
 /* Vuelta: banda magnética, firma, proyectos y frase */
-.cara.atras{transform:rotateY(180deg);display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);grid-template-rows:15cqh auto minmax(0,1fr);column-gap:5cqw;row-gap:5cqh;padding:7cqh 5cqw 6cqh}
+.cara.atras{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);grid-template-rows:15cqh auto minmax(0,1fr);column-gap:5cqw;row-gap:5cqh;padding:7cqh 5cqw 6cqh}
 .banda{grid-column:1/-1;margin:0 -5cqw;background:#0b0f26}
 .firma{align-self:center;height:16cqh;border-radius:.8cqw;background:repeating-linear-gradient(-12deg,#f4efe6 0 1.2cqh,#e3dccf 1.2cqh 1.6cqh);color:#141a3c;display:flex;align-items:center;padding:0 3cqw;font-family:"Segoe Script","Brush Script MT","Snell Roundhand",cursive;font-size:10cqh;transform:rotate(-1deg);overflow:hidden;white-space:nowrap}
 .historial{min-width:0}
@@ -1008,7 +1010,17 @@ function capaCuenta(c) {
   acomodarCreds(cont);
   alCambiarTamano = () => acomodarCreds(cont);
   if (c.volteada) cont.firstElementChild.classList.add('volteada');
-  cont.firstElementChild.onclick = () => { c.volteada = !c.volteada; cont.firstElementChild.classList.toggle('volteada', c.volteada); };
+  // Darle vuelta en 2D: la tarjeta se "cierra" de lado, cambia de cara y se vuelve a abrir (igual con o sin reducir movimiento).
+  const tarjeta = cont.firstElementChild, gira = tarjeta.querySelector('.gira');
+  let girando = false;
+  tarjeta.onclick = async () => {
+    if (girando) return; girando = true;
+    const a = gira.animate([{ transform: 'scaleX(1)' }, { transform: 'scaleX(0)' }], { duration: 170, easing: 'cubic-bezier(.4,0,1,1)', fill: 'forwards' });
+    await a.finished;
+    c.volteada = !c.volteada; tarjeta.classList.toggle('volteada', c.volteada);
+    const b = gira.animate([{ transform: 'scaleX(0)' }, { transform: 'scaleX(1)' }], { duration: 220, easing: 'cubic-bezier(0,0,.2,1)' });
+    a.cancel(); await b.finished; girando = false;
+  };
   const arch = document.getElementById('archivo');
   document.getElementById('foto').onclick = () => arch.click();
   arch.onchange = () => { const f = arch.files[0]; if (f) abrir({ tipo: 'foto', src: URL.createObjectURL(f) }); arch.value = ''; };
