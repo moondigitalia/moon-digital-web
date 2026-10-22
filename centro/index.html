@@ -236,6 +236,24 @@ html:not(.ancho) .agenda>.fila:only-child{border-radius:20px}
 .j-mas{position:relative;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 .j-mas button{border-radius:99px;background:rgba(255,255,255,.13);color:#fff;font-weight:800;font-size:13.5px;padding:11px 6px;transition:transform .25s var(--ease)}
 .j-mas button:active{transform:scale(.96)}.j-mas button:disabled{opacity:.4}
+.etapas{min-height:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:minmax(0,1fr);gap:10px}
+.ancho .etapas{grid-template-columns:repeat(4,minmax(0,1fr))}
+.etapa{min-height:0;overflow:hidden;border-radius:22px;background:var(--tarjeta);box-shadow:var(--sombra-chica);padding:12px 14px;text-align:start;display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:4px;position:relative;transition:transform .25s var(--ease)}
+.etapa::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--c)}
+.etapa:active{transform:scale(.98)}
+.et-cab{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.et-cab b{font-size:15px;font-weight:800;color:var(--tinta)}
+.et-cab i{font-style:normal;min-width:30px;height:30px;padding:0 9px;border-radius:99px;display:grid;place-items:center;background:var(--cf);color:var(--c);font-weight:800;font-size:15px}
+.et-d{font-size:12.5px;font-weight:600;color:var(--suave);line-height:1.3;align-self:start}
+.etapa{grid-template-rows:auto auto minmax(0,1fr) auto!important}
+.et-lista{min-height:0;overflow:hidden;display:grid;align-content:start;gap:5px;margin-top:4px}
+.et-fila{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:700;color:var(--tinta);line-height:1.25}
+.et-fila>span:last-child{overflow-wrap:anywhere}
+.et-fila .icono{background:var(--cf);color:var(--c)}
+.et-mas{font-style:normal;font-size:12px;font-weight:800;color:var(--suave)}.et-mas:empty{display:none}
+.etapas.sin-d .et-d{display:none}
+.lista.desliza>*{flex:none}
+.lista.desliza{display:flex;flex-direction:column;gap:var(--hueco,9px);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;align-content:start;border-radius:20px}
 .casa-filas{display:grid;gap:8px}
 .casa-ic{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(150deg,#22306a,#141a3c);color:#fff;flex:none}.casa-ic svg{width:18px;height:18px}
 .ancho .casa{grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);grid-template-rows:auto minmax(0,1fr)!important}
@@ -659,7 +677,7 @@ function pinta(silencioso) {
   alCambiarTamano = null;
   const c = pila[pila.length - 1];
   if (!c) return pintaInicio(silencioso);
-  ({ tareas: capaTareas, tarea: capaTarea, nuevaTarea: capaNuevaTarea, crm: capaCRM, ficha: capaFicha, nuevoCliente: capaNuevoCliente, proyectos: capaProyectos, proyecto: capaProyecto, nuevoProyecto: capaProyecto, equipo: capaEquipo, moon: capaMoon, lector: capaLector, clientes: capaClientes, cliente: capaCliente, seccion: capaSeccion, documento: capaDocumento, casa: capaCasa, nota: capaNota, editarProyecto: capaProyecto, cuenta: capaCuenta, frase: capaFrase, foto: capaFoto })[c.tipo](c, silencioso);
+  ({ tareas: capaTareas, tarea: capaTarea, nuevaTarea: capaNuevaTarea, crm: capaCRM, crmLista: capaCRMLista, ficha: capaFicha, nuevoCliente: capaNuevoCliente, proyectos: capaProyectos, proyecto: capaProyecto, nuevoProyecto: capaProyecto, equipo: capaEquipo, moon: capaMoon, lector: capaLector, clientes: capaClientes, cliente: capaCliente, seccion: capaSeccion, documento: capaDocumento, casa: capaCasa, nota: capaNota, editarProyecto: capaProyecto, cuenta: capaCuenta, frase: capaFrase, foto: capaFoto })[c.tipo](c, silencioso);
 }
 function marco(titulo, accion, cuerpo, icono) {
   app.innerHTML = `<div class="top"><button class="redondo" id="volver" aria-label="Regresar">${I.atras}</button><div class="cabeza" style="flex:1;min-width:0"><h2>${esc(titulo)}</h2>${accion ? `<button class="redondo accion" id="accion" aria-label="${esc(accion)}" title="${esc(accion)}">${icono || I.mas}</button>` : ''}</div></div><div class="vista" style="grid-template-rows:minmax(0,1fr)">${cuerpo}</div>`;
@@ -707,7 +725,7 @@ function pintaInicio(sil) {
   app.querySelectorAll('[data-ir]').forEach(b => { b.onclick = () => abrir({ tipo: b.dataset.ir }); b.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); b.click(); } }; });
   const atajo = (sel, f) => app.querySelectorAll('.extra ' + sel).forEach(b => b.onclick = e => { e.stopPropagation(); f(b); });
   atajo('[data-t]', b => abrir({ tipo: 'tarea', id: Number(b.dataset.t) }));
-  atajo('[data-g]', b => abrir({ tipo: 'crm', g: b.dataset.g }));
+  atajo('[data-g]', b => abrir({ tipo: 'crmLista', g: b.dataset.g }));
   atajo('[data-y]', b => abrir({ tipo: 'proyecto', id: Number(b.dataset.y) }));
   atajo('[data-c]', b => abrir({ tipo: 'cliente', tel: b.dataset.c }));
   atajo('[data-u]', b => abrir({ tipo: 'tareas', persona: b.dataset.u }));
@@ -808,33 +826,51 @@ function capaNuevaTarea(c) {
 /* ---------- CRM ---------- */
 function grupoDe(k) { return k === 'todos' ? GRUPO_TODOS : k === 'pruebas' ? GRUPO_PRUEBAS : ETAPA[k]; }
 function capaCRM(c) {
-  const base = reales();
-  const pruebas = D.personas.filter(p => p.es_prueba);
-  const grupos = Object.keys(ETAPA);
+  // Cada etapa es una tarjeta con cuántos hay y quiénes son; al picarla se abre la lista completa (ahí sí se desliza).
+  const base = reales(), pruebas = D.personas.filter(p => p.es_prueba);
+  const grupos = ['todos'].concat(Object.keys(ETAPA).filter(e => e !== 'archivo' || base.some(p => p.etapa === e))).concat(pruebas.length ? ['pruebas'] : []);
+  const de = k => k === 'todos' ? base : k === 'pruebas' ? pruebas : base.filter(p => (p.etapa || 'pendiente') === k);
+  const cara = p => { const pan = (D.paneles || []).find(x => x.tel === p.tel); return pan || p.foto ? icono(Object.assign({ color: 'var(--c)' }, pan || {}, p.foto ? { icono: p.foto } : {}), p, 24) : `<span class="icono" style="width:24px;height:24px;font-size:11px">${esc(nombreDe(p).slice(0, 1).toUpperCase())}</span>`; };
+  const nombres = lista => lista.map(p => `<span class="et-fila">${cara(p)}<span>${esc(nombreDe(p))}</span></span>`).join('');
+  marco('CRM de MOON', 'Nuevo cliente', `<div class="cuerpo" style="grid-template-rows:auto minmax(0,1fr)">
+    <label class="buscador">${I.lupa}<input id="busca" placeholder="Buscar cliente, teléfono o nota" enterkeyhint="search"></label>
+    <div class="etapas">${grupos.map(k => { const G = grupoDe(k), l = de(k); return `<button class="etapa" data-g="${k}" style="--c:${G.c};--cf:${G.cf}"><span class="et-cab"><b>${G.n}</b><i>${l.length}</i></span><span class="et-d">${esc(G.d)}</span><span class="et-lista">${nombres(l)}</span><em class="et-mas"></em></button>`; }).join('')}</div></div>`);
+  app.querySelectorAll('.etapa').forEach(b => b.onclick = () => abrir({ tipo: 'crmLista', g: b.dataset.g }));
+  document.getElementById('accion').onclick = () => abrir({ tipo: 'nuevoCliente', etapa: 'pendiente' });
+  const busca = document.getElementById('busca');
+  busca.onkeydown = e => { if (e.key === 'Enter' && busca.value.trim()) { busca.blur(); abrir({ tipo: 'crmLista', g: 'todos', busca: busca.value.trim() }); } };
+  // Si una descripción no cabe completa en su tarjeta, se quita en todas (la descripción completa sale al abrirla). Nunca texto cortado.
+  const acomoda = () => { const g = app.querySelector('.etapas'); if (!g) return; g.classList.remove('sin-d'); pintaNombres();
+    // La última tarjeta se estira para cerrar su fila: nunca queda un hueco.
+    const cols = getComputedStyle(g).gridTemplateColumns.split(' ').length, n = g.children.length, resto = n % cols;
+    [...g.children].forEach(x => x.style.gridColumn = ''); if (resto) g.lastElementChild.style.gridColumn = `span ${cols - resto + 1}`;
+    // En cada tarjeta caben los nombres que caben completos; los demás se cuentan en "+N más".
+    const recorta = () => [...g.children].forEach(x => { const l = x.querySelector('.et-lista'), mas = x.querySelector('.et-mas'), total = l.children.length; mas.textContent = ''; while (l.children.length && (l.scrollHeight > l.clientHeight + 1 || x.scrollHeight > x.clientHeight + 1)) { l.lastElementChild.remove(); mas.textContent = `+${total - l.children.length} más`; } });
+    recorta();
+    if ([...g.children].some(x => !x.querySelector('.et-lista').children.length && x.querySelector('.et-mas').textContent)) { g.classList.add('sin-d'); pintaNombres(); recorta(); } };
+  function pintaNombres() { app.querySelectorAll('.etapa').forEach(x => { x.querySelector('.et-lista').innerHTML = nombres(de(x.dataset.g)); }); }
+  acomoda(); alCambiarTamano = acomoda;
+}
+function capaCRMLista(c) {
+  const base = reales(), pruebas = D.personas.filter(p => p.es_prueba);
   c.g = c.g || 'todos';
   const q = (c.busca || '').toLowerCase();
   let items = c.g === 'pruebas' ? pruebas : c.g === 'todos' ? base : base.filter(p => (p.etapa || 'pendiente') === c.g);
-  if (q) items = (c.g === 'pruebas' ? pruebas : base).filter(p => [p.nombre, p.negocio, p.telefono, p.giro, p.necesidad, p.notas_equipo].join(' ').toLowerCase().includes(q));
-  const pil = (k, n) => { const G = grupoDe(k); return `<button class="pil${c.g === k ? ' on' : ''}" data-g="${k}" style="--c:${G.c};--cf:${G.cf}"><i>${n}</i>${G.n}</button>`; };
-  const pils = pil('todos', base.length) + grupos.map(e => { const n = base.filter(p => (p.etapa || 'pendiente') === e).length; return e === 'archivo' && !n && c.g !== e ? '' : pil(e, n); }).join('') + (pruebas.length ? pil('pruebas', pruebas.length) : '');
-  const G = grupoDe(c.g);
-  marco('CRM de MOON', 'Nuevo cliente', `<div class="cuerpo" style="grid-template-rows:auto auto auto minmax(0,1fr) auto">
-    <label class="buscador">${I.lupa}<input id="busca" placeholder="Buscar cliente, teléfono o nota" value="${esc(c.busca || '')}" enterkeyhint="search"></label>
-    <div class="pils">${pils}</div>
-    <div class="desc" style="--c:${G.c};--cf:${G.cf}"><b>${G.n}:</b> ${esc(G.d)}</div>
-    <div class="lista dos agenda"></div><div class="pie"></div></div>`);
-  app.querySelectorAll('[data-g]').forEach(b => b.onclick = () => { c.g = b.dataset.g; c.p = 0; transicion(() => pinta(true)); });
-  document.getElementById('accion').onclick = () => abrir({ tipo: 'nuevoCliente', etapa: grupos.includes(c.g) ? c.g : 'pendiente' });
-  const busca = document.getElementById('busca');
-  let espera; busca.oninput = () => { clearTimeout(espera); espera = setTimeout(() => { c.busca = busca.value; c.p = 0; const pos = busca.selectionStart; silencio = true; pinta(true); silencio = false; const nb = document.getElementById('busca'); nb.focus(); nb.setSelectionRange(pos, pos); }, 250); };
-  alCambiarTamano = paginar(app.querySelector('.cuerpo'), items, p => filaPersona(p, c.g === 'todos' || c.g === 'pruebas' || !!q), { pagina: c.p, alto: 54, hueco: document.documentElement.classList.contains('ancho') ? 9 : 0, vacio: q ? '<b>Sin resultados</b>Prueba con otra palabra.' : `<b>Aún no hay nadie aquí</b>${esc(G.d)}`, alPintar: l => l.querySelectorAll('[data-p]').forEach(b => { b.onpointerdown = () => traerFicha(b.dataset.p); b.onclick = () => abrir({ tipo: 'ficha', tel: b.dataset.p }); }) });
+  if (q) items = base.concat(pruebas).filter(p => [p.nombre, p.negocio, p.telefono, p.correo, p.giro, p.necesidad, p.notas_equipo].join(' ').toLowerCase().includes(q));
+  const G = grupoDe(c.g), titulo = q ? `Resultados de “${c.busca}”` : `${G.n} (${items.length})`;
+  marco(titulo, q ? '' : 'Nuevo cliente', `<div class="cuerpo" style="grid-template-rows:auto minmax(0,1fr)">
+    ${q ? `<div class="desc" style="--c:var(--tinta);--cf:var(--campo)">${items.length} encontrado${items.length === 1 ? '' : 's'}</div>` : `<div class="desc" style="--c:${G.c};--cf:${G.cf}">${esc(G.d)}</div>`}
+    <div class="lista agenda desliza">${items.length ? items.map(p => filaPersona(p, c.g === 'todos' || c.g === 'pruebas' || !!q)).join('') : `<div class="vacio"><div><b>${q ? 'Sin resultados' : 'Aún no hay nadie aquí'}</b>${q ? 'Prueba con otra palabra.' : ''}</div></div>`}</div></div>`);
+  if (!q) document.getElementById('accion').onclick = () => abrir({ tipo: 'nuevoCliente', etapa: Object.keys(ETAPA).includes(c.g) ? c.g : 'pendiente' });
+  app.querySelectorAll('[data-p]').forEach(b => { b.onpointerdown = () => traerFicha(b.dataset.p); b.onclick = () => abrir({ tipo: 'ficha', tel: b.dataset.p }); });
+  const l = app.querySelector('.desliza'); if (c.scroll) l.scrollTop = c.scroll; l.onscroll = () => { c.scroll = l.scrollTop; };
 }
 function filaPersona(p, conEtapa) {
   const n = D.proyectos.filter(x => x.tel === p.tel).length;
   const E = ETAPA[p.etapa || 'pendiente'] || ETAPA.pendiente;
   const pan = (D.paneles || []).find(x => x.tel === p.tel);
   const sub = [p.proxima_cita ? `Cita: ${p.proxima_cita}` : '', quienDe(p), n ? `${n} proyecto${n === 1 ? '' : 's'}` : ''].filter(Boolean).join(' · ');
-  const cara = pan ? icono(pan, p, 36) : `<span class="icono" style="--c:${E.c};width:36px;height:36px;font-size:15px">${esc(nombreDe(p).slice(0, 1).toUpperCase())}</span>`;
+  const cara = pan || p.foto ? icono(Object.assign({ color: E.c }, pan || {}, p.foto ? { icono: p.foto } : {}), p, 36) : `<span class="icono" style="--c:${E.c};width:36px;height:36px;font-size:15px">${esc(nombreDe(p).slice(0, 1).toUpperCase())}</span>`;
   return `<button class="fila chica" data-p="${esc(p.tel)}">${cara}<span class="q"><b>${esc(nombreDe(p))}</b><span>${conEtapa ? `<em style="font-style:normal;font-weight:800;color:${E.c}">${E.n}</em>${sub ? ' · ' : ''}` : ''}${esc(sub || (conEtapa ? '' : 'Tócalo para ver su ficha'))}</span></span><span class="flecha-f">${I.der}</span></button>`;
 }
 
