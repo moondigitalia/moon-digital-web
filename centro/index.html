@@ -179,6 +179,44 @@ textarea.campo{height:auto;border-radius:22px;padding:14px 18px;resize:none}
 .avance .fase-n{font-size:clamp(22px,calc(4 * var(--u)),30px);font-weight:800;letter-spacing:-.01em}
 .avance .fase-m{font-weight:700;color:var(--suave);max-width:34ch}
 .actual{animation:latido 2.4s ease-in-out infinite}
+.icono{position:relative;flex:none;border-radius:50%;background:var(--c);color:#fff;font-weight:800;display:grid;place-items:center;overflow:hidden}
+.icono img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#fff}
+.demo{position:relative;min-height:0;border-radius:var(--r);overflow:hidden;background:var(--c);box-shadow:var(--sombra);display:flex;flex-direction:column;justify-content:flex-end;gap:12px;padding:clamp(14px,calc(2.4 * var(--u)),22px);color:#fff}
+.demo-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.demo-vivo{position:absolute;inset:0;overflow:hidden;background:#fff}
+.demo-vivo iframe{border:0;transform-origin:0 0;pointer-events:none;display:block}
+.demo-velo{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 30%,rgba(0,0,0,.62))}
+.demo-info{position:relative;display:flex;align-items:center;gap:12px}
+.demo-info b{display:block;font-size:clamp(20px,calc(3.4 * var(--u)),30px);font-weight:800;line-height:1.1}
+.demo-info span:last-child{font-size:13px;font-weight:700;opacity:.85}
+.demo-boton{position:relative;align-self:flex-start;display:inline-flex;align-items:center;gap:8px;background:#fff;color:#18204a}
+.demo-boton svg{width:16px;height:16px}
+.rects{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.ancho .rects{grid-template-columns:repeat(5,minmax(0,1fr))}
+.ancho .casa-rects{grid-template-columns:repeat(4,minmax(0,1fr))}
+.bajo .rect{padding:9px 12px}.bajo .casa .vision p{font-size:14px}.bajo .casa .vision{gap:6px}
+.rect{border-radius:22px;background:var(--tarjeta);box-shadow:var(--sombra-chica);padding:12px 14px;text-align:start;display:grid;gap:3px;align-content:start;transition:transform .25s var(--ease)}
+.rect:active{transform:scale(.98)}
+.rect b{font-size:15px;font-weight:800}
+.rect span{font-size:12.5px;font-weight:600;color:var(--suave);line-height:1.3}
+.rect.vacio{background:transparent;box-shadow:inset 0 0 0 1.5px var(--linea);cursor:default}
+.rect.vacio b{color:var(--suave)}.rect.vacio span{color:var(--tenue)}
+.flecha-f{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--fondo);box-shadow:var(--hundido)}.flecha-f svg{width:14px;height:14px}
+.casa .vision{border-radius:var(--r);background:linear-gradient(150deg,#22306a,#141a3c);color:#fff;padding:clamp(14px,calc(2.6 * var(--u)),24px);display:grid;gap:10px;box-shadow:var(--sombra)}
+.casa .vision .logo{height:26px;color:#fff}
+.casa .vision p{font-size:clamp(15px,calc(2.4 * var(--u)),20px);font-weight:700;line-height:1.35}
+.casa-rects{align-content:stretch;grid-auto-rows:1fr;min-height:0}
+.casa-rects .rect{background:linear-gradient(150deg,#1d2757,#141a3c);color:#fff;box-shadow:var(--sombra);align-content:end;padding:16px}
+.casa-rects .rect b{font-size:clamp(16px,calc(2.6 * var(--u)),22px)}
+.casa-rects .rect span{color:rgba(255,255,255,.75)}
+.casa-rects .rect.vacio{background:transparent;color:var(--suave)}
+.doc-html{width:100%;height:100%;border:0;background:#fff;display:block}
+.hoja.md{display:block;overflow:hidden;line-height:1.5;font-weight:500}
+.hoja.md>*+*{margin-top:.7em}
+.hoja.md h1{font-size:22px;font-weight:800}.hoja.md h2{font-size:18px;font-weight:800}.hoja.md h3{font-size:16px;font-weight:800}
+.hoja.md table{border-collapse:collapse;width:100%;font-size:13px}.hoja.md td,.hoja.md th{border-bottom:1px solid var(--linea);padding:5px 6px;text-align:start}
+.hoja.md ul,.hoja.md ol{padding-inline-start:1.2em}.hoja.md img{max-width:100%;border-radius:12px}
+.hoja.md a{color:var(--cobalto);font-weight:700}
 .cifras{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
 .cifra{border-radius:20px;background:var(--tarjeta);box-shadow:var(--sombra-chica);padding:clamp(8px,calc(1.4 * var(--u)),12px) 10px;text-align:center}
 .cifra b{display:block;font-size:clamp(22px,calc(3.6 * var(--u)),32px);font-weight:800;letter-spacing:-.02em;line-height:1.05}
@@ -426,6 +464,7 @@ function transicion(f) {
   // 1) copia exacta de lo que se ve ahorita, encima; 2) se dibuja la pantalla nueva debajo (ya completa);
   // 3) la copia se desvanece. Nunca hay un instante vacío, nada salta y se ve igual con o sin "reducir movimiento".
   const viejo = app.cloneNode(true);
+  viejo.querySelectorAll('iframe').forEach(f => { const r = document.createElement('div'); r.style.cssText = 'position:absolute;inset:0;background:#fff'; f.replaceWith(r); });
   viejo.removeAttribute('id'); viejo.classList.add('fantasma'); viejo.setAttribute('aria-hidden', 'true'); viejo.inert = true;
   marcoEl.appendChild(viejo);
   fantasmaVivo = viejo;
@@ -547,6 +586,7 @@ document.addEventListener('visibilitychange', () => { if (D && document.visibili
 async function precargar(capa) {
   const espera = p => Promise.race([p, new Promise(ok => setTimeout(ok, 1500))]);
   if (capa.tipo === 'ficha' && !capa.cargado) await espera(api('ficha', { tel: capa.tel }).then(r => { if (r.ok) { capa.ext = r; capa.cargado = true; } }));
+  if (capa.tipo === 'documento' && !capa.doc) await espera(api('documento', { id: capa.id }).then(r => { if (r.ok) capa.doc = r.doc; }));
   if (capa.tipo === 'proyecto' && capa.tab === 'uso' && !capa.uso) await espera(api('uso', { id: capa.id }).then(r => { if (r.ok) capa.uso = r; }));
 }
 let abriendo = false;
@@ -564,7 +604,7 @@ function pinta(silencioso) {
   alCambiarTamano = null;
   const c = pila[pila.length - 1];
   if (!c) return pintaInicio(silencioso);
-  ({ tareas: capaTareas, tarea: capaTarea, nuevaTarea: capaNuevaTarea, crm: capaCRM, ficha: capaFicha, nuevoCliente: capaNuevoCliente, proyectos: capaProyectos, proyecto: capaProyecto, nuevoProyecto: capaProyecto, equipo: capaEquipo, moon: capaMoon, lector: capaLector, nota: capaNota, editarProyecto: capaProyecto, cuenta: capaCuenta, frase: capaFrase, foto: capaFoto })[c.tipo](c, silencioso);
+  ({ tareas: capaTareas, tarea: capaTarea, nuevaTarea: capaNuevaTarea, crm: capaCRM, ficha: capaFicha, nuevoCliente: capaNuevoCliente, proyectos: capaProyectos, proyecto: capaProyecto, nuevoProyecto: capaProyecto, equipo: capaEquipo, moon: capaMoon, lector: capaLector, clientes: capaClientes, cliente: capaCliente, seccion: capaSeccion, documento: capaDocumento, casa: capaCasa, jason: capaJason, nota: capaNota, editarProyecto: capaProyecto, cuenta: capaCuenta, frase: capaFrase, foto: capaFoto })[c.tipo](c, silencioso);
 }
 function marco(titulo, accion, cuerpo) {
   app.innerHTML = `<div class="top"><button class="redondo" id="volver" aria-label="Regresar">${I.atras}</button><div class="cabeza" style="flex:1;min-width:0"><h2>${esc(titulo)}</h2>${accion ? `<button class="redondo accion" id="accion" aria-label="${esc(accion)}">${I.mas}</button>` : ''}</div></div><div class="vista" style="grid-template-rows:minmax(0,1fr)">${cuerpo}</div>`;
@@ -589,9 +629,10 @@ function pintaInicio(sil) {
   const barrita = ['pendiente', 'en proceso', 'cerrado', 'en órbita'].map(e => cuenta(e) ? `<i style="--n:${cuenta(e)};--c:${ETAPA[e].c}"></i>` : '').join('');
   const xTareas = mias.map(x => { const p = proyectoDe(x.proyecto); return `<button class="xi${x.estado === 'nueva' ? ' nueva' : ''}" data-t="${x.id}"><span class="q">${esc(x.titulo)}</span><small>${esc(p ? p.nombre : 'General')}</small></button>`; }).join('');
   const xCrm = Object.keys(ETAPA).filter(e => e !== 'archivo' && cuenta(e)).map(e => `<button class="xi" data-g="${e}"><span class="punto" style="--c:${ETAPA[e].c}"></span><span class="q">${ETAPA[e].n}</span><small>${cuenta(e)}</small></button>`).join('');
-  const xProy = activos.map(p => `<button class="xi" data-y="${p.id}"><span class="q">${esc(p.nombre)}</span><small>${esc(p.fase)}</small></button>`).join('');
+  const clientes = panelesCliente();
+  const xProy = clientes.map(({ p, per }) => `<button class="xi" data-c="${esc(p.tel)}"><span class="punto" style="--c:${p.color}"></span><span class="q">${esc(nombreCorto(per))}</span><small>${esc((ETAPA[per.etapa] || ETAPA.pendiente).n)}</small></button>`).join('');
   const xEq = ['daniel', 'dan', 'kid'].map(id => { const ab = D.tareas.filter(x => x.para === id && x.estado !== 'hecha'); const nv = ab.filter(x => x.estado === 'nueva').length; return `<button class="xi" data-u="${id}">${ava(id, 1)}<span class="q">${GENTE[id].n}</span><small>${nv ? nv + ' sin ver' : ab.length + ' abiertas'}</small></button>`; }).join('');
-  const xMoon = `<p class="xtxt">Ser una empresa de inteligencia artificial muy fuerte, muy dinámica y muy intuitiva.</p>` + ['Agente de llamadas', 'Página web', 'Redes y campañas', 'Administración'].map(n => `<span class="xi">${n}</span>`).join('');
+  const xMoon = `<p class="xtxt">Ser una empresa de inteligencia artificial muy fuerte, muy dinámica y muy intuitiva.</p>` + ['Jason', 'Página de MOON', 'Presentación de MOON'].map(n => `<span class="xi">${n}</span>`).join('');
   app.innerHTML = `
   <div class="top"><div class="marca"><span class="logo" role="img" aria-label="MOON Digital"></span><i>/</i>CENTRO</div><div class="esp"></div><button id="salir" aria-label="Mi cuenta">${ava(yo())}</button></div>
   <div class="vista"${sil ? ' style="animation:none"' : ''}>
@@ -602,9 +643,9 @@ function pintaInicio(sil) {
         <div class="extra">${xTareas}</div>
         <span class="num">${mias.length}</span><span class="sub">${vencen ? `${vencen} atrasada${vencen === 1 ? '' : 's'} · ` : ''}tareas abiertas</span></div>
       <div class="t t-crm" role="button" tabindex="0" data-ir="crm"><span class="flecha">${I.abre}</span><span class="eti">CRM de MOON</span><div class="extra">${xCrm}</div><span class="num">${cuenta('pendiente') + cuenta('en proceso')}</span><span class="sub">clientes por cerrar</span><span class="barrita">${barrita}</span></div>
-      <div class="t t-proy" role="button" tabindex="0" data-ir="proyectos"><span class="flecha">${I.abre}</span><span class="eti">Proyectos</span><div class="extra">${xProy}</div><span class="num">${activos.length}</span><span class="sub">${miosP} con tu nombre</span></div>
+      <div class="t t-proy" role="button" tabindex="0" data-ir="clientes"><span class="flecha">${I.abre}</span><span class="eti">Clientes</span><div class="extra">${xProy}</div><span class="num">${clientes.length}</span><span class="sub">demos, propuestas y material</span></div>
       <div class="t t-equipo" role="button" tabindex="0" data-ir="equipo"><span class="flecha">${I.abre}</span><span class="eti">Equipo</span><div class="extra">${xEq}</div><span class="num">${sinVer}</span><span class="sub">tareas sin ver</span></div>
-      <div class="t t-moon" role="button" tabindex="0" data-ir="moon"><span class="flecha">${I.abre}</span><span class="eti">MOON</span><div class="extra">${xMoon}</div><span class="num" style="font-size:clamp(20px,calc(4.6 * var(--u)),32px)">Quiénes somos</span><span class="sub">visión y servicios</span></div>
+      <div class="t t-moon" role="button" tabindex="0" data-ir="casa"><span class="flecha">${I.abre}</span><span class="eti">Hecho en casa</span><div class="extra">${xMoon}</div><span class="num" style="font-size:clamp(20px,calc(4.6 * var(--u)),32px)">Lo nuestro</span><span class="sub">visión, Jason y presentación</span></div>
       <div class="t t-ultimo">${ult ? ava(ult.quien, 1) : ''}<span class="txt">${ult ? `Lo último: <b>${esc((GENTE[ult.quien] || CLAUDE).n)}</b> ${esc(ult.texto)} · ${cuando(ult.fecha)}` : 'Aquí aparece lo último que pasó en MOON.'}</span></div>
     </main>
   </div>`;
@@ -613,6 +654,7 @@ function pintaInicio(sil) {
   atajo('[data-t]', b => abrir({ tipo: 'tarea', id: Number(b.dataset.t) }));
   atajo('[data-g]', b => abrir({ tipo: 'crm', g: b.dataset.g }));
   atajo('[data-y]', b => abrir({ tipo: 'proyecto', id: Number(b.dataset.y) }));
+  atajo('[data-c]', b => abrir({ tipo: 'cliente', tel: b.dataset.c }));
   atajo('[data-u]', b => abrir({ tipo: 'tareas', persona: b.dataset.u }));
   document.getElementById('salir').onclick = () => abrir({ tipo: 'cuenta' });
   llenarExtras();
@@ -830,9 +872,9 @@ function filaProyecto(p) {
 }
 function capaProyectos(c) {
   c.f = c.f || 'activos';
-  const todos = D.proyectos;
+  const todos = c.soloMoon ? D.proyectos.filter(p => !p.tel) : D.proyectos;
   const fil = { activos: todos.filter(p => p.fase !== 'entregado'), mios: todos.filter(p => p.fase !== 'entregado' && String(p.encargados).split(',').includes(yo())), entregados: todos.filter(p => p.fase === 'entregado') };
-  marco('Proyectos', 'Nuevo proyecto', `<div class="cuerpo"><div class="pils">
+  marco(c.soloMoon ? 'Proyectos internos' : 'Proyectos', 'Nuevo proyecto', `<div class="cuerpo"><div class="pils">
     <button class="pil${c.f === 'activos' ? ' on' : ''}" data-f="activos" style="--c:var(--cobalto);--cf:var(--azulf)"><i>${fil.activos.length}</i>Activos</button>
     <button class="pil${c.f === 'mios' ? ' on' : ''}" data-f="mios" style="--c:var(--cobalto);--cf:var(--azulf)"><i>${fil.mios.length}</i>Míos</button>
     <button class="pil${c.f === 'entregados' ? ' on' : ''}" data-f="entregados" style="--c:var(--verde);--cf:var(--verdef)"><i>${fil.entregados.length}</i>Entregados</button></div>
@@ -937,6 +979,144 @@ function pintaUso(c, p) {
     let det = ''; try { const o = JSON.parse(x.datos || '{}'); det = Object.entries(o).filter(([, v]) => v !== '' && v != null).map(([k2, v]) => `${k2[0].toUpperCase() + k2.slice(1)}: ${v}`).join('\n'); } catch (e) { det = x.datos || ''; }
     abrir({ tipo: 'lector', titulo: `${CANAL[x.canal] || 'Uso'} · ${cuando(x.fecha)}`, texto: [x.resumen, det].filter(Boolean).join('\n\n') || 'Sin detalle.' });
   }) });
+}
+
+/* ---------- Clientes: un panel por cliente con lo que se le enseña ---------- */
+const SECCIONES = [['presentacion', 'Presentación', 'Aún no hay presentación'], ['propuesta', 'Propuesta', 'Aún no hay propuesta'], ['contrato', 'Contrato', 'Aún no hay contrato'], ['material', 'Material', 'Aún no hay material'], ['avance', 'Avance', 'Aún no hay avance']];
+function nombreCorto(per) { return per ? (per.negocio || per.nombre || '').replace(/\s*\(.*\)\s*/g, ' ').trim() : ''; }
+function panelesCliente() { return (D.paneles || []).filter(p => p.tel !== 'moon').map(p => ({ p, per: personaDe(p.tel) })).filter(x => x.per); }
+const docsDe = (tel, sec) => (D.documentos || []).filter(d => d.tel === tel && (!sec || d.seccion === sec));
+const dominio = u => { try { return new URL(u).host.replace(/^www\./, ''); } catch (e) { return u; } };
+function icono(p, per, tam) {
+  const ini = esc(nombreCorto(per).slice(0, 1));
+  return `<span class="icono" style="--c:${p.color};width:${tam}px;height:${tam}px;font-size:${Math.round(tam * .42)}px">${p.icono ? `<img src="${esc(p.icono)}" alt="" onerror="this.remove()">` : ''}${ini}</span>`;
+}
+function abrirDoc(d) {
+  if (d.formato === 'link') {
+    if (/^tel:/.test(d.url)) { location.href = d.url; return; }
+    window.open(d.url, '_blank', 'noopener'); return;
+  }
+  if (d.formato === 'centro') {   // algo que vive dentro del Centro (ej. las llamadas de Jason)
+    const [, clave, tab] = String(d.url).split(':');
+    const pr = D.proyectos.find(x => x.nombre && clave === 'jason' && /jason/i.test(x.nombre));
+    if (pr) abrir({ tipo: 'proyecto', id: pr.id, tab: tab || 'fase' });
+    return;
+  }
+  abrir({ tipo: 'documento', id: d.id, titulo: d.titulo });
+}
+function capaClientes(c) {
+  const lista = panelesCliente();
+  marco('Clientes', '', `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr) auto"><div class="lista dos"></div><div class="pie"></div></div>`);
+  alCambiarTamano = paginar(app.querySelector('.cuerpo'), lista, ({ p, per }) => {
+    const E = ETAPA[per.etapa] || ETAPA.pendiente, n = docsDe(p.tel).length;
+    return `<button class="fila" data-c="${esc(p.tel)}">${icono(p, per, 44)}<span class="q"><b>${esc(nombreCorto(per))}</b><span><em style="font-style:normal;font-weight:800;color:${E.c}">${E.n}</em> · demo${n ? ` · ${n} documento${n === 1 ? '' : 's'}` : ''}</span></span>${avas(per.encargados)}</button>`;
+  }, { pagina: c.p, alto: 64, vacio: '<b>Todavía no hay clientes con panel</b>', alPintar: l => l.querySelectorAll('[data-c]').forEach(b => b.onclick = () => abrir({ tipo: 'cliente', tel: b.dataset.c })) });
+}
+function rectangulos(tel, secciones) {
+  return `<div class="rects">${secciones.map(([k, n, vacio]) => {
+    const ds = docsDe(tel, k);
+    const frase = !ds.length ? vacio : ds.length === 1 ? (ds[0].frase || ds[0].titulo) : `${ds.length}: ${ds.map(d => d.titulo).join(' · ')}`;
+    return `<button class="rect${ds.length ? '' : ' vacio'}" data-s="${k}"${ds.length ? '' : ' aria-disabled="true"'}><b>${n}${ds.length > 1 ? ` (${ds.length})` : ''}</b><span>${esc(frase)}</span></button>`;
+  }).join('')}</div>`;
+}
+function activarRects(tel, secciones) {
+  app.querySelectorAll('.rect[data-s]').forEach(b => b.onclick = () => {
+    const ds = docsDe(tel, b.dataset.s); if (!ds.length) return;
+    if (ds.length === 1) abrirDoc(ds[0]); else abrir({ tipo: 'seccion', tel, seccion: b.dataset.s, nombre: (secciones.find(x => x[0] === b.dataset.s) || [])[1] });
+  });
+}
+function capaCliente(c) {
+  const p = (D.paneles || []).find(x => x.tel === c.tel), per = personaDe(c.tel);
+  if (!p || !per) return cerrar();
+  c.tab = c.tab || 'cliente';
+  const proys = D.proyectos.filter(x => x.tel === c.tel);
+  let cuerpo;
+  if (c.tab === 'cliente') cuerpo = `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr) auto">
+      <div class="demo" style="--c:${p.color}">${p.imagen ? `<img class="demo-img" src="${esc(p.imagen)}" alt="" onerror="this.remove()">` : `<div class="demo-vivo"><iframe src="${esc(p.demo)}" title="Vista del demo" tabindex="-1" aria-hidden="true" loading="lazy" sandbox="allow-scripts allow-same-origin"></iframe></div>`}<div class="demo-velo"></div>
+        <div class="demo-info">${icono(p, per, 56)}<div><span class="eti" style="color:rgba(255,255,255,.8)">DEMO</span><b>${esc(nombreCorto(per))}</b><span>${esc(dominio(p.demo))}</span></div></div>
+        <button class="boton demo-boton" id="demo">Abrir demo ${I.abre}</button></div>
+      ${rectangulos(c.tel, SECCIONES)}</div>`;
+  else if (c.tab === 'proyectos') cuerpo = `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr) auto"><div class="lista"></div><div class="pie"></div></div>`;
+  marco(nombreCorto(per), '', `<div class="cuerpo" style="grid-template-rows:auto minmax(0,1fr)"><div class="tabs"><button data-tab="cliente" class="${c.tab === 'cliente' ? 'on' : ''}">Lo del cliente</button><button data-tab="proyectos" class="${c.tab === 'proyectos' ? 'on' : ''}">Proyectos (${proys.length})</button><button data-tab="ficha">Ficha</button></div>${cuerpo || ''}</div>`);
+  app.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => { if (b.dataset.tab === 'ficha') return abrir({ tipo: 'ficha', tel: c.tel }); c.tab = b.dataset.tab; c.p = 0; transicion(() => pinta(true)); });
+  if (c.tab === 'cliente') { escalarDemo(); alCambiarTamano = escalarDemo; document.getElementById('demo').onclick = () => window.open(p.demo, '_blank', 'noopener'); activarRects(c.tel, SECCIONES); }
+  if (c.tab === 'proyectos') alCambiarTamano = paginar(app.querySelector('.vista .cuerpo .cuerpo'), proys, filaProyecto, { pagina: c.p, vacio: '<b>Sin proyectos</b>', alPintar: l => l.querySelectorAll('[data-y]').forEach(b => b.onclick = () => abrir({ tipo: 'proyecto', id: Number(b.dataset.y) })) });
+}
+// La vista del demo es la página real en miniatura: se dibuja a 1280 de ancho (o 390 en celular) y se encoge a la tarjeta.
+function escalarDemo() {
+  const caja = app.querySelector('.demo-vivo'); if (!caja) return;
+  const f = caja.firstElementChild, W = caja.clientWidth, H = caja.clientHeight;
+  const ancho = W < 520 ? 390 : 1280, k = W / ancho;
+  f.style.width = ancho + 'px'; f.style.height = Math.ceil(H / k) + 'px'; f.style.transform = `scale(${k})`;
+}
+function capaSeccion(c) {
+  const ds = docsDe(c.tel, c.seccion), per = personaDe(c.tel);
+  marco(`${c.nombre || 'Documentos'} · ${nombreCorto(per) || 'MOON'}`, '', `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr) auto"><div class="lista dos"></div><div class="pie"></div></div>`);
+  alCambiarTamano = paginar(app.querySelector('.cuerpo'), ds, d => `<button class="fila" data-d="${esc(d.id)}" style="grid-template-columns:minmax(0,1fr) auto"><span class="q"><b>${esc(d.titulo)}</b><span>${esc(d.frase || (d.formato === 'link' ? dominio(d.url) : 'Se abre aquí mismo'))}</span></span><span class="flecha-f">${I.abre}</span></button>`,
+    { pagina: c.p, alPintar: l => l.querySelectorAll('[data-d]').forEach(b => b.onclick = () => abrirDoc(ds.find(x => x.id === b.dataset.d))) });
+}
+
+/* ---------- Documento guardado: se lee aquí, sin necesitar Claude ---------- */
+let markedListo = null;
+function cargarMarked() {
+  if (window.marked) return Promise.resolve();
+  return markedListo || (markedListo = new Promise((ok, mal) => { const s = document.createElement('script'); s.src = 'https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js'; s.onload = ok; s.onerror = mal; document.head.appendChild(s); }));
+}
+function capaDocumento(c) {
+  const d = c.doc;
+  if (!d) { marco(c.titulo || 'Documento', '', '<div class="vacio"><div><b>No se pudo abrir</b>Revisa tu internet y vuelve a intentar.</div></div>'); return; }
+  if (d.formato === 'html') {
+    // Su propio diseño, aislado del Centro (no puede leer ni tocar nada de aquí).
+    marco(d.titulo, '', `<div class="hoja" style="padding:0;overflow:hidden"><iframe class="doc-html" sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox" title="${esc(d.titulo)}"></iframe></div>`);
+    app.querySelector('.doc-html').srcdoc = d.contenido;
+    return;
+  }
+  marco(d.titulo, '', `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr) auto"><div class="hoja md" id="hojaMd"></div><div class="pie"></div></div>`);
+  const hoja = document.getElementById('hojaMd'), pie = app.querySelector('.vista .pie');
+  cargarMarked().then(() => {
+    const temp = document.createElement('div'); temp.innerHTML = window.marked.parse(String(d.contenido || ''));
+    temp.querySelectorAll('a').forEach(a => { a.target = '_blank'; a.rel = 'noopener'; });
+    const bloques = [...temp.children].map(e => e.outerHTML);
+    function dibuja() {
+      // Páginas por bloques completos: un párrafo o una tabla nunca se cortan a la mitad.
+      const paginas = []; let actual = [];
+      hoja.innerHTML = '';
+      for (const b of bloques) {
+        hoja.insertAdjacentHTML('beforeend', b);
+        if (hoja.scrollHeight > hoja.clientHeight + 1 && actual.length) { hoja.lastElementChild.remove(); paginas.push(actual); actual = []; hoja.innerHTML = b; }
+        actual.push(b);
+      }
+      if (actual.length) paginas.push(actual);
+      c.p = Math.min(c.p || 0, paginas.length - 1);
+      hoja.innerHTML = paginas[c.p].join('');
+      pie.innerHTML = paginas.length > 1 ? `<button class="redondo" data-pag="-1" aria-label="Anterior">${I.izq}</button><span class="pag">${c.p + 1} de ${paginas.length}</span><button class="redondo" data-pag="1" aria-label="Siguiente">${I.der}</button>` : '';
+      pie.querySelectorAll('[data-pag]').forEach(b => b.onclick = () => { c.p = (c.p + Number(b.dataset.pag) + paginas.length) % paginas.length; dibuja(); });
+      let x0 = null; hoja.ontouchstart = e => { x0 = e.touches[0].clientX; };
+      hoja.ontouchend = e => { if (x0 == null || paginas.length < 2) return; const dx = e.changedTouches[0].clientX - x0; x0 = null; if (Math.abs(dx) > 50) { c.p = (c.p + (dx < 0 ? 1 : -1) + paginas.length) % paginas.length; dibuja(); } };
+    }
+    dibuja(); alCambiarTamano = dibuja;
+  }, () => { hoja.innerHTML = '<p>No se pudo mostrar el documento. Revisa tu internet.</p>'; });
+}
+
+/* ---------- Hecho en casa: lo nuestro (otro estilo) ---------- */
+const CASA = [['jason', 'Jason', 'Nuestro recepcionista: probarlo, su ficha, sus llamadas y la bienvenida'], ['pagina', 'Página web de MOON', 'moondigitalia.com'], ['presentacion', 'Presentación de MOON Digital', 'Quiénes somos y qué hacemos'], ['proyectos', 'Proyectos internos', 'Lo que construimos para nosotros']];
+function capaCasa() {
+  marco('Hecho en casa', '', `<div class="cuerpo casa" style="grid-template-rows:auto minmax(0,1fr)">
+    <div class="vision"><span class="logo"></span><p>Ser una empresa de inteligencia artificial muy fuerte, muy dinámica y muy intuitiva. Cada hora que invertimos es para agilizar, mejorar y hacer más inteligente la forma de trabajar.</p></div>
+    <div class="rects casa-rects">${CASA.map(([k, n, f]) => { const ds = k === 'jason' || k === 'proyectos' ? [1] : docsDe('moon', k); return `<button class="rect${ds.length ? '' : ' vacio'}" data-k="${k}"><b>${n}</b><span>${ds.length ? f : 'Aún no está aquí'}</span></button>`; }).join('')}</div></div>`);
+  app.querySelectorAll('[data-k]').forEach(b => b.onclick = () => {
+    const k = b.dataset.k;
+    if (k === 'jason') return abrir({ tipo: 'jason' });
+    if (k === 'proyectos') return abrir({ tipo: 'proyectos', f: 'activos', soloMoon: true });
+    const ds = docsDe('moon', k); if (ds.length) abrirDoc(ds[0]);
+  });
+}
+const JASON = [['jason', 'Probar a Jason'], ['ficha', 'Su ficha'], ['llamadas', 'Sus llamadas'], ['bienvenida', 'Bienvenida']];
+function capaJason() {
+  const docs = docsDe('moon', 'jason');
+  const de = k => k === 'jason' ? docs.find(d => d.id === 'jason-numero') : k === 'ficha' ? docs.find(d => d.id === 'jason-ficha') : k === 'llamadas' ? { formato: 'centro', url: 'proyecto:jason:uso', frase: 'Cada llamada que ha contestado, en el Centro' } : docsDe('moon', 'bienvenida')[0];
+  marco('Jason', '', `<div class="cuerpo casa" style="grid-template-rows:minmax(0,1fr)"><div class="rects casa-rects">${JASON.map(([k, n]) => { const d = de(k); return `<button class="rect${d ? '' : ' vacio'}" data-k="${k}"><b>${n}</b><span>${esc(d ? (d.frase || d.titulo) : 'Aún no está aquí')}</span></button>`; }).join('')}</div></div>`);
+  app.querySelectorAll('[data-k]').forEach(b => b.onclick = () => { const d = de(b.dataset.k); if (d) abrirDoc(d); });
 }
 
 /* ---------- Lector: texto largo completo, en páginas, nunca cortado ---------- */

@@ -6,6 +6,16 @@ const { crypto, ETAPAS, TEMPERATURAS, SERVICIOS, ORIGENES, FASES, igual, leer, s
 
 const AGENDA = 'https://script.google.com/macros/s/AKfycbzmjh39HaP39rdzK3PJdKMULk43T9uvQNwcriSdpzbIRgLC3Xppu9MezL4byJTb4kgX/exec';
 const USUARIOS = ['kid', 'dan', 'daniel'];
+function leerCifrado(id) {
+  try {
+    if (!/^[a-z0-9-]+$/.test(id) || !process.env.CENTRO_LLAVE_DOCS) return null;
+    const archivo = require('path').join(__dirname, '_docs', id + '.bin');
+    if (!require('fs').existsSync(archivo)) return null;
+    const b = require('fs').readFileSync(archivo), llave = Buffer.from(process.env.CENTRO_LLAVE_DOCS, 'base64');
+    const dc = crypto.createDecipheriv('aes-256-gcm', llave, b.subarray(0, 12)); dc.setAuthTag(b.subarray(12, 28));
+    return JSON.parse(require('zlib').gunzipSync(Buffer.concat([dc.update(b.subarray(28)), dc.final()])).toString());
+  } catch (e) { console.log('DOC-CIFRADO', id, e.message); return null; }
+}
 const huella = s => crypto.createHash('sha256').update(String(s)).digest('hex');
 const ahora = () => new Date().toISOString();
 const ocultar = c => { const [u, d] = String(c).split('@'); return u.slice(0, 2) + '•••@' + d; };
@@ -97,17 +107,19 @@ async function entrada(d, req) {
 
 // ---------- Con sesión ----------
 async function inicio(yo) {
-  const [usuarios, personas, proyectos, tareas, actividad, usoMes] = await Promise.all([
+  const [usuarios, personas, proyectos, tareas, actividad, usoMes, paneles, documentos] = await Promise.all([
     sql('SELECT id, nombre, color, rol, lema, creado FROM usuarios'),
     sql('SELECT tel, telefono, nombre, negocio, giro, temperatura, etapa, servicio, origen, necesidad, proxima_cita, encargados, notas_equipo, ultimo_contacto, contactos, es_prueba FROM personas ORDER BY ultimo_contacto DESC LIMIT 1000'),
     sql("SELECT id, tel, nombre, fase, encargados, nota, creado, actualizado, (clave != '' OR llave_uso != '') AS conectado FROM proyectos ORDER BY actualizado DESC"),
     sql("SELECT * FROM tareas WHERE estado != 'hecha' OR hecho > ? ORDER BY id DESC", [new Date(Date.now() - 14 * 864e5).toISOString()]),
     sql('SELECT * FROM actividad ORDER BY id DESC LIMIT 12'),
     sql('SELECT proyecto, COUNT(*) n FROM uso WHERE fecha >= ? AND quien NOT IN (SELECT tel FROM personas WHERE es_prueba = 1) GROUP BY proyecto', [new Date(Date.now() - 30 * 864e5).toISOString()]),
+    sql('SELECT tel, orden, demo, color, imagen, icono FROM paneles ORDER BY orden'),
+    sql('SELECT id, tel, seccion, orden, titulo, frase, url, formato FROM documentos ORDER BY tel, seccion, orden'),
   ]);
   const usos = Object.fromEntries(usoMes.map(x => [x.proyecto, x.n]));
   proyectos.forEach(p => { p.uso_mes = usos[p.id] || 0; });
-  return { ok: true, yo, usuarios, personas, proyectos, tareas, actividad, listas: { etapas: ETAPAS, temperaturas: TEMPERATURAS, servicios: SERVICIOS, origenes: ORIGENES, fases: FASES } };
+  return { ok: true, yo, usuarios, personas, proyectos, tareas, actividad, paneles, documentos, listas: { etapas: ETAPAS, temperaturas: TEMPERATURAS, servicios: SERVICIOS, origenes: ORIGENES, fases: FASES } };
 }
 
 const listaUsuarios = v => (Array.isArray(v) ? v : String(v || '').split(',')).map(x => String(x).trim()).filter(x => USUARIOS.includes(x)).join(',');
@@ -138,6 +150,16 @@ async function conSesion(d, yo) {
     await sql('UPDATE usuarios SET ' + set.join(', ') + ' WHERE id = ?', params);
     if (d.foto !== undefined) await anotar(yo.id, 'cambió su foto de credencial');
     return { ok: true };
+  }
+
+  // Un documento guardado (copia de lo que se le enseña al cliente). Solo con sesión.
+  if (d.accion === 'documento') {
+    const doc = (await sql('SELECT id, titulo, formato, contenido, url FROM documentos WHERE id = ?', [t(d.id, 80)]))[0];
+    if (!doc) return { ok: false, error: 'no existe' };
+    // Los documentos con imágenes viven cifrados dentro del proyecto (api/_docs); solo esta llave los abre.
+    const cifrado = leerCifrado(doc.id);
+    if (cifrado) Object.assign(doc, cifrado);
+    return { ok: true, doc };
   }
 
   if (d.accion === 'uso') {
@@ -273,3 +295,4 @@ module.exports = async (req, res) => {
     res.status(502).json({ ok: false, error: 'base' });
   }
 };
+module.exports._leerCifrado = leerCifrado;   // para la prueba local
