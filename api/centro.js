@@ -116,13 +116,9 @@ async function conSesion(d, yo) {
   if (d.accion === 'inicio') return inicio(yo);
   if (d.accion === 'fotos') {
     // Foto que cada quien subió; si no ha subido, la de su credencial.
-    // Paso único: las fotos que vivían en el código se pasan a la base privada (y luego se borran del código).
-    let base = {}; try { base = require('./_fotos'); } catch (e) {}
+    // Las fotos viven solo en la base privada (nunca en el código).
     const fotos = {};
-    for (const u of await sql('SELECT id, foto FROM usuarios')) {
-      if (u.foto) fotos[u.id] = u.foto;
-      else if (base[u.id]) { await sql("UPDATE usuarios SET foto = ? WHERE id = ? AND foto = ''", [base[u.id], u.id]); fotos[u.id] = base[u.id]; }
-    }
+    for (const u of await sql("SELECT id, foto FROM usuarios WHERE foto != ''")) fotos[u.id] = u.foto;
     return { ok: true, fotos };
   }
 
