@@ -210,7 +210,8 @@ textarea.campo{height:auto;border-radius:22px;padding:14px 18px;resize:none}
 .casa-rects .rect b{font-size:clamp(16px,calc(2.6 * var(--u)),22px)}
 .casa-rects .rect span{color:rgba(255,255,255,.75)}
 .casa-rects .rect.sin{background:transparent;color:var(--suave)}
-.doc-html{width:100%;height:100%;border:0;background:#fff;display:block}
+.doc-html{position:absolute;inset:0;width:100%;height:100%;border:0;background:#fff;display:block}
+.hoja:has(>.doc-html){position:relative}
 .hoja.md{display:block;overflow:hidden;line-height:1.5;font-weight:500}
 .hoja.md>*+*{margin-top:.7em}
 .hoja.md h1{font-size:22px;font-weight:800}.hoja.md h2{font-size:18px;font-weight:800}.hoja.md h3{font-size:16px;font-weight:800}
@@ -1069,8 +1070,21 @@ function capaDocumento(c) {
   if (!d) { marco(c.titulo || 'Documento', '', '<div class="vacio"><div><b>No se pudo abrir</b>Revisa tu internet y vuelve a intentar.</div></div>'); return; }
   if (d.formato === 'html') {
     // Su propio diseño, aislado del Centro (no puede leer ni tocar nada de aquí).
-    marco(d.titulo, '', `<div class="hoja" style="padding:0;overflow:hidden"><iframe class="doc-html" sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox" title="${esc(d.titulo)}"></iframe></div>`);
-    app.querySelector('.doc-html').srcdoc = d.contenido;
+    const laminas = /<section[\s>]/.test(d.contenido) && /section\{[^}]*width:\s*1920px/.test(d.contenido);
+    marco(d.titulo, '', `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr) auto"><div class="hoja" style="position:relative;padding:0;overflow:hidden${laminas ? ';background:#111' : ''}"><iframe class="doc-html" sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox" title="${esc(d.titulo)}"></iframe></div><div class="pie"></div></div>`);
+    const fr = app.querySelector('.doc-html'), pie = app.querySelector('.vista .pie');
+    if (!laminas) { fr.srcdoc = d.contenido; return; }
+    // Presentaciones: una lámina a la vez, del tamaño de la pantalla, con flechas (y deslizando el dedo). Nunca scroll.
+    fr.srcdoc = d.contenido.replace(/<\/head>/i, LAMINAS + '</head>');
+    c.lamina = c.lamina || 0;
+    const ir = n => fr.contentWindow && fr.contentWindow.postMessage({ lamina: n }, '*');
+    onmessage = e => {
+      if (e.source !== fr.contentWindow || !e.data || typeof e.data.total !== 'number') return;
+      c.lamina = e.data.lamina; const n = e.data.total;
+      pie.innerHTML = n > 1 ? `<button class="redondo" data-pag="-1" aria-label="Lámina anterior">${I.izq}</button><span class="pag">${c.lamina + 1} de ${n}</span><button class="redondo" data-pag="1" aria-label="Lámina siguiente">${I.der}</button>` : '';
+      pie.querySelectorAll('[data-pag]').forEach(b => b.onclick = () => ir((c.lamina + Number(b.dataset.pag) + n) % n));
+    };
+    fr.onload = () => ir(c.lamina);
     return;
   }
   marco(d.titulo, '', `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr) auto"><div class="hoja md" id="hojaMd"></div><div class="pie"></div></div>`);
@@ -1100,6 +1114,16 @@ function capaDocumento(c) {
   }, () => { hoja.innerHTML = '<p>No se pudo mostrar el documento. Revisa tu internet.</p>'; });
 }
 
+// Se mete dentro de cada presentación: acomoda las láminas de 1920×1080 a la pantalla y muestra una a la vez.
+const LAMINAS = `<style>html,body{margin:0!important;height:100%;overflow:hidden!important;background:#111!important}
+section{position:absolute!important;left:50%!important;top:50%!important;margin:0!important;transform:translate(-50%,-50%) scale(var(--k,.5))!important;opacity:0;pointer-events:none;transition:opacity .3s ease}
+section.actual{opacity:1;pointer-events:auto}</style>
+<script>(function(){var L=[],i=0;function k(){document.documentElement.style.setProperty('--k',Math.min(innerWidth/1920,innerHeight/1080))}
+function ver(n){L=[].slice.call(document.querySelectorAll('section'));if(!L.length)return;i=Math.max(0,Math.min(L.length-1,n));L.forEach(function(s,j){s.classList.toggle('actual',j===i)});parent.postMessage({lamina:i,total:L.length},'*')}
+addEventListener('message',function(e){if(e.data&&typeof e.data.lamina==='number')ver(e.data.lamina)});
+addEventListener('resize',k);addEventListener('DOMContentLoaded',function(){k();ver(0)});
+var x0=null;addEventListener('touchstart',function(e){x0=e.touches[0].clientX},{passive:true});addEventListener('touchend',function(e){if(x0==null)return;var dx=e.changedTouches[0].clientX-x0;x0=null;if(Math.abs(dx)>50)ver(i+(dx<0?1:-1))});
+addEventListener('keydown',function(e){if(e.key==='ArrowRight')ver(i+1);if(e.key==='ArrowLeft')ver(i-1)});k();})();<\/script>`;
 /* ---------- Hecho en casa: lo nuestro (otro estilo) ---------- */
 const CASA = [['jason', 'Jason', 'Nuestro recepcionista: probarlo, su ficha, sus llamadas y la bienvenida'], ['pagina', 'Página web de MOON', 'moondigitalia.com'], ['presentacion', 'Presentación de MOON Digital', 'Quiénes somos y qué hacemos'], ['proyectos', 'Proyectos internos', 'Lo que construimos para nosotros']];
 function capaCasa() {
