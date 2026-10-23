@@ -33,11 +33,11 @@ main{height:100%;max-width:520px;margin:0 auto;padding:max(22px,env(safe-area-in
 .arriba{display:flex;flex-direction:column;gap:10px;align-items:center}
 h1{font-size:clamp(28px,8vw,40px);font-weight:800;letter-spacing:-.02em;line-height:1.08;text-wrap:balance;overflow-wrap:anywhere}
 .sub{color:var(--suave);font-size:16px;line-height:1.4;text-wrap:balance}
-.centro{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;min-height:0}
+.centro{display:flex;flex-direction:column;align-items:center;justify-content:safe center;gap:22px;min-height:0}
 /* El botón: un círculo cobalto. Mientras el asistente habla, un anillo crece con su voz. */
-.disco{position:relative;width:min(56vw,230px);aspect-ratio:1;display:grid;place-items:center}
+.disco{position:relative;width:min(56vw,230px,26vh);aspect-ratio:1;display:grid;place-items:center}
 .anillo{position:absolute;inset:0;border-radius:50%;background:var(--cobalto);opacity:.16;transform:scale(var(--v,1));transition:transform .12s linear,opacity .4s var(--ease)}
-.hablar{position:relative;width:78%;aspect-ratio:1;border-radius:50%;background:var(--cobalto);color:#fff;box-shadow:var(--sombra);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font-weight:800;font-size:17px;transition:background .35s var(--ease),transform .2s var(--ease)}
+.hablar{position:relative;width:78%;aspect-ratio:1;border-radius:50%;background:var(--cobalto);color:#fff;box-shadow:var(--sombra);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font-weight:800;font-size:min(17px,4.4vw);text-align:center;line-height:1.15;transition:background .35s var(--ease),transform .2s var(--ease)}
 .hablar:active{transform:scale(.96)}
 .hablar svg{width:38%;height:auto}
 .hablar.colgar{background:var(--rojo)}
@@ -49,8 +49,9 @@ h1{font-size:clamp(28px,8vw,40px);font-weight:800;letter-spacing:-.02em;line-hei
 .entra{animation:entra .45s var(--ease) both}
 /* Al terminar: el botón se hace chico y aparecen las tres opciones de seguimiento. */
 .centro.fin{gap:14px}
-.centro.fin .disco{width:min(30vw,112px)}
-.centro.fin .hablar{font-size:13px}
+.centro.fin .disco,.centro.fin #estado{display:none}
+.fin-sub #sub{display:none}
+.par2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 .seguir{width:100%;max-width:380px;display:grid;gap:10px}
 .op{border-radius:999px;height:52px;padding:0 18px;font-weight:800;font-size:16px;background:var(--cobalto);color:#fff;white-space:nowrap;transition:transform .2s var(--ease)}
 .op:active{transform:scale(.97)}
@@ -92,7 +93,7 @@ h1{font-size:clamp(28px,8vw,40px);font-weight:800;letter-spacing:-.02em;line-hei
     <div class="seguir" id="seguir" hidden>
       <button class="op" data-op="quiero">Me gustó, quiero uno</button>
       <button class="op dos" data-op="llamada">Quiero agendar una llamada</button>
-      <button class="op tres" data-op="no">Ahorita no</button>
+      <div class="par2"><button class="op tres" data-op="no">Ahorita no</button><button class="op tres" id="otraVez">Hablarle otra vez</button></div>
     </div>
     <p class="gracias" id="gracias" hidden></p>
   </div>
@@ -127,13 +128,14 @@ function pintar(nuevo) {
   $('icoMic').hidden = enLlamada; $('icoColgar').hidden = !enLlamada;
   $('botonTexto').textContent = enLlamada ? 'Colgar' : (estado === 'termino' ? 'Hablar otra vez' : 'Hablar');
   $('boton').setAttribute('aria-label', $('botonTexto').textContent);
-  $('zona').classList.toggle('fin', estado === 'termino');
+  $('zona').classList.toggle('fin', estado === 'termino' && !opElegida);
+  document.body.classList.toggle('fin-sub', estado === 'termino');
   $('seguir').hidden = estado !== 'termino' || !!opElegida;
   $('gracias').hidden = estado !== 'termino' || !opElegida;
   $('estado').textContent = { listo: '', conectando: 'Conectando…', escuchando: 'Te escucho', hablando: `${demo.asistente} está hablando`, termino: 'Llamada terminada' }[estado] || '';
   $('pista').hidden = estado === 'termino' && !!opElegida;
   $('pista').textContent = estado === 'termino'
-    ? `Así atendería ${demo.asistente} a los clientes de ${demo.negocio}, a cualquier hora. ¿Qué te pareció?`
+    ? (opElegida ? '' : `¿Qué te pareció cómo atendió ${demo.asistente}?`)
     : 'Háblale como si fueras un cliente: pregunta precios u horarios, o pide una cita.';
 }
 
@@ -221,6 +223,7 @@ function pedirDatos(op) {
 }
 function cerrarHoja() { $('velo').classList.remove('ver'); $('hoja').classList.remove('ver'); setTimeout(() => { $('velo').hidden = true; $('hoja').hidden = true; }, 350); }
 $('velo').onclick = cerrarHoja;
+$('otraVez').onclick = () => { aviso(''); empezar(); };
 document.querySelectorAll('[data-op]').forEach(b => b.onclick = () => {
   const op = b.dataset.op;
   if (op !== 'no' && !demo.conocido) return pedirDatos(op);
