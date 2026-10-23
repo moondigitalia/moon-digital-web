@@ -104,7 +104,7 @@ async function inicio(yo) {
   const [usuarios, personas, proyectos, tareas, actividad, usoMes, paneles, documentos] = await Promise.all([
     sql('SELECT id, nombre, color, rol, lema, creado FROM usuarios'),
     sql('SELECT tel, telefono, correo, foto, nombre, negocio, giro, temperatura, etapa, servicio, origen, necesidad, proxima_cita, encargados, notas_equipo, ultimo_contacto, contactos, es_prueba FROM personas ORDER BY ultimo_contacto DESC LIMIT 1000'),
-    sql("SELECT id, tel, nombre, fase, encargados, nota, creado, actualizado, (clave != '' OR llave_uso != '') AS conectado FROM proyectos ORDER BY actualizado DESC"),
+    sql("SELECT id, tel, nombre, fase, enlace, encargados, nota, creado, actualizado, (clave != '' OR llave_uso != '') AS conectado FROM proyectos ORDER BY actualizado DESC"),
     sql("SELECT * FROM tareas WHERE estado != 'hecha' OR hecho > ? ORDER BY id DESC", [new Date(Date.now() - 14 * 864e5).toISOString()]),
     sql('SELECT * FROM actividad ORDER BY id DESC LIMIT 12'),
     sql('SELECT proyecto, COUNT(*) n FROM uso WHERE fecha >= ? AND quien NOT IN (SELECT tel FROM personas WHERE es_prueba = 1) GROUP BY proyecto', [new Date(Date.now() - 30 * 864e5).toISOString()]),
@@ -273,20 +273,24 @@ async function conSesion(d, yo) {
 
   if (d.accion === 'proyecto') {
     const nombre = t(d.nombre, 100);
-    const fase = normal(d.fase, FASES);
+    // Un proyecto puede ir en varias fases a la vez (ej. "construcción,pruebas"); siempre en el orden de FASES.
+    const pedidas = d.fase === undefined ? [] : String(d.fase).split(',').map(x => normal(x, FASES)).filter(Boolean);
+    const fase = FASES.filter(x => pedidas.includes(x)).join(',');
+    const enlace = d.enlace === undefined ? undefined : /^https:\/\/[^\s<>"']{3,400}$/.test(String(d.enlace).trim()) ? String(d.enlace).trim() : '';
+    if (d.enlace !== undefined && String(d.enlace).trim() && !enlace) return { ok: false, error: 'enlace' };
     const f = ahora();
     if (d.id) {
       const p = (await sql('SELECT * FROM proyectos WHERE id = ?', [Number(d.id)]))[0];
       if (!p) return { ok: false };
-      await sql('UPDATE proyectos SET nombre = ?, fase = ?, encargados = ?, nota = ?, tel = ?, actualizado = ? WHERE id = ?',
-        [nombre || p.nombre, fase || p.fase, d.encargados !== undefined ? listaUsuarios(d.encargados) : p.encargados,
+      await sql('UPDATE proyectos SET nombre = ?, fase = ?, enlace = ?, encargados = ?, nota = ?, tel = ?, actualizado = ? WHERE id = ?',
+        [nombre || p.nombre, fase || p.fase, enlace !== undefined ? enlace : (p.enlace || ''), d.encargados !== undefined ? listaUsuarios(d.encargados) : p.encargados,
          d.nota !== undefined ? t(d.nota, 2000) : p.nota, d.tel !== undefined ? llave(d.tel) : p.tel, f, p.id]);
-      if (fase && fase !== p.fase) await anotar(yo.id, `pasó ${p.nombre} a ${fase}`);
+      if (fase && fase !== p.fase) await anotar(yo.id, `puso ${p.nombre} en ${fase.split(',').join(' y ')}`);
       return { ok: true, id: p.id };
     }
     if (!nombre) return { ok: false, error: 'nombre' };
-    await sql('INSERT INTO proyectos (tel, nombre, fase, encargados, nota, creado, actualizado) VALUES (?,?,?,?,?,?,?)',
-      [llave(d.tel), nombre, fase || 'por arrancar', listaUsuarios(d.encargados), t(d.nota, 2000), f, f]);
+    await sql('INSERT INTO proyectos (tel, nombre, fase, enlace, encargados, nota, creado, actualizado) VALUES (?,?,?,?,?,?,?,?)',
+      [llave(d.tel), nombre, fase || 'por arrancar', enlace || '', listaUsuarios(d.encargados), t(d.nota, 2000), f, f]);
     const id = (await sql('SELECT MAX(id) AS id FROM proyectos'))[0].id;
     await anotar(yo.id, `abrió el proyecto ${nombre}`);
     return { ok: true, id };

@@ -186,8 +186,29 @@ textarea.campo{height:auto;border-radius:22px;padding:14px 18px;resize:none}
 .avance{display:grid;justify-items:center;gap:clamp(6px,calc(1.4 * var(--u)),12px);text-align:center}
 .avance svg{width:min(230px,calc(52 * var(--w)),calc(26 * var(--u)));height:auto;overflow:visible}
 .avance .fase-n{font-size:clamp(22px,calc(4 * var(--u)),30px);font-weight:800;letter-spacing:-.01em}
-.avance .fase-m{font-weight:700;color:var(--suave);max-width:34ch}
+.avance{width:100%;min-width:0}.avance .fase-n,.avance .fase-m{max-width:min(34ch,100%)}
+.avance .fase-m{font-weight:700;color:var(--suave)}
+#fases{width:100%;min-width:0}
 .actual{animation:latido 2.4s ease-in-out infinite}
+/* Fases: el proyecto puede ir en varias a la vez. Al tocar, solo cambian los colores, suave (nada se vuelve a dibujar). */
+.arco{stroke:var(--niebla);transition:stroke .55s cubic-bezier(.4,0,.2,1)}
+.arco.hecho{stroke:var(--cielo)}
+.arco.ahora{stroke:var(--cobalto);animation:respira 3.2s ease-in-out infinite}
+@keyframes respira{0%,100%{opacity:1}50%{opacity:.7}}
+.pil.fa{transition:background .35s cubic-bezier(.4,0,.2,1),color .35s,box-shadow .35s}
+.pil.fa i{background:transparent;box-shadow:inset 0 0 0 2px var(--niebla);color:transparent;transition:background .35s,color .35s,box-shadow .35s}
+.pil.fa i svg{width:12px;height:12px}
+.pil.fa.hecha{color:var(--cobalto)}
+.pil.fa.hecha i{box-shadow:inset 0 0 0 2px var(--cobalto)}
+.pil.fa.on{background:var(--cobalto);color:#fff}
+.pil.fa.on i{background:#fff;color:var(--cobalto);box-shadow:none}
+.enlaces{display:flex;gap:8px;justify-content:center;width:100%}
+.enlaces .boton{flex:1 1 0;min-width:0;max-width:220px;height:44px;padding:0 12px;font-size:14px;white-space:nowrap;gap:6px}
+.enlaces.sin-icono .boton svg{display:none}
+.qr-caja{display:grid;justify-items:center;gap:clamp(8px,calc(1.6 * var(--u)),16px);text-align:center;width:100%}
+.qr-caja .qr{background:#fff;border-radius:22px;padding:clamp(12px,calc(2 * var(--u)),20px);box-shadow:var(--sombra-chica);width:min(330px,calc(72 * var(--w)),calc(42 * var(--u)));aspect-ratio:1}
+.qr-caja .qr svg{display:block;width:100%;height:100%}
+.qr-caja .qr-url{font-weight:700;color:var(--suave);font-size:13.5px}
 .icono{position:relative;flex:none;border-radius:50%;background:var(--c);color:#fff;font-weight:800;display:grid;place-items:center;overflow:hidden}
 .icono img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#fff}
 .icono img.logo-c{object-fit:contain;padding:7%}.icono img.en-color{background:var(--c);padding:0}
@@ -389,6 +410,12 @@ const FASE_TXT = {
   'pruebas': '¡Ya casi! Solo falta entregarlo.',
   'entregado': '¡Entregado! Uno más para MOON.',
 };
+// Un proyecto puede ir en varias fases a la vez: se guardan juntas, separadas por coma ("construcción,pruebas").
+const fasesDe = p => { const l = String((p && p.fase) || '').split(',').filter(f => D.listas.fases.includes(f)); return l.length ? l : ['por arrancar']; };
+const entregado = p => fasesDe(p).includes('entregado');
+const activo = p => fasesDe(p).some(f => f !== 'entregado');
+const nombreFases = l => { const t = l.map((f, i) => i ? f : f[0].toUpperCase() + f.slice(1)); return t.length < 2 ? t[0] : t.slice(0, -1).join(', ') + ' y ' + t[t.length - 1]; };
+const textoFases = l => { const ult = l[l.length - 1], otras = l.slice(0, -1); return (FASE_TXT[ult] || '') + (otras.length ? ` Y al mismo tiempo: ${nombreFases(otras).toLowerCase()}.` : ''); };
 const TEMP = { caliente: 'var(--rojo)', tibio: 'var(--naranja)', frio: 'var(--cielo)' };
 const I = {
   mic: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>',
@@ -404,6 +431,9 @@ const I = {
   subir: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4M7 9l5-5 5 5"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>',
   lapiz: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13 7l4 4"/></svg>',
   enviar: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 8l5-5 5 5"/><path d="M5 13v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/></svg>',
+  palomita: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  liga: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>',
+  qr: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="6" height="6" rx="1"/><rect x="14.5" y="3.5" width="6" height="6" rx="1"/><rect x="3.5" y="14.5" width="6" height="6" rx="1"/><path d="M14.5 14.5h2v2h-2zM18.5 18.5h2v2h-2zM18.5 14.5h2M14.5 18.5v2"/></svg>',
   lupa: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>',
 };
 
@@ -636,10 +666,10 @@ async function arrancar() {
   transicion(() => pinta());
 }
 // Solo se repinta si de verdad cambió algo: si no, la pantalla ni se toca.
-async function recargar() {
+async function recargar(callado) {
   const r = await api('inicio'); if (!r.ok) return;
   const antes = JSON.stringify(Object.assign({}, D, { yo: 0 })), ahora = JSON.stringify(Object.assign({}, r, { yo: 0 }));
-  D = r; if (antes !== ahora) pinta(true);
+  D = r; if (antes !== ahora && !callado) pinta(true);   // callado: la pantalla ya muestra el cambio, no se vuelve a dibujar
 }
 setInterval(() => { if (D && document.visibilityState === 'visible' && !document.querySelector('.editando') && !/INPUT|TEXTAREA|SELECT/.test((document.activeElement || {}).tagName || '')) recargar(); }, 60000);
 document.addEventListener('visibilitychange', () => { if (D && document.visibilityState === 'visible') recargar(); });
@@ -649,6 +679,7 @@ async function precargar(capa) {
   const espera = p => Promise.race([p, new Promise(ok => setTimeout(ok, 1500))]);
   if (capa.tipo === 'ficha' && !capa.cargado) await espera(traerFicha(capa.tel).then(r => { if (r && r.ok) { capa.ext = r; capa.cargado = true; } }));
   if (capa.tipo === 'documento' && !capa.doc) await espera(api('documento', { id: capa.id }).then(r => { if (r.ok) capa.doc = r.doc; }));
+  if (capa.tipo === 'qr') await espera(cargarQR().catch(() => null));
   if (capa.tipo === 'proyecto' && capa.tab === 'uso' && !capa.uso) await espera(api('uso', { id: capa.id }).then(r => { if (r.ok) capa.uso = r; }));
 }
 // Las fichas se piden una vez y se guardan un momento: si ya venía en camino, se usa esa misma respuesta.
@@ -680,7 +711,7 @@ function pinta(silencioso) {
   alCambiarTamano = null;
   const c = pila[pila.length - 1];
   if (!c) return pintaInicio(silencioso);
-  ({ tareas: capaTareas, tarea: capaTarea, nuevaTarea: capaNuevaTarea, crm: capaCRM, crmLista: capaCRMLista, editarContacto: capaEditarContacto, subir: capaSubir, ficha: capaFicha, nuevoCliente: capaNuevoCliente, proyectos: capaProyectos, proyecto: capaProyecto, nuevoProyecto: capaProyecto, equipo: capaEquipo, moon: capaMoon, lector: capaLector, clientes: capaClientes, cliente: capaCliente, seccion: capaSeccion, documento: capaDocumento, casa: capaCasa, demo: capaDemo, nota: capaNota, editarProyecto: capaProyecto, cuenta: capaCuenta, frase: capaFrase, foto: capaFoto })[c.tipo](c, silencioso);
+  ({ tareas: capaTareas, tarea: capaTarea, nuevaTarea: capaNuevaTarea, crm: capaCRM, crmLista: capaCRMLista, editarContacto: capaEditarContacto, subir: capaSubir, ficha: capaFicha, nuevoCliente: capaNuevoCliente, proyectos: capaProyectos, proyecto: capaProyecto, nuevoProyecto: capaProyecto, equipo: capaEquipo, moon: capaMoon, lector: capaLector, clientes: capaClientes, cliente: capaCliente, seccion: capaSeccion, documento: capaDocumento, casa: capaCasa, demo: capaDemo, nota: capaNota, editarProyecto: capaProyecto, qr: capaQR, cuenta: capaCuenta, frase: capaFrase, foto: capaFoto })[c.tipo](c, silencioso);
 }
 function marco(titulo, accion, cuerpo, icono) {
   app.innerHTML = `<div class="top"><button class="redondo" id="volver" aria-label="Regresar">${I.atras}</button><div class="cabeza" style="flex:1;min-width:0"><h2>${esc(titulo)}</h2>${accion ? `<button class="redondo accion" id="accion" aria-label="${esc(accion)}" title="${esc(accion)}">${icono || I.mas}</button>` : ''}</div></div><div class="vista" style="grid-template-rows:minmax(0,1fr)">${cuerpo}</div>`;
@@ -696,7 +727,7 @@ function pintaInicio(sil) {
   const vencen = mias.filter(atrasada).length;
   const r = reales();
   const cuenta = e => r.filter(p => (p.etapa || 'pendiente') === e).length;
-  const activos = D.proyectos.filter(p => p.fase !== 'entregado');
+  const activos = D.proyectos.filter(activo);
   const miosP = activos.filter(p => String(p.encargados).split(',').includes(yo())).length;
   const sinVer = D.tareas.filter(x => x.estado === 'nueva').length;
   const ult = D.actividad[0];
@@ -812,7 +843,7 @@ async function capaTarea(c) {
 }
 function capaNuevaTarea(c) {
   let para = c.para || yo();
-  const proys = D.proyectos.filter(p => p.fase !== 'entregado');
+  const proys = D.proyectos.filter(activo);
   marco('Nueva tarea', '', `<form class="hoja editando" id="f" style="align-self:start">
     <input class="campo" name="titulo" placeholder="¿Qué hay que hacer?" required maxlength="160">
     <div><div class="eti" style="margin-bottom:8px">Para</div><div class="quien" id="para">${Object.keys(GENTE).map(id => `<button type="button" data-u="${id}" class="${id === para ? 'on' : ''}">${ava(id)}${GENTE[id].n}</button>`).join('')}</div></div>
@@ -1020,15 +1051,15 @@ function activarFoto(alListo) {
 
 /* ---------- Proyectos ---------- */
 function filaProyecto(p) {
-  const i = Math.max(0, D.listas.fases.indexOf(p.fase));
+  const l = fasesDe(p), i = Math.max(...l.map(f => D.listas.fases.indexOf(f)));
   const cli = personaDe(p.tel);
   const abiertas = D.tareas.filter(x => x.proyecto == p.id && x.estado !== 'hecha').length;
-  return `<button class="fila" data-y="${p.id}"><span class="anillo" style="--p:${Math.round((i + 1) / D.listas.fases.length * 100)}"><b>${i + 1}/${D.listas.fases.length}</b></span><span class="q"><b>${esc(p.nombre)}</b><span>${esc(p.fase)} · ${esc(cli ? nombreDe(cli) : 'MOON')}${abiertas ? ` · ${abiertas} tarea${abiertas === 1 ? '' : 's'}` : ''}${p.uso_mes ? ` · ${p.uso_mes} uso${p.uso_mes === 1 ? '' : 's'} en 30 días` : ''}</span></span><span class="flecha-f">${I.der}</span></button>`;
+  return `<button class="fila" data-y="${p.id}"><span class="anillo" style="--p:${Math.round((i + 1) / D.listas.fases.length * 100)}"><b>${i + 1}/${D.listas.fases.length}</b></span><span class="q"><b>${esc(p.nombre)}</b><span>${esc(nombreFases(l).toLowerCase())} · ${esc(cli ? nombreDe(cli) : 'MOON')}${abiertas ? ` · ${abiertas} tarea${abiertas === 1 ? '' : 's'}` : ''}${p.uso_mes ? ` · ${p.uso_mes} uso${p.uso_mes === 1 ? '' : 's'} en 30 días` : ''}</span></span><span class="flecha-f">${I.der}</span></button>`;
 }
 function capaProyectos(c) {
   c.f = c.f || 'activos';
   const todos = c.soloMoon ? D.proyectos.filter(p => !p.tel) : D.proyectos;
-  const fil = { activos: todos.filter(p => p.fase !== 'entregado'), mios: todos.filter(p => p.fase !== 'entregado' && String(p.encargados).split(',').includes(yo())), entregados: todos.filter(p => p.fase === 'entregado') };
+  const fil = { activos: todos.filter(activo), mios: todos.filter(p => activo(p) && String(p.encargados).split(',').includes(yo())), entregados: todos.filter(entregado) };
   marco(c.soloMoon ? 'Proyectos internos' : 'Proyectos', 'Nuevo proyecto', `<div class="cuerpo"><div class="pils">
     <button class="pil${c.f === 'activos' ? ' on' : ''}" data-f="activos" style="--c:var(--cobalto);--cf:var(--azulf)"><i>${fil.activos.length}</i>Activos</button>
     <button class="pil${c.f === 'mios' ? ' on' : ''}" data-f="mios" style="--c:var(--cobalto);--cf:var(--azulf)"><i>${fil.mios.length}</i>Míos</button>
@@ -1038,23 +1069,43 @@ function capaProyectos(c) {
   document.getElementById('accion').onclick = () => abrir({ tipo: 'nuevoProyecto' });
   alCambiarTamano = paginar(app.querySelector('.cuerpo'), fil[c.f], filaProyecto, { pagina: c.p, vacio: '<b>Sin proyectos aquí</b>Ábrelos con el botón +.', alPintar: l => l.querySelectorAll('[data-y]').forEach(b => b.onclick = () => abrir({ tipo: 'proyecto', id: Number(b.dataset.y) })) });
 }
-function anilloFases(fi) {
-  const n = 6, R = 80, cx = 100, cy = 100, hueco = 0.12, arcos = [];
+// sel: las fases en las que va (posiciones). Las de antes de la más avanzada salen como hechas.
+function estadoArcos(sel, n) { const max = Math.max(...sel); return Array.from({ length: n }, (_, i) => sel.includes(i) ? 'ahora' : i < max ? 'hecho' : ''); }
+function textoAnillo(sel, n) { const max = Math.max(...sel); return { pct: Math.round(max / (n - 1) * 100), sub: sel.length > 1 ? `${sel.length} fases a la vez` : `fase ${max + 1} de ${n}` }; }
+function anilloFases(sel) {
+  const n = 6, R = 80, cx = 100, cy = 100, hueco = 0.12, arcos = [], est = estadoArcos(sel, n), tx = textoAnillo(sel, n);
   for (let i = 0; i < n; i++) {
     const a0 = -Math.PI / 2 + i * 2 * Math.PI / n + hueco / 2, a1 = a0 + 2 * Math.PI / n - hueco;
     const x0 = cx + R * Math.cos(a0), y0 = cy + R * Math.sin(a0), x1 = cx + R * Math.cos(a1), y1 = cy + R * Math.sin(a1);
-    const col = i < fi ? 'var(--cobalto)' : i === fi ? 'var(--cielo)' : 'var(--niebla)';
-    arcos.push(`<path${i === fi ? ' class="actual"' : ''} d="M${x0.toFixed(1)} ${y0.toFixed(1)} A${R} ${R} 0 0 1 ${x1.toFixed(1)} ${y1.toFixed(1)}" stroke="${col}" stroke-width="18" fill="none" stroke-linecap="round"/>`);
+    arcos.push(`<path class="arco ${est[i]}" d="M${x0.toFixed(1)} ${y0.toFixed(1)} A${R} ${R} 0 0 1 ${x1.toFixed(1)} ${y1.toFixed(1)}" stroke-width="18" fill="none" stroke-linecap="round"/>`);
   }
-  const pct = Math.round(fi / (n - 1) * 100);
-  return `<svg viewBox="0 0 200 200" role="img" aria-label="Avance ${pct}%">${arcos.join('')}<text x="100" y="98" text-anchor="middle" font-size="40" font-weight="800" fill="var(--tinta)" font-family="inherit">${pct}%</text><text x="100" y="124" text-anchor="middle" font-size="13" font-weight="700" fill="var(--suave)" font-family="inherit">fase ${fi + 1} de ${n}</text></svg>`;
+  return `<svg viewBox="0 0 200 200" role="img" aria-label="Avance ${tx.pct}%">${arcos.join('')}<text id="anPct" x="100" y="98" text-anchor="middle" font-size="40" font-weight="800" fill="var(--tinta)" font-family="inherit">${tx.pct}%</text><text id="anSub" x="100" y="124" text-anchor="middle" font-size="13" font-weight="700" fill="var(--suave)" font-family="inherit">${tx.sub}</text></svg>`;
+}
+let ajustaFases = null;
+// Cambia las fases en la pantalla sin volver a dibujarla: los colores pasan suave, el número cuenta y el texto se funde.
+function moverFases(sel, fases) {
+  const n = fases.length, est = estadoArcos(sel, n), tx = textoAnillo(sel, n), suave = 'cubic-bezier(.4,0,.2,1)';
+  app.querySelectorAll('.avance .arco').forEach((a, i) => { a.setAttribute('class', 'arco ' + est[i]); });
+  app.querySelectorAll('#fases [data-f]').forEach((b, i) => { b.classList.toggle('on', est[i] === 'ahora'); b.classList.toggle('hecha', est[i] === 'hecho'); b.setAttribute('aria-pressed', est[i] === 'ahora'); });
+  const pct = document.getElementById('anPct'), sub = document.getElementById('anSub'), svg = app.querySelector('.avance svg');
+  if (svg) svg.setAttribute('aria-label', `Avance ${tx.pct}%`);
+  if (pct) { const de = parseInt(pct.textContent) || 0, t0 = performance.now(); cancelAnimationFrame(moverFases.raf);
+    const paso = t => { const k = Math.min(1, (t - t0) / 500), e = 1 - Math.pow(1 - k, 3); pct.textContent = Math.round(de + (tx.pct - de) * e) + '%'; if (k < 1) moverFases.raf = requestAnimationFrame(paso); };
+    moverFases.raf = requestAnimationFrame(paso); }
+  if (sub) sub.textContent = tx.sub;
+  const l = sel.map(i => fases[i]), nombre = app.querySelector('.avance .fase-n'), msg = app.querySelector('.avance .fase-m');
+  [[nombre, nombreFases(l)], [msg, textoFases(l)]].forEach(([el, txt]) => {
+    if (!el || el.textContent === txt) return;
+    const sale = el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 140, easing: suave, fill: 'forwards' });
+    sale.finished.then(() => { el.textContent = txt; ajustaFases && ajustaFases(); el.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 220, easing: suave, fill: 'forwards' }); }, () => { el.textContent = txt; });
+  });
 }
 function capaProyecto(c) {
   const editar = c.tipo === 'nuevoProyecto' || c.tipo === 'editarProyecto';
   const nuevo = c.tipo === 'nuevoProyecto';
   const p = nuevo ? { nombre: '', fase: 'por arrancar', encargados: yo(), tel: c.tel || '', nota: '' } : proyectoDe(c.id);
   if (!p) return cerrar();
-  const fases = D.listas.fases, fi = Math.max(0, fases.indexOf(p.fase));
+  const fases = D.listas.fases, sel = fasesDe(p).map(f => fases.indexOf(f));
   const clientes = reales().filter(x => x.etapa !== 'archivo');
   const cli = personaDe(p.tel);
   if (editar) {
@@ -1063,16 +1114,18 @@ function capaProyecto(c) {
       <select class="campo" name="tel"><option value="">MOON (proyecto interno)</option>${clientes.map(x => `<option value="${esc(x.tel)}"${x.tel === p.tel ? ' selected' : ''}>${esc(nombreDe(x))}</option>`).join('')}</select>
       <div><div class="eti" style="margin-bottom:8px">Encargados</div><div class="quien" id="enc">${Object.keys(GENTE).map(id => `<button type="button" data-u="${id}" class="${String(p.encargados).split(',').includes(id) ? 'on' : ''}">${ava(id)}${GENTE[id].n}</button>`).join('')}</div></div>
       <textarea class="campo" name="nota" rows="3" placeholder="En una o dos frases: de qué trata">${esc(p.nota)}</textarea>
+      <input class="campo" name="enlace" type="url" inputmode="url" placeholder="Enlace para abrirlo (https://…)" value="${esc(p.enlace || '')}" maxlength="400">
       <button class="boton">${nuevo ? 'Abrir proyecto' : 'Guardar'}</button><div class="aviso" id="aviso"></div></form>`);
     app.querySelectorAll('#enc button').forEach(b => b.onclick = () => b.classList.toggle('on'));
     const f = document.getElementById('f');
     f.onsubmit = async e => {
       e.preventDefault(); const fd = new FormData(f);
-      const datos = { nombre: fd.get('nombre'), tel: fd.get('tel'), nota: fd.get('nota'), encargados: [...app.querySelectorAll('#enc button.on')].map(b => b.dataset.u).join(',') };
+      let enl = String(fd.get('enlace') || '').trim(); if (enl && !/^https?:\/\//i.test(enl)) enl = 'https://' + enl; enl = enl.replace(/^http:\/\//i, 'https://');
+      const datos = { nombre: fd.get('nombre'), tel: fd.get('tel'), nota: fd.get('nota'), enlace: enl, encargados: [...app.querySelectorAll('#enc button.on')].map(b => b.dataset.u).join(',') };
       if (!nuevo) datos.id = p.id;
       const r = await api('proyecto', datos);
       if (r.ok) { await recargar(); nuevo ? reemplazar({ tipo: 'proyecto', id: r.id }) : cerrar(); }
-      else document.getElementById('aviso').textContent = 'No se pudo guardar.';
+      else document.getElementById('aviso').textContent = r.error === 'enlace' ? 'Revisa el enlace: tiene que empezar con https://' : 'No se pudo guardar.';
     };
     return;
   }
@@ -1080,28 +1133,103 @@ function capaProyecto(c) {
   const tareas = D.tareas.filter(x => x.proyecto == p.id);
   const abiertas = tareas.filter(x => x.estado !== 'hecha').length;
   let cuerpo;
-  if (c.tab === 'fase') cuerpo = `<div class="hoja" style="align-content:center;justify-items:center;gap:clamp(8px,calc(1.8 * var(--u)),16px)">
+  if (c.tab === 'fase') cuerpo = `<div class="hoja" style="grid-template-columns:minmax(0,1fr);align-content:center;justify-items:center;gap:clamp(8px,calc(1.8 * var(--u)),16px)">
       <span class="eti">${esc(cli ? nombreDe(cli) : 'Proyecto de MOON')}</span>
-      <div class="avance">${anilloFases(fi)}<div class="fase-n">${esc(fases[fi][0].toUpperCase() + fases[fi].slice(1))}</div><div class="fase-m">${esc(FASE_TXT[fases[fi]] || '')}</div></div>
-      <div class="pils" id="fases" style="justify-content:center">${fases.map((f, i) => `<button class="pil solo${i === fi ? ' on' : ''}" data-f="${esc(f)}" style="--c:#fff;--cf:${i < fi ? 'var(--cielo)' : 'var(--cobalto)'}">${esc(f[0].toUpperCase() + f.slice(1))}</button>`).join('')}</div>
-      <span class="mini pista">Toca una fase para mover el proyecto</span></div>`;
+      <div class="avance">${anilloFases(sel)}<div class="fase-n">${esc(nombreFases(sel.map(i => fases[i])))}</div><div class="fase-m">${esc(textoFases(sel.map(i => fases[i])))}</div></div>
+      <div class="pils" id="fases" style="justify-content:center">${fases.map((f, i) => { const e = estadoArcos(sel, fases.length)[i]; return `<button class="pil fa${e === 'ahora' ? ' on' : e === 'hecho' ? ' hecha' : ''}" data-f="${esc(f)}" aria-pressed="${e === 'ahora'}"><i>${I.palomita}</i>${esc(f[0].toUpperCase() + f.slice(1))}</button>`; }).join('')}</div>
+      <span class="mini pista">Toca las fases en las que va; puede ir en varias a la vez</span>
+      ${p.enlace ? `<div class="enlaces"><button class="boton" id="abrirEnlace">${I.liga}Abrir enlace</button><button class="boton dos" id="conseguirQR">${I.qr}Conseguir QR</button></div>` : ''}</div>`;
   else if (c.tab === 'tareas') cuerpo = `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr) auto auto"><div class="lista"></div><div class="pie"></div><button class="boton dos" id="nt">Dejar una tarea de este proyecto</button></div>`;
   else if (c.tab === 'uso') cuerpo = `<div class="cuerpo" style="grid-template-rows:auto auto minmax(0,1fr) auto"><div class="cifras" id="cifras"></div><div class="barras" id="barras"></div><div class="lista"></div><div class="pie"></div></div>`;
   else cuerpo = `<div class="hoja" style="align-self:start">
       <div class="par"><span>Cliente</span><b>${esc(cli ? nombreDe(cli) : 'MOON (interno)')}</b></div>
       <div class="par"><span>Encargados</span><b>${String(p.encargados || '').split(',').filter(x => GENTE[x]).map(x => GENTE[x].n).join(', ') || 'Nadie todavía'}</b></div>
       <div class="par"><span>De qué trata</span><b style="white-space:pre-line">${esc(p.nota || 'Sin descripción todavía')}</b></div>
+      ${p.enlace ? `<div class="par"><span>Enlace</span><b>${esc(p.enlace.replace(/^https:\/\//, ''))}</b></div>` : ''}
       <div class="par"><span>Abierto</span><b>${cuando(p.creado)}</b></div>
       <button class="boton dos" id="editar">Editar datos</button></div>`;
   marco(p.nombre, '', `<div class="cuerpo" style="grid-template-rows:auto minmax(0,1fr)"><div class="tabs"><button data-tab="fase" class="${c.tab === 'fase' ? 'on' : ''}">Fase</button><button data-tab="tareas" class="${c.tab === 'tareas' ? 'on' : ''}">Tareas (${abiertas})</button><button data-tab="uso" class="${c.tab === 'uso' ? 'on' : ''}">Uso (${p.uso_mes || 0})</button><button data-tab="datos" class="${c.tab === 'datos' ? 'on' : ''}">Datos</button></div>${cuerpo}</div>`);
   app.querySelectorAll('[data-tab]').forEach(b => b.onclick = async () => { c.tab = b.dataset.tab; c.p = 0; await precargar(c); transicion(() => pinta(true)); });
-  if (c.tab === 'fase') app.querySelectorAll('#fases [data-f]').forEach(b => b.onclick = async () => { const r = await api('proyecto', { id: p.id, fase: b.dataset.f }); if (r.ok) { p.fase = b.dataset.f; pinta(true); recargar(); } });
+  if (c.tab === 'fase') {
+    // Varias fases a la vez: cada toque prende o apaga una, al momento; se guarda un instante después (si tocas varias seguidas, se guarda una vez).
+    let actual = sel.slice(), guardado = p.fase, espera = null;
+    app.querySelectorAll('#fases [data-f]').forEach((b, i) => b.onclick = () => {
+      const nuevo = actual.includes(i) ? actual.filter(x => x !== i) : actual.concat(i).sort((x, y) => x - y);
+      if (!nuevo.length) { avisoFlotante('Tiene que quedar al menos una fase.'); return; }
+      actual = nuevo; moverFases(actual, fases);
+      clearTimeout(espera);
+      espera = setTimeout(async () => {
+        const fase = actual.map(x => fases[x]).join(','); if (fase === guardado) return;
+        const r = await api('proyecto', { id: p.id, fase });
+        if (r.ok) { guardado = fase; p.fase = fase; recargar(true); }
+        else { actual = fasesDe({ fase: guardado }).map(f => fases.indexOf(f)); if (pila[pila.length - 1] === c) moverFases(actual, fases); avisoFlotante('No se pudo guardar. Revisa tu internet.'); }
+      }, 450);
+    });
+    // Que todo quepa sin deslizar en cualquier pantalla: primero se quita la pista, luego se achica el anillo y, si hace falta, el texto largo.
+    const hoja = app.querySelector('.vista .cuerpo .hoja');
+    const ajusta = () => {
+      const svg = hoja && hoja.querySelector('.avance svg'), msg = hoja && hoja.querySelector('.fase-m'), pista = hoja && hoja.querySelector('.pista'); if (!svg) return;
+      [svg, msg, pista].forEach(e => e && e.style.removeProperty(e === svg ? 'width' : 'display'));
+      const sobra = () => hoja.scrollHeight > hoja.clientHeight + 1 || hoja.scrollWidth > hoja.clientWidth + 1;
+      const en = hoja.querySelector('.enlaces'); if (en) { en.classList.remove('sin-icono'); if ([...en.children].some(b => b.scrollWidth > b.clientWidth + 1)) en.classList.add('sin-icono'); }
+      if (!sobra()) return;
+      if (pista) pista.style.display = 'none';
+      let w = svg.getBoundingClientRect().width;
+      while (sobra() && w > 120) { w -= 8; svg.style.width = w + 'px'; }
+      if (sobra() && msg) msg.style.display = 'none';
+      while (sobra() && w > 76) { w -= 6; svg.style.width = w + 'px'; }
+    };
+    ajusta(); alCambiarTamano = ajusta; ajustaFases = ajusta;
+    if (p.enlace) {
+      document.getElementById('abrirEnlace').onclick = () => abrir({ tipo: 'documento', titulo: p.nombre, doc: { formato: 'link', url: p.enlace, titulo: p.nombre, compartir: p.enlace } });
+      document.getElementById('conseguirQR').onclick = () => abrir({ tipo: 'qr', url: p.enlace, titulo: p.nombre });
+    }
+  }
   if (c.tab === 'tareas') {
     document.getElementById('nt').onclick = () => abrir({ tipo: 'nuevaTarea', proyecto: p.id });
     alCambiarTamano = paginar(app.querySelector('.vista .cuerpo .cuerpo'), tareas.sort((a, b) => (a.estado === 'hecha') - (b.estado === 'hecha') || b.id - a.id), x => filaTarea(x).replace(ava(x.de, 1), ava(x.para, 1)), { pagina: c.p, vacio: '<b>Sin tareas</b>Deja la primera con el botón de abajo.', alPintar: l => l.querySelectorAll('[data-t]').forEach(b => b.onclick = () => abrir({ tipo: 'tarea', id: Number(b.dataset.t) })) });
   }
   if (c.tab === 'uso') pintaUso(c, p);
   if (c.tab === 'datos') document.getElementById('editar').onclick = () => abrir({ tipo: 'editarProyecto', id: p.id });
+}
+
+/* ---------- QR del enlace de un proyecto: se ve grande, se descarga o se manda ---------- */
+let qrCargando = null;
+function cargarQR() {
+  if (window.qrcode) return Promise.resolve();
+  return qrCargando || (qrCargando = new Promise((ok, mal) => { const s = document.createElement('script'); s.src = '/centro/qrcode.min.js'; s.onload = ok; s.onerror = () => { qrCargando = null; mal(new Error('qr')); }; document.head.appendChild(s); }));
+}
+function matrizQR(url) { const q = window.qrcode(0, 'M'); q.addData(url); q.make(); return q; }
+function svgQR(q) {
+  const n = q.getModuleCount(), m = 2; let d = '';
+  for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) if (q.isDark(y, x)) d += `M${x + m} ${y + m}h1v1h-1z`;
+  return `<svg viewBox="0 0 ${n + m * 2} ${n + m * 2}" shape-rendering="crispEdges" role="img" aria-label="Código QR"><rect width="100%" height="100%" fill="#fff"/><path d="${d}" fill="#111"/></svg>`;
+}
+// Imagen lista para imprimir o mandar: el QR grande y el nombre del proyecto abajo.
+function pngQR(q, titulo) {
+  const n = q.getModuleCount(), cel = Math.floor(960 / (n + 8)), lado = cel * (n + 8), alto = lado + 150;
+  const cv = document.createElement('canvas'); cv.width = lado; cv.height = alto; const g = cv.getContext('2d');
+  g.fillStyle = '#fff'; g.fillRect(0, 0, lado, alto); g.fillStyle = '#111';
+  for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) if (q.isDark(y, x)) g.fillRect((x + 4) * cel, (y + 4) * cel, cel, cel);
+  g.textAlign = 'center'; g.font = '700 40px system-ui,-apple-system,sans-serif';
+  let t = titulo; while (g.measureText(t).width > lado - 80 && t.length > 4) t = t.slice(0, -2).trim() + '…';
+  g.fillText(t, lado / 2, lado + 40); g.font = '600 26px system-ui,-apple-system,sans-serif'; g.fillStyle = '#777'; g.fillText('MOON Digital', lado / 2, lado + 90);
+  return new Promise(ok => cv.toBlob(ok, 'image/png'));
+}
+function capaQR(c) {
+  if (!window.qrcode) { marco('QR', '', '<div class="vacio"><div><b>No se pudo preparar el QR</b>Revisa tu internet y vuelve a intentar.</div></div>'); return; }
+  const q = matrizQR(c.url), archivo = `QR ${c.titulo}.png`.replace(/[\\/:*?"<>|]/g, '');
+  marco(c.titulo, '', `<div class="hoja" style="grid-template-columns:minmax(0,1fr);align-content:center;justify-items:center">
+    <div class="qr-caja"><div class="qr">${svgQR(q)}</div><span class="qr-url">${esc(c.url.replace(/^https:\/\//, ''))}</span>
+    <div class="enlaces"><button class="boton" id="qrBajar">${I.subir.replace('<svg', '<svg style="transform:rotate(180deg)"')}Descargar</button><button class="boton dos" id="qrMandar">${I.enviar}Enviar</button></div>
+    <span class="mini pista">Escanéalo con la cámara del celular para abrirlo</span></div></div>`);
+  const bajar = async () => { const b = await pngQR(q, c.titulo), u = URL.createObjectURL(b), a = document.createElement('a'); a.href = u; a.download = archivo; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 4000); };
+  document.getElementById('qrBajar').onclick = bajar;
+  document.getElementById('qrMandar').onclick = async () => {
+    const b = await pngQR(q, c.titulo), f = new File([b], archivo, { type: 'image/png' });
+    if (navigator.canShare && navigator.canShare({ files: [f] })) { try { await navigator.share({ files: [f], title: c.titulo, text: c.url }); } catch (e) {} return; }
+    bajar(); avisoFlotante('Se descargó la imagen del QR. Ya la puedes mandar por WhatsApp o correo.');
+  };
 }
 
 /* ---------- Uso: cuántas personas usan lo que construimos ---------- */
@@ -1411,7 +1539,7 @@ function credencial(id) {
   const g = GENTE[id], u = usuario(id), k = ['daniel', 'dan', 'kid'].indexOf(id) + 1;
   const t = D.tareas.filter(x => x.para === id), ab = t.filter(x => x.estado !== 'hecha');
   const nv = ab.filter(x => x.estado === 'nueva').length, at = ab.filter(atrasada).length, he = t.filter(x => x.estado === 'hecha').length;
-  const proys = D.proyectos.filter(p => p.fase !== 'entregado' && String(p.encargados).split(',').includes(id));
+  const proys = D.proyectos.filter(p => activo(p) && String(p.encargados).split(',').includes(id));
   const desde = u.creado ? new Date(u.creado).toLocaleDateString('es-MX', { month: 'short', year: 'numeric', timeZone: 'America/Cancun' }) : '';
   const lema = String(u.lema || '').trim();
   return `<div class="cred${id === yo() ? ' yo' : ''}" data-u="${id}" role="button" tabindex="0" aria-label="Credencial de ${g.n}" style="--c:${g.c}"><div class="gira">
