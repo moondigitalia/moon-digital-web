@@ -134,7 +134,7 @@ async function empezar() {
       onConnect: () => { conecto = true; pintar('escuchando'); api('uso'); },
       onModeChange: m => { if (estado !== 'termino') pintar(m && m.mode === 'speaking' ? 'hablando' : 'escuchando'); },
       // Si nunca llegó a conectar, no es "llamada terminada": se dice qué pasó y el botón queda listo para reintentar.
-      onDisconnect: () => { conv = null; if (conecto) pintar('termino'); else { pintar('listo'); aviso('No se pudo conectar con el asistente. Pica el botón para volver a intentar.'); } },
+      onDisconnect: () => { conv = null; if (conecto) pintar('termino'); else { pintar('listo'); aviso(`${demo.asistente} está atendiendo a otras personas en este momento. Intenta de nuevo en unos minutos.`); } },
       onError: () => { aviso('Se cortó la conexión. Pica el botón para volver a intentar.'); },
     });
     latir();

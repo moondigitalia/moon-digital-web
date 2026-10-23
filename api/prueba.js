@@ -10,6 +10,9 @@ const AGENTE = 'agent_7801m5k7sesyektvzg9f2dz6hd48';
 const VOCES = { hombre: 'hEKEQC93QpOYMa6WuwWp', mujer: '1u9q7vX1Lcx74yAcFPt7' }; // voz de Jason · voz de Luna
 const huella = s => crypto.createHash('sha256').update(String(s)).digest('hex');
 const ahora = () => new Date().toISOString();
+const TOPE_DIA = 60; // el mismo tope que tiene el agente en ElevenLabs
+// Inicio del día en Cancún (UTC-5, sin horario de verano), en hora universal.
+const inicioHoy = () => { const d = new Date(Date.now() - 5 * 36e5); d.setUTCHours(5, 0, 0, 0); if (d.getTime() > Date.now()) d.setUTCDate(d.getUTCDate() - 1); return d.toISOString(); };
 
 let tablaLista = false;
 async function tabla() {
@@ -17,6 +20,7 @@ async function tabla() {
   await sql(`CREATE TABLE IF NOT EXISTS demos (
     codigo TEXT PRIMARY KEY, negocio TEXT, giro TEXT, servicios TEXT, horario TEXT, ubicacion TEXT,
     asistente TEXT, voz TEXT, creado TEXT, creado_por TEXT, vistas INTEGER DEFAULT 0, usos INTEGER DEFAULT 0, ultimo_uso TEXT DEFAULT '')`);
+  await sql('CREATE TABLE IF NOT EXISTS demo_usos (codigo TEXT, fecha TEXT)'); // una fila por plática: así sabemos cuántas van hoy de las 60
   tablaLista = true;
 }
 
@@ -68,6 +72,7 @@ module.exports = async (req, res) => {
     }
     if (d.accion === 'uso') {
       await sql('UPDATE demos SET usos = usos + 1, ultimo_uso = ? WHERE codigo = ?', [ahora(), codigo]);
+      await sql('INSERT INTO demo_usos (codigo, fecha) VALUES (?,?)', [codigo, ahora()]);
       res.status(200).json({ ok: true });
       return;
     }
@@ -93,7 +98,8 @@ module.exports = async (req, res) => {
 
     if (d.accion === 'mios') {
       const lista = await sql('SELECT codigo, negocio, asistente, creado, creado_por, vistas, usos, ultimo_uso FROM demos ORDER BY creado DESC LIMIT 30');
-      res.status(200).json({ ok: true, yo, demos: lista });
+      const hoy = ((await sql('SELECT COUNT(*) AS n FROM demo_usos WHERE fecha >= ?', [inicioHoy()]))[0] || {}).n || 0;
+      res.status(200).json({ ok: true, yo, demos: lista, hoy, tope: TOPE_DIA });
       return;
     }
 

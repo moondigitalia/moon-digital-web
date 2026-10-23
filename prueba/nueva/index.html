@@ -121,7 +121,7 @@ input:focus,textarea:focus{outline:2px solid var(--cobalto);outline-offset:1px}
 
   <!-- Demos recientes -->
   <section class="tarjeta vista" id="recientes" hidden>
-    <span class="eti">Demos recientes</span>
+    <span class="eti" id="recEti">Demos recientes</span>
     <div id="lista"></div>
   </section>
 </main>
@@ -160,6 +160,7 @@ async function cargarLista() {
   if (r.error === 'sesion') { mostrar('sinSesion'); $('recientes').hidden = true; return false; }
   const demos = (r.demos || []);
   $('recientes').hidden = !demos.length;
+  $('recEti').textContent = r.tope ? `Demos recientes · hoy van ${r.hoy || 0} de ${r.tope} pláticas` : 'Demos recientes';
   $('lista').innerHTML = demos.map(x => `<div class="fila"><div><b>${esc(x.negocio)}</b><small>${esc(cuando(x.creado))} · ${x.usos ? `${x.usos} ${x.usos === 1 ? 'vez' : 'veces'} que le hablaron` : 'aún no le hablan'}</small></div><a href="/prueba/${esc(x.codigo)}" target="_blank" rel="noopener">Abrir</a></div>`).join('');
   return true;
 }
