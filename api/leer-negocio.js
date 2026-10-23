@@ -82,10 +82,10 @@ const HERRAMIENTA = {
     type: 'object',
     properties: {
       negocio: { type: 'string', description: 'Nombre comercial del negocio. Vacío si no aparece.' },
-      giro: { type: 'string', description: 'A qué se dedica, en pocas palabras y con la ciudad si aparece. Ej. "Clínica dental en Cancún".' },
+      giro: { type: 'string', description: 'A qué se dedica, en máximo 8 palabras, con la ciudad principal si aparece. Ej. "Clínica dental en Cancún" o "Repostería artesanal en Mérida".' },
       servicios: { type: 'string', description: 'Servicios o productos con su precio tal como aparecen, separados por coma. Ej. "Limpieza dental $600, Blanqueamiento $2,500". Máximo 1200 caracteres; si hay muchos, los más importantes o representativos. Sin precio si no aparece. Vacío si no hay.' },
       horario: { type: 'string', description: 'Horario de atención tal como aparece, en una línea. Vacío si no aparece.' },
-      ubicacion: { type: 'string', description: 'Dirección o ciudad. Vacío si no aparece.' },
+      ubicacion: { type: 'string', description: 'Dirección o ciudad, en una línea corta (si hay muchas sucursales, las principales). Vacío si no aparece.' },
     },
     required: ['negocio', 'giro', 'servicios', 'horario', 'ubicacion'],
   },
