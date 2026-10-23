@@ -524,18 +524,13 @@ function transicion(f) {
   marcoEl.appendChild(viejo);
   fantasmaVivo = viejo;
   // Pase lo que pase al dibujar, la copia de encima SIEMPRE se desvanece y se quita (nunca se queda pegada).
-  // La pantalla de antes es una copia SÓLIDA (con su fondo) encima; la nueva ya está completa debajo.
-  // Al entrar a algo, la de antes se desliza hacia la izquierda; al regresar, hacia la derecha. Nunca hay transparencias:
-  // no se ven dos pantallas encimadas, no hay instante vacío y solo se mueve una capa (ligero en cualquier celular).
+  // Sin movimiento: lo de antes se desvanece sobre el fondo y lo nuevo aparece en su lugar, suave.
+  // Nunca se ven las dos pantallas encimadas: primero se va lo viejo, luego se descubre lo nuevo (ya completo debajo).
   viejo.style.background = getComputedStyle(document.body).backgroundColor;
-  const nivel = pila.length, antes = transicion.nivel == null ? nivel : transicion.nivel; transicion.nivel = nivel;
-  const dir = nivel > antes ? -1 : nivel < antes ? 1 : 0;
   try { f(); } finally {
-  const z = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--z')) || 1, W = marcoEl.clientWidth / z;
-  const a = dir === 0
-    ? viejo.animate([{ visibility: 'hidden' }, { visibility: 'hidden' }], { duration: 1, fill: 'forwards' })   // cambio de pestaña: inmediato
-    : viejo.animate([{ transform: 'translate3d(0,0,0)', boxShadow: '0 0 0 rgba(0,0,0,0)' }, { transform: `translate3d(${dir * W}px,0,0)`, boxShadow: `${-dir * 18}px 0 40px rgba(0,0,0,.18)` }],
-        { duration: 300, easing: 'cubic-bezier(.3,.7,.2,1)', fill: 'forwards' });
+  const suave = 'cubic-bezier(.4,0,.2,1)';
+  [...viejo.children].forEach(h => h.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 130, easing: suave, fill: 'forwards' }));
+  const a = viejo.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 230, delay: 110, easing: suave, fill: 'forwards' });
   a.finished.then(() => { viejo.remove(); if (fantasmaVivo === viejo) fantasmaVivo = null; }, () => { viejo.remove(); });
   }
 }
