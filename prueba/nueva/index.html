@@ -64,11 +64,15 @@ input,textarea{background:var(--campo);box-shadow:var(--hundido);border-radius:1
 textarea{height:auto;padding:13px 16px;resize:none;line-height:1.4}
 input:focus,textarea:focus{outline:2px solid var(--cobalto);outline-offset:1px}
 /* Pastillas que abren una hoja: dicen si ya tienen algo o si faltan. */
-.pastillas{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.pastilla{min-height:calc(var(--alto) + 12px);border-radius:20px;background:var(--campo);box-shadow:var(--hundido);padding:8px 14px;text-align:start;display:flex;flex-direction:column;justify-content:center;gap:2px}
+.pastillas{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr);gap:8px}
+.pastilla{min-height:calc(var(--alto) + 12px);border-radius:20px;background:var(--campo);box-shadow:var(--hundido);padding:8px clamp(9px,2.6vw,12px);overflow:hidden;text-align:start;display:flex;flex-direction:column;justify-content:center;gap:2px}
 .pastilla b{font-size:14px;line-height:1.2}
 .pastilla span{font-size:12px;font-weight:600;color:var(--tenue)}
 .pastilla.lleno span{color:var(--verde)}
+.pastilla.ia{background:var(--cobalto);box-shadow:none;color:#fff}
+.pastilla.ia span{color:rgba(255,255,255,.8)}
+.pastilla b{white-space:nowrap;font-size:clamp(13px,3.9vw,14px)}
+.pastilla span{white-space:nowrap}
 .voz-fila{display:grid;grid-template-columns:auto auto minmax(0,1fr);gap:8px}
 .voz{border-radius:999px;height:var(--alto);padding:0 16px;font-weight:700;font-size:15px;background:var(--campo);box-shadow:var(--hundido);transition:background .25s var(--ease),color .25s var(--ease)}
 .voz[aria-pressed="true"]{background:var(--cobalto);color:#fff;box-shadow:none}
@@ -247,7 +251,6 @@ html.dentro,html.dentro body{background:transparent}
 
   <!-- Formulario del negocio: cabe completo en una pantalla -->
   <form class="tarjeta vista" id="forma" hidden autocomplete="off">
-    <button type="button" class="lector" id="lector"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 4.6L18 9l-4.2 1.4L12 15l-1.8-4.6L6 9l4.2-1.4z"/><path d="M19 15l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/></svg></i><span><b id="lectorTitulo">Llenar solo con tu página o menú</b><small>Pega tu link o sube una foto o PDF</small></span></button>
     <label class="campo"><span id="lNegocio">Nombre del negocio</span>
       <input name="negocio" required maxlength="80" placeholder="Ej. Clínica Dental Sonrisa">
     </label>
@@ -255,6 +258,7 @@ html.dentro,html.dentro body{background:transparent}
       <input name="giro" required maxlength="200" placeholder="Ej. Clínica dental en Cancún">
     </label>
     <div class="pastillas">
+      <button type="button" class="pastilla ia" id="lector"><b id="lectorTitulo">Llenar solo</b><span>con tu link</span></button>
       <button type="button" class="pastilla" id="pServicios"><b>Precios</b><span>Opcional</span></button>
       <button type="button" class="pastilla" id="pHorario"><b>Horario</b><span>Opcional</span></button>
     </div>
@@ -438,7 +442,7 @@ $('lector').onclick = () => {
       if (x.horario) f.horario.value = x.horario;
       if (x.ubicacion) f.ubicacion.value = x.ubicacion;
       pintarPastillas();
-      $('lectorTitulo').textContent = 'Listo: revisa lo que llenamos';
+      $('lectorTitulo').textContent = 'Ya se llenó';
       $('aviso').textContent = 'Llenamos lo que encontramos. Revisa Precios y Horario antes de crear.'; $('aviso').classList.add('bien'); $('aviso').hidden = false;
     });
   $('lArchivo').onchange = e => {
@@ -485,7 +489,7 @@ F().addEventListener('submit', async e => {
   $('copiar').onclick = async () => { try { await navigator.clipboard.writeText(r.link); $('copiar').textContent = 'Copiado'; } catch (e) { $('copiar').textContent = 'Mantén presionado el link'; } setTimeout(() => $('copiar').textContent = 'Copiar link', 2200); };
   mostrar('resultado');
 });
-$('otro').onclick = () => { $('lectorTitulo').textContent = 'Llenar solo con tu página o menú'; $('aviso').hidden = true; F().reset(); ['servicios', 'horario', 'ubicacion'].forEach(n => F()[n].value = ''); voz = 'mujer'; document.querySelectorAll('.voz').forEach(x => x.setAttribute('aria-pressed', x.dataset.voz === 'mujer')); pintarPastillas(); $('resultado').hidden = true; mostrar('forma'); };
+$('otro').onclick = () => { $('lectorTitulo').textContent = 'Llenar solo'; $('aviso').hidden = true; F().reset(); ['servicios', 'horario', 'ubicacion'].forEach(n => F()[n].value = ''); voz = 'mujer'; document.querySelectorAll('.voz').forEach(x => x.setAttribute('aria-pressed', x.dataset.voz === 'mujer')); pintarPastillas(); $('resultado').hidden = true; mostrar('forma'); };
 
 /* ---------- Tablero ---------- */
 function cuando(iso) {
@@ -630,7 +634,8 @@ function entrarAbierta() {
 // Con sesión del tablero se enseña al instante la vista de Dan (no se espera a nadie); la sesión se confirma por detrás
 // y solo si ya no sirve se pasa a la puerta abierta.
 (async () => {
-  if (!sesion() || PARAMS.has('abierta')) return entrarAbierta();
+  // El link público siempre se ve como lo ve el cliente; la vista del equipo (Armar demo · Tablero) solo vive dentro del Tablero de MOON.
+  if (!sesion() || !PARAMS.get('dentro')) return entrarAbierta();
   $('cabEti').textContent = 'MOON Digital';
   $('cabTitulo').textContent = 'Crea tu recepcionista'; document.documentElement.classList.add('dan');
   $('pestanas').hidden = false;
