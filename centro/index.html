@@ -11,6 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="prefetch" href="/prueba/nueva?dentro=1">
 <style>
 :root{
   --fondo:#f3efe9; --tarjeta:#f6f3ee; --campo:#ece7e0; --tinta:#1d1d22; --suave:#5d5d66; --tenue:#8b8a92; --linea:rgba(29,29,34,.08);
@@ -191,15 +192,12 @@ textarea.campo{height:auto;border-radius:22px;padding:14px 18px;resize:none}
 #fases{width:100%;min-width:0}
 .actual{animation:latido 2.4s ease-in-out infinite}
 /* Fases: el proyecto puede ir en varias a la vez. Al tocar, solo cambian los colores, suave (nada se vuelve a dibujar). */
-.arco{stroke:var(--niebla);transition:stroke .55s cubic-bezier(.4,0,.2,1)}
+.arco{stroke:var(--niebla);transition:stroke .2s}
 .arco.hecho{stroke:var(--cielo)}
 .arco.ahora{stroke:var(--cobalto);animation:respira 3.2s ease-in-out infinite}
 @keyframes respira{0%,100%{opacity:1}50%{opacity:.7}}
-/* Cambio de pantalla: las formas llegan primero; las letras aparecen después, suave (igual con o sin "reducir movimiento"). */
-#app.letras-esperan *{color:transparent!important;transition:none!important}
-#app.letras-llegan *{transition:color .32s cubic-bezier(.4,0,.2,1) .24s!important}
-.pil.fa{transition:background .35s cubic-bezier(.4,0,.2,1),color .35s,box-shadow .35s}
-.pil.fa i{background:transparent;box-shadow:inset 0 0 0 2px var(--niebla);color:transparent;transition:background .35s,color .35s,box-shadow .35s}
+.pil.fa{transition:background .2s,color .2s,box-shadow .2s}
+.pil.fa i{background:transparent;box-shadow:inset 0 0 0 2px var(--niebla);color:transparent;transition:background .2s,color .2s,box-shadow .2s}
 .pil.fa i svg{width:12px;height:12px}
 .pil.fa.hecha{color:var(--cobalto)}
 .pil.fa.hecha i{box-shadow:inset 0 0 0 2px var(--cobalto)}
@@ -552,39 +550,12 @@ addEventListener('orientationchange', () => setTimeout(alMedir, 250));
 // Nada de zoom con los dedos sobre la página (el tamaño se elige en tu credencial); solo se pellizca para acomodar tu foto.
 document.addEventListener('gesturestart', e => { if (!e.target.closest || !e.target.closest('.recorte')) e.preventDefault(); });
 document.addEventListener('touchmove', e => { if (e.touches.length > 1 && !e.target.closest('.recorte')) e.preventDefault(); }, { passive: false });
-// Cambio de pantalla con fundido cruzado; se ve igual con o sin "reducir movimiento".
 let fantasmaVivo = null;
+// Cambio de pantalla al instante, sin animación (Kid, 23-oct): la nueva aparece completa en el mismo cuadro en que se va la anterior.
+// Nunca hay dos pantallas encimadas, nada se mueve y nada parece que "está cargando".
 function transicion(f) {
-  const marcoEl = document.getElementById('marco');
   if (fantasmaVivo) { fantasmaVivo.remove(); fantasmaVivo = null; }
-  // 1) copia exacta de lo que se ve ahorita, encima; 2) se dibuja la pantalla nueva debajo (ya completa);
-  // 3) la copia se desvanece. Nunca hay un instante vacío, nada salta y se ve igual con o sin "reducir movimiento".
-  const viejo = app.cloneNode(true);
-  viejo.querySelectorAll('iframe').forEach(f => { const r = document.createElement('div'); r.style.cssText = 'position:absolute;inset:0;background:transparent'; /* deja ver el fondo de la hoja: nunca un destello blanco */ f.replaceWith(r); });
-  viejo.removeAttribute('id'); viejo.querySelectorAll('[id]').forEach(e => e.removeAttribute('id'));   // la copia nunca comparte nombres con la pantalla real
-  viejo.classList.add('fantasma'); viejo.setAttribute('aria-hidden', 'true'); viejo.inert = true;
-  marcoEl.appendChild(viejo);
-  fantasmaVivo = viejo;
-  // Pase lo que pase al dibujar, la copia de encima SIEMPRE se desvanece y se quita (nunca se queda pegada).
-  // Sin movimiento: lo de antes se desvanece sobre el fondo y lo nuevo aparece en su lugar, suave.
-  // Nunca se ven las dos pantallas encimadas: primero se va lo viejo, luego se descubre lo nuevo (ya completo debajo).
-  viejo.style.background = getComputedStyle(document.body).backgroundColor;
-  try { f(); } finally {
-  const suave = 'cubic-bezier(.4,0,.2,1)';
-  [...viejo.children].forEach(h => h.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 130, easing: suave, fill: 'forwards' }));
-  const a = viejo.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 230, delay: 110, easing: suave, fill: 'forwards' });
-  a.finished.then(() => { viejo.remove(); if (fantasmaVivo === viejo) fantasmaVivo = null; }, () => { viejo.remove(); });
-  letrasDespues();
-  }
-}
-// Cada cosa con su tiempo: primero aparecen las formas (tarjetas, círculos, botones) y un instante después sus letras.
-let letrasReloj = 0;
-function letrasDespues() {
-  clearTimeout(letrasReloj);
-  app.classList.remove('letras-llegan'); app.classList.add('letras-esperan');
-  void app.offsetWidth;   // que el navegador registre las letras escondidas antes de soltarlas
-  app.classList.add('letras-llegan'); app.classList.remove('letras-esperan');
-  letrasReloj = setTimeout(() => app.classList.remove("letras-llegan"), 800);
+  f();
 }
 
 /* ---------- Entrada ---------- */
@@ -1115,23 +1086,18 @@ function anilloFases(sel) {
   return `<svg viewBox="0 0 200 200" role="img" aria-label="Avance ${tx.pct}%">${arcos.join('')}<text id="anPct" x="100" y="98" text-anchor="middle" font-size="40" font-weight="800" fill="var(--tinta)" font-family="inherit">${tx.pct}%</text><text id="anSub" x="100" y="124" text-anchor="middle" font-size="13" font-weight="700" fill="var(--suave)" font-family="inherit">${tx.sub}</text></svg>`;
 }
 let ajustaFases = null;
-// Cambia las fases en la pantalla sin volver a dibujarla: los colores pasan suave, el número cuenta y el texto se funde.
+// Cambia las fases en la pantalla sin volver a dibujarla: todo al instante, en su mismo lugar.
 function moverFases(sel, fases) {
   const n = fases.length, est = estadoArcos(sel, n), tx = textoAnillo(sel, n), suave = 'cubic-bezier(.4,0,.2,1)';
   app.querySelectorAll('.avance .arco').forEach((a, i) => { a.setAttribute('class', 'arco ' + est[i]); });
   app.querySelectorAll('#fases [data-f]').forEach((b, i) => { b.classList.toggle('on', est[i] === 'ahora'); b.classList.toggle('hecha', est[i] === 'hecho'); b.setAttribute('aria-pressed', est[i] === 'ahora'); });
   const pct = document.getElementById('anPct'), sub = document.getElementById('anSub'), svg = app.querySelector('.avance svg');
   if (svg) svg.setAttribute('aria-label', `Avance ${tx.pct}%`);
-  if (pct) { const de = parseInt(pct.textContent) || 0, t0 = performance.now(); cancelAnimationFrame(moverFases.raf);
-    const paso = t => { const k = Math.min(1, (t - t0) / 500), e = 1 - Math.pow(1 - k, 3); pct.textContent = Math.round(de + (tx.pct - de) * e) + '%'; if (k < 1) moverFases.raf = requestAnimationFrame(paso); };
-    moverFases.raf = requestAnimationFrame(paso); }
+  if (pct) pct.textContent = tx.pct + '%';   // al instante: nada cuenta ni se desvanece
   if (sub) sub.textContent = tx.sub;
   const l = sel.map(i => fases[i]), nombre = app.querySelector('.avance .fase-n'), msg = app.querySelector('.avance .fase-m');
-  [[nombre, tituloFases(l)], [msg, textoFases(l)]].forEach(([el, txt]) => {
-    if (!el || el.textContent === txt) return;
-    const sale = el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 140, easing: suave, fill: 'forwards' });
-    sale.finished.then(() => { el.textContent = txt; el.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 220, easing: suave, fill: 'forwards' }); }, () => { el.textContent = txt; });
-  });
+  if (nombre) nombre.textContent = tituloFases(l);
+  if (msg) msg.textContent = textoFases(l);
 }
 function capaProyecto(c) {
   const editar = c.tipo === 'nuevoProyecto' || c.tipo === 'editarProyecto';

@@ -12,7 +12,8 @@ const srv = http.createServer((q, r) => {
     const o = d.accion === 'crear' ? { ok: true, codigo: 'clinica-dental-sonrisa-k7q2', link: 'https://moondigitalia.com/prueba/clinica-dental-sonrisa-k7q2' }
       : d.accion === 'tablero' ? tablero : d.accion === 'buscar_persona' ? { ok: true, lista: demos.slice(0, 9).map((x, i) => ({ tel: String(i), nombre: 'Persona ' + i, negocio: x.negocio, etapa: 'pendiente' })) }
       : d.accion === 'mios' ? (ses ? { ok: true, demos, hoy: 7, tope: 30 } : { ok: false, error: 'sesion' }) : { ok: true };
-    r.end(JSON.stringify(o)); }); return; }
+    // Internet lento a propósito: la página tiene que verse completa sin esperar la respuesta (Kid: 'tarda una eternidad').
+    setTimeout(() => r.end(JSON.stringify(o)), d.accion === 'mios' || d.accion === 'tablero' ? 1500 : 0); }); return; }
   r.setHeader('Content-Type', 'text/html'); r.end(fs.readFileSync(path.join(raiz, 'prueba/nueva/index.html')));
 }).listen(8790);
 (async () => {

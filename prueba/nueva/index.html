@@ -94,8 +94,6 @@ input:focus,textarea:focus{outline:2px solid var(--cobalto);outline-offset:1px}
 .fila a{color:var(--cobalto);font-weight:700;text-decoration:none;white-space:nowrap}
 .lista{min-height:0;flex:1 1 auto;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;margin:0 -4px;padding:0 4px}
 .entrar{text-align:center;justify-content:center;gap:14px}
-.vista{animation:entra .35s var(--ease) both}
-@keyframes entra{from{opacity:0}to{opacity:1}}
 /* Pestañas de Dan: Armar demo · Tablero */
 .pestanas{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:var(--campo);box-shadow:var(--hundido);border-radius:999px;padding:5px}
 .pestana{height:calc(var(--alto) - 6px);border-radius:999px;font-weight:800;font-size:15px;color:var(--suave);transition:background .25s var(--ease),color .25s var(--ease)}
@@ -137,7 +135,6 @@ input:focus,textarea:focus{outline:2px solid var(--cobalto);outline-offset:1px}
 .tecleando #cabeza,.tecleando #pestanas,.tecleando #tira,.tecleando main>.vista:not(:focus-within),
 .tecleando main>.vista>:not(.campo),.tecleando main>.vista>.campo:not(:focus-within){display:none!important}
 .tecleando main{justify-content:flex-start}
-.tecleando main>.vista{animation:none}
 </style>
 </head>
 <body>
@@ -366,10 +363,13 @@ function pintarTablero() {
   const tot = T.cobros.reduce((a, x) => a + (x.cobro_total || 0), 0), mes = T.cobros.reduce((a, x) => a + (x.cobro_mensual || 0), 0);
   $('cTotal').textContent = pesos(tot); $('cMes').textContent = pesos(mes);
 }
+// El tablero se enseña al instante con lo último que se vio en este aparato y se pone al día solo en cuanto llegan los números.
+const COPIA_T = 'moon.recepcionista.tablero';
 async function cargarTablero() {
+  if (!T) { try { const c = JSON.parse(localStorage.getItem(COPIA_T) || 'null'); if (c && c.ok) { T = c; pintarTablero(); } } catch (e) {} }
   const r = await api('tablero');
   if (r.error === 'sesion') return entrarAbierta();
-  if (r.ok) { T = r; pintarTablero(); }
+  if (r.ok) { T = r; pintarTablero(); try { localStorage.setItem(COPIA_T, JSON.stringify(r)); } catch (e) {} }
 }
 $('tEmbudo').onclick = e => {
   const el = e.target.closest('[data-paso]'); const k = el ? el.dataset.paso : 'armados';
@@ -477,14 +477,16 @@ function entrarAbierta() {
   document.title = 'Prueba tu propio recepcionista · MOON Digital';
   mostrar('paso1');
 }
+// Con sesión del tablero se enseña al instante la vista de Dan (no se espera a nadie); la sesión se confirma por detrás
+// y solo si ya no sirve se pasa a la puerta abierta.
 (async () => {
   if (!sesion() || PARAMS.has('abierta')) return entrarAbierta();
-  const r = await api('mios');
-  if (!r.ok) return entrarAbierta();
   $('cabEti').textContent = 'MOON Digital';
   $('cabTitulo').textContent = 'Crea tu recepcionista'; document.documentElement.classList.add('dan');
   $('pestanas').hidden = false;
   mostrar(PARAMS.get('ver') === 'tablero' ? 'tablero' : 'forma');
+  const r = await api('mios');
+  if (!r.ok && r.error === 'sesion') entrarAbierta();
 })();
 </script>
 </body>

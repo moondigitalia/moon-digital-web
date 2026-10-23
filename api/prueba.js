@@ -22,23 +22,8 @@ const cancun = () => new Date(Date.now() - 5 * 36e5);
 const inicioHoy = () => { const d = cancun(); return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), 5)).toISOString(); };
 const inicioMes = () => { const d = cancun(); return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1, 5)).toISOString(); };
 
-let tablaLista = false;
-async function tabla() {
-  if (tablaLista) return;
-  await sql(`CREATE TABLE IF NOT EXISTS demos (
-    codigo TEXT PRIMARY KEY, negocio TEXT, giro TEXT, servicios TEXT, horario TEXT, ubicacion TEXT,
-    asistente TEXT, voz TEXT, creado TEXT, creado_por TEXT, vistas INTEGER DEFAULT 0, usos INTEGER DEFAULT 0, ultimo_uso TEXT DEFAULT '')`);
-  await sql('CREATE TABLE IF NOT EXISTS demo_usos (codigo TEXT, fecha TEXT)'); // una fila por plática
-  // Columnas que llegaron después (si ya existen, SQLite avisa y se ignora).
-  const extra = [
-    ['demos', "puerta TEXT DEFAULT 'dan'"], ['demos', "contacto TEXT DEFAULT ''"], ['demos', "whatsapp TEXT DEFAULT ''"],
-    ['demos', "respuesta TEXT DEFAULT ''"], ['demos', "respuesta_fecha TEXT DEFAULT ''"],
-    ['demo_usos', 'segundos INTEGER DEFAULT 0'], ['demo_usos', "puerta TEXT DEFAULT 'dan'"],
-    ['personas', 'cobro_total REAL DEFAULT 0'], ['personas', 'cobro_mensual REAL DEFAULT 0'], ['personas', "cobro_fecha TEXT DEFAULT ''"],
-  ];
-  for (const [tb, col] of extra) await sql(`ALTER TABLE ${tb} ADD COLUMN ${col}`).catch(() => {});
-  tablaLista = true;
-}
+// Las tablas y columnas de los demos ya existen en la base (se crearon una sola vez el 23-oct-2026).
+// Antes se revisaban en CADA arranque con 13 consultas seguidas y eso hacía que la página tardara segundos en abrir.
 
 function leer(req) {
   if (req.body && typeof req.body === 'object') return Promise.resolve(req.body);
@@ -93,30 +78,36 @@ async function alCRM(tel10, telefono, nombre, negocio, giro, resumen, ref) {
 
 // ---------- Tablero ----------
 // Gasto exacto si hay llave de ElevenLabs (ELEVENLABS_LECTURA); si no, aproximado con los segundos de cada plática de demo.
-async function gastoElevenLabs(desdeIso) {
+// Se lee UNA vez el mes completo (lo de hoy sale de la misma lista) y se guarda 10 minutos: el tablero abre al instante.
+async function gastoElevenLabs(mesIso, hoyIso) {
   const llave = process.env.ELEVENLABS_LECTURA;
   if (!llave) return null;
-  const desde = Math.floor(Date.parse(desdeIso) / 1000);
-  let total = 0, n = 0, cursor = '', porAgente = {};
+  const clave = 'eleven:' + mesIso.slice(0, 10);
+  const guardado = (await sql('SELECT valor, fecha FROM cache_gasto WHERE clave = ?', [clave]).catch(() => []))[0];
+  if (guardado && Date.now() - guardado.fecha < 10 * 60 * 1000) { try { return JSON.parse(guardado.valor); } catch (e) {} }
+  const desde = Math.floor(Date.parse(mesIso) / 1000), desdeHoy = Math.floor(Date.parse(hoyIso) / 1000);
+  const suma = () => ({ todas: true, platicas: 0, usd: 0, porAgente: {} });
+  const mes = suma(), hoy = suma();
+  let cursor = '';
   for (let vuelta = 0; vuelta < 20; vuelta++) {
     const u = new URL('https://api.elevenlabs.io/v1/convai/conversations');
     u.searchParams.set('page_size', '100'); u.searchParams.set('call_start_after_unix', String(desde));
     if (cursor) u.searchParams.set('cursor', cursor);
     const r = await fetch(u, { headers: { 'xi-api-key': llave } });
-    if (!r.ok) return null;
+    if (!r.ok) return guardado ? JSON.parse(guardado.valor) : null;
     const j = await r.json();
     for (const c of j.conversations || []) {
-      n++;
       // Sin el detalle de cada plática no viene el costo: se calcula por minutos con el costo medido.
-      const usd = (c.call_duration_secs || 0) / 60 * USD_MIN;
-      total += usd;
-      const k = c.agent_name || c.agent_id;
-      porAgente[k] = (porAgente[k] || 0) + usd;
+      const usd = (c.call_duration_secs || 0) / 60 * USD_MIN, k = c.agent_name || c.agent_id;
+      for (const g of (c.start_time_unix_secs || 0) >= desdeHoy ? [mes, hoy] : [mes]) { g.platicas++; g.usd += usd; g.porAgente[k] = (g.porAgente[k] || 0) + usd; }
     }
     if (!j.has_more || !j.next_cursor) break;
     cursor = j.next_cursor;
   }
-  return { todas: true, platicas: n, mxn: Math.round(total * MXN_USD), porAgente: Object.entries(porAgente).map(([k, v]) => ({ nombre: k, mxn: Math.round(v * MXN_USD) })) };
+  const fin = g => ({ todas: true, platicas: g.platicas, mxn: Math.round(g.usd * MXN_USD), porAgente: Object.entries(g.porAgente).map(([k, v]) => ({ nombre: k, mxn: Math.round(v * MXN_USD) })) });
+  const valor = { hoy: fin(hoy), mes: fin(mes) };
+  await sql('INSERT OR REPLACE INTO cache_gasto (clave, valor, fecha) VALUES (?,?,?)', [clave, JSON.stringify(valor), Date.now()]).catch(() => {});
+  return valor;
 }
 async function gastoDemos(desdeIso) {
   const r = (await sql('SELECT COUNT(*) n, COALESCE(SUM(CASE WHEN segundos > 0 THEN segundos ELSE 180 END), 0) s FROM demo_usos WHERE fecha >= ?', [desdeIso]))[0] || {};
@@ -133,7 +124,7 @@ async function tablero() {
   ]);
   const cerr = new Set(cerrados.map(x => x.codigo));
   demos.forEach(x => { x.cerrado = cerr.has(x.codigo); });
-  const [gHoy, gMes] = await Promise.all([gastoElevenLabs(hoy).catch(() => null), gastoElevenLabs(mes).catch(() => null)]);
+  const g = await gastoElevenLabs(mes, hoy).catch(() => null), gHoy = g && g.hoy, gMes = g && g.mes;
   const pl = Object.fromEntries(usosHoy.map(x => [x.puerta || 'dan', x.n]));
   return {
     ok: true, demos, cobros,
@@ -148,7 +139,6 @@ module.exports = async (req, res) => {
   if (!process.env.CF_ACCOUNT_ID || !process.env.CF_D1_TOKEN) { res.status(503).json({ ok: false, error: 'base' }); return; }
   const d = await leer(req);
   try {
-    await tabla();
     const codigo = String(d.codigo || '').toLowerCase().replace(/[^a-z0-9-]/g, '').slice(0, 40);
 
     // ---- Público: lo que necesita la página del prospecto ----
@@ -235,8 +225,10 @@ module.exports = async (req, res) => {
     }
 
     if (d.accion === 'mios') {
-      const lista = await sql('SELECT codigo, negocio, asistente, creado, creado_por, puerta, contacto, vistas, usos, ultimo_uso, respuesta FROM demos ORDER BY creado DESC LIMIT 60');
-      const hoy = ((await sql("SELECT COUNT(*) AS n FROM demo_usos WHERE fecha >= ? AND COALESCE(puerta,'dan') = 'dan'", [inicioHoy()]))[0] || {}).n || 0;
+      const [lista, cuenta] = await Promise.all([
+        sql('SELECT codigo, negocio, asistente, creado, creado_por, puerta, contacto, vistas, usos, ultimo_uso, respuesta FROM demos ORDER BY creado DESC LIMIT 60'),
+        sql("SELECT COUNT(*) AS n FROM demo_usos WHERE fecha >= ? AND COALESCE(puerta,'dan') = 'dan'", [inicioHoy()])]);
+      const hoy = ((cuenta || [])[0] || {}).n || 0;
       res.status(200).json({ ok: true, yo, demos: lista, hoy, tope: TOPES.dan });
       return;
     }
