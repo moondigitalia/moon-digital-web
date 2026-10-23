@@ -47,6 +47,25 @@ h1{font-size:clamp(28px,8vw,40px);font-weight:800;letter-spacing:-.02em;line-hei
 .pie{font-size:13px;color:var(--tenue)}
 .pie a{color:inherit;font-weight:700}
 .entra{animation:entra .45s var(--ease) both}
+/* Al terminar: el botón se hace chico y aparecen las tres opciones de seguimiento. */
+.centro.fin{gap:14px}
+.centro.fin .disco{width:min(30vw,112px)}
+.centro.fin .hablar{font-size:13px}
+.seguir{width:100%;max-width:380px;display:grid;gap:10px}
+.op{border-radius:999px;height:52px;padding:0 18px;font-weight:800;font-size:16px;background:var(--cobalto);color:#fff;white-space:nowrap;transition:transform .2s var(--ease)}
+.op:active{transform:scale(.97)}
+.op.dos{background:var(--tarjeta);color:var(--tinta);box-shadow:0 10px 22px -12px rgba(120,105,85,.4)}
+.op.tres{background:none;color:var(--suave);height:40px;font-weight:700;font-size:15px}
+.gracias{font-weight:700;font-size:17px;line-height:1.4;max-width:340px;text-wrap:balance}
+/* Hoja para dejar nombre y WhatsApp (solo si no los conocemos). */
+.velo{position:fixed;inset:0;background:rgba(0,0,0,.4);opacity:0;transition:opacity .3s var(--ease);z-index:5}
+.velo.ver{opacity:1}
+.hoja{position:fixed;left:0;right:0;bottom:0;margin:0 auto;max-width:520px;background:var(--fondo);border-radius:28px 28px 0 0;padding:22px 16px max(16px,env(safe-area-inset-bottom));display:grid;gap:12px;transform:translateY(100%);transition:transform .35s var(--ease);z-index:6;text-align:start}
+.hoja.ver{transform:none}
+.hoja h2{font-size:20px;font-weight:800}
+.hoja label{display:grid;gap:5px;font-weight:700;font-size:14px}
+.hoja input{font:inherit;font-size:16px;color:inherit;border:0;background:var(--campo);border-radius:18px;height:48px;padding:0 16px;width:100%}
+.hoja input:focus{outline:2px solid var(--cobalto)}
 @keyframes entra{from{opacity:0}to{opacity:1}}
 </style>
 </head>
@@ -70,19 +89,33 @@ h1{font-size:clamp(28px,8vw,40px);font-weight:800;letter-spacing:-.02em;line-hei
     <p class="estado" id="estado"></p>
     <p class="pista" id="pista"></p>
     <p class="aviso" id="aviso" hidden></p>
+    <div class="seguir" id="seguir" hidden>
+      <button class="op" data-op="quiero">Me gustó, quiero uno</button>
+      <button class="op dos" data-op="llamada">Quiero agendar una llamada</button>
+      <button class="op tres" data-op="no">Ahorita no</button>
+    </div>
+    <p class="gracias" id="gracias" hidden></p>
   </div>
 
   <p class="pie">Demostración preparada por <a href="https://moondigitalia.com" target="_blank" rel="noopener">MOON Digital</a></p>
 </main>
 
+<div class="velo" id="velo" hidden></div>
+<form class="hoja" id="hoja" hidden autocomplete="on">
+  <h2>¿A dónde te escribimos?</h2>
+  <label>Tu nombre<input name="nombre" maxlength="80" autocomplete="name" required></label>
+  <label>Tu WhatsApp<input name="whatsapp" type="tel" inputmode="tel" maxlength="20" autocomplete="tel" placeholder="10 dígitos" required></label>
+  <p class="aviso" id="hojaAviso" hidden></p>
+  <button class="op" id="hojaListo">Listo</button>
+</form>
 <script src="https://cdn.jsdelivr.net/npm/@elevenlabs/client@1.27.0/dist/lib.iife.js"></script>
 <script>
 const $ = id => document.getElementById(id);
 const codigo = decodeURIComponent(location.pathname.split('/').filter(Boolean)[1] || '').toLowerCase();
-let demo = null, agente = '', vozId = '', conv = null, estado = 'listo', anim = 0, conecto = false;
+let demo = null, agente = '', vozId = '', conv = null, estado = 'listo', anim = 0, conecto = false, inicio = '', t0 = 0, opElegida = '';
 
-async function api(accion) {
-  const r = await fetch('/api/prueba', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ accion, codigo }) }).catch(() => null);
+async function api(accion, extra) {
+  const r = await fetch('/api/prueba', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Object.assign({ accion, codigo }, extra || {})) }).catch(() => null);
   if (!r) return { ok: false, error: 'red' };
   return r.json().catch(() => ({ ok: false, error: 'red' }));
 }
@@ -94,9 +127,13 @@ function pintar(nuevo) {
   $('icoMic').hidden = enLlamada; $('icoColgar').hidden = !enLlamada;
   $('botonTexto').textContent = enLlamada ? 'Colgar' : (estado === 'termino' ? 'Hablar otra vez' : 'Hablar');
   $('boton').setAttribute('aria-label', $('botonTexto').textContent);
+  $('zona').classList.toggle('fin', estado === 'termino');
+  $('seguir').hidden = estado !== 'termino' || !!opElegida;
+  $('gracias').hidden = estado !== 'termino' || !opElegida;
   $('estado').textContent = { listo: '', conectando: 'Conectando…', escuchando: 'Te escucho', hablando: `${demo.asistente} está hablando`, termino: 'Llamada terminada' }[estado] || '';
+  $('pista').hidden = estado === 'termino' && !!opElegida;
   $('pista').textContent = estado === 'termino'
-    ? `¿Qué te pareció? Así atendería ${demo.asistente} a los clientes de ${demo.negocio}, a cualquier hora.`
+    ? `Así atendería ${demo.asistente} a los clientes de ${demo.negocio}, a cualquier hora. ¿Qué te pareció?`
     : 'Háblale como si fueras un cliente: pregunta precios u horarios, o pide una cita.';
 }
 
@@ -131,10 +168,10 @@ async function empezar() {
       connectionType: 'websocket', // la voz por websocket sí manda de qué página viene (el candado de origen la deja pasar; por webrtc se rechazaba)
       dynamicVariables: { negocio: demo.negocio, asistente: demo.asistente, giro: demo.giro || '', servicios: demo.servicios || 'No hay lista de servicios todavía.', horario: demo.horario || 'No se indicó.', ubicacion: demo.ubicacion || 'No se indicó.' },
       overrides: { tts: { voiceId: vozId } },
-      onConnect: () => { conecto = true; pintar('escuchando'); api('uso'); },
+      onConnect: () => { conecto = true; t0 = Date.now(); pintar('escuchando'); api('uso').then(r => { inicio = (r && r.inicio) || ''; }); },
       onModeChange: m => { if (estado !== 'termino') pintar(m && m.mode === 'speaking' ? 'hablando' : 'escuchando'); },
       // Si nunca llegó a conectar, no es "llamada terminada": se dice qué pasó y el botón queda listo para reintentar.
-      onDisconnect: () => { conv = null; if (conecto) pintar('termino'); else { pintar('listo'); aviso(`${demo.asistente} está atendiendo a otras personas en este momento. Intenta de nuevo en unos minutos.`); } },
+      onDisconnect: () => { conv = null; terminar(); if (conecto) pintar('termino'); else { pintar('listo'); aviso(`${demo.asistente} está atendiendo a otras personas en este momento. Intenta de nuevo en unos minutos.`); } },
       onError: () => { aviso('Se cortó la conexión. Pica el botón para volver a intentar.'); },
     });
     latir();
@@ -145,9 +182,55 @@ async function empezar() {
   }
 }
 
+// Cuánto duró la plática (para el gasto del día en el tablero de Dan).
+function terminar() {
+  if (!inicio || !t0) return;
+  const cuerpo = JSON.stringify({ accion: 'fin', codigo, inicio, segundos: Math.round((Date.now() - t0) / 1000) });
+  inicio = ''; t0 = 0;
+  try { navigator.sendBeacon('/api/prueba', new Blob([cuerpo], { type: 'application/json' })); } catch (e) {}
+}
+addEventListener('pagehide', terminar);
+
+/* ---------- Seguimiento: qué le pareció ---------- */
+const GRACIAS = {
+  quiero: '¡Qué gusto! El equipo de MOON Digital te escribe por WhatsApp para armar el tuyo.',
+  llamada: 'Listo. El equipo de MOON Digital te escribe por WhatsApp para agendar la llamada.',
+  no: 'Gracias por probarlo. Aquí sigue tu demo cuando quieras volver a hablarle.',
+};
+async function elegir(op, extra) {
+  const r = await api('respuesta', Object.assign({ opcion: op }, extra || {}));
+  if (r.error === 'whatsapp') return pedirDatos(op);
+  if (!r.ok) { aviso('No se pudo enviar. Revisa tu internet y vuelve a picar.'); return false; }
+  opElegida = op; aviso('');
+  $('gracias').textContent = GRACIAS[op]; $('gracias').hidden = false;
+  pintar(estado);
+  return true;
+}
+function pedirDatos(op) {
+  $('velo').hidden = false; $('hoja').hidden = false; $('hojaAviso').hidden = true;
+  requestAnimationFrame(() => requestAnimationFrame(() => { $('velo').classList.add('ver'); $('hoja').classList.add('ver'); }));
+  $('hoja').onsubmit = async e => {
+    e.preventDefault();
+    const f = new FormData($('hoja'));
+    if (String(f.get('whatsapp') || '').replace(/\D/g, '').length < 10) { $('hojaAviso').textContent = 'Escribe tu WhatsApp completo, con 10 dígitos.'; $('hojaAviso').hidden = false; return; }
+    $('hojaListo').disabled = true;
+    const ok = await elegir(op, { nombre: f.get('nombre'), whatsapp: f.get('whatsapp') });
+    $('hojaListo').disabled = false;
+    if (ok) cerrarHoja();
+  };
+}
+function cerrarHoja() { $('velo').classList.remove('ver'); $('hoja').classList.remove('ver'); setTimeout(() => { $('velo').hidden = true; $('hoja').hidden = true; }, 350); }
+$('velo').onclick = cerrarHoja;
+document.querySelectorAll('[data-op]').forEach(b => b.onclick = () => {
+  const op = b.dataset.op;
+  if (op !== 'no' && !demo.conocido) return pedirDatos(op);
+  elegir(op);
+});
+
 async function colgar() {
   const c = conv; conv = null;
   try { if (c) await c.endSession(); } catch (e) {}
+  terminar();
   pintar('termino');
 }
 

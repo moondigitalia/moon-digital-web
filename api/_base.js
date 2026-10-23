@@ -6,7 +6,7 @@ const BASE = '3badeaa5-4933-42e1-89fd-7f06dd087b5b'; // moon-crm (Cloudflare D1 
 const ETAPAS = ['pendiente', 'en proceso', 'cerrado', 'en órbita', 'portafolio', 'archivo'];
 const TEMPERATURAS = ['caliente', 'tibio', 'frio'];
 const SERVICIOS = ['agente de llamadas', 'página web', 'redes y campañas', 'administración', 'otro'];
-const ORIGENES = ['llamada', 'whatsapp', 'cuestionario', 'referido', 'otro'];
+const ORIGENES = ['llamada', 'whatsapp', 'cuestionario', 'demo', 'referido', 'otro'];
 const FASES = ['por arrancar', 'información', 'diseño', 'construcción', 'pruebas', 'entregado'];
 
 function igual(a, b) {
