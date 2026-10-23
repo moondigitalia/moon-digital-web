@@ -151,12 +151,13 @@ html.dentro,html.dentro body{background:transparent}
 .tecleando #cabeza,.tecleando #pestanas,.tecleando #tira,.tecleando main>.vista:not(:focus-within),
 .tecleando main>.vista>:not(.campo),.tecleando main>.vista>.campo:not(:focus-within){display:none!important}
 .tecleando main{justify-content:flex-start}
-.bienvenida{display:flex;flex-direction:column;align-items:center;text-align:center;gap:clamp(10px,2.2vh,20px)}
+.bienvenida{display:flex;flex-direction:column;align-items:stretch;text-align:start;gap:clamp(10px,2.2vh,20px)}
 .bv-titulo{font-size:clamp(24px,min(7.2vw,4.4vh),36px);font-weight:800;letter-spacing:-.025em;line-height:1.08;text-wrap:balance}
 .bv-nota{color:var(--suave);font-size:clamp(14.5px,min(4.1vw,2.3vh),17px);line-height:1.4;max-width:420px;text-wrap:balance}
 /* El asistente "hablando": un círculo cobalto con ondas y lo que diría a tus clientes. */
-.bv-escena{display:flex;flex-direction:column;align-items:center;gap:clamp(18px,3vh,26px)}
-.orbe{position:relative;width:clamp(64px,min(24vw,13vh),112px);aspect-ratio:1;display:grid;place-items:center}
+.bv-escena{display:flex;flex-direction:row;align-items:center;gap:clamp(14px,4vw,22px);padding-left:4px}
+.bv-escena .orbe{flex:none}
+.orbe{position:relative;width:clamp(56px,min(20vw,11vh),96px);aspect-ratio:1;display:grid;place-items:center}
 .orbe i{position:absolute;inset:0;border-radius:50%;background:var(--cobalto);opacity:.14;animation:onda 2.6s cubic-bezier(.3,.6,.4,1) infinite}
 .orbe i:nth-child(2){animation-delay:1.3s}
 @keyframes onda{from{transform:scale(1);opacity:.22}to{transform:scale(1.55);opacity:0}}
@@ -166,12 +167,13 @@ html.dentro,html.dentro body{background:transparent}
 .globo{background:var(--tarjeta);box-shadow:var(--sombra);border-radius:22px 22px 22px 8px;padding:10px 16px;font-size:clamp(14px,min(3.9vw,2.2vh),16px);font-weight:600;line-height:1.35;max-width:340px;text-align:start}
 .globo small{display:block;font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--cobalto);margin-bottom:2px}
 /* Los 3 pasos: círculos numerados */
-.pasos3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;width:100%;max-width:440px}
-.p3{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0}
+.pasos3{display:grid;grid-template-columns:1fr;gap:clamp(6px,1.2vh,10px);width:100%}
+.p3{display:flex;flex-direction:row;align-items:center;gap:8px;min-width:0}
 .p3 i{font-style:normal;width:clamp(34px,min(10vw,5.4vh),44px);aspect-ratio:1;border-radius:50%;display:grid;place-items:center;background:var(--campo);box-shadow:var(--hundido);font-weight:800;font-size:16px;color:var(--cobalto)}
-.p3 span{font-size:13px;font-weight:700;line-height:1.2;color:var(--tinta)}
+.p3 span{font-size:clamp(14px,min(4vw,2.2vh),16px);font-weight:600;line-height:1.25;color:var(--suave)}
+.p3 b{color:var(--tinta);font-weight:800}
 .p3 small{display:block;font-size:12px;font-weight:600;color:var(--tenue)}
-.bv-cta{width:100%;max-width:440px;display:flex;flex-direction:column;gap:8px}
+.bv-cta{width:100%;display:flex;flex-direction:column;gap:8px}
 .bv-cta small{font-size:13px;font-weight:600;color:var(--tenue)}
 /* Avance de la puerta abierta: tres puntos */
 .puntos{display:flex;gap:6px;align-items:center}
@@ -209,9 +211,9 @@ html.dentro,html.dentro body{background:transparent}
     <h1 class="bv-titulo">Un asistente que atiende a tus clientes por ti</h1>
     <p class="bv-nota">Contesta a cualquier hora, dice tus precios y toma citas. Pruébalo gratis con tu negocio.</p>
     <div class="pasos3">
-      <div class="p3"><i>1</i><span>Tus datos</span></div>
-      <div class="p3"><i>2</i><span>Tu negocio</span></div>
-      <div class="p3"><i>3</i><span>Háblale</span></div>
+      <div class="p3"><i>1</i><span><b>Tus datos:</b> nombre y WhatsApp</span></div>
+      <div class="p3"><i>2</i><span><b>Tu negocio:</b> qué vendes y precios</span></div>
+      <div class="p3"><i>3</i><span><b>Háblale</b> como si fueras tu cliente</span></div>
     </div>
     <div class="bv-cta">
       <button class="boton" id="empezar" type="button">Probarlo gratis</button>
