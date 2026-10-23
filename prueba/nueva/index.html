@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Armar un demo · MOON Digital</title>
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f3efe9" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16171b" media="(prefers-color-scheme: dark)">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* Misma familia que el Centro MOON: marfil, cobalto, Manrope y orillas redondas. */
+:root{
+  --fondo:#f3efe9; --tarjeta:#f6f3ee; --campo:#ece7e0; --tinta:#1d1d22; --suave:#5d5d66; --tenue:#8b8a92;
+  --cobalto:#0b4fd6; --cobalto2:#0a44b8; --verde:#2f9e5a; --verdef:#e6f4ea; --rojo:#c0392b; --rojof:#fbe9e7;
+  --sombra:0 14px 28px -12px rgba(120,105,85,.35),0 2px 6px rgba(120,105,85,.10),inset 0 1px 0 rgba(255,255,255,.85);
+  --hundido:inset 0 2px 5px rgba(120,105,85,.22),inset 0 -1px 0 rgba(255,255,255,.7);
+  --ease:cubic-bezier(.22,.8,.24,1); --r:28px;
+}
+@media (prefers-color-scheme:dark){:root{
+  --fondo:#16171b; --tarjeta:#1d1e23; --campo:#25262c; --tinta:#efedea; --suave:#b3b1b8; --tenue:#85848c;
+  --cobalto:#3a78ff; --cobalto2:#2f69eb; --verde:#5cc283; --verdef:#183026; --rojo:#ef7b72; --rojof:#3a1f1d;
+  --sombra:0 14px 28px -12px rgba(0,0,0,.7),0 2px 6px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.05);
+  --hundido:inset 0 2px 5px rgba(0,0,0,.45),inset 0 -1px 0 rgba(255,255,255,.04);
+}}
+*{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--fondo);color:var(--tinta);font-family:Manrope,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;font-size:16px;line-height:1.4;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+button,input,textarea{font:inherit;color:inherit;border:0;background:none}
+button{cursor:pointer}
+[hidden]{display:none!important}
+main{max-width:560px;margin:0 auto;padding:max(20px,env(safe-area-inset-top)) 16px max(28px,env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:18px}
+.eti{font-size:11px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--suave)}
+h1{font-size:clamp(26px,7vw,34px);font-weight:800;letter-spacing:-.02em;line-height:1.1}
+.nota{color:var(--suave);font-size:15px}
+.tarjeta{background:var(--tarjeta);border-radius:var(--r);box-shadow:var(--sombra);padding:20px;display:flex;flex-direction:column;gap:16px}
+label{display:flex;flex-direction:column;gap:6px;font-weight:700;font-size:14px}
+label small{font-weight:500;color:var(--tenue)}
+input,textarea{background:var(--campo);box-shadow:var(--hundido);border-radius:18px;padding:13px 16px;font-size:16px;width:100%}
+textarea{min-height:96px;resize:vertical}
+input:focus,textarea:focus{outline:2px solid var(--cobalto);outline-offset:1px}
+.voces{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.voz{border-radius:999px;padding:13px;font-weight:700;background:var(--campo);box-shadow:var(--hundido);transition:background .25s var(--ease),color .25s var(--ease)}
+.voz[aria-pressed="true"]{background:var(--cobalto);color:#fff;box-shadow:none}
+.boton{border-radius:999px;padding:16px 22px;font-weight:800;font-size:17px;background:var(--cobalto);color:#fff;text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:10px;transition:transform .2s var(--ease),background .2s var(--ease)}
+.boton:active{transform:scale(.97)}
+.boton.dos{background:var(--campo);color:var(--tinta);box-shadow:var(--hundido)}
+.boton.wa{background:#1f9d55}
+.boton svg{width:22px;height:22px;flex:none}
+.aviso{font-size:14px;font-weight:600;color:var(--rojo)}
+.link{background:var(--campo);box-shadow:var(--hundido);border-radius:18px;padding:14px 16px;font-weight:700;word-break:break-all;color:var(--cobalto)}
+.listo{display:flex;align-items:center;gap:10px;color:var(--verde);font-weight:800}
+.listo svg{width:26px;height:26px}
+.fila{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-top:1px solid rgba(127,127,127,.15)}
+.fila:first-child{border-top:0}
+.fila b{display:block}
+.fila small{color:var(--tenue)}
+.fila a{color:var(--cobalto);font-weight:700;text-decoration:none;white-space:nowrap}
+.entrar{text-align:center;gap:14px}
+.vista{animation:entra .35s var(--ease) both}
+@keyframes entra{from{opacity:0}to{opacity:1}}
+</style>
+</head>
+<body>
+<main>
+  <header style="display:flex;flex-direction:column;gap:8px">
+    <span class="eti">MOON Digital · Demo personalizado</span>
+    <h1>Arma el recepcionista de tu prospecto</h1>
+    <p class="nota">Llena los datos de su negocio y en un minuto tienes un link para que él mismo le hable a su asistente.</p>
+  </header>
+
+  <!-- Sin sesión del Centro -->
+  <section class="tarjeta entrar vista" id="sinSesion" hidden>
+    <p><b>Primero entra al Centro MOON</b> desde este mismo teléfono o compu.</p>
+    <a class="boton" href="https://moondigitalia.com/centro">Ir al Centro MOON</a>
+  </section>
+
+  <!-- Formulario -->
+  <form class="tarjeta vista" id="forma" hidden autocomplete="off">
+    <label>Nombre del negocio
+      <input name="negocio" required maxlength="80" placeholder="Ej. Clínica Dental Sonrisa">
+    </label>
+    <label>¿A qué se dedica?
+      <input name="giro" required maxlength="200" placeholder="Ej. Clínica dental en Cancún">
+    </label>
+    <label>Servicios y precios <small>Lo que el asistente puede decir. Si no lo sabes, déjalo vacío.</small>
+      <textarea name="servicios" maxlength="1500" placeholder="Ej. Limpieza $600, blanqueamiento $2,500, consulta de valoración gratis"></textarea>
+    </label>
+    <label>Horario <small>Opcional</small>
+      <input name="horario" maxlength="200" placeholder="Ej. Lunes a sábado de 9 a 7">
+    </label>
+    <label>Dirección o ciudad <small>Opcional</small>
+      <input name="ubicacion" maxlength="200" placeholder="Ej. Av. Tulum 200, Cancún">
+    </label>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <span style="font-weight:700;font-size:14px">Voz del asistente</span>
+      <div class="voces">
+        <button type="button" class="voz" data-voz="mujer" aria-pressed="true">Mujer</button>
+        <button type="button" class="voz" data-voz="hombre" aria-pressed="false">Hombre</button>
+      </div>
+    </div>
+    <label>Nombre del asistente
+      <input name="asistente" maxlength="30" value="Sofía">
+    </label>
+    <button class="boton" id="crear">Crear demo</button>
+    <p class="aviso" id="aviso" hidden></p>
+  </form>
+
+  <!-- Resultado -->
+  <section class="tarjeta vista" id="resultado" hidden>
+    <p class="listo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M7.5 12.5l3 3 6-6.5"/></svg>Demo listo</p>
+    <p class="nota" id="resTexto"></p>
+    <div class="link" id="resLink"></div>
+    <a class="boton wa" id="mandar" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.4a.5.5 0 0 0 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.4.8 3.2.7a2.8 2.8 0 0 0 1.8-1.3 2.3 2.3 0 0 0 .2-1.3c-.1-.1-.3-.2-.5-.3z"/></svg>Mandar por WhatsApp</a>
+    <button class="boton dos" id="copiar" type="button">Copiar link</button>
+    <a class="boton dos" id="probar" target="_blank" rel="noopener">Probarlo yo</a>
+    <button class="boton dos" id="otro" type="button">Armar otro demo</button>
+  </section>
+
+  <!-- Demos recientes -->
+  <section class="tarjeta vista" id="recientes" hidden>
+    <span class="eti">Demos recientes</span>
+    <div id="lista"></div>
+  </section>
+</main>
+
+<script>
+const API = '/api/prueba';
+const LLAVE = 'centro.moon.sesion'; // la misma sesión del Centro MOON
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const sesion = () => { try { return localStorage.getItem(LLAVE) || ''; } catch (e) { return ''; } };
+let voz = 'mujer';
+
+async function api(accion, datos) {
+  const r = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-sesion': sesion() }, body: JSON.stringify(Object.assign({ accion }, datos || {})) }).catch(() => null);
+  if (!r) return { ok: false, error: 'red' };
+  return r.json().catch(() => ({ ok: false, error: 'red' }));
+}
+
+function mostrar(id) { ['sinSesion', 'forma', 'resultado'].forEach(x => $(x).hidden = x !== id); }
+
+document.querySelectorAll('.voz').forEach(b => b.onclick = () => {
+  voz = b.dataset.voz;
+  document.querySelectorAll('.voz').forEach(x => x.setAttribute('aria-pressed', x === b));
+  const n = $('forma').asistente;
+  if (!n.value.trim() || n.value === 'Sofía' || n.value === 'Mateo') n.value = voz === 'hombre' ? 'Mateo' : 'Sofía';
+});
+
+function cuando(iso) {
+  if (!iso) return '';
+  const d = Math.floor((Date.now() - Date.parse(iso)) / 864e5);
+  return d <= 0 ? 'hoy' : d === 1 ? 'ayer' : `hace ${d} días`;
+}
+
+async function cargarLista() {
+  const r = await api('mios');
+  if (r.error === 'sesion') { mostrar('sinSesion'); $('recientes').hidden = true; return false; }
+  const demos = (r.demos || []);
+  $('recientes').hidden = !demos.length;
+  $('lista').innerHTML = demos.map(x => `<div class="fila"><div><b>${esc(x.negocio)}</b><small>${esc(cuando(x.creado))} · ${x.usos ? `${x.usos} ${x.usos === 1 ? 'vez' : 'veces'} que le hablaron` : 'aún no le hablan'}</small></div><a href="/prueba/${esc(x.codigo)}" target="_blank" rel="noopener">Abrir</a></div>`).join('');
+  return true;
+}
+
+$('forma').addEventListener('submit', async e => {
+  e.preventDefault();
+  const f = new FormData($('forma'));
+  const datos = Object.fromEntries(f.entries());
+  datos.voz = voz;
+  $('crear').disabled = true; $('crear').textContent = 'Creando…'; $('aviso').hidden = true;
+  const r = await api('crear', datos);
+  $('crear').disabled = false; $('crear').textContent = 'Crear demo';
+  if (r.error === 'sesion') { mostrar('sinSesion'); return; }
+  if (!r.ok) { $('aviso').textContent = r.error === 'faltan' ? 'Falta el nombre del negocio o a qué se dedica.' : 'No se pudo crear. Revisa tu internet y vuelve a intentar.'; $('aviso').hidden = false; return; }
+  const negocio = datos.negocio.trim();
+  $('resTexto').textContent = `Mándale este link a ${negocio}. Lo abre en su celular, pica el botón y le habla a su asistente.`;
+  $('resLink').textContent = r.link;
+  $('probar').href = r.link;
+  const mensaje = `Hola, te preparé una muestra de cómo atendería un asistente virtual a los clientes de ${negocio}. Ábrela y háblale como si fueras un cliente: ${r.link}`;
+  $('mandar').href = 'https://wa.me/?text=' + encodeURIComponent(mensaje);
+  $('copiar').onclick = async () => { try { await navigator.clipboard.writeText(r.link); $('copiar').textContent = 'Link copiado'; } catch (e) { $('copiar').textContent = 'Mantén presionado el link para copiarlo'; } setTimeout(() => $('copiar').textContent = 'Copiar link', 2200); };
+  mostrar('resultado');
+  window.scrollTo({ top: 0 });
+  cargarLista();
+});
+
+$('otro').onclick = () => { $('forma').reset(); voz = 'mujer'; document.querySelectorAll('.voz').forEach(x => x.setAttribute('aria-pressed', x.dataset.voz === 'mujer')); mostrar('forma'); };
+
+(async () => {
+  if (!sesion()) { mostrar('sinSesion'); return; }
+  if (await cargarLista()) mostrar('forma');
+})();
+</script>
+</body>
+</html>

@@ -11,6 +11,10 @@
     {
       "source": "/ver/:codigo",
       "destination": "/api/ver?t=:codigo"
+    },
+    {
+      "source": "/prueba/:codigo",
+      "destination": "/prueba/index.html"
     }
   ]
 }
