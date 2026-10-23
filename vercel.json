@@ -9,12 +9,33 @@
   },
   "rewrites": [
     {
+      "source": "/tablero",
+      "destination": "/centro/index.html"
+    },
+    {
       "source": "/ver/:codigo",
       "destination": "/api/ver?t=:codigo"
     },
     {
       "source": "/prueba/:codigo",
       "destination": "/prueba/index.html"
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/centro",
+      "destination": "/tablero",
+      "permanent": false
+    },
+    {
+      "source": "/centro/",
+      "destination": "/tablero",
+      "permanent": false
+    },
+    {
+      "source": "/centro/index.html",
+      "destination": "/tablero",
+      "permanent": false
     }
   ]
 }
