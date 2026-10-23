@@ -67,6 +67,6 @@ function preparar(html, opciones) {
 }
 
 // Solo estos se pueden mandar fuera: lo del cliente y la presentación/página de MOON. Lo interno del equipo, no.
-const enviable = d => !!d && (d.formato === 'html' || d.formato === 'md' || (d.formato === 'link' && /^https:\/\//.test(d.url || ''))) && !(d.tel === 'moon' && ['bienvenida', 'jason'].includes(d.seccion));
+const enviable = d => !!d && (d.formato === 'html' || d.formato === 'md' || d.formato === 'archivo' || (d.formato === 'link' && /^https:\/\//.test(d.url || ''))) && !(d.tel === 'moon' && ['bienvenida', 'jason'].includes(d.seccion));
 
 module.exports = { leerCifrado, preparar, modoDe, enviable };

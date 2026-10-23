@@ -9,6 +9,28 @@ const NO_ESTA = `<!doctype html><html lang="es"><head><meta charset="utf-8"><met
 <body style="margin:0;min-height:100vh;display:grid;place-items:center;font:600 17px system-ui,-apple-system,sans-serif;background:#f4f1ec;color:#1d1d22;text-align:center;padding:24px">
 <div><p style="letter-spacing:4px;font-size:12px">MOON DIGITAL</p><p>Este documento ya no está disponible.<br>Pídenos el link nuevo y te lo mandamos.</p></div></body></html>`;
 
+// Un archivo subido (PDF, foto u otro): hoja por hoja como en el Centro, con botón para descargarlo.
+function paginaArchivo(d, f, codigo, tarjeta) {
+  const datos = JSON.stringify({ codigo, partes: f.partes, mime: f.mime || '', nombre: f.nombre || 'archivo' }).replace(/</g, '\\u003c');
+  return `<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">${tarjeta}
+<style>html,body{margin:0;height:100%;background:#dfe2ea;font:600 15px system-ui,-apple-system,"Segoe UI",sans-serif;color:#1d1d22}
+#caja{position:fixed;left:0;right:0;top:0;bottom:72px}#caja img{width:100%;height:100%;object-fit:contain}
+#barra{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);display:flex;align-items:center;gap:10px;background:rgba(20,22,30,.88);color:#fff;border-radius:99px;padding:6px;white-space:nowrap}
+#barra button,#barra a{all:unset;cursor:pointer;height:40px;min-width:40px;border-radius:99px;display:grid;place-items:center;background:rgba(255,255,255,.14);color:#fff;font-weight:800;padding:0 4px}
+#barra a{padding:0 16px}#barra span{min-width:60px;text-align:center}#barra .no{display:none}
+.msg{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:24px}</style></head>
+<body><div id="caja"><div class="msg">Abriendo…</div></div>
+<div id="barra"><button id="ant" class="no" aria-label="Anterior">‹</button><span id="pag" class="no"></span><button id="sig" class="no" aria-label="Siguiente">›</button><a id="bajar" download>Descargar</a></div>
+<script src="/centro/visor-archivo.js"></script>
+<script>(async function(){var D=${datos},caja=document.getElementById('caja'),msg=caja.firstChild;
+try{var bytes=await VisorArchivo.bajar(D.partes,function(n){return fetch('/api/ver?t='+D.codigo+'&parte='+n).then(function(r){return r.ok?r.json():Promise.reject()}).then(function(j){return j.datos})},function(k,n){if(n>1)msg.textContent='Abriendo… '+Math.round(k/n*100)+'%'});
+var url=URL.createObjectURL(new Blob([bytes],{type:D.mime||'application/octet-stream'})),a=document.getElementById('bajar');a.href=url;a.download=D.nombre;
+if(/^image\\//.test(D.mime)){caja.innerHTML='<img alt="" src="'+url+'">';return}
+if(/pdf/i.test(D.mime)||/\\.pdf$/i.test(D.nombre)){var v=await VisorArchivo.pdf(caja,bytes,function(i,n){if(n<2)return;['ant','pag','sig'].forEach(function(x){document.getElementById(x).classList.remove('no')});document.getElementById('pag').textContent=i+' de '+n});
+document.getElementById('ant').onclick=function(){v.ver(v.hoja-1)};document.getElementById('sig').onclick=function(){v.ver(v.hoja+1)};addEventListener('resize',function(){v.redibuja()});return}
+msg.textContent='Este archivo no se puede ver aquí. Usa “Descargar”.';}catch(e){msg.textContent='No se pudo abrir. Revisa tu internet y vuelve a intentar.'}})();</script></body></html>`;
+}
+
 module.exports = async (req, res) => {
   res.setHeader('Cache-Control', 'no-store');
   res.setHeader('X-Robots-Tag', 'noindex, nofollow');
@@ -16,12 +38,22 @@ module.exports = async (req, res) => {
   const codigo = String((req.query && req.query.t) || '');
   if (!/^[A-Za-z0-9_-]{20,40}$/.test(codigo)) { res.status(404).send(NO_ESTA); return; }
   try {
-    const d = (await sql('SELECT id, tel, seccion, titulo, frase, formato, contenido, url FROM documentos WHERE enlace = ?', [codigo]))[0];
+    const d = (await sql('SELECT id, tel, seccion, titulo, frase, formato, contenido, url, fuente FROM documentos WHERE enlace = ?', [codigo]))[0];
     if (!d || d.seccion === 'oculto' || !enviable(d)) { res.status(404).send(NO_ESTA); return; }
     const cifrado = leerCifrado(d.id); if (cifrado) Object.assign(d, cifrado);
     const url = 'https://moondigitalia.com/ver/' + codigo;
     // La tarjeta que enseña WhatsApp al pegar el link.
     const tarjeta = `<title>${esc(d.titulo)}</title><meta property="og:type" content="website"><meta property="og:url" content="${url}"><meta property="og:site_name" content="MOON Digital"><meta property="og:title" content="${esc(d.titulo)}"><meta property="og:description" content="${esc(d.frase || 'De MOON Digital')}">`;
+    if (d.formato === 'archivo') {
+      const f = JSON.parse(d.fuente || '{}');
+      if (!f.listo) { res.status(404).send(NO_ESTA); return; }
+      // Las partes del archivo (el visor las pide una por una y lo arma en el celular del cliente).
+      if (req.query.parte !== undefined) {
+        const r = (await sql('SELECT datos FROM partes WHERE doc = ? AND n = ?', [d.id, Number(req.query.parte) || 0]))[0];
+        res.setHeader('Content-Type', 'application/json'); res.status(r ? 200 : 404).send(JSON.stringify(r ? { datos: r.datos } : {})); return;
+      }
+      res.status(200).send(paginaArchivo(d, f, codigo, tarjeta)); return;
+    }
     if (d.formato === 'html') {
       const h = String(d.contenido).replace(/<title>[\s\S]*?<\/title>/i, '');
       res.status(200).send(preparar(h, { suelto: true, extra: tarjeta }).contenido); return;

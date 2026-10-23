@@ -19,7 +19,7 @@ function leer(req) {
   if (req.body && typeof req.body === 'object') return Promise.resolve(req.body);
   return new Promise(ok => {
     let s = '';
-    req.on('data', c => { s += c; if (s.length > 200000) req.destroy(); });
+    req.on('data', c => { s += c; if (s.length > 1500000) req.destroy(); });
     req.on('end', () => { try { ok(JSON.parse(s || '{}')); } catch (e) { ok({}); } });
     req.on('error', () => ok({}));
   });

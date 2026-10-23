@@ -7,6 +7,9 @@ const { crypto, ETAPAS, TEMPERATURAS, SERVICIOS, ORIGENES, FASES, igual, leer, s
 const AGENDA = 'https://script.google.com/macros/s/AKfycbzmjh39HaP39rdzK3PJdKMULk43T9uvQNwcriSdpzbIRgLC3Xppu9MezL4byJTb4kgX/exec';
 const USUARIOS = ['kid', 'dan', 'daniel'];
 const { leerCifrado, preparar, enviable } = require('./_visor');
+// Foto o logo: una imagen chica ya reducida en el celular (data:image/…), nunca un archivo cualquiera.
+const fotoValida = f => { if (f === '' || f == null) return ''; f = String(f); return /^data:image\/(webp|jpeg|png);base64,[A-Za-z0-9+/=]+$/.test(f) && f.length < 160000 ? f : null; };
+const SECCIONES_CLIENTE = ['propuesta', 'contrato', 'material', 'avance'];
 const huella = s => crypto.createHash('sha256').update(String(s)).digest('hex');
 const ahora = () => new Date().toISOString();
 const ocultar = c => { const [u, d] = String(c).split('@'); return u.slice(0, 2) + '•••@' + d; };
@@ -100,13 +103,13 @@ async function entrada(d, req) {
 async function inicio(yo) {
   const [usuarios, personas, proyectos, tareas, actividad, usoMes, paneles, documentos] = await Promise.all([
     sql('SELECT id, nombre, color, rol, lema, creado FROM usuarios'),
-    sql('SELECT tel, telefono, nombre, negocio, giro, temperatura, etapa, servicio, origen, necesidad, proxima_cita, encargados, notas_equipo, ultimo_contacto, contactos, es_prueba FROM personas ORDER BY ultimo_contacto DESC LIMIT 1000'),
+    sql('SELECT tel, telefono, correo, foto, nombre, negocio, giro, temperatura, etapa, servicio, origen, necesidad, proxima_cita, encargados, notas_equipo, ultimo_contacto, contactos, es_prueba FROM personas ORDER BY ultimo_contacto DESC LIMIT 1000'),
     sql("SELECT id, tel, nombre, fase, encargados, nota, creado, actualizado, (clave != '' OR llave_uso != '') AS conectado FROM proyectos ORDER BY actualizado DESC"),
     sql("SELECT * FROM tareas WHERE estado != 'hecha' OR hecho > ? ORDER BY id DESC", [new Date(Date.now() - 14 * 864e5).toISOString()]),
     sql('SELECT * FROM actividad ORDER BY id DESC LIMIT 12'),
     sql('SELECT proyecto, COUNT(*) n FROM uso WHERE fecha >= ? AND quien NOT IN (SELECT tel FROM personas WHERE es_prueba = 1) GROUP BY proyecto', [new Date(Date.now() - 30 * 864e5).toISOString()]),
     sql('SELECT tel, orden, demo, color, imagen, icono FROM paneles ORDER BY orden'),
-    sql("SELECT id, tel, seccion, orden, titulo, frase, url, formato FROM documentos WHERE seccion != 'oculto' ORDER BY tel, seccion, orden"),
+    sql("SELECT id, tel, seccion, orden, titulo, frase, url, formato FROM documentos WHERE seccion != 'oculto' AND NOT (formato = 'archivo' AND fuente NOT LIKE '%\"listo\":1%') ORDER BY tel, seccion, orden"),
   ]);
   const usos = Object.fromEntries(usoMes.map(x => [x.proyecto, x.n]));
   proyectos.forEach(p => { p.uso_mes = usos[p.id] || 0; });
@@ -144,13 +147,53 @@ async function conSesion(d, yo) {
   }
 
   // Un documento guardado (copia de lo que se le enseña al cliente). Solo con sesión.
+  // Subir un archivo (presentación, contrato, fotos…) a la sección de un cliente. Va en partes para que pase
+  // por cualquier internet; hasta que llega la última parte no aparece en el panel.
+  if (d.accion === 'subir_inicio') {
+    const tel = llave(d.tel), seccion = String(d.seccion || '');
+    if (!tel || !SECCIONES_CLIENTE.includes(seccion)) return { ok: false };
+    if (!(await sql('SELECT tel FROM personas WHERE tel = ?', [tel]))[0]) return { ok: false };
+    const tamano = Number(d.tamano) || 0; if (tamano <= 0 || tamano > 25e6) return { ok: false, error: 'tamano' };
+    const id = 'a-' + crypto.randomBytes(6).toString('hex');
+    const orden = (((await sql('SELECT MAX(orden) m FROM documentos WHERE tel = ? AND seccion = ?', [tel, seccion]))[0] || {}).m || 0) + 1;
+    const fuente = JSON.stringify({ nombre: t(d.nombre, 160), mime: t(d.mime, 80) || 'application/octet-stream', tamano, listo: 0, subio: yo.id });
+    await sql('INSERT INTO documentos (id, tel, seccion, orden, titulo, frase, url, formato, contenido, fuente, creado) VALUES (?,?,?,?,?,?,?,?,?,?,?)',
+      [id, tel, seccion, orden, t(d.titulo, 120) || t(d.nombre, 120) || 'Archivo', t(d.frase, 160), '', 'archivo', '', fuente, ahora()]);
+    return { ok: true, id };
+  }
+  if (d.accion === 'subir_parte') {
+    const id = String(d.id || ''), n = Number(d.n), datos = String(d.datos || '');
+    if (!/^a-[0-9a-f]{12}$/.test(id) || !Number.isInteger(n) || n < 0 || n > 2000 || !/^[A-Za-z0-9+/=]+$/.test(datos) || datos.length > 1200000) return { ok: false };
+    try { await sql('INSERT OR REPLACE INTO partes (doc, n, datos) VALUES (?,?,?)', [id, n, datos]); }
+    catch (e) { return { ok: false, error: 'grande' }; }   // la parte no cupo: el celular la manda en pedazos más chicos
+    return { ok: true };
+  }
+  if (d.accion === 'subir_fin') {
+    const id = String(d.id || ''); if (!/^a-[0-9a-f]{12}$/.test(id)) return { ok: false };
+    const doc = (await sql('SELECT tel, titulo, fuente FROM documentos WHERE id = ?', [id]))[0]; if (!doc) return { ok: false };
+    const n = ((await sql('SELECT COUNT(*) n FROM partes WHERE doc = ?', [id]))[0] || {}).n;
+    if (n !== Number(d.partes)) return { ok: false, error: 'faltan' };
+    const f = JSON.parse(doc.fuente || '{}'); f.listo = 1; f.partes = n;
+    await sql('UPDATE documentos SET fuente = ? WHERE id = ?', [JSON.stringify(f), id]);
+    const p = (await sql('SELECT nombre, negocio FROM personas WHERE tel = ?', [doc.tel]))[0] || {};
+    await anotar(yo.id, `subió "${doc.titulo}" a ${p.negocio || p.nombre || 'un cliente'}`);
+    return { ok: true };
+  }
+  if (d.accion === 'archivo_parte') {
+    const id = String(d.id || ''), n = Number(d.n); if (!/^a-[0-9a-f]{12}$/.test(id)) return { ok: false };
+    const r = (await sql('SELECT datos FROM partes WHERE doc = ? AND n = ?', [id, n]))[0];
+    return r ? { ok: true, datos: r.datos } : { ok: false };
+  }
+
   if (d.accion === 'documento') {
-    const doc = (await sql('SELECT id, tel, seccion, titulo, frase, formato, contenido, url, enlace FROM documentos WHERE id = ?', [t(d.id, 80)]))[0];
+    const doc = (await sql('SELECT id, tel, seccion, titulo, frase, formato, contenido, url, enlace, fuente FROM documentos WHERE id = ?', [t(d.id, 80)]))[0];
     if (!doc) return { ok: false, error: 'no existe' };
     // Los documentos con imágenes viven cifrados dentro del proyecto (api/_docs); solo esta llave los abre.
     const cifrado = leerCifrado(doc.id);
     if (cifrado) Object.assign(doc, cifrado);
     if (doc.formato === 'html') Object.assign(doc, preparar(doc.contenido));
+    if (doc.formato === 'archivo') { const f = JSON.parse(doc.fuente || '{}'); Object.assign(doc, { mime: f.mime, nombre: f.nombre, tamano: f.tamano, partes: f.partes || 0 }); }
+    delete doc.fuente;
     // El link para mandárselo al cliente: el mismo documento, sin contraseña, en una dirección imposible de adivinar.
     if (enviable(doc) && doc.formato !== 'link') {
       if (!doc.enlace) { doc.enlace = crypto.randomBytes(16).toString('base64url'); await sql('UPDATE documentos SET enlace = ? WHERE id = ? AND enlace IS NULL', [doc.enlace, doc.id]); doc.enlace = ((await sql('SELECT enlace FROM documentos WHERE id = ?', [doc.id]))[0] || {}).enlace; }
@@ -198,7 +241,8 @@ async function conSesion(d, yo) {
     const set = [], params = [];
     const listas = { etapa: ETAPAS, temperatura: TEMPERATURAS, servicio: SERVICIOS, origen: ORIGENES };
     for (const k in listas) if (d[k] !== undefined) { const v = normal(d[k], listas[k]); if (v || d[k] === '') { set.push(k + ' = ?'); params.push(v); } }
-    for (const k of ['nombre', 'negocio', 'notas_equipo']) if (d[k] !== undefined) { set.push(k + ' = ?'); params.push(t(d[k], k === 'notas_equipo' ? 4000 : 120)); }
+    for (const k of ['nombre', 'negocio', 'notas_equipo', 'telefono', 'correo', 'giro']) if (d[k] !== undefined) { set.push(k + ' = ?'); params.push(t(d[k], k === 'notas_equipo' ? 4000 : 120)); }
+    if (d.foto !== undefined) { const f = fotoValida(d.foto); if (f === null) return { ok: false, error: 'foto' }; set.push('foto = ?'); params.push(f); }
     if (d.encargados !== undefined) { set.push('encargados = ?'); params.push(listaUsuarios(d.encargados)); }
     if (d.es_prueba !== undefined) { set.push('es_prueba = ?'); params.push(d.es_prueba ? 1 : 0); }
     if (!set.length) return { ok: false };
@@ -219,9 +263,9 @@ async function conSesion(d, yo) {
     const ya = (await sql('SELECT tel FROM personas WHERE tel = ?', [tel]))[0];
     if (ya) return { ok: true, tel, existia: true };
     const f = ahora();
-    await sql(`INSERT INTO personas (tel, telefono, nombre, negocio, etapa, servicio, origen, encargados, creado, actualizado, ultimo_contacto, contactos, es_prueba)
-               VALUES (?,?,?,?,?,?,?,?,?,?,?,0,0)`,
-      [tel, t(d.telefono, 30), nombre, negocio, normal(d.etapa, ETAPAS) || 'pendiente', normal(d.servicio, SERVICIOS), normal(d.origen, ORIGENES) || 'otro', listaUsuarios(d.encargados), f, f, f]);
+    await sql(`INSERT INTO personas (tel, telefono, correo, foto, nombre, negocio, etapa, servicio, origen, encargados, creado, actualizado, ultimo_contacto, contactos, es_prueba)
+               VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,0,0)`,
+      [tel, t(d.telefono, 30), t(d.correo, 120), fotoValida(d.foto) || '', nombre, negocio, normal(d.etapa, ETAPAS) || 'pendiente', normal(d.servicio, SERVICIOS), normal(d.origen, ORIGENES) || 'otro', listaUsuarios(d.encargados), f, f, f]);
     await anotar(yo.id, `agregó a ${negocio || nombre} al CRM`);
     return { ok: true, tel };
   }

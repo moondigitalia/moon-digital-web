@@ -254,6 +254,13 @@ html:not(.ancho) .agenda>.fila:only-child{border-radius:20px}
 .etapas.sin-d .et-d{display:none}
 .lista.desliza>*{flex:none}
 .lista.desliza{display:flex;flex-direction:column;gap:var(--hueco,9px);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;align-content:start;border-radius:20px}
+.boton svg{width:18px;height:18px;flex:none}.boton:has(svg){display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.bajo .campo-foto{padding:6px 10px}.bajo .cf-vista{width:40px;height:40px}
+.campo-foto{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:20px;background:var(--campo);cursor:pointer}
+.cf-vista{width:56px;height:56px;border-radius:50%;flex:none;display:grid;place-items:center;overflow:hidden;background:var(--tarjeta);color:var(--suave);box-shadow:var(--sombra-chica)}
+.cf-vista img{width:100%;height:100%;object-fit:contain;background:#fff}.cf-vista svg{width:22px;height:22px}
+.campo-foto b{display:block;font-size:14.5px;font-weight:800;overflow-wrap:anywhere}.campo-foto small{display:block;font-size:12px;font-weight:600;color:var(--suave)}
+.et-campo{display:grid;gap:5px;font-size:12px;font-weight:800;color:var(--suave);letter-spacing:.04em}
 .casa-filas{display:grid;gap:8px}
 .casa-ic{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(150deg,#22306a,#141a3c);color:#fff;flex:none}.casa-ic svg{width:18px;height:18px}
 .ancho .casa{grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);grid-template-rows:auto minmax(0,1fr)!important}
@@ -345,6 +352,7 @@ html:not(.ancho) .agenda>.fila:only-child{border-radius:20px}
 <body>
 <div id="marco"><div class="app" id="app"></div></div>
 
+<script src="/centro/visor-archivo.js" defer></script>
 <script>
 'use strict';
 const API = '/api/centro';
@@ -380,6 +388,8 @@ const I = {
   wa: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21l1.7-5A8.5 8.5 0 1 1 8 19.4L3 21"/></svg>',
   ojo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>',
   ojoNo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18M10.6 5.1A10.7 10.7 0 0 1 12 5c6.5 0 10 7 10 7a17 17 0 0 1-3.2 4.2M6.6 6.6C3.7 8.4 2 12 2 12s3.5 7 10 7c1.9 0 3.6-.6 5-1.5"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>',
+  subir: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4M7 9l5-5 5 5"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>',
+  lapiz: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13 7l4 4"/></svg>',
   enviar: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 8l5-5 5 5"/><path d="M5 13v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/></svg>',
   lupa: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>',
 };
@@ -565,7 +575,7 @@ function pantallaClave(u) {
     <form id="f" style="display:grid;gap:12px;width:100%">${campoClave('clave', 'Tu contraseña', 'current-password')}
     <button class="boton">Entrar</button><div class="aviso" id="aviso"></div></form><button class="enlace" id="olvide">Olvidé mi contraseña</button>`);
   const f = document.getElementById('f'), av = document.getElementById('aviso');
-  setTimeout(() => document.getElementById('clave').focus(), 300);
+  setTimeout(() => { const x = document.getElementById('clave'); if (x) x.focus(); }, 300);
   document.getElementById('olvide').onclick = () => pantallaCodigo(u);
   f.onsubmit = async e => {
     e.preventDefault(); const b = f.querySelector('button'); b.disabled = true; av.textContent = '';
@@ -677,7 +687,7 @@ function pinta(silencioso) {
   alCambiarTamano = null;
   const c = pila[pila.length - 1];
   if (!c) return pintaInicio(silencioso);
-  ({ tareas: capaTareas, tarea: capaTarea, nuevaTarea: capaNuevaTarea, crm: capaCRM, crmLista: capaCRMLista, ficha: capaFicha, nuevoCliente: capaNuevoCliente, proyectos: capaProyectos, proyecto: capaProyecto, nuevoProyecto: capaProyecto, equipo: capaEquipo, moon: capaMoon, lector: capaLector, clientes: capaClientes, cliente: capaCliente, seccion: capaSeccion, documento: capaDocumento, casa: capaCasa, nota: capaNota, editarProyecto: capaProyecto, cuenta: capaCuenta, frase: capaFrase, foto: capaFoto })[c.tipo](c, silencioso);
+  ({ tareas: capaTareas, tarea: capaTarea, nuevaTarea: capaNuevaTarea, crm: capaCRM, crmLista: capaCRMLista, editarContacto: capaEditarContacto, subir: capaSubir, ficha: capaFicha, nuevoCliente: capaNuevoCliente, proyectos: capaProyectos, proyecto: capaProyecto, nuevoProyecto: capaProyecto, equipo: capaEquipo, moon: capaMoon, lector: capaLector, clientes: capaClientes, cliente: capaCliente, seccion: capaSeccion, documento: capaDocumento, casa: capaCasa, nota: capaNota, editarProyecto: capaProyecto, cuenta: capaCuenta, frase: capaFrase, foto: capaFoto })[c.tipo](c, silencioso);
 }
 function marco(titulo, accion, cuerpo, icono) {
   app.innerHTML = `<div class="top"><button class="redondo" id="volver" aria-label="Regresar">${I.atras}</button><div class="cabeza" style="flex:1;min-width:0"><h2>${esc(titulo)}</h2>${accion ? `<button class="redondo accion" id="accion" aria-label="${esc(accion)}" title="${esc(accion)}">${icono || I.mas}</button>` : ''}</div></div><div class="vista" style="grid-template-rows:minmax(0,1fr)">${cuerpo}</div>`;
@@ -898,7 +908,7 @@ async function capaFicha(c, sil) {
   } else if (c.tab === 'datos') {
     const util = v => v !== '' && v != null && !/^otros?$/i.test(String(v).trim());
     const filas = [['Nombre', P.nombre], ['Negocio', P.negocio], ['Giro', P.giro], ['Teléfono', P.telefono || 'Aún no lo tenemos'], ['Correo', P.correo || 'Aún no lo tenemos'], ['Servicio', P.servicio], ['Llegó por', P.origen], ['Necesita', P.necesidad], ['Volumen', P.volumen], ['Urgencia', P.urgencia], ['Decide', P.decide], deJason ? ['Nos llamó', cuando(P.creado)] : null].filter(x => x && util(x[1]));
-    cuerpo = `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr) auto"><div class="lista"></div><div class="pie"></div></div>`;
+    cuerpo = `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr) auto auto"><div class="lista"></div><div class="pie"></div><button class="boton dos" id="editarContacto">${I.lapiz} Editar contacto, foto o logo</button></div>`;
     c._items = filas;
   } else if (c.tab === 'proyectos') {
     cuerpo = `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr) auto auto"><div class="lista"></div><div class="pie"></div><button class="boton dos" id="np">Nuevo proyecto para este cliente</button></div>`;
@@ -920,6 +930,7 @@ async function capaFicha(c, sil) {
     if (nota && hoja.scrollHeight > hoja.clientHeight + 1) { nota.outerHTML = '<button class="boton dos" id="leerNota" style="height:44px;width:100%">Leer la nota completa</button>'; document.getElementById('leerNota').onclick = () => abrir({ tipo: 'lector', titulo: 'Nota de ' + nombreDe(P), texto: P.notas_equipo }); }
     document.getElementById('prueba').onchange = async e => { await guarda({ es_prueba: e.target.checked }); recargar(); };
   } else if (c.tab === 'datos') {
+    document.getElementById('editarContacto').onclick = () => abrir({ tipo: 'editarContacto', tel: c.tel });
     alCambiarTamano = paginar(app.querySelector('.vista .cuerpo .cuerpo'), c._items, ([k, v]) => `<div class="fila" style="grid-template-columns:110px minmax(0,1fr)"><span class="eti" style="letter-spacing:.12em">${esc(k)}</span><span class="q"><b style="font-weight:600">${esc(v)}</b></span></div>`, { pagina: c.p, alto: 58, hueco: 7 });
   } else if (c.tab === 'proyectos') {
     document.getElementById('np').onclick = () => abrir({ tipo: 'nuevoProyecto', tel: c.tel });
@@ -928,6 +939,28 @@ async function capaFicha(c, sil) {
     const h = (ext.contactos || []).map(x => ({ x }));
     alCambiarTamano = paginar(app.querySelector('.vista .cuerpo .cuerpo'), h, ({ x }) => `<div class="fila"><span class="estado" style="--c:var(--cobalto);--cf:var(--azulf)">${esc(x.tipo)}</span><span class="q"><b style="font-weight:600">${esc(x.resumen || 'Sin resumen')}</b><span>${esc(x.canal)} · ${cuando(x.fecha)}</span></span><span></span></div>`, { pagina: c.p, vacio: c.ext ? '<b>Sin llamadas todavía</b>Aquí aparece cada vez que nos llame o nos escriba.' : 'Cargando…' });
   }
+}
+function capaEditarContacto(c) {
+  const p = personaDe(c.tel); if (!p) return cerrar();
+  const pan = (D.paneles || []).find(x => x.tel === c.tel);
+  marco('Contacto de ' + nombreDe(p), '', `<form class="hoja editando" id="f" style="align-self:start">
+    ${campoFoto(p.foto || '')}
+    <label class="et-campo">Negocio<input class="campo" name="negocio" value="${esc(p.negocio || '')}" maxlength="120"></label>
+    <label class="et-campo">Nombre de la persona<input class="campo" name="nombre" value="${esc(p.nombre || '')}" maxlength="80"></label>
+    <label class="et-campo">Teléfono<input class="campo" name="telefono" value="${esc(p.telefono || '')}" inputmode="tel" maxlength="30"></label>
+    <label class="et-campo">Correo<input class="campo" name="correo" value="${esc(p.correo || '')}" inputmode="email" maxlength="120"></label>
+    <button class="boton">Guardar</button><div class="aviso" id="aviso"></div></form>`);
+  let foto; activarFoto(d => { foto = d; });
+  const f = document.getElementById('f');
+  f.onsubmit = async e => {
+    e.preventDefault(); const fd = new FormData(f);
+    const datos = { negocio: fd.get('negocio'), nombre: fd.get('nombre'), telefono: fd.get('telefono'), correo: fd.get('correo') };
+    if (!datos.negocio && !datos.nombre) { document.getElementById('aviso').textContent = 'Escribe al menos el negocio o el nombre.'; return; }
+    if (foto !== undefined) datos.foto = foto;
+    const r = await api('editar_persona', Object.assign({ tel: c.tel }, datos));
+    if (!r.ok) { document.getElementById('aviso').textContent = r.error === 'foto' ? 'Esa foto no se pudo guardar. Prueba con otra.' : 'No se pudo guardar.'; return; }
+    Object.assign(p, datos); delete FICHAS[c.tel]; await recargar(); cerrar();
+  };
 }
 function capaNota(c) {
   const p = personaDe(c.tel); if (!p) return cerrar();
@@ -941,19 +974,40 @@ function capaNuevoCliente(c) {
     <input class="campo" name="negocio" placeholder="Negocio (ej. Grupo Beta)" maxlength="120">
     <input class="campo" name="nombre" placeholder="Nombre de la persona" maxlength="80">
     <input class="campo" name="telefono" placeholder="Teléfono (opcional)" inputmode="tel" maxlength="30">
-    <div><div class="eti" style="margin-bottom:8px">Encargados</div><div class="quien" id="enc">${Object.keys(GENTE).map(id => `<button type="button" data-u="${id}" class="${id === yo() ? 'on' : ''}">${ava(id)}${GENTE[id].n}</button>`).join('')}</div></div>
+    <input class="campo" name="correo" placeholder="Correo (opcional)" inputmode="email" maxlength="120">
+    ${campoFoto('')}
     <div class="pils" style="align-content:start">${Object.keys(ETAPA).filter(e => e !== 'archivo').map(e => `<button type="button" class="pil${(c.etapa || 'pendiente') === e ? ' on' : ''}" data-e="${e}" style="--c:${ETAPA[e].c};--cf:${ETAPA[e].cf}"><i>${ETAPA[e].ic}</i>${ETAPA[e].n}</button>`).join('')}</div>
     <button class="boton">Agregar al CRM</button><div class="aviso" id="aviso"></div></form>`);
   let etapa = c.etapa || 'pendiente';
   app.querySelectorAll('[data-e]').forEach(b => b.onclick = () => { etapa = b.dataset.e; app.querySelectorAll('[data-e]').forEach(x => x.classList.toggle('on', x === b)); });
-  app.querySelectorAll('#enc button').forEach(b => b.onclick = () => b.classList.toggle('on'));
+  let foto = ''; activarFoto(d => { foto = d; });
   const f = document.getElementById('f');
   f.onsubmit = async e => {
     e.preventDefault(); const fd = new FormData(f);
     if (!fd.get('negocio') && !fd.get('nombre')) { document.getElementById('aviso').textContent = 'Escribe al menos el negocio o el nombre.'; return; }
-    const encargados = [...app.querySelectorAll('#enc button.on')].map(b => b.dataset.u).join(',');
-    const r = await api('nuevo_cliente', { negocio: fd.get('negocio'), nombre: fd.get('nombre'), telefono: fd.get('telefono'), etapa, encargados });
+    const r = await api('nuevo_cliente', { negocio: fd.get('negocio'), nombre: fd.get('nombre'), telefono: fd.get('telefono'), correo: fd.get('correo'), foto, etapa, encargados: 'daniel,dan,kid' });
     if (r.ok) { await recargar(); reemplazar({ tipo: 'ficha', tel: r.tel }); } else document.getElementById('aviso').textContent = 'No se pudo guardar.';
+  };
+}
+
+// Foto o logo: se ve completa (sin recortar) sobre blanco, de 200×200, ya ligera.
+function campoFoto(actual) {
+  return `<label class="campo-foto"><span class="cf-vista" id="fotoVista">${actual ? `<img src="${esc(actual)}" alt="">` : I.subir}</span><span><b>${actual ? 'Cambiar foto o logo' : 'Agregar foto o logo'}</b><small>Opcional · se ve en el CRM y en su panel</small></span><input type="file" accept="image/*" id="fotoArchivo" hidden></label>`;
+}
+function activarFoto(alListo) {
+  const inp = document.getElementById('fotoArchivo'); if (!inp) return;
+  inp.onchange = () => {
+    const f = inp.files && inp.files[0]; if (!f) return;
+    const img = new Image(), url = URL.createObjectURL(f);
+    img.onload = () => {
+      const L = 200, cv = document.createElement('canvas'); cv.width = cv.height = L; const x = cv.getContext('2d');
+      x.fillStyle = '#fff'; x.fillRect(0, 0, L, L);
+      const k = Math.min(L / img.width, L / img.height), w = img.width * k, h = img.height * k; x.drawImage(img, (L - w) / 2, (L - h) / 2, w, h);
+      const dato = cv.toDataURL('image/jpeg', .85); URL.revokeObjectURL(url);
+      document.getElementById('fotoVista').innerHTML = `<img src="${dato}" alt="">`; alListo(dato);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); avisoFlotante('Esa imagen no se pudo abrir. Prueba con otra.'); };
+    img.src = url;
   };
 }
 
@@ -1082,6 +1136,7 @@ function panelesCliente() { return (D.paneles || []).filter(p => p.tel !== 'moon
 const docsDe = (tel, sec) => (D.documentos || []).filter(d => d.tel === tel && (!sec || d.seccion === sec));
 const dominio = u => { try { return new URL(u).host.replace(/^www\./, ''); } catch (e) { return u; } };
 function icono(p, per, tam) {
+  if (per && per.foto && !p.__sinFoto) p = Object.assign({}, p, { icono: per.foto });
   const ini = esc(nombreCorto(per).slice(0, 1)), imgs = String(p.icono || '').split('|').filter(Boolean);
   const med = tam ? `width:${tam}px;height:${tam}px;font-size:${Math.round(tam * .42)}px` : '';
   if (imgs.length > 1) return `<span class="icono duo" style="--c:${p.color};${med}">${imgs.map(u => `<img src="${esc(u)}" alt="" onerror="this.remove()">`).join('')}</span>`;
@@ -1127,7 +1182,7 @@ function capaClientes(c) {
 function rectangulos(tel, secciones) {
   return `<div class="rects">${secciones.map(([k, n, vacio]) => {
     const ds = docsDe(tel, k);
-    const frase = !ds.length ? vacio : ds.length === 1 ? (ds[0].frase || ds[0].titulo) : ds.map(d => d.titulo).join(' · ');
+    const frase = !ds.length ? vacio : ds.length === 1 ? (ds[0].frase || ds[0].titulo) : ds.length === 2 ? ds.map(d => d.titulo).join(' · ') : `${ds.length} archivos · el más nuevo: ${ds[ds.length - 1].titulo}`;
     return `<button class="rect${ds.length ? '' : ' sin'}" data-s="${k}"${ds.length ? '' : ' aria-disabled="true"'}><b>${n}${ds.length > 1 ? ` (${ds.length})` : ''}</b><span>${esc(frase)}</span></button>`;
   }).join('')}</div>`;
 }
@@ -1149,11 +1204,44 @@ function capaCliente(c) {
         <div class="demo-botones"><button class="boton demo-boton" id="demo">Abrir demo ${I.abre}</button><button class="redondo demo-enviar" id="demoEnviar" aria-label="Enviar el demo" title="Enviar el demo">${I.enviar}</button></div></div>
       ${rectangulos(c.tel, SECCIONES)}</div>`;
   else if (c.tab === 'proyectos') cuerpo = `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr) auto"><div class="lista"></div><div class="pie"></div></div>`;
-  marco(nombreCorto(per), '', `<div class="cuerpo" style="grid-template-rows:auto minmax(0,1fr)"><div class="tabs"><button data-tab="cliente" class="${c.tab === 'cliente' ? 'on' : ''}">Panel</button><button data-tab="proyectos" class="${c.tab === 'proyectos' ? 'on' : ''}">Proyectos</button><button data-tab="ficha">Ficha</button></div>${cuerpo || ''}</div>`);
+  marco(nombreCorto(per), c.tab === 'cliente' ? 'Subir archivo' : '', `<div class="cuerpo" style="grid-template-rows:auto minmax(0,1fr)"><div class="tabs"><button data-tab="cliente" class="${c.tab === 'cliente' ? 'on' : ''}">Panel</button><button data-tab="proyectos" class="${c.tab === 'proyectos' ? 'on' : ''}">Proyectos</button><button data-tab="ficha">Ficha</button></div>${cuerpo || ''}</div>`);
   app.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => { if (b.dataset.tab === 'ficha') return abrir({ tipo: 'ficha', tel: c.tel, desdeCliente: true }); c.tab = b.dataset.tab; c.p = 0; transicion(() => pinta(true)); });
   traerFicha(c.tel);
-  if (c.tab === 'cliente') { document.getElementById('demo').onclick = () => window.open(p.demo, '_blank', 'noopener'); document.getElementById('demoEnviar').onclick = () => compartir('Demo · ' + nombreCorto(per), p.demo); activarRects(c.tel, SECCIONES); }
+  if (c.tab === 'cliente') { const ac = document.getElementById('accion'); ac.innerHTML = I.subir; ac.onclick = () => abrir({ tipo: 'subir', tel: c.tel }); document.getElementById('demo').onclick = () => window.open(p.demo, '_blank', 'noopener'); document.getElementById('demoEnviar').onclick = () => compartir('Demo · ' + nombreCorto(per), p.demo); activarRects(c.tel, SECCIONES); }
   if (c.tab === 'proyectos') alCambiarTamano = paginar(app.querySelector('.vista .cuerpo .cuerpo'), proys, filaProyecto, { pagina: c.p, vacio: '<b>Sin proyectos</b>', alPintar: l => l.querySelectorAll('[data-y]').forEach(b => b.onclick = () => abrir({ tipo: 'proyecto', id: Number(b.dataset.y) })) });
+}
+function capaSubir(c) {
+  const per = personaDe(c.tel); if (!per) return cerrar();
+  c.sec = c.sec || 'propuesta';
+  marco('Subir a ' + nombreCorto(per), '', `<form class="hoja editando" id="f" style="align-self:start">
+    <div><div class="eti" style="margin-bottom:8px">¿Dónde va?</div><div class="pils">${SECCIONES.map(([k, n]) => `<button type="button" class="pil solo${c.sec === k ? ' on' : ''}" data-sec="${k}">${n}</button>`).join('')}</div></div>
+    <label class="campo-foto"><span class="cf-vista">${I.subir}</span><span><b id="archNombre">Elegir archivo</b><small>PDF, foto o cualquier archivo · hasta 25 MB</small></span><input type="file" id="arch" hidden></label>
+    <label class="et-campo">Nombre que verá el equipo<input class="campo" name="titulo" id="titulo" maxlength="120" placeholder="Ej. Contrato firmado"></label>
+    <button class="boton" id="subirBtn">Subir</button><div class="aviso" id="aviso"></div></form>`);
+  app.querySelectorAll('[data-sec]').forEach(b => b.onclick = () => { c.sec = b.dataset.sec; app.querySelectorAll('[data-sec]').forEach(x => x.classList.toggle('on', x === b)); });
+  const inp = document.getElementById('arch'), tit = document.getElementById('titulo'), aviso = document.getElementById('aviso');
+  inp.onchange = () => { const f = inp.files[0]; if (!f) return; document.getElementById('archNombre').textContent = f.name; if (!tit.value) tit.value = f.name.replace(/\.[^.]+$/, ''); };
+  document.getElementById('f').onsubmit = async e => {
+    e.preventDefault(); const f = inp.files && inp.files[0];
+    if (!f) { aviso.textContent = 'Primero elige el archivo.'; return; }
+    if (f.size > 25e6) { aviso.textContent = 'Ese archivo pesa más de 25 MB. Mándalo más ligero (ej. el PDF comprimido).'; return; }
+    const btn = document.getElementById('subirBtn'); btn.disabled = true; aviso.textContent = 'Preparando…';
+    const ini = await api('subir_inicio', { tel: c.tel, seccion: c.sec, titulo: tit.value, nombre: f.name, mime: f.type, tamano: f.size });
+    if (!ini.ok) { aviso.textContent = 'No se pudo empezar. Revisa tu internet y vuelve a intentar.'; btn.disabled = false; return; }
+    const bytes = new Uint8Array(await f.arrayBuffer());
+    // Va en pedazos; si un pedazo no cabe, se parte a la mitad y se reintenta (funciona con cualquier internet).
+    let pos = 0, n = 0, tam = 600000;
+    while (pos < bytes.length) {
+      const trozo = bytes.subarray(pos, Math.min(bytes.length, pos + tam));
+      let b = ''; for (let i = 0; i < trozo.length; i += 32768) b += String.fromCharCode.apply(null, trozo.subarray(i, i + 32768));
+      const r = await api('subir_parte', { id: ini.id, n, datos: btoa(b) });
+      if (!r.ok) { if (tam > 40000) { tam = Math.floor(tam / 2); continue; } aviso.textContent = 'Se cortó la subida. Revisa tu internet y vuelve a intentar.'; btn.disabled = false; return; }
+      pos += trozo.length; n++; aviso.textContent = `Subiendo… ${Math.round(pos / bytes.length * 100)}%`;
+    }
+    const fin = await api('subir_fin', { id: ini.id, partes: n });
+    if (!fin.ok) { aviso.textContent = 'No se pudo terminar. Vuelve a intentar.'; btn.disabled = false; return; }
+    await recargar(); avisoFlotante('Listo: ya está en ' + (SECCIONES.find(x => x[0] === c.sec) || [, ''])[1] + '.'); cerrar();
+  };
 }
 function capaSeccion(c) {
   const ds = docsDe(c.tel, c.seccion), per = personaDe(c.tel);
@@ -1189,6 +1277,29 @@ function capaDocumento(c) {
         pie.querySelectorAll('[data-pag]').forEach(b => b.onclick = () => ir((c.lamina + Number(b.dataset.pag) + n) % n));
       };
       fr.onload = () => ir(c.lamina);
+    }
+  } else if (d.formato === 'archivo') {
+    const esPdf = /pdf/i.test(d.mime || '') || /\.pdf$/i.test(d.nombre || ''), esImg = /^image\//.test(d.mime || '');
+    marco(d.titulo, enviar, `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr)${esPdf ? ' auto' : ''}"><div class="hoja visor" id="hojaArch" style="background:#dfe2ea"></div>${esPdf ? '<div class="pie"></div>' : ''}</div>`, I.enviar);
+    const hoja = document.getElementById('hojaArch'), pie = app.querySelector('.vista .pie');
+    const mostrar = async () => {
+      if (pila[pila.length - 1] !== c) return;
+      if (esImg) { hoja.innerHTML = `<img src="${c.url}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain">`; return; }
+      if (esPdf) {
+        try {
+          const v = await VisorArchivo.pdf(hoja, c.bytes, (i, n) => { c.hojaPdf = i; pie.innerHTML = n > 1 ? `<button class="redondo" data-pag="-1" aria-label="Anterior">${I.izq}</button><span class="pag">${i} de ${n}</span><button class="redondo" data-pag="1" aria-label="Siguiente">${I.der}</button>` : ''; pie.querySelectorAll('[data-pag]').forEach(b => b.onclick = () => v.ver(i + Number(b.dataset.pag))); });
+          if (c.hojaPdf > 1) v.ver(c.hojaPdf); alCambiarTamano = () => v.redibuja();
+        } catch (e) { hoja.innerHTML = '<div class="vacio"><div><b>No se pudo mostrar el PDF</b>Revisa tu internet y vuelve a abrirlo.</div></div>'; }
+        return;
+      }
+      hoja.innerHTML = `<div class="vacio"><div><b>${esc(d.nombre || d.titulo)}</b>Este tipo de archivo no se puede ver aquí.<br><a class="boton" style="margin-top:12px;display:inline-flex" href="${c.url}" download="${esc(d.nombre || 'archivo')}">Descargar</a></div></div>`;
+    };
+    if (c.bytes) mostrar();
+    else {
+      hoja.innerHTML = '<div class="vacio"><div><b id="bajando">Abriendo…</b></div></div>';
+      VisorArchivo.bajar(d.partes, n => api('archivo_parte', { id: d.id, n }).then(r => r.ok ? r.datos : Promise.reject()), (k, n) => { const b = document.getElementById('bajando'); if (b && n > 1) b.textContent = `Abriendo… ${Math.round(k / n * 100)}%`; })
+        .then(bytes => { c.bytes = bytes; c.url = URL.createObjectURL(new Blob([bytes], { type: d.mime || 'application/octet-stream' })); mostrar(); })
+        .catch(() => { if (pila[pila.length - 1] === c) hoja.innerHTML = '<div class="vacio"><div><b>No se pudo abrir</b>Revisa tu internet y vuelve a intentar.</div></div>'; });
     }
   } else {
     marco(d.titulo, enviar, `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr) auto"><div class="hoja md" id="hojaMd"></div><div class="pie"></div></div>`, I.enviar);
