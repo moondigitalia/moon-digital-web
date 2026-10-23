@@ -305,6 +305,10 @@ html:not(.ancho) .agenda>.fila:only-child{border-radius:20px}
 .ancho .casa-filas .q b{font-size:17px}.ancho .casa-filas .casa-ic{width:46px;height:46px}
 .hoja.visor{position:relative;padding:0!important;overflow:hidden}
 .doc-html{position:absolute;inset:0;width:100%;height:100%;border:0;background:transparent;display:block}
+/* Un marco (página de adentro) no se enseña hasta que ya tiene su contenido: el celular nunca muestra su hoja en blanco
+   mientras carga. Si algo tarda de más, a los 3 s se enseña igual. */
+.doc-html:not(.listo){visibility:hidden;animation:marcoTarde 0s 3s forwards}
+@keyframes marcoTarde{to{visibility:visible}}
 #flotante{position:absolute;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));transform:translate(-50%,8px);opacity:0;pointer-events:none;z-index:60;background:#1d1d22;color:#fff;padding:12px 16px;border-radius:18px;font-weight:700;font-size:14px;line-height:1.35;width:max-content;max-width:min(92%,420px);text-align:center;overflow-wrap:anywhere;transition:opacity .25s var(--ease),transform .25s var(--ease)}
 #flotante.ve{opacity:1;transform:translate(-50%,0)}
 .hoja.md{display:block;overflow:hidden;line-height:1.5;font-weight:500}
@@ -551,11 +555,15 @@ addEventListener('orientationchange', () => setTimeout(alMedir, 250));
 document.addEventListener('gesturestart', e => { if (!e.target.closest || !e.target.closest('.recorte')) e.preventDefault(); });
 document.addEventListener('touchmove', e => { if (e.touches.length > 1 && !e.target.closest('.recorte')) e.preventDefault(); }, { passive: false });
 let fantasmaVivo = null;
-// Cambio de pantalla al instante, sin animación (Kid, 23-oct): la nueva aparece completa en el mismo cuadro en que se va la anterior.
-// Nunca hay dos pantallas encimadas, nada se mueve y nada parece que "está cargando".
+// Cada marco avisa cuando ya cargó (el evento se escucha aquí para todos, también los que se crean después).
+document.addEventListener('load', e => { const t = e.target; if (t && t.classList && t.classList.contains('doc-html')) t.classList.add('listo'); }, true);
+// Cambio de pantalla (Kid, 23-oct): lo nuevo aparece AL INSTANTE, ya en su lugar, y solo se "asienta" con un fundido de 0.15 s,
+// como una luz con regulador. Nada se espera, nada se mueve y nunca hay dos pantallas encimadas.
 function transicion(f) {
   if (fantasmaVivo) { fantasmaVivo.remove(); fantasmaVivo = null; }
   f();
+  app.getAnimations().forEach(a => a.cancel());
+  app.animate([{ opacity: .45 }, { opacity: 1 }], { duration: 150, easing: 'cubic-bezier(.2,.7,.3,1)' });
 }
 
 /* ---------- Entrada ---------- */
@@ -961,7 +969,7 @@ async function capaFicha(c, sil) {
   if (sil) app.querySelector('.vista').style.animation = 'none';
   // Llamar y WhatsApp viven arriba, siempre a la mano, sin ocupar espacio de la ficha.
   if (tel) app.querySelector('.cabeza').insertAdjacentHTML('beforeend', `<a class="redondo accion" href="tel:+52${tel.slice(-10)}" aria-label="Llamar">${I.tel}</a><a class="redondo" style="color:var(--verde)" href="https://wa.me/52${tel.slice(-10)}" target="_blank" rel="noopener" aria-label="WhatsApp">${I.wa}</a>`);
-  app.querySelectorAll('[data-tab]').forEach(b => b.onclick = async () => { c.tab = b.dataset.tab; c.p = 0; await precargar(c); transicion(() => pinta(true)); });
+  app.querySelectorAll('[data-tab]').forEach(b => b.onclick = async () => { c.tab = b.dataset.tab; c.p = 0; await precargar(c); pinta(true); });   // pestañas: al instante, como pasar de hoja
   const guarda = async datos => { const r = await api('editar_persona', Object.assign({ tel: c.tel }, datos)); if (r.ok) { Object.assign(p, datos); if (c.ext && c.ext.persona) Object.assign(c.ext.persona, datos); } return r; };
   if (c.tab === 'estado') {
     app.querySelectorAll('#etapas [data-e]').forEach(b => b.onclick = async () => { await guarda({ etapa: b.dataset.e }); pinta(true); recargar(); });
@@ -1148,7 +1156,7 @@ function capaProyecto(c) {
       <div class="par"><span>Abierto</span><b>${cuando(p.creado)}</b></div>
       <button class="boton dos" id="editar">Editar datos</button></div>`;
   marco(p.nombre, '', `<div class="cuerpo" style="grid-template-rows:auto minmax(0,1fr)"><div class="tabs"><button data-tab="fase" class="${c.tab === 'fase' ? 'on' : ''}">Fase</button><button data-tab="tareas" class="${c.tab === 'tareas' ? 'on' : ''}">Tareas (${abiertas})</button><button data-tab="uso" class="${c.tab === 'uso' ? 'on' : ''}">Uso (${p.uso_mes || 0})</button><button data-tab="datos" class="${c.tab === 'datos' ? 'on' : ''}">Datos</button></div>${cuerpo}</div>`);
-  app.querySelectorAll('[data-tab]').forEach(b => b.onclick = async () => { c.tab = b.dataset.tab; c.p = 0; await precargar(c); transicion(() => pinta(true)); });
+  app.querySelectorAll('[data-tab]').forEach(b => b.onclick = async () => { c.tab = b.dataset.tab; c.p = 0; await precargar(c); pinta(true); });   // pestañas: al instante, como pasar de hoja
   if (c.tab === 'fase') {
     // Varias fases a la vez: cada toque prende o apaga una, al momento; se guarda un instante después (si tocas varias seguidas, se guarda una vez).
     let actual = sel.slice(), guardado = p.fase, espera = null;
@@ -1348,7 +1356,7 @@ function capaCliente(c) {
       ${rectangulos(c.tel, SECCIONES)}</div>`;
   else if (c.tab === 'proyectos') cuerpo = `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr) auto"><div class="lista"></div><div class="pie"></div></div>`;
   marco(nombreCorto(per), c.tab === 'cliente' ? 'Subir archivo' : '', `<div class="cuerpo" style="grid-template-rows:auto minmax(0,1fr)"><div class="tabs"><button data-tab="cliente" class="${c.tab === 'cliente' ? 'on' : ''}">Panel</button><button data-tab="proyectos" class="${c.tab === 'proyectos' ? 'on' : ''}">Proyectos</button><button data-tab="ficha">Ficha</button></div>${cuerpo || ''}</div>`);
-  app.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => { if (b.dataset.tab === 'ficha') return abrir({ tipo: 'ficha', tel: c.tel, desdeCliente: true }); c.tab = b.dataset.tab; c.p = 0; transicion(() => pinta(true)); });
+  app.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => { if (b.dataset.tab === 'ficha') return abrir({ tipo: 'ficha', tel: c.tel, desdeCliente: true }); c.tab = b.dataset.tab; c.p = 0; pinta(true); });
   traerFicha(c.tel);
   // El logo vive en los aros, pero nunca encima del nombre ni de los botones: su tamaño sale del espacio que queda libre.
   const ajustaLogo = () => { const d = app.querySelector('.demo'), l = app.querySelector('.demo-logo'); if (!d || !l) return; l.style.removeProperty('--lg');

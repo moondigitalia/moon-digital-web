@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <meta name="robots" content="noindex, nofollow">
+<!-- Dentro del tablero el fondo es transparente desde el primer instante (antes de que se pinte nada). -->
+<script>if (/[?&]dentro=/.test(location.search)) document.documentElement.classList.add('dentro');</script>
 <title>Armar un demo · MOON Digital</title>
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#f3efe9" media="(prefers-color-scheme: light)">
@@ -94,6 +96,11 @@ input:focus,textarea:focus{outline:2px solid var(--cobalto);outline-offset:1px}
 .fila a{color:var(--cobalto);font-weight:700;text-decoration:none;white-space:nowrap}
 .lista{min-height:0;flex:1 1 auto;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;margin:0 -4px;padding:0 4px}
 .entrar{text-align:center;justify-content:center;gap:14px}
+html.dentro,html.dentro body{background:transparent}
+/* Igual que el tablero: lo nuevo aparece al instante y solo se asienta en 0.15 s. */
+.vista{animation:asienta .15s cubic-bezier(.2,.7,.3,1)}
+@keyframes asienta{from{opacity:.45}to{opacity:1}}
+.tecleando main>.vista{animation:none}
 /* Pestañas de Dan: Armar demo · Tablero */
 .pestanas{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:var(--campo);box-shadow:var(--hundido);border-radius:999px;padding:5px}
 .pestana{height:calc(var(--alto) - 6px);border-radius:999px;font-weight:800;font-size:15px;color:var(--suave);transition:background .25s var(--ease),color .25s var(--ease)}
