@@ -79,7 +79,7 @@ h1{font-size:clamp(28px,8vw,40px);font-weight:800;letter-spacing:-.02em;line-hei
 <script>
 const $ = id => document.getElementById(id);
 const codigo = decodeURIComponent(location.pathname.split('/').filter(Boolean)[1] || '').toLowerCase();
-let demo = null, agente = '', vozId = '', conv = null, estado = 'listo', anim = 0;
+let demo = null, agente = '', vozId = '', conv = null, estado = 'listo', anim = 0, conecto = false;
 
 async function api(accion) {
   const r = await fetch('/api/prueba', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ accion, codigo }) }).catch(() => null);
@@ -116,6 +116,7 @@ function aviso(t) { $('aviso').textContent = t; $('aviso').hidden = !t; }
 
 async function empezar() {
   aviso('');
+  conecto = false;
   pintar('conectando');
   try {
     await navigator.mediaDevices.getUserMedia({ audio: true }).then(s => s.getTracks().forEach(t => t.stop()));
@@ -127,12 +128,13 @@ async function empezar() {
   try {
     conv = await ElevenLabsClient.Conversation.startSession({
       agentId: agente,
-      connectionType: 'webrtc',
+      connectionType: 'websocket', // la voz por websocket sí manda de qué página viene (el candado de origen la deja pasar; por webrtc se rechazaba)
       dynamicVariables: { negocio: demo.negocio, asistente: demo.asistente, giro: demo.giro || '', servicios: demo.servicios || 'No hay lista de servicios todavía.', horario: demo.horario || 'No se indicó.', ubicacion: demo.ubicacion || 'No se indicó.' },
       overrides: { tts: { voiceId: vozId } },
-      onConnect: () => { pintar('escuchando'); api('uso'); },
+      onConnect: () => { conecto = true; pintar('escuchando'); api('uso'); },
       onModeChange: m => { if (estado !== 'termino') pintar(m && m.mode === 'speaking' ? 'hablando' : 'escuchando'); },
-      onDisconnect: () => { conv = null; pintar('termino'); },
+      // Si nunca llegó a conectar, no es "llamada terminada": se dice qué pasó y el botón queda listo para reintentar.
+      onDisconnect: () => { conv = null; if (conecto) pintar('termino'); else { pintar('listo'); aviso('No se pudo conectar con el asistente. Pica el botón para volver a intentar.'); } },
       onError: () => { aviso('Se cortó la conexión. Pica el botón para volver a intentar.'); },
     });
     latir();
