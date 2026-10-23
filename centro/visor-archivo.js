@@ -48,7 +48,7 @@
       await pg.render({ canvasContext: tmp.getContext('2d'), viewport: vp }).promise; if (mio !== turno) return;
       // Se dibuja aparte y se cambia de golpe: nunca se ve una hoja a medias.
       lienzo.width = tmp.width; lienzo.height = tmp.height; lienzo.getContext('2d').drawImage(tmp, 0, 0);
-      ancho0 = v.width * k; alto0 = v.height * k; tamano();
+      ancho0 = Math.floor(v.width * k); alto0 = Math.floor(v.height * k); tamano();
       alCambiar && alCambiar(i, doc.numPages);
     }
     let espera = null;
@@ -71,6 +71,8 @@
     caja.addEventListener('dblclick', e => zoomA(Z > 1 ? 1 : 2.5, e.clientX, e.clientY));
     caja.addEventListener('wheel', e => { if (e.ctrlKey) { e.preventDefault(); zoomA(Z * Math.exp(-e.deltaY / 120), e.clientX, e.clientY); } }, { passive: false });
     await ver(1);
+    // Si el espacio cambió mientras se dibujaba (aparecen las flechas, gira el celular), se vuelve a medir una vez.
+    requestAnimationFrame(() => { if (caja.scrollHeight > caja.clientHeight + 1 || caja.scrollWidth > caja.clientWidth + 1) ver(i, true); });
     return { ver, get hoja() { return i; }, total: doc.numPages, redibuja: () => ver(i, true) };
   }
   window.VisorArchivo = { bajar, pdf, cargarPDFjs };
