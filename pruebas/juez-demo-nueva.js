@@ -34,9 +34,11 @@ const srv = http.createServer((q, r) => {
         const de = document.scrollingElement; if (de.scrollHeight > innerHeight + 1 || de.scrollWidth > innerWidth + 1) out.push('página se mueve ' + de.scrollHeight + '>' + innerHeight);
         document.querySelectorAll('main *, .hoja, .hoja *').forEach(e => {
           const cs = getComputedStyle(e); if (e.offsetParent === null && cs.position !== 'fixed') return; if (e.closest('[hidden]')) return;
-          if (e.scrollHeight > e.clientHeight + 1 && e.tagName !== 'TEXTAREA' && !e.classList.contains('lista') && !['A', 'BUTTON', 'SPAN', 'B', 'SMALL', 'LABEL', 'P', 'H1', 'H2', 'INPUT', 'I'].includes(e.tagName)) out.push('cortado: ' + (e.id || e.className || e.tagName) + ' ' + e.scrollHeight + '>' + e.clientHeight);
+          if (e.scrollHeight > e.clientHeight + 1 && cs.overflow !== 'visible' && e.tagName !== 'TEXTAREA' && !e.classList.contains('lista') && !['A', 'BUTTON', 'SPAN', 'B', 'SMALL', 'LABEL', 'P', 'H1', 'H2', 'INPUT', 'I'].includes(e.tagName)) out.push('cortado: ' + (e.id || e.className || e.tagName) + ' ' + e.scrollHeight + '>' + e.clientHeight);
           const rc = e.getBoundingClientRect(); if (rc.width && !e.closest('.lista') && (rc.bottom > innerHeight + 1 || rc.right > innerWidth + 1)) out.push('se sale: ' + (e.id || e.className || e.tagName));
           // Ninguna palabra partida: un texto de una sola palabra no debe ocupar dos renglones.
+          // Renglón extra: una sola palabra suelta en el último renglón de un título o texto.
+          if (['P', 'H1', 'H2'].includes(e.tagName) && e.children.length === 0) { const n = e.firstChild; if (n && n.nodeType === 3) { const ws = [...n.textContent.matchAll(/\S+/g)]; if (ws.length > 3) { const top = m => { const rg = document.createRange(); rg.setStart(n, m.index); rg.setEnd(n, m.index + m[0].length); const r = rg.getClientRects(); return r.length ? Math.round(r[r.length - 1].top) : 0; }; const a1 = top(ws[ws.length - 1]), a2 = top(ws[ws.length - 2]); if (a1 > a2 + 2) out.push('palabra sola en su renglón: ' + ws[ws.length - 1][0] + ' (' + (e.id || e.className || e.tagName) + ')'); } } }
           for (const n of e.childNodes) if (n.nodeType === 3) for (const m of n.textContent.matchAll(/\S{4,}/g)) { const rg = document.createRange(); rg.setStart(n, m.index); rg.setEnd(n, m.index + m[0].length); const tops = new Set([...rg.getClientRects()].map(x => Math.round(x.top))); if (tops.size > 1) out.push('palabra partida: ' + m[0]); }
         });
         return [...new Set(out)].slice(0, 6);
@@ -59,6 +61,7 @@ const srv = http.createServer((q, r) => {
       if (vuelve) fallas.push(`${nom} teclado ${sel}: no regresa a la vista completa`);
     };
     if (quien === 'abierta') {
+      await revisa('bienvenida'); await p.click('#empezar');
       await revisa('paso1'); await teclado('input[name=whatsapp]');
       await p.fill('input[name=contacto]', 'Laura'); await p.fill('input[name=whatsapp]', '9981234567'); await p.click('#paso1 .boton');
       await revisa('forma-abierta');

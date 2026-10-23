@@ -6,7 +6,15 @@
 <meta name="robots" content="noindex, nofollow">
 <!-- Dentro del tablero el fondo es transparente desde el primer instante (antes de que se pinte nada). -->
 <script>if (/[?&]dentro=/.test(location.search)) document.documentElement.classList.add('dentro');</script>
-<title>Armar un demo · MOON Digital</title>
+<title>Prueba gratis tu recepcionista con IA · MOON Digital</title>
+<meta name="description" content="Un asistente que contesta a tus clientes a cualquier hora: dice tus precios y horarios y toma citas. Arma el tuyo en un minuto y háblale tú mismo.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://moondigitalia.com/prueba/nueva">
+<meta property="og:title" content="Prueba gratis tu recepcionista con inteligencia artificial">
+<meta property="og:description" content="Contesta a tus clientes a cualquier hora. Arma el tuyo en un minuto y háblale tú mismo.">
+<meta property="og:image" content="https://moondigitalia.com/img/recepcionista-compartir.png">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#f3efe9" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#16171b" media="(prefers-color-scheme: dark)">
@@ -49,6 +57,7 @@ main>#tablero{flex:1 1 auto}
 .eti{font-size:11px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--suave)}
 h1{font-size:clamp(22px,6.4vw,30px);font-weight:800;letter-spacing:-.02em;line-height:1.1}
 .nota{color:var(--suave);font-size:15px;line-height:1.35}
+p,h1,h2{text-wrap:pretty}
 .tarjeta{min-height:0;background:var(--tarjeta);border-radius:var(--r);box-shadow:var(--sombra);padding:var(--pad);display:flex;flex-direction:column;gap:var(--hueco);overflow:hidden}
 .campo{display:flex;flex-direction:column;gap:5px;font-weight:700;font-size:14px}
 input,textarea{background:var(--campo);box-shadow:var(--hundido);border-radius:18px;padding:0 16px;height:var(--alto);font-size:16px;width:100%}
@@ -142,6 +151,35 @@ html.dentro,html.dentro body{background:transparent}
 .tecleando #cabeza,.tecleando #pestanas,.tecleando #tira,.tecleando main>.vista:not(:focus-within),
 .tecleando main>.vista>:not(.campo),.tecleando main>.vista>.campo:not(:focus-within){display:none!important}
 .tecleando main{justify-content:flex-start}
+.bienvenida{display:flex;flex-direction:column;align-items:center;text-align:center;gap:clamp(10px,2.2vh,20px)}
+.bv-titulo{font-size:clamp(24px,min(7.2vw,4.4vh),36px);font-weight:800;letter-spacing:-.025em;line-height:1.08;text-wrap:balance}
+.bv-nota{color:var(--suave);font-size:clamp(14.5px,min(4.1vw,2.3vh),17px);line-height:1.4;max-width:420px;text-wrap:balance}
+/* El asistente "hablando": un círculo cobalto con ondas y lo que diría a tus clientes. */
+.bv-escena{display:flex;flex-direction:column;align-items:center;gap:clamp(18px,3vh,26px)}
+.orbe{position:relative;width:clamp(64px,min(24vw,13vh),112px);aspect-ratio:1;display:grid;place-items:center}
+.orbe i{position:absolute;inset:0;border-radius:50%;background:var(--cobalto);opacity:.14;animation:onda 2.6s cubic-bezier(.3,.6,.4,1) infinite}
+.orbe i:nth-child(2){animation-delay:1.3s}
+@keyframes onda{from{transform:scale(1);opacity:.22}to{transform:scale(1.55);opacity:0}}
+@media (prefers-reduced-motion:reduce){.orbe i{animation-duration:2.6s}}
+.orbe b{position:relative;width:100%;height:100%;border-radius:50%;background:var(--cobalto);color:#fff;display:grid;place-items:center;box-shadow:0 18px 34px -14px rgba(11,79,214,.6)}
+.orbe svg{width:40%;height:auto}
+.globo{background:var(--tarjeta);box-shadow:var(--sombra);border-radius:22px 22px 22px 8px;padding:10px 16px;font-size:clamp(14px,min(3.9vw,2.2vh),16px);font-weight:600;line-height:1.35;max-width:340px;text-align:start}
+.globo small{display:block;font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--cobalto);margin-bottom:2px}
+/* Los 3 pasos: círculos numerados */
+.pasos3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;width:100%;max-width:440px}
+.p3{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0}
+.p3 i{font-style:normal;width:clamp(34px,min(10vw,5.4vh),44px);aspect-ratio:1;border-radius:50%;display:grid;place-items:center;background:var(--campo);box-shadow:var(--hundido);font-weight:800;font-size:16px;color:var(--cobalto)}
+.p3 span{font-size:13px;font-weight:700;line-height:1.2;color:var(--tinta)}
+.p3 small{display:block;font-size:12px;font-weight:600;color:var(--tenue)}
+.bv-cta{width:100%;max-width:440px;display:flex;flex-direction:column;gap:8px}
+.bv-cta small{font-size:13px;font-weight:600;color:var(--tenue)}
+/* Avance de la puerta abierta: tres puntos */
+.puntos{display:flex;gap:6px;align-items:center}
+.puntos i{width:8px;height:8px;border-radius:999px;background:var(--campo);box-shadow:var(--hundido);transition:width .25s var(--ease),background .25s var(--ease)}
+.puntos i.ya{background:var(--cobalto);box-shadow:none}
+.puntos i.aqui{width:22px;background:var(--cobalto);box-shadow:none}
+#cabNota{color:var(--suave);font-size:15px;line-height:1.35}
+@media (max-height:620px){#cabNota{font-size:14px}.p3 small{display:none}}
 </style>
 </head>
 <body>
@@ -149,6 +187,8 @@ html.dentro,html.dentro body{background:transparent}
   <header id="cabeza" style="display:flex;flex-direction:column;gap:6px">
     <span class="eti" id="cabEti">MOON Digital</span>
     <h1 id="cabTitulo">Crea tu recepcionista</h1>
+    <p id="cabNota" hidden></p>
+    <div class="puntos" id="puntos" hidden aria-hidden="true"><i></i><i></i><i></i></div>
   </header>
 
   <div class="pestanas" id="pestanas" role="tablist" hidden>
@@ -159,9 +199,28 @@ html.dentro,html.dentro body{background:transparent}
   <!-- El link de la puerta abierta, siempre a la mano de Dan -->
   <button class="tira" id="tira" hidden type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3M7 8l5-5 5 5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg><span id="compartir">Compartir link para clientes</span></button>
 
+  <!-- Puerta abierta: bienvenida. Quien llega de un anuncio entiende en segundos qué es y qué sigue. -->
+  <section class="bienvenida vista" id="bienvenida" hidden>
+    <span class="eti">MOON Digital</span>
+    <div class="bv-escena">
+      <div class="orbe" aria-hidden="true"><i></i><i></i><b><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></b></div>
+      <p class="globo"><small>Así contesta</small>"Hola, gracias por llamar a Pastelería Luna. Soy Sofía, ¿en qué te ayudo?"</p>
+    </div>
+    <h1 class="bv-titulo">Un asistente que atiende a tus clientes por ti</h1>
+    <p class="bv-nota">Contesta a cualquier hora, dice tus precios y toma citas. Pruébalo gratis con tu negocio.</p>
+    <div class="pasos3">
+      <div class="p3"><i>1</i><span>Tus datos</span></div>
+      <div class="p3"><i>2</i><span>Tu negocio</span></div>
+      <div class="p3"><i>3</i><span>Háblale</span></div>
+    </div>
+    <div class="bv-cta">
+      <button class="boton" id="empezar" type="button">Probarlo gratis</button>
+      <small>Toma 1 minuto · No se descarga nada</small>
+    </div>
+  </section>
+
   <!-- Puerta abierta, paso 1: quién eres -->
   <form class="tarjeta vista" id="paso1" hidden autocomplete="on">
-    <p class="nota">En un minuto armas al asistente que contestaría a tus clientes, y le hablas tú mismo para ver cómo atiende.</p>
     <label class="campo">Tu nombre
       <input name="contacto" required maxlength="80" autocomplete="name" placeholder="Ej. Laura">
     </label>
@@ -181,8 +240,8 @@ html.dentro,html.dentro body{background:transparent}
       <input name="giro" required maxlength="200" placeholder="Ej. Clínica dental en Cancún">
     </label>
     <div class="pastillas">
-      <button type="button" class="pastilla" id="pServicios"><b>Servicios y precios</b><span>Opcional</span></button>
-      <button type="button" class="pastilla" id="pHorario"><b>Horario y dirección</b><span>Opcional</span></button>
+      <button type="button" class="pastilla" id="pServicios"><b>Precios</b><span>Opcional</span></button>
+      <button type="button" class="pastilla" id="pHorario"><b>Horario</b><span>Opcional</span></button>
     </div>
     <div class="campo">Voz y nombre del asistente
       <div class="voz-fila">
@@ -247,7 +306,15 @@ async function api(accion, datos) {
 }
 
 function mostrar(id) {
-  ['paso1', 'forma', 'resultado', 'tablero'].forEach(x => $(x).hidden = x !== id);
+  ['bienvenida', 'paso1', 'forma', 'resultado', 'tablero'].forEach(x => $(x).hidden = x !== id);
+  if (modo === 'abierta') {
+    const PASO = { paso1: [1, '¿Con quién tengo el gusto?', 'Para mandarte tu asistente si te gusta.'], forma: [2, 'Cuéntanos de tu negocio', 'Así sabrá qué contestar a tus clientes.'] }[id];
+    $('cabeza').hidden = !PASO;
+    if (PASO) {
+      $('cabTitulo').textContent = PASO[1]; $('cabNota').textContent = PASO[2]; $('cabNota').hidden = false; $('puntos').hidden = false;
+      [...$('puntos').children].forEach((p, i) => { p.className = i + 1 < PASO[0] ? 'ya' : i + 1 === PASO[0] ? 'aqui' : ''; });
+    }
+  }
   $('tira').hidden = modo !== 'dan' || id === 'tablero' || id === 'paso1';
   document.querySelectorAll('.pestana').forEach(b => b.setAttribute('aria-selected', b.dataset.v === (id === 'tablero' ? 'tablero' : 'forma')));
   clearInterval(reloj);
@@ -478,11 +545,12 @@ function entrarAbierta() {
   $('pestanas').hidden = true; $('cabeza').hidden = false;
   $('cabEti').textContent = 'MOON Digital';
   $('cabTitulo').textContent = 'Prueba tu propio recepcionista';
+  $('empezar').onclick = () => { mostrar('paso1'); };
   $('lNegocio').textContent = 'Nombre de tu negocio';
   $('lGiro').textContent = '¿A qué se dedica tu negocio?';
   $('crear').textContent = 'Crear mi demo y hablarle';
-  document.title = 'Prueba tu propio recepcionista · MOON Digital';
-  mostrar('paso1');
+  document.title = 'Prueba gratis tu recepcionista con IA · MOON Digital';
+  mostrar('bienvenida');
 }
 // Con sesión del tablero se enseña al instante la vista de Dan (no se espera a nadie); la sesión se confirma por detrás
 // y solo si ya no sirve se pasa a la puerta abierta.

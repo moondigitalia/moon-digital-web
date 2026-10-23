@@ -136,6 +136,7 @@ function pintar(nuevo) {
   $('pista').hidden = estado === 'termino' && !!opElegida;
   $('pista').textContent = estado === 'termino'
     ? (opElegida ? '' : `¿Qué te pareció cómo atendió ${demo.asistente}?`)
+    : estado === 'listo' ? 'Pica el botón y, si tu celular pregunta, permite el micrófono. Luego háblale como cliente: pregunta precios, horarios o pide una cita.'
     : 'Háblale como si fueras un cliente: pregunta precios u horarios, o pide una cita.';
 }
 
