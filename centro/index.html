@@ -208,7 +208,7 @@ textarea.campo{height:auto;border-radius:22px;padding:14px 18px;resize:none}
 .rect:active{transform:scale(.98)}
 .rect b{font-size:15px;font-weight:800}
 .rect span{font-size:12.5px;font-weight:600;color:var(--suave);line-height:1.3}
-.rect.sin{background:transparent;box-shadow:inset 0 0 0 1.5px var(--linea);cursor:default}
+.rect.sin{background:transparent;box-shadow:inset 0 0 0 1.5px var(--linea)}
 .rect.sin b{color:var(--suave)}.rect.sin span{color:var(--tenue)}
 .flecha-f{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--fondo);box-shadow:var(--hundido)}.flecha-f svg{width:14px;height:14px}
 .fila.chica{min-height:52px;padding-top:8px!important;padding-bottom:8px!important;gap:11px;border-radius:18px}
@@ -236,6 +236,7 @@ html:not(.ancho) .agenda>.fila:only-child{border-radius:20px}
 .j-mas{position:relative;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 .j-mas button{border-radius:99px;background:rgba(255,255,255,.13);color:#fff;font-weight:800;font-size:13.5px;padding:11px 6px;transition:transform .25s var(--ease)}
 .j-mas button:active{transform:scale(.96)}.j-mas button:disabled{opacity:.4}
+.etapas[hidden],#resultados[hidden]{display:none!important}
 .etapas{min-height:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:minmax(0,1fr);gap:10px}
 .ancho .etapas{grid-template-columns:repeat(4,minmax(0,1fr))}
 .etapa{min-height:0;overflow:hidden;border-radius:22px;background:var(--tarjeta);box-shadow:var(--sombra-chica);padding:12px 14px;text-align:start;display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:4px;position:relative;transition:transform .25s var(--ease)}
@@ -261,6 +262,7 @@ html:not(.ancho) .agenda>.fila:only-child{border-radius:20px}
 .cf-vista img{width:100%;height:100%;object-fit:contain;background:#fff}.cf-vista svg{width:22px;height:22px}
 .campo-foto b{display:block;font-size:14.5px;font-weight:800;overflow-wrap:anywhere}.campo-foto small{display:block;font-size:12px;font-weight:600;color:var(--suave)}
 .et-campo{display:grid;gap:5px;font-size:12px;font-weight:800;color:var(--suave);letter-spacing:.04em}
+.doc-ic{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:var(--azulf);color:var(--cobalto);flex:none}.doc-ic svg{width:18px;height:18px}
 .casa-filas{display:grid;gap:8px}
 .casa-ic{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(150deg,#22306a,#141a3c);color:#fff;flex:none}.casa-ic svg{width:18px;height:18px}
 .ancho .casa{grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);grid-template-rows:auto minmax(0,1fr)!important}
@@ -498,6 +500,7 @@ function letra() { return Math.min(letraElegida(), letraMax()); }
 let altoMax = 0, anchoAntes = 0;
 function medir() {
   const vv = window.visualViewport;
+  if (vv && vv.scale > 1.01) return;   // con zoom del celular: se congela el acomodo hasta regresar a tamaño normal
   const W0 = vv ? vv.width : innerWidth, H0 = vv ? vv.height : innerHeight, top = vv ? vv.offsetTop : 0;
   if (Math.abs(W0 - anchoAntes) > 40) { altoMax = 0; anchoAntes = W0; }   // giró el celular
   altoMax = Math.max(altoMax, H0);
@@ -844,11 +847,25 @@ function capaCRM(c) {
   const nombres = lista => lista.map(p => `<span class="et-fila">${cara(p)}<span>${esc(nombreDe(p))}</span></span>`).join('');
   marco('CRM de MOON', 'Nuevo cliente', `<div class="cuerpo" style="grid-template-rows:auto minmax(0,1fr)">
     <label class="buscador">${I.lupa}<input id="busca" placeholder="Buscar cliente, teléfono o nota" enterkeyhint="search"></label>
+    <div class="lista agenda desliza" id="resultados" hidden></div>
     <div class="etapas">${grupos.map(k => { const G = grupoDe(k), l = de(k); return `<button class="etapa" data-g="${k}" style="--c:${G.c};--cf:${G.cf}"><span class="et-cab"><b>${G.n}</b><i>${l.length}</i></span><span class="et-d">${esc(G.d)}</span><span class="et-lista">${nombres(l)}</span><em class="et-mas"></em></button>`; }).join('')}</div></div>`);
   app.querySelectorAll('.etapa').forEach(b => b.onclick = () => abrir({ tipo: 'crmLista', g: b.dataset.g }));
   document.getElementById('accion').onclick = () => abrir({ tipo: 'nuevoCliente', etapa: 'pendiente' });
   const busca = document.getElementById('busca');
-  busca.onkeydown = e => { if (e.key === 'Enter' && busca.value.trim()) { busca.blur(); abrir({ tipo: 'crmLista', g: 'todos', busca: busca.value.trim() }); } };
+  // Busca desde la primera letra (nombre, negocio, teléfono, correo o nota) y sin importar acentos ni mayúsculas.
+  const sinAc = x => String(x || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  const res = document.getElementById('resultados'), cartas = app.querySelector('.etapas');
+  const buscar = () => {
+    const q = sinAc(busca.value.trim()); c.busca = busca.value;
+    if (!q) { res.hidden = true; cartas.hidden = false; return; }
+    const digitos = q.replace(/\D/g, '');
+    const hay = base.concat(pruebas).filter(p => sinAc([p.nombre, p.negocio, p.correo, p.giro, p.necesidad, p.notas_equipo].join(' ')).includes(q) || (digitos.length >= 3 && String(p.telefono || '').replace(/\D/g, '').includes(digitos)));
+    res.innerHTML = hay.length ? hay.map(p => filaPersona(p, true)).join('') : `<div class="vacio"><div><b>Nadie con “${esc(busca.value.trim())}”</b>Prueba con otra parte del nombre.</div></div>`;
+    res.querySelectorAll('[data-p]').forEach(b => { b.onpointerdown = () => traerFicha(b.dataset.p); b.onclick = () => abrir({ tipo: 'ficha', tel: b.dataset.p }); });
+    res.hidden = false; cartas.hidden = true;
+  };
+  busca.oninput = buscar; busca.onkeydown = e => { if (e.key === 'Enter') busca.blur(); };
+  if (c.busca) { busca.value = c.busca; buscar(); }
   // Si una descripción no cabe completa en su tarjeta, se quita en todas (la descripción completa sale al abrirla). Nunca texto cortado.
   const acomoda = () => { const g = app.querySelector('.etapas'); if (!g) return; g.classList.remove('sin-d'); pintaNombres();
     // La última tarjeta se estira para cerrar su fila: nunca queda un hueco.
@@ -1183,13 +1200,12 @@ function rectangulos(tel, secciones) {
   return `<div class="rects">${secciones.map(([k, n, vacio]) => {
     const ds = docsDe(tel, k);
     const frase = !ds.length ? vacio : ds.length === 1 ? (ds[0].frase || ds[0].titulo) : ds.length === 2 ? ds.map(d => d.titulo).join(' · ') : `${ds.length} archivos · el más nuevo: ${ds[ds.length - 1].titulo}`;
-    return `<button class="rect${ds.length ? '' : ' sin'}" data-s="${k}"${ds.length ? '' : ' aria-disabled="true"'}><b>${n}${ds.length > 1 ? ` (${ds.length})` : ''}</b><span>${esc(frase)}</span></button>`;
+    return `<button class="rect${ds.length ? '' : ' sin'}" data-s="${k}"><b>${n}${ds.length > 1 ? ` (${ds.length})` : ''}</b><span>${esc(frase)}</span></button>`;
   }).join('')}</div>`;
 }
 function activarRects(tel, secciones) {
   app.querySelectorAll('.rect[data-s]').forEach(b => b.onclick = () => {
-    const ds = docsDe(tel, b.dataset.s); if (!ds.length) return;
-    if (ds.length === 1) abrirDoc(ds[0]); else abrir({ tipo: 'seccion', tel, seccion: b.dataset.s, nombre: (secciones.find(x => x[0] === b.dataset.s) || [])[1] });
+    abrir({ tipo: 'seccion', tel, seccion: b.dataset.s, nombre: (secciones.find(x => x[0] === b.dataset.s) || [])[1] });
   });
 }
 function capaCliente(c) {
@@ -1245,9 +1261,12 @@ function capaSubir(c) {
 }
 function capaSeccion(c) {
   const ds = docsDe(c.tel, c.seccion), per = personaDe(c.tel);
-  marco(`${c.nombre || 'Documentos'} · ${nombreCorto(per) || 'MOON'}`, '', `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr) auto"><div class="lista dos"></div><div class="pie"></div></div>`);
-  alCambiarTamano = paginar(app.querySelector('.cuerpo'), ds, d => `<button class="fila" data-d="${esc(d.id)}" style="grid-template-columns:minmax(0,1fr) auto"><span class="q"><b>${esc(d.titulo)}</b><span>${esc(d.frase || 'Se abre aquí mismo')}</span></span><span class="flecha-f">${I.der}</span></button>`,
-    { pagina: c.p, alPintar: l => l.querySelectorAll('[data-d]').forEach(b => b.onclick = () => abrirDoc(ds.find(x => x.id === b.dataset.d))) });
+  const cliente = c.tel !== 'moon' && SECCIONES.some(x => x[0] === c.seccion);
+  marco(`${c.nombre || 'Documentos'} · ${nombreCorto(per) || 'MOON'}`, cliente ? 'Subir archivo' : '', `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr) auto"><div class="lista dos"></div><div class="pie"></div></div>`, I.subir);
+  if (cliente) document.getElementById('accion').onclick = () => abrir({ tipo: 'subir', tel: c.tel, sec: c.seccion });
+  const vacio = (SECCIONES.find(x => x[0] === c.seccion) || [, , 'Aún no hay nada aquí'])[2];
+  alCambiarTamano = paginar(app.querySelector('.cuerpo'), ds, d => `<button class="fila" data-d="${esc(d.id)}" style="grid-template-columns:auto minmax(0,1fr) auto"><span class="doc-ic">${d.formato === 'archivo' ? I.subir : I.enviar}</span><span class="q"><b>${esc(d.titulo)}</b><span>${esc(d.frase || (d.formato === 'archivo' ? 'Archivo subido' : 'Se abre aquí mismo'))}</span></span><span class="flecha-f">${I.der}</span></button>`,
+    { pagina: c.p, vacio: `<b>${esc(vacio)}</b>${cliente ? 'Súbelo con el botón de arriba.' : ''}`, alPintar: l => l.querySelectorAll('[data-d]').forEach(b => b.onclick = () => abrirDoc(ds.find(x => x.id === b.dataset.d))) });
 }
 
 /* ---------- Documento guardado: se lee aquí, sin necesitar Claude ---------- */

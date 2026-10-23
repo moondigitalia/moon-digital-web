@@ -2,19 +2,19 @@
 // que de verdad se vea: la hoja/lámina dentro de la pantalla, con contenido (no un recuadro gris o en blanco),
 // y que nada obligue a deslizar a los lados. Uso: node juez-docs.js <carpeta con .html/.md> [llave base64 para api/_docs]
 const { chromium } = require('playwright'); const fs = require('fs'), path = require('path');
-const { preparar, leerCifrado } = require('../../api/_visor');
+const { preparar, leerCifrado, mdAHoja } = require('../../api/_visor');
 const [carpeta, llave] = process.argv.slice(2); if (llave) process.env.CENTRO_LLAVE_DOCS = llave;
 const docs = [];
-if (carpeta) for (const f of fs.readdirSync(carpeta)) if (/\.html$/.test(f)) docs.push([f.replace(/\.html$/, ''), fs.readFileSync(path.join(carpeta, f), 'utf8')]);
+if (carpeta) for (const f of fs.readdirSync(carpeta)) { if (/\.html$/.test(f)) docs.push([f.replace(/\.html$/, ''), fs.readFileSync(path.join(carpeta, f), 'utf8')]); if (/\.md$/.test(f)) docs.push([f.replace(/\.md$/, ''), mdAHoja(fs.readFileSync(path.join(carpeta, f), 'utf8'), f)]); }
 const dir = path.join(__dirname, '../../api/_docs');
-for (const f of fs.readdirSync(dir)) if (/\.bin$/.test(f)) { const r = leerCifrado(f.replace(/\.bin$/, '')); if (r && r.formato === 'html') docs.push([f.replace(/\.bin$/, ''), r.contenido]); else if (!r) docs.push([f, null]); }
+for (const f of fs.readdirSync(dir)) if (/\.bin$/.test(f)) { const r = leerCifrado(f.replace(/\.bin$/, '')); if (r && r.formato === 'md') docs.push([f.replace(/\.bin$/, ''), mdAHoja(r.contenido, f)]); else if (r && r.formato === 'html') docs.push([f.replace(/\.bin$/, ''), r.contenido]); else if (!r) docs.push([f, null]); }
 (async () => {
   const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' }); const fallas = [];
   for (const [id, html] of docs) {
     if (html == null) { fallas.push(id + ': no se pudo abrir'); continue; }
     for (const suelto of [false, true]) for (const [w, h] of [[375, 667], [1280, 800]]) {
       const pr = preparar(html, { suelto });
-      const c = await b.newContext({ viewport: { width: w, height: h } }); await c.route(/^https?:/, r => r.abort());
+      const c = await b.newContext({ viewport: { width: w, height: h } }); await c.route(/^https?:/, r => r.abort()); await c.route(/cdn\.jsdelivr\.net\/npm\/marked@12\.0\.2\/marked\.min\.js/,r=>r.fulfill({path:require('path').join(__dirname,'../../node_modules/marked/marked.min.js'),contentType:'text/javascript'}));
       const p = await c.newPage(); await p.setContent(pr.contenido, { waitUntil: 'load' }); await p.waitForTimeout(500);
       const r = await p.evaluate(() => {
         const o = { sw: document.documentElement.scrollWidth, n: 0 };

@@ -1,9 +1,16 @@
 {
   "functions": {
-    "api/centro.js": { "includeFiles": "api/_docs/**" },
-    "api/ver.js": { "includeFiles": "api/_docs/**" }
+    "api/centro.js": {
+      "includeFiles": "{api/_docs/**,api/_lib/**}"
+    },
+    "api/ver.js": {
+      "includeFiles": "{api/_docs/**,api/_lib/**}"
+    }
   },
   "rewrites": [
-    { "source": "/ver/:codigo", "destination": "/api/ver?t=:codigo" }
+    {
+      "source": "/ver/:codigo",
+      "destination": "/api/ver?t=:codigo"
+    }
   ]
 }

@@ -6,7 +6,7 @@ const { crypto, ETAPAS, TEMPERATURAS, SERVICIOS, ORIGENES, FASES, igual, leer, s
 
 const AGENDA = 'https://script.google.com/macros/s/AKfycbzmjh39HaP39rdzK3PJdKMULk43T9uvQNwcriSdpzbIRgLC3Xppu9MezL4byJTb4kgX/exec';
 const USUARIOS = ['kid', 'dan', 'daniel'];
-const { leerCifrado, preparar, enviable } = require('./_visor');
+const { leerCifrado, preparar, enviable, mdAHoja } = require('./_visor');
 // Foto o logo: una imagen chica ya reducida en el celular (data:image/…), nunca un archivo cualquiera.
 const fotoValida = f => { if (f === '' || f == null) return ''; f = String(f); return /^data:image\/(webp|jpeg|png);base64,[A-Za-z0-9+/=]+$/.test(f) && f.length < 160000 ? f : null; };
 const SECCIONES_CLIENTE = ['propuesta', 'contrato', 'material', 'avance'];
@@ -191,6 +191,7 @@ async function conSesion(d, yo) {
     // Los documentos con imágenes viven cifrados dentro del proyecto (api/_docs); solo esta llave los abre.
     const cifrado = leerCifrado(doc.id);
     if (cifrado) Object.assign(doc, cifrado);
+    if (doc.formato === 'md') { doc.contenido = mdAHoja(doc.contenido, doc.titulo); doc.formato = 'html'; }   // texto → documento con hojas
     if (doc.formato === 'html') Object.assign(doc, preparar(doc.contenido));
     if (doc.formato === 'archivo') { const f = JSON.parse(doc.fuente || '{}'); Object.assign(doc, { mime: f.mime, nombre: f.nombre, tamano: f.tamano, partes: f.partes || 0 }); }
     delete doc.fuente;

@@ -2,7 +2,7 @@
 // Abre UN documento, sin contraseña ni cuenta. El código es largo y al azar (imposible de adivinar) y solo existe
 // para lo que se puede enseñar al cliente. No da acceso a nada más del Centro.
 const { sql } = require('./_base');
-const { leerCifrado, preparar, enviable } = require('./_visor');
+const { leerCifrado, preparar, enviable, mdAHoja } = require('./_visor');
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
 const NO_ESTA = `<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MOON Digital</title></head>
@@ -54,6 +54,7 @@ module.exports = async (req, res) => {
       }
       res.status(200).send(paginaArchivo(d, f, codigo, tarjeta)); return;
     }
+    if (d.formato === 'md') { d.contenido = mdAHoja(d.contenido, d.titulo); d.formato = 'html'; }
     if (d.formato === 'html') {
       const h = String(d.contenido).replace(/<title>[\s\S]*?<\/title>/i, '');
       res.status(200).send(preparar(h, { suelto: true, extra: tarjeta }).contenido); return;
