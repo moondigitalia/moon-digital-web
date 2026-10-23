@@ -92,7 +92,7 @@ const HERRAMIENTA = {
 };
 const INSTRUCCIONES = 'Lees la información de un negocio (su página web, un menú, una lista de precios o un folleto) para llenar los datos de su recepcionista virtual. ' +
   'Usa SOLO lo que aparece; nunca inventes precios, horarios, servicios ni direcciones. Si algo no aparece, déjalo vacío. ' +
-  'Escribe en español, claro y corto. Copia los precios exactamente como aparecen (con su moneda). Ignora menús de navegación, avisos legales y textos de cookies.';
+  'Escribe en español, claro y corto: "giro" en máximo 8 palabras (ej. "Repostería artesanal en Mérida") y "ubicacion" en máximo 15 palabras. Copia los precios exactamente como aparecen (con su moneda). Ignora menús de navegación, avisos legales y textos de cookies.';
 
 async function preguntarAClaude(contenido) {
   const llave = process.env.ANTHROPIC_LLAVE;
@@ -110,7 +110,9 @@ async function preguntarAClaude(contenido) {
     const uso = (j.content || []).find(c => c.type === 'tool_use');
     if (!uso) return { error: 'ia' };
     const x = uso.input || {};
-    return { datos: { negocio: t(x.negocio, 80), giro: t(x.giro, 200), servicios: t(x.servicios, 1500), horario: t(x.horario, 200), ubicacion: t(x.ubicacion, 200) }, modelo };
+    // Por si la IA se alarga: se corta en la última coma o punto y coma que quepa (nunca a media palabra).
+    const corto = (v, max) => { v = t(v, 2000); if (v.length <= max) return v; const c = v.slice(0, max); const i = Math.max(c.lastIndexOf(','), c.lastIndexOf(';'), c.lastIndexOf('.')); return (i > max * 0.4 ? c.slice(0, i) : c.slice(0, c.lastIndexOf(' '))).trim(); };
+    return { datos: { negocio: t(x.negocio, 80), giro: corto(x.giro, 70), servicios: corto(x.servicios, 1400), horario: corto(x.horario, 160), ubicacion: corto(x.ubicacion, 120) }, modelo };
   }
   return { error: 'ia' };
 }
