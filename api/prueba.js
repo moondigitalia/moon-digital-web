@@ -10,7 +10,7 @@ const AGENTE = 'agent_7801m5k7sesyektvzg9f2dz6hd48';
 const VOCES = { hombre: 'hEKEQC93QpOYMa6WuwWp', mujer: '1u9q7vX1Lcx74yAcFPt7' }; // voz de Jason · voz de Luna
 const huella = s => crypto.createHash('sha256').update(String(s)).digest('hex');
 const ahora = () => new Date().toISOString();
-const TOPE_DIA = 60; // el mismo tope que tiene el agente en ElevenLabs
+const TOPE_DIA = 30; // el mismo tope que tiene el agente en ElevenLabs
 // Inicio del día en Cancún (UTC-5, sin horario de verano), en hora universal.
 const inicioHoy = () => { const d = new Date(Date.now() - 5 * 36e5); d.setUTCHours(5, 0, 0, 0); if (d.getTime() > Date.now()) d.setUTCDate(d.getUTCDate() - 1); return d.toISOString(); };
 

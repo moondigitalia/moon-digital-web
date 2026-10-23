@@ -59,7 +59,7 @@ button{cursor:pointer}
 /* ---------- Inicio ---------- */
 .hola{font-size:clamp(22px,calc(6.4 * var(--w)),34px);font-weight:700;letter-spacing:-.02em;line-height:1.1}
 .hola small{display:block;font-size:13px;font-weight:600;color:var(--suave);letter-spacing:0;margin-top:4px}
-.mosaico{min-height:0;display:grid;gap:clamp(9px,calc(1.5 * var(--u)),14px);grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:1.35fr 1fr 1fr .5fr;grid-template-areas:"tuyo tuyo" "crm proy" "equipo moon" "ultimo ultimo"}
+.mosaico{min-height:0;display:grid;gap:clamp(9px,calc(1.5 * var(--u)),14px);grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:1.35fr 1fr 1fr .62fr .5fr;grid-template-areas:"tuyo tuyo" "crm proy" "equipo moon" "demo demo" "ultimo ultimo"}
 .t{position:relative;min-height:0;border-radius:var(--r);background:var(--tarjeta);box-shadow:var(--sombra);padding:clamp(12px,calc(2 * var(--u)),18px) 16px;text-align:start;display:flex;flex-direction:column;gap:6px;overflow:hidden;transition:transform .3s var(--ease)}
 .t:active{transform:scale(.985)}
 .t .num{font-size:clamp(24px,calc(5.2 * var(--u)),40px);font-weight:800;letter-spacing:-.03em;line-height:1;margin-top:auto}
@@ -72,6 +72,14 @@ button{cursor:pointer}
 .t-tuyo .eti,.t-tuyo .sub{color:rgba(255,255,255,.82)}
 .t-tuyo .flecha{background:rgba(255,255,255,.16);box-shadow:none}
 .t-crm{grid-area:crm}.t-proy{grid-area:proy}.t-equipo{grid-area:equipo}.t-moon{grid-area:moon}
+/* Armar demo: la herramienta de venta de Dan, una franja con el micrófono a la vista. */
+.t-demo{grid-area:demo;flex-direction:row;align-items:center;gap:14px;padding:10px 16px}
+.t-demo .mic{flex:none;width:clamp(40px,calc(6 * var(--u)),52px);aspect-ratio:1;border-radius:50%;background:var(--cobalto);color:#fff;display:grid;place-items:center;box-shadow:0 10px 20px -10px rgba(11,79,214,.7)}
+.t-demo .mic svg{width:46%;height:auto}
+.t-demo .q{min-width:0;display:grid;gap:2px}
+.t-demo .q b{font-size:clamp(16px,calc(2.6 * var(--u)),22px);font-weight:800;letter-spacing:-.01em;line-height:1.15}
+.t-demo .q span{font-size:13px;line-height:1.25;color:var(--suave);font-weight:600}
+.t-demo .flecha{position:static;margin-left:auto;flex:none}
 .t-ultimo{grid-area:ultimo;flex-direction:row;align-items:center;gap:12px;padding:10px 16px}
 .t-ultimo .txt{min-width:0;font-size:13px;line-height:1.3;font-weight:600;color:var(--suave)}
 .t-ultimo .txt b{color:var(--tinta)}
@@ -294,13 +302,13 @@ html:not(.ancho) .agenda>.fila:only-child{border-radius:20px}
 .desc b{font-weight:800}
 .nota{flex:1 1 0;min-height:0;overflow:hidden;border-radius:20px;background:var(--campo);box-shadow:var(--hundido);padding:12px 14px;font-weight:600;color:var(--suave);white-space:pre-line}
 /* Tamaños según el espacio que DE VERDAD se ve (ya con el tamaño de letra elegido y el teclado): clases que pone medir() */
-.ancho .mosaico{grid-template-columns:repeat(12,minmax(0,1fr));grid-template-rows:1fr 1fr minmax(64px,.32fr);grid-template-areas:"tuyo tuyo tuyo tuyo tuyo crm crm crm crm proy proy proy" "tuyo tuyo tuyo tuyo tuyo equipo equipo equipo equipo moon moon moon" "ultimo ultimo ultimo ultimo ultimo ultimo ultimo ultimo ultimo ultimo ultimo ultimo"}
+.ancho .mosaico{grid-template-columns:repeat(12,minmax(0,1fr));grid-template-rows:1fr 1fr minmax(64px,.32fr);grid-template-areas:"tuyo tuyo tuyo tuyo tuyo crm crm crm crm proy proy proy" "tuyo tuyo tuyo tuyo tuyo equipo equipo equipo equipo moon moon moon" "demo demo demo demo demo ultimo ultimo ultimo ultimo ultimo ultimo ultimo"}
 .ancho .lista.dos{grid-template-columns:repeat(2,minmax(0,1fr))}
 .mini .tabs button{font-size:12px}
 .angosto .pils{gap:5px}.angosto .pil{padding:5px 10px 5px 5px;font-size:12.5px;gap:5px}.angosto .pil i{width:18px;height:18px;font-size:10px}.angosto .pil.solo{padding:5px 11px}
 .angosto .desc{padding:8px 12px;font-size:12.5px}
 .bajo .pista{display:none}.bajo .avance svg{width:min(200px,calc(50 * var(--w)),calc(23 * var(--u)))}.bajo .avance .fase-m{font-size:13px}.bajo .hoja{padding:12px;gap:8px!important}.bajo .pil{padding:5px 11px 5px 6px}.bajo .quien button{padding:3px 12px 3px 3px}.bajo .hoja .eti{margin-bottom:5px!important}
-.bajo2 .mosaico{grid-template-rows:1.1fr 1fr 1fr .55fr}.bajo2 .t .sub{display:none}.bajo2 .hola small{display:none}
+.bajo2 .mosaico{grid-template-rows:1.1fr 1fr 1fr .6fr .55fr}.bajo2 .t-demo .q span{display:none}.bajo2 .t .sub{display:none}.bajo2 .hola small{display:none}
 /* Con el teclado arriba: la entrada se compacta para que el campo quede a la vista */
 .teclado .top{display:none}.teclado .entrada .caja{gap:8px}.teclado .aviso:empty{display:none}.teclado .enlace{min-height:0}.teclado .entrada p,.teclado .entrada .eti{display:none}.teclado .entrada .ava{width:36px;height:36px;font-size:13px}.teclado .entrada h1{font-size:20px}
 .teclado .gente .ava{width:56px;height:56px}
@@ -382,6 +390,7 @@ const FASE_TXT = {
 };
 const TEMP = { caliente: 'var(--rojo)', tibio: 'var(--naranja)', frio: 'var(--cielo)' };
 const I = {
+  mic: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>',
   atras: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>',
   mas: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
   abre: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M9 7h8v8"/></svg>',
@@ -692,7 +701,7 @@ function pinta(silencioso) {
   alCambiarTamano = null;
   const c = pila[pila.length - 1];
   if (!c) return pintaInicio(silencioso);
-  ({ tareas: capaTareas, tarea: capaTarea, nuevaTarea: capaNuevaTarea, crm: capaCRM, crmLista: capaCRMLista, editarContacto: capaEditarContacto, subir: capaSubir, ficha: capaFicha, nuevoCliente: capaNuevoCliente, proyectos: capaProyectos, proyecto: capaProyecto, nuevoProyecto: capaProyecto, equipo: capaEquipo, moon: capaMoon, lector: capaLector, clientes: capaClientes, cliente: capaCliente, seccion: capaSeccion, documento: capaDocumento, casa: capaCasa, nota: capaNota, editarProyecto: capaProyecto, cuenta: capaCuenta, frase: capaFrase, foto: capaFoto })[c.tipo](c, silencioso);
+  ({ tareas: capaTareas, tarea: capaTarea, nuevaTarea: capaNuevaTarea, crm: capaCRM, crmLista: capaCRMLista, editarContacto: capaEditarContacto, subir: capaSubir, ficha: capaFicha, nuevoCliente: capaNuevoCliente, proyectos: capaProyectos, proyecto: capaProyecto, nuevoProyecto: capaProyecto, equipo: capaEquipo, moon: capaMoon, lector: capaLector, clientes: capaClientes, cliente: capaCliente, seccion: capaSeccion, documento: capaDocumento, casa: capaCasa, demo: capaDemo, nota: capaNota, editarProyecto: capaProyecto, cuenta: capaCuenta, frase: capaFrase, foto: capaFoto })[c.tipo](c, silencioso);
 }
 function marco(titulo, accion, cuerpo, icono) {
   app.innerHTML = `<div class="top"><button class="redondo" id="volver" aria-label="Regresar">${I.atras}</button><div class="cabeza" style="flex:1;min-width:0"><h2>${esc(titulo)}</h2>${accion ? `<button class="redondo accion" id="accion" aria-label="${esc(accion)}" title="${esc(accion)}">${icono || I.mas}</button>` : ''}</div></div><div class="vista" style="grid-template-rows:minmax(0,1fr)">${cuerpo}</div>`;
@@ -734,6 +743,7 @@ function pintaInicio(sil) {
       <div class="t t-proy" role="button" tabindex="0" data-ir="clientes"><span class="flecha">${I.abre}</span><span class="eti">Clientes</span><div class="extra">${xProy}</div><span class="num">${clientes.length}</span><span class="sub">demos, propuestas y material</span></div>
       <div class="t t-equipo" role="button" tabindex="0" data-ir="equipo"><span class="flecha">${I.abre}</span><span class="eti">Equipo</span><div class="extra">${xEq}</div><span class="num">${sinVer}</span><span class="sub">tareas sin ver</span></div>
       <div class="t t-moon" role="button" tabindex="0" data-ir="casa"><span class="flecha">${I.abre}</span><span class="eti">Hecho en casa</span><div class="extra">${xMoon}</div><span class="sub" style="margin-top:auto">Visión, Jason y presentación</span></div>
+      <div class="t t-demo" role="button" tabindex="0" data-ir="demo"><span class="mic">${I.mic}</span><span class="q"><b>Armar demo</b><span class="sub">Tu prospecto le habla a su propio asistente</span></span><span class="flecha">${I.abre}</span></div>
       <div class="t t-ultimo">${ult ? ava(ult.quien, 1) : ''}<span class="txt">${ult ? `Lo último: <b>${esc((GENTE[ult.quien] || CLAUDE).n)}</b> ${esc(ult.texto)} · ${cuando(ult.fecha)}` : 'Aquí aparece lo último que pasó en MOON.'}</span></div>
     </main>
   </div>`;
@@ -1373,6 +1383,11 @@ function capaCasa() {
     if (k === 'proyectos') return abrir({ tipo: 'proyectos', f: 'activos', soloMoon: true });
     const ds = docsDe('moon', k); if (ds.length) abrirDoc(ds[0]);
   });
+}
+
+/* ---------- Armar demo: la página de demos vive aquí adentro (mismo Centro, misma sesión) ---------- */
+function capaDemo() {
+  marco('Armar demo', '', `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr)"><div class="hoja visor" style="background:var(--fondo)"><iframe class="doc-html" src="/prueba/nueva?dentro=1" title="Armar demo" allow="clipboard-write; microphone"></iframe></div></div>`);
 }
 
 /* ---------- Lector: texto largo completo, en páginas, nunca cortado ---------- */

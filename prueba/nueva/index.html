@@ -127,6 +127,8 @@ input:focus,textarea:focus{outline:2px solid var(--cobalto);outline-offset:1px}
 </main>
 
 <script>
+// Dentro del Centro MOON el título ya lo pone el Centro: aquí no se repite.
+if (new URLSearchParams(location.search).get('dentro')) { document.querySelector('main > header').style.display = 'none'; document.documentElement.style.background = 'transparent'; document.body.style.background = 'transparent'; }
 const API = '/api/prueba';
 const LLAVE = 'centro.moon.sesion'; // la misma sesión del Centro MOON
 const $ = id => document.getElementById(id);
