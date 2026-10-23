@@ -3,7 +3,7 @@ const tam=[[320,568],[375,667],[390,844],[430,932],[768,1024],[1280,800]];
 (async()=>{
  const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium'}).catch(async()=>chromium.launch());
  const fallas=[];
- const corridas=[];const TODAS=process.argv[2]==='todo';const lista=TODAS?[[320,568],[360,560],[360,640],[375,667],[390,844],[412,780],[430,932],[768,1024],[1024,768],[1280,800]]:[[320,568],[360,560],[375,667],[1280,800]];for(const tema of (TODAS?['light','dark']:['light']))for(const t of lista)corridas.push([tema,t,1]);for(const t of (TODAS?[[375,667],[390,844],[430,932],[768,1024]]:[[390,844]]))corridas.push(['light',t,1.3]);corridas.push(['dark',[390,844],1.15,'reduce']);
+ const corridas=[];const TODAS=process.argv[2]==='todo';const RAPIDO=process.env.RAPIDO==='1';const lista=RAPIDO?[[320,568],[1280,800]]:TODAS?[[320,568],[360,560],[360,640],[375,667],[390,844],[412,780],[430,932],[768,1024],[1024,768],[1280,800]]:[[320,568],[360,560],[375,667],[1280,800]];for(const tema of (TODAS?['light','dark']:['light']))for(const t of lista)corridas.push([tema,t,1]);if(!RAPIDO)for(const t of (TODAS?[[375,667],[390,844],[430,932],[768,1024]]:[[390,844]]))corridas.push(['light',t,1.3]);corridas.push(['dark',[390,844],1.15,'reduce']);
  for(const [tema,[w,h],z,rm] of corridas){console.log("CORRIDA",tema,w,h,z,rm||"");
   const c=await b.newContext({viewport:{width:w,height:h},colorScheme:tema,hasTouch:w<800,isMobile:w<800,reducedMotion:rm||'no-preference'});
   await c.addInitScript(z=>{try{localStorage.setItem('centro.moon.letra',String(z))}catch(e){}},z);

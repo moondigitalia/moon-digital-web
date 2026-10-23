@@ -5,6 +5,7 @@
 #   - recepcionista (prueba/, api/prueba.js)                          -> juez de demos (+ juez del tablero, porque vive adentro)
 #   - página web (index.html, img/)                                    -> juez de la página web
 #   - lo demás (links, textos sueltos, configuración)                  -> solo el candado
+#   - si en el tablero o el recepcionista solo cambiaron PALABRAS       -> revisión rápida (~1 min)
 cd "$(dirname "$0")/.." || exit 1
 RAIZ=$(pwd)
 git fetch -q origin main 2>/dev/null
@@ -17,12 +18,15 @@ tiene '^(prueba/|api/prueba\.js|pruebas/juez-demo)' && { DEMOS=1; TABLERO=1; }
 tiene '^(index\.html|img/|pruebas/juez-web)' && WEB=1
 
 node pruebas/candado-publicar.js || exit 1
+# Si solo cambiaron palabras (no diseño ni código), la revisión es rápida: teléfono chico y computadora, ~1 minuto.
+RAPIDO=0; [ $TABLERO = 1 ] && [ "$(node pruebas/solo-texto.js $(echo "$CAMBIOS" | grep -E '^(centro/|prueba/|index\.html)'))" = "si" ] && { RAPIDO=1; DEMOS=0; echo "Solo cambiaron palabras: revisión rápida."; }
+export RAPIDO
 T=$(mktemp -d)
 cd pruebas/centro
 # El servidor de prueba se prende solo si hace falta (ya no depende de acordarse).
 if [ $TABLERO = 1 ] && ! curl -s -o /dev/null localhost:8765/; then (node servidor.js > /dev/null 2>&1 &); sleep 1; fi
-[ $TABLERO = 1 ] && { (node juez.js 2>&1 | tail -1 > $T/juez) & (node parpadeo.js 2>&1 | tail -1 > $T/parpadeo) & (node fotogramas.js 2>&1 | tail -1 > $T/fotogramas) &
-  [ -n "$DOCS" ] && (node juez-docs.js "$DOCS" "$LLAVE" 2>&1 | tail -1 > $T/documentos) & }
+[ $TABLERO = 1 ] && { (node juez.js 2>&1 | tail -1 > $T/juez) & [ $RAPIDO = 0 ] && { (node parpadeo.js 2>&1 | tail -1 > $T/parpadeo) & (node fotogramas.js 2>&1 | tail -1 > $T/fotogramas) &
+  [ -n "$DOCS" ] && (node juez-docs.js "$DOCS" "$LLAVE" 2>&1 | tail -1 > $T/documentos) & }; }
 [ $WEB = 1 ] && (node ../juez-web.js 2>&1 | tail -1 > $T/web) &
 [ $DEMOS = 1 ] && { mkdir -p /tmp/fotos-demo; (node ../juez-demo-nueva.js "$RAIZ" /tmp/fotos-demo 2>&1 | tail -1 > $T/demos) & }
 wait
