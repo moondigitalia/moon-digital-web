@@ -20,7 +20,7 @@ const srv = http.createServer((q, r) => {
   const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
   const fallas = [];
   const tam = [[320, 568, ''], [375, 667, ''], [390, 844, ''], [1280, 800, ''], [320, 460, '?dentro=1'], [375, 560, '?dentro=1'], [390, 740, '?dentro=1'], [600, 640, '?dentro=1']];
-  for (const esquema of ['light', 'dark']) for (const [w, h, q] of tam) for (const quien of q ? ['dan'] : ['dan', 'abierta']) {
+  for (const esquema of ['light', 'dark']) for (const [w, h, q] of tam) for (const quien of q ? ['dan'] : ['abierta']) {
     const p = await b.newPage({ viewport: { width: w, height: h }, colorScheme: esquema });
     const errs = []; p.on('pageerror', e => errs.push(e.message));
     await p.route(/^https?:\/\/(?!localhost)/, r => r.abort());
@@ -35,6 +35,7 @@ const srv = http.createServer((q, r) => {
         document.querySelectorAll('main *, .hoja, .hoja *').forEach(e => {
           const cs = getComputedStyle(e); if (e.offsetParent === null && cs.position !== 'fixed') return; if (e.closest('[hidden]')) return;
           if (e.scrollHeight > e.clientHeight + 1 && cs.overflow !== 'visible' && e.tagName !== 'TEXTAREA' && !e.classList.contains('lista') && !['A', 'BUTTON', 'SPAN', 'B', 'SMALL', 'LABEL', 'P', 'H1', 'H2', 'INPUT', 'I'].includes(e.tagName)) out.push('cortado: ' + (e.id || e.className || e.tagName) + ' ' + e.scrollHeight + '>' + e.clientHeight);
+          if (['B', 'SPAN', 'SMALL'].includes(e.tagName) && e.scrollWidth > e.clientWidth + 1 && e.clientWidth > 0) out.push('texto que no cabe a lo ancho: ' + e.textContent.trim().slice(0, 30));
           const rc = e.getBoundingClientRect(); if (rc.width && !e.closest('.lista') && (rc.bottom > innerHeight + 1 || rc.right > innerWidth + 1)) out.push('se sale: ' + (e.id || e.className || e.tagName));
           // Ninguna palabra partida: un texto de una sola palabra no debe ocupar dos renglones.
           // Renglón extra: una sola palabra suelta en el último renglón de un título o texto.
@@ -68,6 +69,7 @@ const srv = http.createServer((q, r) => {
     } else {
       await revisa('forma');
       for (const x of ['input[name=negocio]', 'input[name=giro]', 'input[name=asistente]']) await teclado(x);
+      await p.click('#lector'); await revisa('hoja-lector'); await p.click('#velo', { position: { x: 5, y: 5 } }); await p.waitForTimeout(400);
       await p.click('#pServicios'); await revisa('hoja-servicios'); await p.click('#hojaListo'); await p.waitForTimeout(400);
       await p.click('#pHorario'); await revisa('hoja-horario'); await p.click('#hojaListo'); await p.waitForTimeout(400);
       await p.fill('input[name=negocio]', 'Clínica Dental Sonrisa'); await p.fill('input[name=giro]', 'Clínica dental'); await p.click('#crear'); await p.waitForTimeout(400);

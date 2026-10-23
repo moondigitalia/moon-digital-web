@@ -5,6 +5,9 @@
     },
     "api/ver.js": {
       "includeFiles": "{api/_docs/**,api/_lib/**}"
+    },
+    "api/leer-negocio.js": {
+      "maxDuration": 60
     }
   },
   "rewrites": [
