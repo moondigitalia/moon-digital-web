@@ -32,7 +32,7 @@
 }}
 /* Pantallas bajitas: todo se compacta un poco para seguir cabiendo. */
 @media (max-height:620px){.dan #cabeza{display:none!important}:root{--alto:42px;--hueco:9px;--pad:14px}.nota{font-size:14px}.listo{font-size:16px}.link{padding:10px 14px;font-size:14px}}
-@media (max-height:520px){:root{--alto:40px;--hueco:7px;--pad:12px}.tira small{display:none}.tira{padding:3px 3px 3px 14px}.tira .chico{height:32px}.paso span{font-size:11px}}
+@media (max-height:520px){:root{--alto:40px;--hueco:7px;--pad:12px}.paso span{font-size:11px}}
 *{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;overflow:hidden;overscroll-behavior:none;background:var(--fondo);color:var(--tinta);font-family:Manrope,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;font-size:16px;line-height:1.35;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%;text-size-adjust:100%}
 button,input,textarea{font:inherit;color:inherit;border:0;background:none}
@@ -80,6 +80,8 @@ input:focus,textarea:focus{outline:2px solid var(--cobalto);outline-offset:1px}
 .velo.ver{opacity:1}
 .hoja{position:fixed;left:0;right:0;bottom:0;margin:0 auto;max-width:560px;max-height:calc(100% - 24px);overflow:hidden;background:var(--fondo);border-radius:var(--r) var(--r) 0 0;padding:20px 16px max(16px,env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:var(--hueco);transform:translateY(100%);transition:transform .35s var(--ease);z-index:6}
 .hoja.ver{transform:none}
+/* Dentro del tablero la hoja flota como tarjeta redonda completa (el tablero oscurece todo lo demás). */
+.dentro .hoja{border-radius:var(--r);padding-bottom:16px}
 @media (prefers-reduced-motion:reduce){.hoja{transition:transform .35s var(--ease)}}
 .hoja h2{font-size:20px;font-weight:800;letter-spacing:-.01em}
 .hoja .cuerpo{flex:1 1 auto;min-height:0;overflow:hidden;display:flex;flex-direction:column;gap:var(--hueco)}
@@ -120,17 +122,29 @@ input:focus,textarea:focus{outline:2px solid var(--cobalto);outline-offset:1px}
 .marca{display:inline-block;font-size:11px;font-weight:800;border-radius:999px;padding:2px 8px;background:var(--campo);color:var(--suave);margin-left:6px;vertical-align:middle}
 .marca.si{background:var(--verdef);color:var(--verde)}
 .elegible{width:100%;text-align:start}
-.tira{display:flex;align-items:center;gap:10px;background:var(--tarjeta);box-shadow:var(--sombra);border-radius:999px;padding:6px 6px 6px 18px;flex:none}
-.tira div{min-width:0;flex:1;display:grid;line-height:1.2}
-.tira small{font-size:12px;font-weight:700;color:var(--suave)}
-.tira b{font-size:14px;font-weight:800;color:var(--cobalto);white-space:nowrap;overflow:hidden}
+.tira{display:flex;align-items:center;justify-content:center;gap:9px;background:var(--tarjeta);box-shadow:var(--sombra);border-radius:999px;height:calc(var(--alto) + 2px);padding:0 18px;flex:none;width:100%;font-weight:800;font-size:15px;color:var(--cobalto);white-space:nowrap}
+.tira svg{width:19px;height:19px;flex:none}
+/* Voz y nombre del asistente: la voz es un interruptor de dos lados; el nombre es un campo que dice "Nombre" adentro. */
+.voz-fila{grid-template-columns:auto minmax(0,1fr)}
+.segmento{display:grid;grid-template-columns:1fr 1fr;gap:2px;background:var(--campo);box-shadow:var(--hundido);border-radius:999px;padding:4px;height:var(--alto)}
+.segmento .voz{height:100%;box-shadow:none;background:transparent;padding:0 14px;font-size:14.5px}
+.segmento .voz[aria-pressed="true"]{background:var(--cobalto);color:#fff}
+.nombre-as{display:flex;flex-direction:column;justify-content:center;gap:1px;min-width:0;background:var(--campo);box-shadow:var(--hundido);border-radius:18px;height:var(--alto);padding:0 14px;cursor:text}
+.nombre-as small{font-size:11px;font-weight:700;color:var(--tenue);line-height:1}
+.nombre-as input{background:none;box-shadow:none;border-radius:0;padding:0;height:auto;line-height:1.25;font-weight:700;outline:0}
+.nombre-as:focus-within{outline:2px solid var(--cobalto);outline-offset:1px}
+/* Con el teclado abierto solo se ve el campo que estás llenando, arriba y completo (nada gris, nada tapado). */
+.tecleando #cabeza,.tecleando #pestanas,.tecleando #tira,.tecleando main>.vista:not(:focus-within),
+.tecleando main>.vista>:not(.campo),.tecleando main>.vista>.campo:not(:focus-within){display:none!important}
+.tecleando main{justify-content:flex-start}
+.tecleando main>.vista{animation:none}
 </style>
 </head>
 <body>
 <main>
   <header id="cabeza" style="display:flex;flex-direction:column;gap:6px">
     <span class="eti" id="cabEti">MOON Digital</span>
-    <h1 id="cabTitulo">Demos</h1>
+    <h1 id="cabTitulo">Crea tu recepcionista</h1>
   </header>
 
   <div class="pestanas" id="pestanas" role="tablist" hidden>
@@ -139,7 +153,7 @@ input:focus,textarea:focus{outline:2px solid var(--cobalto);outline-offset:1px}
   </div>
 
   <!-- El link de la puerta abierta, siempre a la mano de Dan -->
-  <div class="tira" id="tira" hidden><div><small>Link para Facebook y correos</small><b>moondigitalia.com/prueba/nueva</b></div><button class="chico" id="compartir" type="button">Compartir</button></div>
+  <button class="tira" id="tira" hidden type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3M7 8l5-5 5 5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg><span id="compartir">Compartir link para clientes</span></button>
 
   <!-- Puerta abierta, paso 1: quién eres -->
   <form class="tarjeta vista" id="paso1" hidden autocomplete="on">
@@ -168,9 +182,8 @@ input:focus,textarea:focus{outline:2px solid var(--cobalto);outline-offset:1px}
     </div>
     <div class="campo">Voz y nombre del asistente
       <div class="voz-fila">
-        <button type="button" class="voz" data-voz="mujer" aria-pressed="true">Mujer</button>
-        <button type="button" class="voz" data-voz="hombre" aria-pressed="false">Hombre</button>
-        <input name="asistente" maxlength="30" value="Sofía" aria-label="Nombre del asistente">
+        <div class="segmento" role="group" aria-label="Voz del asistente"><button type="button" class="voz" data-voz="mujer" aria-pressed="true">Mujer</button><button type="button" class="voz" data-voz="hombre" aria-pressed="false">Hombre</button></div>
+        <label class="nombre-as"><small>Nombre</small><input name="asistente" maxlength="30" value="Sofía" aria-label="Nombre del asistente" enterkeyhint="done"></label>
       </div>
     </div>
     <input type="hidden" name="servicios"><input type="hidden" name="horario"><input type="hidden" name="ubicacion">
@@ -254,9 +267,15 @@ function abrirHoja(titulo, html, listo, fn) {
   $('hojaListo').disabled = false;
   alListo = fn || null;
   $('velo').hidden = false; $('hoja').hidden = false;
+  avisarVelo(true);
   requestAnimationFrame(() => requestAnimationFrame(() => { $('velo').classList.add('ver'); $('hoja').classList.add('ver'); }));
 }
+// Dentro del tablero: se le avisa para que oscurezca todo lo de afuera igual, al mismo tiempo (una sola sombra en toda la pantalla).
+const DENTRO = !!PARAMS.get('dentro') && window.parent !== window;
+function avisarVelo(ver) { if (DENTRO) try { parent.postMessage({ moonVelo: ver, color: getComputedStyle($('velo')).backgroundColor }, location.origin); } catch (e) {} }
+addEventListener('message', e => { if (DENTRO && e.source === parent && e.data && e.data.cerrarHoja && !$('hoja').hidden) cerrarHoja(); });
 function cerrarHoja() {
+  avisarVelo(false);
   $('velo').classList.remove('ver'); $('hoja').classList.remove('ver');
   setTimeout(() => { $('velo').hidden = true; $('hoja').hidden = true; }, 350);
 }
@@ -305,7 +324,7 @@ F().addEventListener('submit', async e => {
   if (!r.ok) {
     $('aviso').textContent = r.error === 'faltan' ? 'Falta el nombre del negocio o a qué se dedica.'
       : r.error === 'lleno' ? 'Por hoy ya se armaron muchos demos. Vuelve mañana, con gusto te esperamos.'
-      : r.error === 'sesion' ? 'Tu sesión del Centro se cerró. Vuelve a entrar al Centro MOON.'
+      : r.error === 'sesion' ? 'Tu sesión del tablero se cerró. Vuelve a entrar al tablero de MOON.'
       : 'No se pudo crear. Revisa tu internet y vuelve a intentar.';
     $('aviso').hidden = false; return;
   }
@@ -411,13 +430,39 @@ $('anotar').onclick = e => {
   buscar();
 };
 
+/* ---------- Teclado abierto: se enfoca en un solo campo ---------- */
+// La pantalla se achica cuando sale el teclado (también dentro del tablero). Si ya no cabe todo, se muestra solo el campo que se está llenando.
+let altoMax = innerHeight, anchoTec = innerWidth;
+function revisarTeclado() {
+  if (Math.abs(innerWidth - anchoTec) > 40) { anchoTec = innerWidth; altoMax = innerHeight; }   // giró el celular
+  altoMax = Math.max(altoMax, innerHeight);
+  const a = document.activeElement, enCampo = a && /^(INPUT|TEXTAREA)$/.test(a.tagName) && a.type !== 'hidden' && a.closest('main');
+  const sale = !!enCampo && innerHeight < altoMax * 0.8;
+  if (sale !== document.documentElement.classList.contains('tecleando')) {
+    document.documentElement.classList.toggle('tecleando', sale);
+    document.querySelector('main').scrollTop = 0; scrollTo(0, 0);
+  }
+}
+addEventListener('resize', revisarTeclado);
+if (window.visualViewport) visualViewport.addEventListener('resize', revisarTeclado);
+document.addEventListener('focusin', () => setTimeout(revisarTeclado, 60));
+document.addEventListener('focusout', () => setTimeout(revisarTeclado, 60));
+// "Siguiente" en el teclado pasa al siguiente campo; en el último se cierra el teclado.
+document.querySelectorAll('main form').forEach(f => f.addEventListener('keydown', e => {
+  if (e.key !== 'Enter' || e.target.tagName !== 'INPUT') return;
+  const campos = [...f.querySelectorAll('input:not([type=hidden])')], i = campos.indexOf(e.target);
+  if (i < campos.length - 1) { e.preventDefault(); campos[i + 1].focus(); }
+  else if (f.id === 'forma') { e.preventDefault(); e.target.blur(); }
+}));
+document.querySelectorAll('main form').forEach(f => { const l = [...f.querySelectorAll('input:not([type=hidden])')]; l.forEach((x, i) => x.enterKeyHint = i < l.length - 1 ? 'next' : f.id === 'forma' ? 'done' : 'go'); });
+
 /* ---------- Compartir el link de la puerta abierta ---------- */
 const LINK_ABIERTA = 'https://moondigitalia.com/prueba/nueva';
-$('compartir').onclick = async () => {
+$('tira').onclick = async () => {
   const texto = `¿Te gustaría que un asistente virtual contestara a tus clientes a cualquier hora? Arma el tuyo en un minuto y háblale tú mismo: ${LINK_ABIERTA}`;
   try { if (navigator.share) { await navigator.share({ text: texto }); return; } } catch (e) { if (e && e.name === 'AbortError') return; }
-  try { await navigator.clipboard.writeText(texto); $('compartir').textContent = 'Copiado'; } catch (e) { $('compartir').textContent = 'No se pudo'; }
-  setTimeout(() => $('compartir').textContent = 'Compartir', 2200);
+  try { await navigator.clipboard.writeText(texto); $('compartir').textContent = 'Link copiado'; } catch (e) { $('compartir').textContent = 'No se pudo copiar'; }
+  setTimeout(() => $('compartir').textContent = 'Compartir link para clientes', 2200);
 };
 
 /* ---------- Arranque: con sesión del Centro es Dan; sin sesión es la puerta abierta ---------- */
@@ -437,7 +482,7 @@ function entrarAbierta() {
   const r = await api('mios');
   if (!r.ok) return entrarAbierta();
   $('cabEti').textContent = 'MOON Digital';
-  $('cabTitulo').textContent = 'Demos'; document.documentElement.classList.add('dan');
+  $('cabTitulo').textContent = 'Crea tu recepcionista'; document.documentElement.classList.add('dan');
   $('pestanas').hidden = false;
   mostrar(PARAMS.get('ver') === 'tablero' ? 'tablero' : 'forma');
 })();

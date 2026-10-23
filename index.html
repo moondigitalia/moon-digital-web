@@ -55,6 +55,10 @@
   @media (max-width:900px){.nav ul{display:none}}
   .nav .btn{white-space:nowrap}
   @media (max-width:520px){.nav .btn{padding:9px 14px;font-size:13px}.ai-status{font-size:10.5px}}
+  /* Celulares angostos (y la vista dentro del tablero): el botón de arriba dice lo mismo en corto, para que todo quepa completo y nada se deslice a los lados. */
+  .nav .btn .corto{display:none}
+  @media (max-width:440px){.nav .btn .largo{display:none}.nav .btn .corto{display:inline}.nav .wrap{gap:10px}}
+  @media (max-width:300px){.brand{font-size:16px}.brand svg{width:26px;height:26px}}
 
   /* hero */
   .hero{padding-block:88px 96px;position:relative;overflow:hidden}
@@ -259,7 +263,7 @@
       <li><a href="#planes">Planes</a></li>
       <li><a href="#faq">Preguntas</a></li>
     </ul>
-    <a class="btn btn-gold" href="#contacto">Agenda un diagnóstico</a>
+    <a class="btn btn-gold" href="#contacto" aria-label="Agenda un diagnóstico"><span class="largo">Agenda un diagnóstico</span><span class="corto">Diagnóstico</span></a>
   </div>
 </header>
 

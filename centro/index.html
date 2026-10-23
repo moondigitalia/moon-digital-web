@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <meta name="robots" content="noindex, nofollow">
-<title>Centro MOON</title>
+<title>Tablero MOON</title>
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#f3efe9" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#16171b" media="(prefers-color-scheme: dark)">
@@ -186,7 +186,7 @@ textarea.campo{height:auto;border-radius:22px;padding:14px 18px;resize:none}
 .avance{display:grid;justify-items:center;gap:clamp(6px,calc(1.4 * var(--u)),12px);text-align:center}
 .avance svg{width:min(230px,calc(52 * var(--w)),calc(26 * var(--u)));height:auto;overflow:visible}
 .avance .fase-n{font-size:clamp(22px,calc(4 * var(--u)),30px);font-weight:800;letter-spacing:-.01em}
-.avance{width:100%;min-width:0}.avance .fase-n,.avance .fase-m{max-width:min(34ch,100%)}
+.avance{width:100%;min-width:0}.avance .fase-n,.avance .fase-m{width:min(34ch,100%)}
 .avance .fase-m{font-weight:700;color:var(--suave)}
 #fases{width:100%;min-width:0}
 .actual{animation:latido 2.4s ease-in-out infinite}
@@ -195,6 +195,9 @@ textarea.campo{height:auto;border-radius:22px;padding:14px 18px;resize:none}
 .arco.hecho{stroke:var(--cielo)}
 .arco.ahora{stroke:var(--cobalto);animation:respira 3.2s ease-in-out infinite}
 @keyframes respira{0%,100%{opacity:1}50%{opacity:.7}}
+/* Cambio de pantalla: las formas llegan primero; las letras aparecen después, suave (igual con o sin "reducir movimiento"). */
+#app.letras-esperan *{color:transparent!important;transition:none!important}
+#app.letras-llegan *{transition:color .32s cubic-bezier(.4,0,.2,1) .24s!important}
 .pil.fa{transition:background .35s cubic-bezier(.4,0,.2,1),color .35s,box-shadow .35s}
 .pil.fa i{background:transparent;box-shadow:inset 0 0 0 2px var(--niebla);color:transparent;transition:background .35s,color .35s,box-shadow .35s}
 .pil.fa i svg{width:12px;height:12px}
@@ -263,7 +266,7 @@ html:not(.ancho) .agenda>.fila:only-child{border-radius:20px}
 .j-probar{display:inline-flex;align-items:center;gap:10px;background:#fff;color:#141a3c;text-decoration:none;font-size:17px;min-height:56px;padding:0 28px}
 .j-probar svg{width:20px;height:20px}
 .j-num{font-size:12.5px;font-weight:700;opacity:.8;line-height:1.35}
-.j-mas{position:relative;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.j-mas{position:relative;display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:8px}
 .j-mas button{border-radius:99px;background:rgba(255,255,255,.13);color:#fff;font-weight:800;font-size:13.5px;padding:11px 6px;transition:transform .25s var(--ease)}
 .j-mas button:active{transform:scale(.96)}.j-mas button:disabled{opacity:.4}
 .etapas[hidden],#resultados[hidden]{display:none!important}
@@ -332,7 +335,8 @@ html:not(.ancho) .agenda>.fila:only-child{border-radius:20px}
 .bajo .pista{display:none}.bajo .avance svg{width:min(200px,calc(50 * var(--w)),calc(23 * var(--u)))}.bajo .avance .fase-m{font-size:13px}.bajo .hoja{padding:12px;gap:8px!important}.bajo .pil{padding:5px 11px 5px 6px}.bajo .quien button{padding:3px 12px 3px 3px}.bajo .hoja .eti{margin-bottom:5px!important}
 .bajo2 .mosaico{grid-template-rows:1.1fr 1fr 1fr .6fr .55fr}.bajo2 .t-demo .q span{display:none}.bajo2 .t .sub{display:none}.bajo2 .hola small{display:none}
 /* Con el teclado arriba: la entrada se compacta para que el campo quede a la vista */
-.teclado .top{display:none}.teclado .entrada .caja{gap:8px}.teclado .aviso:empty{display:none}.teclado .enlace{min-height:0}.teclado .entrada p,.teclado .entrada .eti{display:none}.teclado .entrada .ava{width:36px;height:36px;font-size:13px}.teclado .entrada h1{font-size:20px}
+/* Con teclado se esconde la barra de arriba y lo de abajo ocupa TODO el alto (antes se quedaba en un renglón sin alto y se veía gris). */
+.teclado .app{grid-template-rows:minmax(0,1fr)}.teclado .top{display:none}.teclado .entrada .caja{gap:8px}.teclado .aviso:empty{display:none}.teclado .enlace{min-height:0}.teclado .entrada p,.teclado .entrada .eti{display:none}.teclado .entrada .ava{width:36px;height:36px;font-size:13px}.teclado .entrada h1{font-size:20px}
 .teclado .gente .ava{width:56px;height:56px}
 
 /* ---------- Credencial horizontal (como una credencial de verdad: 86 × 54) ---------- */
@@ -415,7 +419,9 @@ const fasesDe = p => { const l = String((p && p.fase) || '').split(',').filter(f
 const entregado = p => fasesDe(p).includes('entregado');
 const activo = p => fasesDe(p).some(f => f !== 'entregado');
 const nombreFases = l => { const t = l.map((f, i) => i ? f : f[0].toUpperCase() + f.slice(1)); return t.length < 2 ? t[0] : t.slice(0, -1).join(', ') + ' y ' + t[t.length - 1]; };
-const textoFases = l => { const ult = l[l.length - 1], otras = l.slice(0, -1); return (FASE_TXT[ult] || '') + (otras.length ? ` Y al mismo tiempo: ${nombreFases(otras).toLowerCase()}.` : ''); };
+const textoFases = l => { const ult = l[l.length - 1], otras = l.slice(0, -1); return (FASE_TXT[ult] || '') + (otras.length ? ` También va en ${nombreFases(otras).toLowerCase()}.` : ''); };
+// El título de la fase es siempre una sola palabra (la más avanzada); las demás van en el texto de abajo. Así nunca cambia de tamaño.
+const tituloFases = l => { const f = l[l.length - 1]; return f[0].toUpperCase() + f.slice(1); };
 const TEMP = { caliente: 'var(--rojo)', tibio: 'var(--naranja)', frio: 'var(--cielo)' };
 const I = {
   mic: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>',
@@ -443,7 +449,13 @@ let estado = { tareas: 'mias', crm: 'pendiente', proy: 'todos', busca: '' };
 const app = document.getElementById('app');
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const sesionGuardada = () => { try { return localStorage.getItem(LLAVE) || ''; } catch (e) { return ''; } };
-const guardarSesion = v => { try { v ? localStorage.setItem(LLAVE, v) : localStorage.removeItem(LLAVE); } catch (e) {} };
+const guardarSesion = v => { try { v ? localStorage.setItem(LLAVE, v) : (localStorage.removeItem(LLAVE), localStorage.removeItem(COPIA)); } catch (e) {} };
+// Copia de lo último que se vio (solo en este aparato y solo para esta sesión): al abrir, el tablero aparece al instante con ella
+// y se pone al día solo en cuanto llega lo nuevo. Al cerrar sesión se borra.
+const COPIA = 'centro.moon.copia';
+const firmaSesion = () => { const v = sesionGuardada(); let h = 0; for (let i = 0; i < v.length; i++) h = (h * 31 + v.charCodeAt(i)) | 0; return String(h); };
+function leerCopia() { try { const c = JSON.parse(localStorage.getItem(COPIA) || 'null'); return c && c.s === firmaSesion() && c.d ? c : null; } catch (e) { return null; } }
+function guardarCopia(d, f) { try { const c = leerCopia() || {}; localStorage.setItem(COPIA, JSON.stringify({ s: firmaSesion(), d: d || c.d, f: f || c.f })); } catch (e) {} }
 
 async function api(accion, datos) {
   const r = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-sesion': sesionGuardada() }, body: JSON.stringify(Object.assign({ accion }, datos || {})) })
@@ -562,12 +574,22 @@ function transicion(f) {
   [...viejo.children].forEach(h => h.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 130, easing: suave, fill: 'forwards' }));
   const a = viejo.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 230, delay: 110, easing: suave, fill: 'forwards' });
   a.finished.then(() => { viejo.remove(); if (fantasmaVivo === viejo) fantasmaVivo = null; }, () => { viejo.remove(); });
+  letrasDespues();
   }
+}
+// Cada cosa con su tiempo: primero aparecen las formas (tarjetas, círculos, botones) y un instante después sus letras.
+let letrasReloj = 0;
+function letrasDespues() {
+  clearTimeout(letrasReloj);
+  app.classList.remove('letras-llegan'); app.classList.add('letras-esperan');
+  void app.offsetWidth;   // que el navegador registre las letras escondidas antes de soltarlas
+  app.classList.add('letras-llegan'); app.classList.remove('letras-esperan');
+  letrasReloj = setTimeout(() => app.classList.remove("letras-llegan"), 800);
 }
 
 /* ---------- Entrada ---------- */
 async function pantallaQuien() {
-  app.innerHTML = `<div class="top"><div class="marca"><span class="logo" role="img" aria-label="MOON Digital"></span><i>/</i>CENTRO</div></div><div class="entrada"><div class="caja"><span class="eti">Bienvenido</span><h1>¿Quién eres?</h1><div class="gente" id="gente"><span class="mini">Cargando…</span></div></div></div>`;
+  app.innerHTML = `<div class="top"><div class="marca"><span class="logo" role="img" aria-label="MOON Digital"></span><i>/</i>TABLERO</div></div><div class="entrada"><div class="caja"><span class="eti">Bienvenido</span><h1>¿Quién eres?</h1><div class="gente" id="gente"><span class="mini">Cargando…</span></div></div></div>`;
   const r = await api('quienes');
   const g = document.getElementById('gente');
   if (!r.ok) { g.innerHTML = '<span class="aviso">No hay conexión. Revisa tu internet y vuelve a abrir.</span>'; return; }
@@ -588,7 +610,7 @@ function activarOjos() {
   });
 }
 function marcoEntrada(u, html) {
-  app.innerHTML = `<div class="top"><button class="redondo" id="volver" aria-label="Regresar">${I.atras}</button><div class="marca"><span class="logo" role="img" aria-label="MOON Digital"></span><i>/</i>CENTRO</div></div><div class="entrada"><div class="caja">${ava(u.id)}${html}</div></div>`;
+  app.innerHTML = `<div class="top"><button class="redondo" id="volver" aria-label="Regresar">${I.atras}</button><div class="marca"><span class="logo" role="img" aria-label="MOON Digital"></span><i>/</i>TABLERO</div></div><div class="entrada"><div class="caja">${ava(u.id)}${html}</div></div>`;
   document.getElementById('volver').onclick = () => transicion(pantallaQuien);
   activarOjos();
 }
@@ -635,7 +657,7 @@ function pantallaNueva(u, codigo) {
   marcoEntrada(u, `<h1>Crea tu contraseña</h1><p>Mínimo 6 letras o números. Este dispositivo quedará recordado.</p>
     <form id="f" style="display:grid;gap:12px;width:100%">${campoClave('c1', 'Contraseña nueva', 'new-password')}
     ${campoClave('c2', 'Repítela', 'new-password')}
-    <button class="boton">Entrar al Centro</button><div class="aviso" id="aviso"></div></form>`);
+    <button class="boton">Entrar al tablero</button><div class="aviso" id="aviso"></div></form>`);
   const f = document.getElementById('f'), av = document.getElementById('aviso');
   f.onsubmit = async e => {
     e.preventDefault(); const c1 = document.getElementById('c1').value, c2 = document.getElementById('c2').value;
@@ -657,19 +679,30 @@ function atrasada(x) { return x.estado !== 'hecha' && x.vence && x.vence < new D
 
 async function arrancar() {
   if (!sesionGuardada()) return pantallaQuien();
-  if (!D) app.innerHTML = '<div class="top"><div class="marca"><span class="logo" role="img" aria-label="MOON Digital"></span><i>/</i>CENTRO</div></div><div class="entrada"><span class="mini">Cargando…</span></div>';
+  // Si ya se había abierto en este aparato, se pinta al instante con lo último que se vio (nunca una pantalla vacía);
+  // lo nuevo llega por detrás y, si algo cambió, se actualiza sin animar nada.
+  const copia = !D && leerCopia();
+  if (copia) {
+    if (copia.f && !Object.keys(FOTOS).length) FOTOS = await prepararFotos(copia.f);
+    D = copia.d; transicion(() => pinta());
+    api('fotos').then(async f => { if (f && f.ok) { guardarCopia(null, f.fotos); } });
+    return recargar().then(() => guardarCopia(D));
+  }
+  if (!D) app.innerHTML = '<div class="top"><div class="marca"><span class="logo" role="img" aria-label="MOON Digital"></span><i>/</i>TABLERO</div></div><div class="entrada"><span class="mini">Cargando…</span></div>';
   // Datos y fotos llegan juntos ANTES de pintar: la pantalla aparece una sola vez, completa, sin repintarse después.
   const [r, f] = await Promise.all([api('inicio'), Object.keys(FOTOS).length ? null : api('fotos')]);
-  if (f && f.ok) FOTOS = await prepararFotos(f.fotos);
+  if (f && f.ok) { FOTOS = await prepararFotos(f.fotos); guardarCopia(null, f.fotos); }
   if (!r.ok) { if (r.error !== 'sesion' && !D) app.innerHTML = '<div class="entrada"><div class="caja"><h1>Sin conexión</h1><p>Revisa tu internet.</p><button class="boton" onclick="arrancar()">Reintentar</button></div></div>'; return; }
-  D = r;
+  D = r; guardarCopia(D);
   transicion(() => pinta());
 }
 // Solo se repinta si de verdad cambió algo: si no, la pantalla ni se toca.
 async function recargar(callado) {
   const r = await api('inicio'); if (!r.ok) return;
   const antes = JSON.stringify(Object.assign({}, D, { yo: 0 })), ahora = JSON.stringify(Object.assign({}, r, { yo: 0 }));
-  D = r; if (antes !== ahora && !callado) pinta(true);   // callado: la pantalla ya muestra el cambio, no se vuelve a dibujar
+  const arriba = pila[pila.length - 1];
+  // La página de recepcionistas vive en su propio marco: volver a dibujarla borraría lo que se está escribiendo.
+  D = r; guardarCopia(D); if (antes !== ahora && !callado && !(arriba && arriba.tipo === 'demo')) pinta(true);   // callado: la pantalla ya muestra el cambio, no se vuelve a dibujar
 }
 setInterval(() => { if (D && document.visibilityState === 'visible' && !document.querySelector('.editando') && !/INPUT|TEXTAREA|SELECT/.test((document.activeElement || {}).tagName || '')) recargar(); }, 60000);
 document.addEventListener('visibilitychange', () => { if (D && document.visibilityState === 'visible') recargar(); });
@@ -710,6 +743,7 @@ function pinta(silencioso) {
   // Si solo se actualizan datos (llegó la ficha, la foto o la recarga de cada minuto), se cambia sin animar nada.
   alCambiarTamano = null;
   const c = pila[pila.length - 1];
+  if (!c || c.tipo !== 'demo') veloFuera(false);
   if (!c) return pintaInicio(silencioso);
   ({ tareas: capaTareas, tarea: capaTarea, nuevaTarea: capaNuevaTarea, crm: capaCRM, crmLista: capaCRMLista, editarContacto: capaEditarContacto, subir: capaSubir, ficha: capaFicha, nuevoCliente: capaNuevoCliente, proyectos: capaProyectos, proyecto: capaProyecto, nuevoProyecto: capaProyecto, equipo: capaEquipo, moon: capaMoon, lector: capaLector, clientes: capaClientes, cliente: capaCliente, seccion: capaSeccion, documento: capaDocumento, casa: capaCasa, demo: capaDemo, nota: capaNota, editarProyecto: capaProyecto, qr: capaQR, cuenta: capaCuenta, frase: capaFrase, foto: capaFoto })[c.tipo](c, silencioso);
 }
@@ -729,7 +763,6 @@ function pintaInicio(sil) {
   const cuenta = e => r.filter(p => (p.etapa || 'pendiente') === e).length;
   const activos = D.proyectos.filter(activo);
   const miosP = activos.filter(p => String(p.encargados).split(',').includes(yo())).length;
-  const sinVer = D.tareas.filter(x => x.estado === 'nueva').length;
   const ult = D.actividad[0];
   const hora = Number(new Date().toLocaleString('en-US', { hour: 'numeric', hour12: false, timeZone: 'America/Cancun' }));
   const saludo = hora < 12 ? 'Buenos días' : hora < 19 ? 'Buenas tardes' : 'Buenas noches';
@@ -741,7 +774,7 @@ function pintaInicio(sil) {
   const xEq = ['daniel', 'dan', 'kid'].map(id => { const ab = D.tareas.filter(x => x.para === id && x.estado !== 'hecha'); const nv = ab.filter(x => x.estado === 'nueva').length; return `<button class="xi" data-u="${id}">${ava(id, 1)}<span class="q">${GENTE[id].n}</span><small>${nv ? nv + ' sin ver' : ab.length + ' abiertas'}</small></button>`; }).join('');
   const xMoon = `<p class="xtxt">Ser una empresa de inteligencia artificial muy fuerte, muy dinámica y muy intuitiva.</p>` + ['Jason', 'Página de MOON', 'Presentación de MOON'].map(n => `<span class="xi">${n}</span>`).join('');
   app.innerHTML = `
-  <div class="top"><div class="marca"><span class="logo" role="img" aria-label="MOON Digital"></span><i>/</i>CENTRO</div><div class="esp"></div><button id="salir" aria-label="Mi cuenta">${ava(yo())}</button></div>
+  <div class="top"><div class="marca"><span class="logo" role="img" aria-label="MOON Digital"></span><i>/</i>TABLERO</div><div class="esp"></div><button id="salir" aria-label="Mi cuenta">${ava(yo())}</button></div>
   <div class="vista"${sil ? ' style="animation:none"' : ''}>
     <h1 class="hola">${saludo}, ${esc(GENTE[yo()] ? GENTE[yo()].n : D.yo.nombre)}<small>${mias.length ? `Tienes ${mias.length} tarea${mias.length === 1 ? '' : 's'} abierta${mias.length === 1 ? '' : 's'}` : 'No tienes tareas pendientes'}</small></h1>
     <main class="mosaico">
@@ -751,9 +784,9 @@ function pintaInicio(sil) {
         <span class="num">${mias.length}</span><span class="sub">${vencen ? `${vencen} atrasada${vencen === 1 ? '' : 's'} · ` : ''}tareas abiertas</span></div>
       <div class="t t-crm" role="button" tabindex="0" data-ir="crm"><span class="flecha">${I.abre}</span><span class="eti">CRM de MOON</span><div class="extra">${xCrm}</div><span class="num">${cuenta('pendiente') + cuenta('en proceso')}</span><span class="sub">clientes por cerrar</span><span class="barrita">${barrita}</span></div>
       <div class="t t-proy" role="button" tabindex="0" data-ir="clientes"><span class="flecha">${I.abre}</span><span class="eti">Clientes</span><div class="extra">${xProy}</div><span class="num">${clientes.length}</span><span class="sub">demos, propuestas y material</span></div>
-      <div class="t t-equipo" role="button" tabindex="0" data-ir="equipo"><span class="flecha">${I.abre}</span><span class="eti">Equipo</span><div class="extra">${xEq}</div><span class="num">${sinVer}</span><span class="sub">tareas sin ver</span></div>
+      <div class="t t-equipo" role="button" tabindex="0" data-ir="equipo"><span class="flecha">${I.abre}</span><span class="eti">Equipo</span><div class="extra">${xEq}</div><span class="num">${Object.keys(GENTE).length}</span><span class="sub">integrantes</span></div>
       <div class="t t-moon" role="button" tabindex="0" data-ir="casa"><span class="flecha">${I.abre}</span><span class="eti">Hecho en casa</span><div class="extra">${xMoon}</div><span class="sub" style="margin-top:auto">Visión, Jason y presentación</span></div>
-      <div class="t t-demo" role="button" tabindex="0" data-ir="demo"><span class="mic">${I.mic}</span><span class="q"><b>Demos</b><span class="sub">Arma uno y mira cómo van</span></span><span class="flecha">${I.abre}</span></div>
+      <div class="t t-demo" role="button" tabindex="0" data-ir="demo"><span class="mic">${I.mic}</span><span class="q"><b>Crea tu recepcionista</b><span class="sub">Arma uno y mira cómo van</span></span><span class="flecha">${I.abre}</span></div>
       <div class="t t-ultimo">${ult ? ava(ult.quien, 1) : ''}<span class="txt">${ult ? `Lo último: <b>${esc((GENTE[ult.quien] || CLAUDE).n)}</b> ${esc(ult.texto)} · ${cuando(ult.fecha)}` : 'Aquí aparece lo último que pasó en MOON.'}</span></div>
     </main>
   </div>`;
@@ -1094,10 +1127,10 @@ function moverFases(sel, fases) {
     moverFases.raf = requestAnimationFrame(paso); }
   if (sub) sub.textContent = tx.sub;
   const l = sel.map(i => fases[i]), nombre = app.querySelector('.avance .fase-n'), msg = app.querySelector('.avance .fase-m');
-  [[nombre, nombreFases(l)], [msg, textoFases(l)]].forEach(([el, txt]) => {
+  [[nombre, tituloFases(l)], [msg, textoFases(l)]].forEach(([el, txt]) => {
     if (!el || el.textContent === txt) return;
     const sale = el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 140, easing: suave, fill: 'forwards' });
-    sale.finished.then(() => { el.textContent = txt; ajustaFases && ajustaFases(); el.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 220, easing: suave, fill: 'forwards' }); }, () => { el.textContent = txt; });
+    sale.finished.then(() => { el.textContent = txt; el.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 220, easing: suave, fill: 'forwards' }); }, () => { el.textContent = txt; });
   });
 }
 function capaProyecto(c) {
@@ -1135,7 +1168,7 @@ function capaProyecto(c) {
   let cuerpo;
   if (c.tab === 'fase') cuerpo = `<div class="hoja" style="grid-template-columns:minmax(0,1fr);align-content:center;justify-items:center;gap:clamp(8px,calc(1.8 * var(--u)),16px)">
       <span class="eti">${esc(cli ? nombreDe(cli) : 'Proyecto de MOON')}</span>
-      <div class="avance">${anilloFases(sel)}<div class="fase-n">${esc(nombreFases(sel.map(i => fases[i])))}</div><div class="fase-m">${esc(textoFases(sel.map(i => fases[i])))}</div></div>
+      <div class="avance">${anilloFases(sel)}<div class="fase-n">${esc(tituloFases(sel.map(i => fases[i])))}</div><div class="fase-m">${esc(textoFases(sel.map(i => fases[i])))}</div></div>
       <div class="pils" id="fases" style="justify-content:center">${fases.map((f, i) => { const e = estadoArcos(sel, fases.length)[i]; return `<button class="pil fa${e === 'ahora' ? ' on' : e === 'hecho' ? ' hecha' : ''}" data-f="${esc(f)}" aria-pressed="${e === 'ahora'}"><i>${I.palomita}</i>${esc(f[0].toUpperCase() + f.slice(1))}</button>`; }).join('')}</div>
       <span class="mini pista">Toca las fases en las que va; puede ir en varias a la vez</span>
       ${p.enlace ? `<div class="enlaces"><button class="boton" id="abrirEnlace">${I.liga}Abrir enlace</button><button class="boton dos" id="conseguirQR">${I.qr}Conseguir QR</button></div>` : ''}</div>`;
@@ -1167,18 +1200,28 @@ function capaProyecto(c) {
     });
     // Que todo quepa sin deslizar en cualquier pantalla: primero se quita la pista, luego se achica el anillo y, si hace falta, el texto largo.
     const hoja = app.querySelector('.vista .cuerpo .hoja');
+    // Se mide con el texto más largo posible (todas las fases prendidas) y se deja ese espacio fijo:
+    // al prender o apagar fases nada crece, nada se encoge y nada se mueve ni un píxel.
     const ajusta = () => {
-      const svg = hoja && hoja.querySelector('.avance svg'), msg = hoja && hoja.querySelector('.fase-m'), pista = hoja && hoja.querySelector('.pista'); if (!svg) return;
-      [svg, msg, pista].forEach(e => e && e.style.removeProperty(e === svg ? 'width' : 'display'));
+      const svg = hoja && hoja.querySelector('.avance svg'), nom = hoja && hoja.querySelector('.fase-n'), msg = hoja && hoja.querySelector('.fase-m'), pista = hoja && hoja.querySelector('.pista'); if (!svg) return;
+      const ahora = [nom.textContent, msg.textContent];
+      [svg, nom, msg, pista].forEach(e => e && ['width', 'display', 'min-height'].forEach(k => e.style.removeProperty(k)));
+      const largo = fases.reduce((a, f) => tituloFases([f]).length > a.length ? tituloFases([f]) : a, '');
+      nom.textContent = largo; msg.textContent = fases.slice().reverse().map(f => textoFases(fases.filter(x => x !== f).concat(f))).sort((a, b) => b.length - a.length)[0];
       const sobra = () => hoja.scrollHeight > hoja.clientHeight + 1 || hoja.scrollWidth > hoja.clientWidth + 1;
       const en = hoja.querySelector('.enlaces'); if (en) { en.classList.remove('sin-icono'); if ([...en.children].some(b => b.scrollWidth > b.clientWidth + 1)) en.classList.add('sin-icono'); }
-      if (!sobra()) return;
-      if (pista) pista.style.display = 'none';
+      if (sobra() && pista) pista.style.display = 'none';
       let w = svg.getBoundingClientRect().width;
       while (sobra() && w > 120) { w -= 8; svg.style.width = w + 'px'; }
       if (sobra() && msg) msg.style.display = 'none';
       while (sobra() && w > 76) { w -= 6; svg.style.width = w + 'px'; }
+      svg.style.width = w + 'px';
+      nom.style.minHeight = nom.offsetHeight + 'px'; if (msg.style.display !== 'none') msg.style.minHeight = msg.offsetHeight + 'px';
+      while (sobra() && w > 76) { w -= 4; svg.style.width = w + 'px'; }
+      if (sobra() && msg.style.display !== 'none') { msg.style.display = 'none'; msg.style.removeProperty('min-height'); }
+      nom.textContent = ahora[0]; msg.textContent = ahora[1];
     };
+    if (document.fonts && document.fonts.status !== 'loaded') document.fonts.ready.then(() => { if (pila[pila.length - 1] === c && c.tab === 'fase') ajusta(); });
     ajusta(); alCambiarTamano = ajusta; ajustaFases = ajusta;
     if (p.enlace) {
       document.getElementById('abrirEnlace').onclick = () => abrir({ tipo: 'documento', titulo: p.nombre, doc: { formato: 'link', url: p.enlace, titulo: p.nombre, compartir: p.enlace } });
@@ -1481,7 +1524,7 @@ const CASA_IC = {
 const CASA = [['presentacion', 'Presentación de MOON Digital', 'Quiénes somos y qué hacemos'], ['pagina', 'Página web de MOON', 'moondigitalia.com'], ['proyectos', 'Proyectos internos', 'Lo que construimos para nosotros']];
 function capaCasa() {
   const jd = docsDe('moon', 'jason'), num = jd.find(d => d.id === 'jason-numero');
-  const JAS = [['ficha', 'Su ficha', jd.find(d => d.id === 'jason-ficha')], ['llamadas', 'Llamadas', jd.find(d => d.id === 'jason-llamadas') || { formato: 'centro', url: 'proyecto:jason:uso' }], ['bienvenida', 'Bienvenida', docsDe('moon', 'bienvenida')[0]]];
+  const JAS = [['llamadas', 'Llamadas', jd.find(d => d.id === 'jason-llamadas') || { formato: 'centro', url: 'proyecto:jason:uso' }], ['bienvenida', 'Bienvenida', docsDe('moon', 'bienvenida')[0]]];
   marco('Hecho en casa', '', `<div class="cuerpo casa" style="grid-template-rows:auto minmax(0,1fr) auto">
     <div class="vision"><span class="logo"></span><p>Ser una empresa de inteligencia artificial muy fuerte, muy dinámica y muy intuitiva.</p></div>
     <div class="jason">
@@ -1509,7 +1552,25 @@ function capaCasa() {
 
 /* ---------- Armar demo: la página de demos vive aquí adentro (mismo Centro, misma sesión) ---------- */
 function capaDemo() {
-  marco('Demos', '', `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr)"><div class="hoja visor" style="background:transparent;box-shadow:none;border-radius:0;overflow:visible"><iframe class="doc-html" src="/prueba/nueva?dentro=1" title="Demos" allow="clipboard-write; microphone"></iframe></div></div>`);
+  marco('Crea tu recepcionista', '', `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr)"><div class="hoja visor" style="background:transparent;box-shadow:none;border-radius:0;overflow:visible"><iframe class="doc-html" src="/prueba/nueva?dentro=1" title="Crea tu recepcionista" allow="clipboard-write; microphone"></iframe></div></div>`);
+  const fr = app.querySelector('.doc-html');
+  // Cuando la página de adentro abre una hoja, oscurece solo su recuadro; aquí se oscurece todo lo demás, igual y al mismo tiempo,
+  // para que se vea UNA sola sombra en toda la pantalla (nunca un rectángulo más oscuro). Tocar afuera cierra la hoja.
+  onmessage = e => {
+    if (e.source !== fr.contentWindow || !e.data || typeof e.data.moonVelo !== 'boolean') return;
+    veloFuera(e.data.moonVelo, fr, e.data.color, () => fr.contentWindow.postMessage({ cerrarHoja: true }, '*'));
+  };
+}
+// Sombra de pantalla completa con un hueco exacto donde está el marco de adentro (ese hueco lo oscurece la página de adentro).
+function veloFuera(ver, fr, color, alTocar) {
+  let v = document.getElementById('veloFuera');
+  if (!ver) { if (v) { v.style.opacity = '0'; v.style.pointerEvents = 'none'; setTimeout(() => { if (v.style.opacity === '0') v.remove(); }, 320); } return; }
+  if (!v) { v = document.createElement('div'); v.id = 'veloFuera'; v.style.cssText = 'position:fixed;inset:0;z-index:50;opacity:0;transition:opacity .3s cubic-bezier(.22,.8,.24,1)'; document.body.appendChild(v); }
+  const r = fr.getBoundingClientRect(), W = innerWidth, H = innerHeight;
+  v.style.background = color || 'rgba(0,0,0,.4)';
+  v.style.clipPath = `polygon(evenodd, 0 0, ${W}px 0, ${W}px ${H}px, 0 ${H}px, 0 0, ${r.left}px ${r.top}px, ${r.right}px ${r.top}px, ${r.right}px ${r.bottom}px, ${r.left}px ${r.bottom}px, ${r.left}px ${r.top}px)`;
+  v.style.pointerEvents = 'auto'; v.onclick = alTocar;
+  requestAnimationFrame(() => { v.style.opacity = '1'; });
 }
 
 /* ---------- Lector: texto largo completo, en páginas, nunca cortado ---------- */

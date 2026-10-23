@@ -43,12 +43,27 @@ const srv = http.createServer((q, r) => {
       r.forEach(x => fallas.push(`${nom} ${vista}: ${x}`));
       if (esquema === 'light' && (w === 375 || w === 320)) await p.screenshot({ path: `${salida}/n-${quien}-${w}x${h}${q ? '-dentro' : ''}-${vista}.png` });
     };
+    // Teclado: la pantalla se achica casi a la mitad; el campo que se llena se ve completo y no queda nada gris ni tapado.
+    const teclado = async (sel) => {
+      if (w > 800) return;
+      await p.focus(sel); await p.setViewportSize({ width: w, height: Math.round(h * 0.46) }); await p.waitForTimeout(350);
+      const r = await p.evaluate(s => { const e = document.querySelector(s), c = e.getBoundingClientRect(); const o = [];
+        if (!e.offsetParent || c.height < 10) o.push('campo escondido'); if (c.top < 0 || c.bottom > innerHeight + 1) o.push('campo fuera de la vista ' + Math.round(c.top) + '/' + Math.round(c.bottom) + '>' + innerHeight);
+        const de = document.scrollingElement; if (de.scrollHeight > innerHeight + 1) o.push('página se mueve con teclado');
+        return o; }, sel);
+      r.forEach(x => fallas.push(`${nom} teclado ${sel}: ${x}`));
+      if (esquema === 'light' && w === 375) await p.screenshot({ path: `${salida}/n-${quien}-${w}${q ? '-dentro' : ''}-teclado-${sel.replace(/\W/g, '')}.png` });
+      await p.evaluate(() => document.activeElement.blur()); await p.setViewportSize({ width: w, height: h }); await p.waitForTimeout(300);
+      const vuelve = await p.evaluate(() => document.documentElement.classList.contains('tecleando'));
+      if (vuelve) fallas.push(`${nom} teclado ${sel}: no regresa a la vista completa`);
+    };
     if (quien === 'abierta') {
-      await revisa('paso1');
+      await revisa('paso1'); await teclado('input[name=whatsapp]');
       await p.fill('input[name=contacto]', 'Laura'); await p.fill('input[name=whatsapp]', '9981234567'); await p.click('#paso1 .boton');
       await revisa('forma-abierta');
     } else {
       await revisa('forma');
+      for (const x of ['input[name=negocio]', 'input[name=giro]', 'input[name=asistente]']) await teclado(x);
       await p.click('#pServicios'); await revisa('hoja-servicios'); await p.click('#hojaListo'); await p.waitForTimeout(400);
       await p.click('#pHorario'); await revisa('hoja-horario'); await p.click('#hojaListo'); await p.waitForTimeout(400);
       await p.fill('input[name=negocio]', 'Clínica Dental Sonrisa'); await p.fill('input[name=giro]', 'Clínica dental'); await p.click('#crear'); await p.waitForTimeout(400);
