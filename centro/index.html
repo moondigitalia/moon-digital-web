@@ -541,30 +541,8 @@ function transicion(f) {
   marcoEl.appendChild(viejo);
   fantasmaVivo = viejo;
   // Pase lo que pase al dibujar, la copia de encima SIEMPRE se desvanece y se quita (nunca se queda pegada).
-  const fondo = getComputedStyle(document.body).backgroundColor;
-  const nivel = pila.length, antes = transicion.nivel == null ? nivel : transicion.nivel; transicion.nivel = nivel;
-  const dir = nivel > antes ? 1 : nivel < antes ? -1 : 0;
-  // Como en el iPhone: al entrar, lo nuevo llega desde la derecha encima de lo de antes; al regresar, lo de antes se va
-  // a la derecha y descubre lo anterior. Nunca se enciman transparentes (no se ven "las dos juntas").
-  // Cambiar de pestaña dentro de la misma pantalla es inmediato.
-  if (dir === 1) marcoEl.insertBefore(viejo, app); else marcoEl.appendChild(viejo);
-  viejo.style.background = fondo;
   try { f(); } finally {
-  const curva = 'cubic-bezier(.2,.8,.2,1)', t = 360;
-  let a;
-  if (dir === 0) { a = viejo.animate([{ opacity: 1 }, { opacity: 1 }], { duration: 1 }); viejo.style.visibility = 'hidden'; }
-  else {
-    const fondoApp = app.style.background; app.style.background = fondo;
-    const atras = [{ transform: 'none' }, { transform: 'translateX(-28%)' }];
-    if (dir === 1) {
-      a = app.animate([{ transform: 'translateX(100%)', boxShadow: '-12px 0 30px rgba(0,0,0,.12)' }, { transform: 'none', boxShadow: '-12px 0 30px rgba(0,0,0,0)' }], { duration: t, easing: curva });
-      viejo.animate(atras, { duration: t, easing: curva, fill: 'forwards' });
-    } else {
-      a = viejo.animate([{ transform: 'none', boxShadow: '-12px 0 30px rgba(0,0,0,.12)' }, { transform: 'translateX(100%)', boxShadow: '-12px 0 30px rgba(0,0,0,0)' }], { duration: t, easing: curva, fill: 'forwards' });
-      app.animate(atras.slice().reverse(), { duration: t, easing: curva });
-    }
-    a.finished.then(() => { app.style.background = fondoApp; }, () => { app.style.background = fondoApp; });
-  }
+  const a = viejo.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 240, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'forwards' });
   a.finished.then(() => { viejo.remove(); if (fantasmaVivo === viejo) fantasmaVivo = null; }, () => { viejo.remove(); });
   }
 }
