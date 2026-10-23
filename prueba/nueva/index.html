@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <meta name="robots" content="noindex, nofollow">
 <title>Armar un demo · MOON Digital</title>
 <meta name="color-scheme" content="light dark">
@@ -12,63 +12,91 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-/* Misma familia que el Centro MOON: marfil, cobalto, Manrope y orillas redondas. */
+/* Misma familia que el Centro MOON: marfil, cobalto, Manrope y orillas redondas.
+   Regla de esta página: todo cabe en UNA pantalla, sin scroll. Lo que no cabe se abre con un botón en una hoja aparte. */
 :root{
   --fondo:#f3efe9; --tarjeta:#f6f3ee; --campo:#ece7e0; --tinta:#1d1d22; --suave:#5d5d66; --tenue:#8b8a92;
-  --cobalto:#0b4fd6; --cobalto2:#0a44b8; --verde:#2f9e5a; --verdef:#e6f4ea; --rojo:#c0392b; --rojof:#fbe9e7;
+  --cobalto:#0b4fd6; --verde:#2f9e5a; --verdef:#e6f4ea; --rojo:#c0392b;
   --sombra:0 14px 28px -12px rgba(120,105,85,.35),0 2px 6px rgba(120,105,85,.10),inset 0 1px 0 rgba(255,255,255,.85);
   --hundido:inset 0 2px 5px rgba(120,105,85,.22),inset 0 -1px 0 rgba(255,255,255,.7);
+  --velo:rgba(29,29,34,.38);
   --ease:cubic-bezier(.22,.8,.24,1); --r:28px;
+  --alto:46px; --hueco:12px; --pad:18px;
 }
 @media (prefers-color-scheme:dark){:root{
   --fondo:#16171b; --tarjeta:#1d1e23; --campo:#25262c; --tinta:#efedea; --suave:#b3b1b8; --tenue:#85848c;
-  --cobalto:#3a78ff; --cobalto2:#2f69eb; --verde:#5cc283; --verdef:#183026; --rojo:#ef7b72; --rojof:#3a1f1d;
+  --cobalto:#3a78ff; --verde:#5cc283; --verdef:#183026; --rojo:#ef7b72;
   --sombra:0 14px 28px -12px rgba(0,0,0,.7),0 2px 6px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.05);
   --hundido:inset 0 2px 5px rgba(0,0,0,.45),inset 0 -1px 0 rgba(255,255,255,.04);
+  --velo:rgba(0,0,0,.55);
 }}
+/* Pantallas bajitas: todo se compacta un poco para seguir cabiendo. */
+@media (max-height:620px){:root{--alto:42px;--hueco:9px;--pad:14px}.nota{font-size:14px}.listo{font-size:16px}.link{padding:10px 14px;font-size:14px}}
+@media (max-height:520px){:root{--alto:40px;--hueco:7px;--pad:12px}}
 *{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
-html,body{background:var(--fondo);color:var(--tinta);font-family:Manrope,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;font-size:16px;line-height:1.4;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+html,body{height:100%;overflow:hidden;overscroll-behavior:none;background:var(--fondo);color:var(--tinta);font-family:Manrope,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;font-size:16px;line-height:1.35;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%;text-size-adjust:100%}
 button,input,textarea{font:inherit;color:inherit;border:0;background:none}
 button{cursor:pointer}
 [hidden]{display:none!important}
-main{max-width:560px;margin:0 auto;padding:max(20px,env(safe-area-inset-top)) 16px max(28px,env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:18px}
+main{height:100%;max-width:560px;margin:0 auto;padding:max(18px,env(safe-area-inset-top)) 16px max(16px,env(safe-area-inset-bottom));display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:var(--hueco)}
+.dentro main{padding:0 0 2px;max-width:none}
 .eti{font-size:11px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--suave)}
-h1{font-size:clamp(26px,7vw,34px);font-weight:800;letter-spacing:-.02em;line-height:1.1}
-.nota{color:var(--suave);font-size:15px}
-.tarjeta{background:var(--tarjeta);border-radius:var(--r);box-shadow:var(--sombra);padding:20px;display:flex;flex-direction:column;gap:16px}
-label{display:flex;flex-direction:column;gap:6px;font-weight:700;font-size:14px}
-label small{font-weight:500;color:var(--tenue)}
-input,textarea{background:var(--campo);box-shadow:var(--hundido);border-radius:18px;padding:13px 16px;font-size:16px;width:100%}
-textarea{min-height:96px;resize:vertical}
+h1{font-size:clamp(22px,6.4vw,30px);font-weight:800;letter-spacing:-.02em;line-height:1.1}
+.nota{color:var(--suave);font-size:15px;line-height:1.35}
+.tarjeta{min-height:0;background:var(--tarjeta);border-radius:var(--r);box-shadow:var(--sombra);padding:var(--pad);display:flex;flex-direction:column;gap:var(--hueco);overflow:hidden}
+.campo{display:flex;flex-direction:column;gap:5px;font-weight:700;font-size:14px}
+input,textarea{background:var(--campo);box-shadow:var(--hundido);border-radius:18px;padding:0 16px;height:var(--alto);font-size:16px;width:100%}
+textarea{height:auto;padding:13px 16px;resize:none;line-height:1.4}
 input:focus,textarea:focus{outline:2px solid var(--cobalto);outline-offset:1px}
-.voces{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.voz{border-radius:999px;padding:13px;font-weight:700;background:var(--campo);box-shadow:var(--hundido);transition:background .25s var(--ease),color .25s var(--ease)}
+/* Pastillas que abren una hoja: dicen si ya tienen algo o si faltan. */
+.pastillas{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pastilla{min-height:calc(var(--alto) + 12px);border-radius:20px;background:var(--campo);box-shadow:var(--hundido);padding:8px 14px;text-align:start;display:flex;flex-direction:column;justify-content:center;gap:2px}
+.pastilla b{font-size:14px;line-height:1.2}
+.pastilla span{font-size:12px;font-weight:600;color:var(--tenue)}
+.pastilla.lleno span{color:var(--verde)}
+.voz-fila{display:grid;grid-template-columns:auto auto minmax(0,1fr);gap:8px}
+.voz{border-radius:999px;height:var(--alto);padding:0 16px;font-weight:700;font-size:15px;background:var(--campo);box-shadow:var(--hundido);transition:background .25s var(--ease),color .25s var(--ease)}
 .voz[aria-pressed="true"]{background:var(--cobalto);color:#fff;box-shadow:none}
-.boton{border-radius:999px;padding:16px 22px;font-weight:800;font-size:17px;background:var(--cobalto);color:#fff;text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:10px;transition:transform .2s var(--ease),background .2s var(--ease)}
+.boton{border-radius:999px;height:calc(var(--alto) + 6px);padding:0 16px;font-weight:800;font-size:clamp(15px,4.6vw,17px);white-space:nowrap;background:var(--cobalto);color:#fff;text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:10px;flex:none;transition:transform .2s var(--ease),background .2s var(--ease)}
 .boton:active{transform:scale(.97)}
-.boton.dos{background:var(--campo);color:var(--tinta);box-shadow:var(--hundido)}
+.boton.dos{background:var(--campo);color:var(--tinta);box-shadow:var(--hundido);font-size:clamp(14px,4.2vw,15px)}
 .boton.wa{background:#1f9d55}
 .boton svg{width:22px;height:22px;flex:none}
+.par{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#forma,#resultado{justify-content:space-between}
 .aviso{font-size:14px;font-weight:600;color:var(--rojo)}
-.link{background:var(--campo);box-shadow:var(--hundido);border-radius:18px;padding:14px 16px;font-weight:700;word-break:break-all;color:var(--cobalto)}
-.listo{display:flex;align-items:center;gap:10px;color:var(--verde);font-weight:800}
+.link{background:var(--campo);box-shadow:var(--hundido);border-radius:18px;padding:12px 16px;font-weight:700;font-size:15px;color:var(--cobalto)}
+.listo{display:flex;align-items:center;gap:10px;color:var(--verde);font-weight:800;font-size:18px}
 .listo svg{width:26px;height:26px}
-.fila{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-top:1px solid rgba(127,127,127,.15)}
+/* Botón de abajo: mis demos y cuántas pláticas van hoy. */
+.mis{height:calc(var(--alto) + 6px);border-radius:999px;background:var(--tarjeta);box-shadow:var(--sombra);display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 8px 0 20px;font-weight:700;font-size:15px}
+.mis small{font-weight:700;font-size:13px;color:var(--suave);background:var(--campo);border-radius:999px;padding:6px 12px;white-space:nowrap}
+/* Hoja que sube desde abajo: nunca más alta que la pantalla. */
+.velo{position:fixed;inset:0;background:var(--velo);opacity:0;transition:opacity .3s var(--ease);z-index:5}
+.velo.ver{opacity:1}
+.hoja{position:fixed;left:0;right:0;bottom:0;margin:0 auto;max-width:560px;max-height:calc(100% - 24px);overflow:hidden;background:var(--fondo);border-radius:var(--r) var(--r) 0 0;padding:20px 16px max(16px,env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:var(--hueco);transform:translateY(100%);transition:transform .35s var(--ease);z-index:6}
+.hoja.ver{transform:none}
+@media (prefers-reduced-motion:reduce){.hoja{transition:transform .35s var(--ease)}}
+.hoja h2{font-size:20px;font-weight:800;letter-spacing:-.01em}
+.hoja .cuerpo{flex:1 1 auto;min-height:0;overflow:hidden;display:flex;flex-direction:column;gap:var(--hueco)}
+.hoja textarea{min-height:0;flex:1 1 auto;height:clamp(110px,32vh,220px)}
+.fila{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid rgba(127,127,127,.15);min-height:58px}
 .fila:first-child{border-top:0}
-.fila b{display:block}
-.fila small{color:var(--tenue)}
+.fila div{min-width:0}
+.fila b{display:block;overflow-wrap:anywhere;line-height:1.25}
+.fila small{color:var(--tenue);font-size:13px}
 .fila a{color:var(--cobalto);font-weight:700;text-decoration:none;white-space:nowrap}
-.entrar{text-align:center;gap:14px}
+.lista{min-height:0;flex:1 1 auto;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;margin:0 -4px;padding:0 4px}
+.entrar{text-align:center;justify-content:center;gap:14px}
 .vista{animation:entra .35s var(--ease) both}
 @keyframes entra{from{opacity:0}to{opacity:1}}
 </style>
 </head>
 <body>
 <main>
-  <header style="display:flex;flex-direction:column;gap:8px">
-    <span class="eti">MOON Digital · Demo personalizado</span>
+  <header id="cabeza" style="display:flex;flex-direction:column;gap:6px">
+    <span class="eti">Demo personalizado</span>
     <h1>Arma el recepcionista de tu prospecto</h1>
-    <p class="nota">Llena los datos de su negocio y en un minuto tienes un link para que él mismo le hable a su asistente.</p>
   </header>
 
   <!-- Sin sesión del Centro -->
@@ -77,64 +105,67 @@ input:focus,textarea:focus{outline:2px solid var(--cobalto);outline-offset:1px}
     <a class="boton" href="https://moondigitalia.com/centro">Ir al Centro MOON</a>
   </section>
 
-  <!-- Formulario -->
+  <!-- Formulario: cabe completo en una pantalla -->
   <form class="tarjeta vista" id="forma" hidden autocomplete="off">
-    <label>Nombre del negocio
+    <label class="campo">Nombre del negocio
       <input name="negocio" required maxlength="80" placeholder="Ej. Clínica Dental Sonrisa">
     </label>
-    <label>¿A qué se dedica?
+    <label class="campo">¿A qué se dedica?
       <input name="giro" required maxlength="200" placeholder="Ej. Clínica dental en Cancún">
     </label>
-    <label>Servicios y precios <small>Lo que el asistente puede decir. Si no lo sabes, déjalo vacío.</small>
-      <textarea name="servicios" maxlength="1500" placeholder="Ej. Limpieza $600, blanqueamiento $2,500, consulta de valoración gratis"></textarea>
-    </label>
-    <label>Horario <small>Opcional</small>
-      <input name="horario" maxlength="200" placeholder="Ej. Lunes a sábado de 9 a 7">
-    </label>
-    <label>Dirección o ciudad <small>Opcional</small>
-      <input name="ubicacion" maxlength="200" placeholder="Ej. Av. Tulum 200, Cancún">
-    </label>
-    <div style="display:flex;flex-direction:column;gap:8px">
-      <span style="font-weight:700;font-size:14px">Voz del asistente</span>
-      <div class="voces">
+    <div class="pastillas">
+      <button type="button" class="pastilla" id="pServicios"><b>Servicios y precios</b><span>Opcional</span></button>
+      <button type="button" class="pastilla" id="pHorario"><b>Horario y dirección</b><span>Opcional</span></button>
+    </div>
+    <div class="campo">Voz y nombre del asistente
+      <div class="voz-fila">
         <button type="button" class="voz" data-voz="mujer" aria-pressed="true">Mujer</button>
         <button type="button" class="voz" data-voz="hombre" aria-pressed="false">Hombre</button>
+        <input name="asistente" maxlength="30" value="Sofía" aria-label="Nombre del asistente">
       </div>
     </div>
-    <label>Nombre del asistente
-      <input name="asistente" maxlength="30" value="Sofía">
-    </label>
-    <button class="boton" id="crear">Crear demo</button>
+    <input type="hidden" name="servicios"><input type="hidden" name="horario"><input type="hidden" name="ubicacion">
     <p class="aviso" id="aviso" hidden></p>
+    <button class="boton" id="crear">Crear demo</button>
   </form>
 
-  <!-- Resultado -->
+  <!-- Resultado: también en una pantalla -->
   <section class="tarjeta vista" id="resultado" hidden>
     <p class="listo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M7.5 12.5l3 3 6-6.5"/></svg>Demo listo</p>
     <p class="nota" id="resTexto"></p>
     <div class="link" id="resLink"></div>
     <a class="boton wa" id="mandar" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.4a.5.5 0 0 0 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.4.8 3.2.7a2.8 2.8 0 0 0 1.8-1.3 2.3 2.3 0 0 0 .2-1.3c-.1-.1-.3-.2-.5-.3z"/></svg>Mandar por WhatsApp</a>
-    <button class="boton dos" id="copiar" type="button">Copiar link</button>
-    <a class="boton dos" id="probar" target="_blank" rel="noopener">Probarlo yo</a>
+    <div class="par">
+      <button class="boton dos" id="copiar" type="button">Copiar link</button>
+      <a class="boton dos" id="probar" target="_blank" rel="noopener">Probarlo yo</a>
+    </div>
     <button class="boton dos" id="otro" type="button">Armar otro demo</button>
   </section>
 
-  <!-- Demos recientes -->
-  <section class="tarjeta vista" id="recientes" hidden>
-    <span class="eti" id="recEti">Demos recientes</span>
-    <div id="lista"></div>
-  </section>
+  <!-- Mis demos: botón que abre la lista en una hoja -->
+  <button class="mis vista" id="mis" type="button" hidden><span>Mis demos</span><small id="hoy"></small></button>
 </main>
 
+<!-- Hoja que sube desde abajo (servicios, horario o mis demos) -->
+<div class="velo" id="velo" hidden></div>
+<section class="hoja" id="hoja" hidden role="dialog" aria-modal="true" aria-labelledby="hojaTitulo">
+  <h2 id="hojaTitulo"></h2>
+  <div class="cuerpo" id="hojaCuerpo"></div>
+  <button class="boton" id="hojaListo" type="button">Listo</button>
+</section>
+
 <script>
-// Dentro del Centro MOON el título ya lo pone el Centro: aquí no se repite.
-if (new URLSearchParams(location.search).get('dentro')) { document.querySelector('main > header').style.display = 'none'; document.documentElement.style.background = 'transparent'; document.body.style.background = 'transparent'; }
+const PARAMS = new URLSearchParams(location.search);
+// Dentro del Centro MOON el título ya lo pone el Centro: aquí no se repite, y la tarjeta es el único marco.
+if (PARAMS.get('dentro')) { document.documentElement.classList.add('dentro'); $id('cabeza').hidden = true; document.documentElement.style.background = 'transparent'; document.body.style.background = 'transparent'; }
+function $id(id) { return document.getElementById(id); }
+const $ = $id;
 const API = '/api/prueba';
 const LLAVE = 'centro.moon.sesion'; // la misma sesión del Centro MOON
-const $ = id => document.getElementById(id);
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const sesion = () => { try { return localStorage.getItem(LLAVE) || ''; } catch (e) { return ''; } };
-let voz = 'mujer';
+const F = () => $('forma');
+let voz = 'mujer', demos = [], resumenHoy = '';
 
 async function api(accion, datos) {
   const r = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-sesion': sesion() }, body: JSON.stringify(Object.assign({ accion }, datos || {})) }).catch(() => null);
@@ -142,35 +173,79 @@ async function api(accion, datos) {
   return r.json().catch(() => ({ ok: false, error: 'red' }));
 }
 
-function mostrar(id) { ['sinSesion', 'forma', 'resultado'].forEach(x => $(x).hidden = x !== id); }
+function mostrar(id) { ['sinSesion', 'forma', 'resultado'].forEach(x => $(x).hidden = x !== id); $('mis').hidden = id === 'sinSesion' || !demos.length; }
 
 document.querySelectorAll('.voz').forEach(b => b.onclick = () => {
   voz = b.dataset.voz;
   document.querySelectorAll('.voz').forEach(x => x.setAttribute('aria-pressed', x === b));
-  const n = $('forma').asistente;
+  const n = F().asistente;
   if (!n.value.trim() || n.value === 'Sofía' || n.value === 'Mateo') n.value = voz === 'hombre' ? 'Mateo' : 'Sofía';
 });
 
+/* ---------- Hoja ---------- */
+let alCerrar = null;
+function abrirHoja(titulo, html, listo, alListo) {
+  $('hojaTitulo').textContent = titulo;
+  $('hojaCuerpo').innerHTML = html;
+  $('hojaListo').textContent = listo || 'Listo';
+  alCerrar = alListo || null;
+  $('velo').hidden = false; $('hoja').hidden = false;
+  requestAnimationFrame(() => requestAnimationFrame(() => { $('velo').classList.add('ver'); $('hoja').classList.add('ver'); }));
+}
+function cerrarHoja() {
+  if (alCerrar) alCerrar();
+  $('velo').classList.remove('ver'); $('hoja').classList.remove('ver');
+  setTimeout(() => { $('velo').hidden = true; $('hoja').hidden = true; }, 350);
+}
+$('hojaListo').onclick = cerrarHoja;
+$('velo').onclick = cerrarHoja;
+
+function pintarPastillas() {
+  const s = F().servicios.value.trim(), h = F().horario.value.trim(), u = F().ubicacion.value.trim();
+  $('pServicios').classList.toggle('lleno', !!s);
+  $('pServicios').querySelector('span').textContent = s ? 'Listo ✓' : 'Opcional';
+  $('pHorario').classList.toggle('lleno', !!(h || u));
+  $('pHorario').querySelector('span').textContent = h && u ? 'Listo ✓' : h ? 'Horario ✓' : u ? 'Dirección ✓' : 'Opcional';
+}
+
+$('pServicios').onclick = () => {
+  abrirHoja('Servicios y precios',
+    `<p class="nota">Lo que el asistente puede decir. Si no sabes los precios, déjalo vacío y dirá que el equipo los confirma.</p>
+     <textarea id="hServicios" maxlength="1500" placeholder="Ej. Limpieza $600, blanqueamiento $2,500, consulta de valoración gratis">${esc(F().servicios.value)}</textarea>`,
+    'Listo', () => { F().servicios.value = $('hServicios').value.trim(); pintarPastillas(); });
+};
+$('pHorario').onclick = () => {
+  abrirHoja('Horario y dirección',
+    `<label class="campo">Horario<input id="hHorario" maxlength="200" placeholder="Ej. Lunes a sábado de 9 a 7" value="${esc(F().horario.value)}"></label>
+     <label class="campo">Dirección o ciudad<input id="hUbicacion" maxlength="200" placeholder="Ej. Av. Tulum 200, Cancún" value="${esc(F().ubicacion.value)}"></label>`,
+    'Listo', () => { F().horario.value = $('hHorario').value.trim(); F().ubicacion.value = $('hUbicacion').value.trim(); pintarPastillas(); });
+};
+
+/* ---------- Mis demos (en páginas: nunca scroll) ---------- */
 function cuando(iso) {
   if (!iso) return '';
   const d = Math.floor((Date.now() - Date.parse(iso)) / 864e5);
   return d <= 0 ? 'hoy' : d === 1 ? 'ayer' : `hace ${d} días`;
 }
+const filaDemo = x => `<div class="fila"><div><b>${esc(x.negocio)}</b><small>${esc(cuando(x.creado))} · ${x.usos ? `le hablaron ${x.usos} ${x.usos === 1 ? 'vez' : 'veces'}` : 'aún no le hablan'}</small></div><a href="/prueba/${esc(x.codigo)}" target="_blank" rel="noopener">Abrir</a></div>`;
+$('mis').onclick = () => {
+  // La lista se desliza con el dedo (nada de "1 de 4"): el título y el botón Cerrar quedan fijos.
+  abrirHoja('Mis demos', `<p class="nota">${esc(resumenHoy)}</p><div class="lista" id="lista">${demos.map(filaDemo).join('')}</div>`, 'Cerrar');
+};
 
 async function cargarLista() {
   const r = await api('mios');
-  if (r.error === 'sesion') { mostrar('sinSesion'); $('recientes').hidden = true; return false; }
-  const demos = (r.demos || []);
-  $('recientes').hidden = !demos.length;
-  $('recEti').textContent = r.tope ? `Demos recientes · hoy van ${r.hoy || 0} de ${r.tope} pláticas` : 'Demos recientes';
-  $('lista').innerHTML = demos.map(x => `<div class="fila"><div><b>${esc(x.negocio)}</b><small>${esc(cuando(x.creado))} · ${x.usos ? `${x.usos} ${x.usos === 1 ? 'vez' : 'veces'} que le hablaron` : 'aún no le hablan'}</small></div><a href="/prueba/${esc(x.codigo)}" target="_blank" rel="noopener">Abrir</a></div>`).join('');
+  if (r.error === 'sesion') { mostrar('sinSesion'); return false; }
+  demos = r.demos || [];
+  resumenHoy = r.tope ? `Hoy van ${r.hoy || 0} de ${r.tope} pláticas.` : '';
+  $('hoy').textContent = r.tope ? `hoy ${r.hoy || 0} de ${r.tope}` : `${demos.length}`;
+  $('mis').hidden = !demos.length || !$('sinSesion').hidden;
   return true;
 }
 
-$('forma').addEventListener('submit', async e => {
+F().addEventListener('submit', async e => {
   e.preventDefault();
-  const f = new FormData($('forma'));
-  const datos = Object.fromEntries(f.entries());
+  const datos = Object.fromEntries(new FormData(F()).entries());
   datos.voz = voz;
   $('crear').disabled = true; $('crear').textContent = 'Creando…'; $('aviso').hidden = true;
   const r = await api('crear', datos);
@@ -179,17 +254,16 @@ $('forma').addEventListener('submit', async e => {
   if (!r.ok) { $('aviso').textContent = r.error === 'faltan' ? 'Falta el nombre del negocio o a qué se dedica.' : 'No se pudo crear. Revisa tu internet y vuelve a intentar.'; $('aviso').hidden = false; return; }
   const negocio = datos.negocio.trim();
   $('resTexto').textContent = `Mándale este link a ${negocio}. Lo abre en su celular, pica el botón y le habla a su asistente.`;
-  $('resLink').textContent = r.link;
+  $('resLink').innerHTML = esc(r.link.replace(/^https:\/\//, '')).replace(/([\/-])/g, '$1<wbr>'); // se ve corto y solo se parte en / o -, nunca a media palabra; al mandarlo va completo con https://
   $('probar').href = r.link;
   const mensaje = `Hola, te preparé una muestra de cómo atendería un asistente virtual a los clientes de ${negocio}. Ábrela y háblale como si fueras un cliente: ${r.link}`;
   $('mandar').href = 'https://wa.me/?text=' + encodeURIComponent(mensaje);
-  $('copiar').onclick = async () => { try { await navigator.clipboard.writeText(r.link); $('copiar').textContent = 'Link copiado'; } catch (e) { $('copiar').textContent = 'Mantén presionado el link para copiarlo'; } setTimeout(() => $('copiar').textContent = 'Copiar link', 2200); };
+  $('copiar').onclick = async () => { try { await navigator.clipboard.writeText(r.link); $('copiar').textContent = 'Copiado'; } catch (e) { $('copiar').textContent = 'Mantén presionado el link'; } setTimeout(() => $('copiar').textContent = 'Copiar link', 2200); };
   mostrar('resultado');
-  window.scrollTo({ top: 0 });
   cargarLista();
 });
 
-$('otro').onclick = () => { $('forma').reset(); voz = 'mujer'; document.querySelectorAll('.voz').forEach(x => x.setAttribute('aria-pressed', x.dataset.voz === 'mujer')); mostrar('forma'); };
+$('otro').onclick = () => { F().reset(); ['servicios', 'horario', 'ubicacion'].forEach(n => F()[n].value = ''); voz = 'mujer'; document.querySelectorAll('.voz').forEach(x => x.setAttribute('aria-pressed', x.dataset.voz === 'mujer')); pintarPastillas(); mostrar('forma'); };
 
 (async () => {
   if (!sesion()) { mostrar('sinSesion'); return; }

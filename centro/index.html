@@ -42,7 +42,7 @@ button{cursor:pointer}
 .eti{font-size:11px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--suave)}
 .top{display:flex;align-items:center;gap:12px;min-height:44px}
 .marca{display:flex;align-items:center;gap:10px;font-size:clamp(12px,calc(3.4 * var(--w)),15px);font-weight:800;letter-spacing:.3em;white-space:nowrap}
-.logo{display:inline-block;height:clamp(24px,calc(6.6 * var(--w)),32px);aspect-ratio:2496/682;background:currentColor;-webkit-mask:url(logo.svg) center/contain no-repeat;mask:url(logo.svg) center/contain no-repeat}
+.logo{display:inline-block;height:clamp(24px,calc(6.6 * var(--w)),32px);aspect-ratio:2496/682;background:currentColor;-webkit-mask:url(/centro/logo.svg) center/contain no-repeat;mask:url(/centro/logo.svg) center/contain no-repeat}
 .marca i{font-style:normal;color:var(--cobalto);font-weight:600;letter-spacing:0}
 .top .esp{flex:1}
 .redondo{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;color:inherit;text-decoration:none;background:var(--tarjeta);box-shadow:var(--sombra-chica);flex:none;transition:transform .25s var(--ease)}
@@ -748,6 +748,7 @@ function llenarExtras() {
       pon();
       while (x.scrollHeight > x.clientHeight + 1 && x.children.length > 1) { x.children[x.children.length - 2].remove(); quitados++; pon(); }
       if (x.scrollHeight > x.clientHeight + 1) mas.remove();
+      if (x.children.length === 1 && x.firstElementChild === mas) mas.remove();   // si no cupo ningún renglón, no se anuncia "+N más" sobre la nada
     }
     if (!x.children.length) x.style.display = 'none';   // vacía no ocupa lugar
   });
@@ -1380,7 +1381,7 @@ function capaCasa() {
 
 /* ---------- Armar demo: la página de demos vive aquí adentro (mismo Centro, misma sesión) ---------- */
 function capaDemo() {
-  marco('Armar demo', '', `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr)"><div class="hoja visor" style="background:var(--fondo)"><iframe class="doc-html" src="/prueba/nueva?dentro=1" title="Armar demo" allow="clipboard-write; microphone"></iframe></div></div>`);
+  marco('Armar demo', '', `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr)"><div class="hoja visor" style="background:transparent;box-shadow:none;border-radius:0;overflow:visible"><iframe class="doc-html" src="/prueba/nueva?dentro=1" title="Armar demo" allow="clipboard-write; microphone"></iframe></div></div>`);
 }
 
 /* ---------- Lector: texto largo completo, en páginas, nunca cortado ---------- */

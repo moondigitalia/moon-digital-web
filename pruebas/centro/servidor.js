@@ -30,6 +30,6 @@ http.createServer((q,r)=>{
  if(q.url.startsWith('/centro/logos/')){const f=require('path').resolve(__dirname,'../..')+q.url.split('?')[0];if(fs.existsSync(f)){r.setHeader('Content-Type',f.endsWith('.svg')?'image/svg+xml':'image/webp');r.end(fs.readFileSync(f));return;}}
  if(q.url.startsWith('/demo-falso')){r.setHeader('Content-Type','text/html');r.end('<!doctype html><body style="margin:0;background:linear-gradient(#fde,#cef);font:40px sans-serif;display:grid;place-items:center;height:100vh">DEMO</body>');return;}
  if(q.url.startsWith('/imagen-falsa')){r.setHeader('Content-Type','image/jpeg');r.end(fs.readFileSync(require('path').join(__dirname,'prueba.jpg')));return;}
- if(q.url.startsWith('/logo.svg')){r.setHeader('Content-Type','image/svg+xml');r.end(fs.readFileSync(''+require('path').resolve(__dirname,'../..')+'/centro/logo.svg'));return;}
+ if(q.url.startsWith('/logo.svg')||q.url.startsWith('/centro/logo.svg')){r.setHeader('Content-Type','image/svg+xml');r.end(fs.readFileSync(''+require('path').resolve(__dirname,'../..')+'/centro/logo.svg'));return;}
  r.setHeader('Content-Type','text/html');r.end(html());
 }).listen(8765);
