@@ -146,6 +146,16 @@ textarea.campo{height:auto;border-radius:22px;padding:14px 18px;resize:none}
 .boton[disabled]{opacity:.55}
 .botones{display:flex;gap:10px;flex-wrap:wrap}
 .botones .boton{flex:1 1 140px}
+.dos-campos{display:grid;grid-template-columns:minmax(0,1fr) 84px;gap:10px}.teclado .pasos .dos-campos:not(:focus-within){display:none}.teclado .pasos .dos-campos+.mini{display:none}
+.botones.apilados{display:grid;gap:8px}.botones.apilados .boton{height:44px}
+.boton.chico{height:38px;padding:0 14px;font-size:13.5px;flex:none}
+/* Equipo */
+.socios{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.socio{display:grid;align-content:start;justify-items:center;text-align:center;gap:3px;padding:10px 4px;border-radius:22px;background:var(--tarjeta);box-shadow:var(--sombra-chica);min-width:0}
+.socio .ava{width:clamp(40px,calc(12 * var(--w)),58px);height:clamp(40px,calc(12 * var(--w)),58px);font-size:17px;margin-bottom:3px}
+.socio b{font-size:15px;font-weight:800}.socio span{font-size:12px;font-weight:600;color:var(--suave);line-height:1.25;overflow-wrap:anywhere}.socio small{font-size:12px;font-weight:800;color:var(--cobalto)}
+.eq-cab{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.eq-enlaces{display:flex;justify-content:center;gap:24px;flex-wrap:wrap}.eq-enlaces .enlace{min-height:36px}
 .quien{display:flex;gap:10px;flex-wrap:wrap}
 .quien button{display:flex;align-items:center;gap:8px;border-radius:99px;padding:5px 14px 5px 5px;background:var(--tarjeta);box-shadow:var(--sombra-chica);font-weight:700;font-size:14px;opacity:.6;transition:opacity .25s,box-shadow .25s}
 .quien button .ava{width:30px;height:30px;font-size:12px}
@@ -723,6 +733,8 @@ async function precargar(capa) {
   if (capa.tipo === 'ficha' && !capa.cargado) await espera(traerFicha(capa.tel).then(r => { if (r && r.ok) { capa.ext = r; capa.cargado = true; } }));
   if (capa.tipo === 'documento' && !capa.doc) await espera(api('documento', { id: capa.id }).then(r => { if (r.ok) capa.doc = r.doc; }));
   if (capa.tipo === 'qr') await espera(cargarQR().catch(() => null));
+  if (capa.tipo === 'equipo' && !capa.eq) await espera(traerEquipo(capa));
+  if ((capa.tipo === 'bitacora' || capa.tipo === 'papelera') && !capa.lista) await espera(api(capa.tipo).then(r => { if (r.ok) capa.lista = r.lista; }));
   if (capa.tipo === 'proyecto' && capa.tab === 'uso' && !capa.uso) await espera(api('uso', { id: capa.id }).then(r => { if (r.ok) capa.uso = r; }));
 }
 // Las fichas se piden una vez y se guardan un momento: si ya venía en camino, se usa esa misma respuesta.
@@ -758,7 +770,7 @@ function pinta(silencioso) {
   const c = pila[pila.length - 1];
   if (!c || c.tipo !== 'demo') veloFuera(false);
   if (!c) return esEmb() ? pintaInicioEmbajador(silencioso) : pintaInicio(silencioso);
-  ({ tareas: capaTareas, tarea: capaTarea, nuevaTarea: capaNuevaTarea, crm: capaCRM, crmLista: capaCRMLista, editarContacto: capaEditarContacto, subir: capaSubir, ficha: capaFicha, nuevoCliente: capaNuevoCliente, proyectos: capaProyectos, proyecto: capaProyecto, nuevoProyecto: capaProyecto, equipo: capaEquipo, moon: capaMoon, lector: capaLector, clientes: capaClientes, cliente: capaCliente, seccion: capaSeccion, documento: capaDocumento, casa: capaCasa, demo: capaDemo, nota: capaNota, editarProyecto: capaProyecto, qr: capaQR, cuenta: capaCuenta, frase: capaFrase, foto: capaFoto, emProspectos: capaEmProspectos, emComisiones: capaEmComisiones, emMaterial: capaEmMaterial, emCuenta: capaEmCuenta })[c.tipo](c, silencioso);
+  ({ tareas: capaTareas, tarea: capaTarea, nuevaTarea: capaNuevaTarea, crm: capaCRM, crmLista: capaCRMLista, editarContacto: capaEditarContacto, subir: capaSubir, ficha: capaFicha, nuevoCliente: capaNuevoCliente, proyectos: capaProyectos, proyecto: capaProyecto, nuevoProyecto: capaProyecto, equipo: capaEquipo, moon: capaMoon, lector: capaLector, clientes: capaClientes, cliente: capaCliente, seccion: capaSeccion, documento: capaDocumento, casa: capaCasa, demo: capaDemo, nota: capaNota, editarProyecto: capaProyecto, qr: capaQR, cuenta: capaCuenta, frase: capaFrase, foto: capaFoto, emProspectos: capaEmProspectos, emComisiones: capaEmComisiones, emMaterial: capaEmMaterial, emCuenta: capaEmCuenta, embajador: capaEmbajador, comision: capaComision, bitacora: capaBitacora, papelera: capaPapelera })[c.tipo](c, silencioso);
 }
 function marco(titulo, accion, cuerpo, icono) {
   app.innerHTML = `<div class="top"><button class="redondo" id="volver" aria-label="Regresar">${I.atras}</button><div class="cabeza" style="flex:1;min-width:0"><h2>${esc(titulo)}</h2>${accion ? `<button class="redondo accion" id="accion" aria-label="${esc(accion)}" title="${esc(accion)}">${icono || I.mas}</button>` : ''}</div></div><div class="vista" style="grid-template-rows:minmax(0,1fr)">${cuerpo}</div>`;
@@ -1697,13 +1709,96 @@ function acomodarCreds(cont) {
   cont.style.setProperty('--hc', gap + 'px');
 }
 
-/* ---------- Equipo ---------- */
-function capaEquipo() {
-  marco('Equipo', '', `<div class="creds" id="creds">${['daniel', 'dan', 'kid'].map(credencial).join('')}</div>`);
-  const cont = document.getElementById('creds');
-  acomodarCreds(cont);
-  alCambiarTamano = () => acomodarCreds(cont);
-  cont.querySelectorAll('[data-u]').forEach(b => b.onclick = () => abrir({ tipo: 'tareas', persona: b.dataset.u }));
+/* ---------- Equipo (lo ven los socios): quién es quién, embajadores, comisión, quién movió qué y papelera ---------- */
+async function traerEquipo(c) { const r = await api('equipo'); if (r.ok) c.eq = r; return r; }
+function capaEquipo(c) {
+  const eq = c.eq;
+  const socios = ['daniel', 'dan', 'kid'].map(id => { const ab = D.tareas.filter(x => x.para === id && x.estado !== 'hecha').length; return `<button class="socio" data-u="${id}">${ava(id)}<b>${GENTE[id].n}</b><span>${esc(usuario(id).rol || ROL[id])}</span><small>${ab} tarea${ab === 1 ? '' : 's'}</small></button>`; }).join('');
+  marco('Equipo', '', `<div class="cuerpo equipo" style="grid-template-rows:auto auto auto minmax(0,1fr) auto auto">
+    <span class="eti">Socios · pueden todo</span>
+    <div class="socios">${socios}</div>
+    <div class="eq-cab"><span class="eti">Embajadores</span><span class="mini">Solo agregan en lo suyo</span></div>
+    <div class="lista"></div>
+    <button class="fila chica" id="comision"><span class="casa-ic" style="background:#1f6f43">%</span><span class="q"><b>Comisión de embajadores</b><span>${eq ? esc(eq.comision || 'Por definir') : '…'}</span></span><span class="flecha-f">${I.der}</span></button>
+    <div class="botones"><button class="boton" id="agregar">Agregar embajador</button></div>
+    <div class="eq-enlaces"><button class="enlace" id="bitacora">Quién movió qué</button><button class="enlace" id="papelera">Papelera</button></div></div>`);
+  app.querySelectorAll('.socio').forEach(b => b.onclick = () => abrir({ tipo: 'tareas', persona: b.dataset.u }));
+  const lista = eq ? eq.embajadores : [];
+  lista.forEach(e => { if (!EMB[e.id]) EMB[e.id] = { n: e.nombre, c: e.color || '#e8892f', i: e.nombre.split(/\s+/).slice(0, 2).map(x => x[0]).join('').toUpperCase() }; });
+  paginar(app.querySelector('.cuerpo'), lista, e => `<button class="fila" data-e="${esc(e.id)}">${ava(e.id)}<span class="q"><b>${esc(e.nombre)}</b><span>${e.demos} recepcionista${e.demos === 1 ? '' : 's'} armado${e.demos === 1 ? '' : 's'} · ${e.cierres} cierre${e.cierres === 1 ? '' : 's'}</span></span>${!e.activo ? '<span class="estado" style="--c:var(--rojo);--cf:var(--rojof)">Sin acceso</span>' : !e.con_clave ? '<span class="estado" style="--c:var(--naranja);--cf:var(--naranjaf)">No ha entrado</span>' : ''}</button>`,
+    { vacio: eq ? '<b>Todavía no hay embajadores</b>Toca "Agregar embajador".' : '<b>Cargando…</b>', alPintar: l => l.querySelectorAll('[data-e]').forEach(b => b.onclick = () => abrir({ tipo: 'embajador', id: b.dataset.e, eq })) });
+  document.getElementById('agregar').onclick = () => abrir({ tipo: 'embajador', eq });
+  document.getElementById('comision').onclick = () => eq && abrir({ tipo: 'comision', valor: eq.comision || '' });
+  document.getElementById('bitacora').onclick = () => abrir({ tipo: 'bitacora' });
+  document.getElementById('papelera').onclick = () => abrir({ tipo: 'papelera' });
+  // Si no cabe (celular bajito o letra grande), primero se quitan los detalles; la lista de embajadores nunca queda aplastada.
+  const cu = app.querySelector('.cuerpo'), li = cu.querySelector('.lista');
+  const acomoda = () => {
+    const quitar = ['.eq-cab .mini', '.socio span', '.socio small'];
+    quitar.forEach(q => app.querySelectorAll(q).forEach(e => e.style.display = ''));
+    for (const q of quitar) { if (cu.scrollHeight <= cu.clientHeight + 1 && li.clientHeight >= 70) break; app.querySelectorAll(q).forEach(e => e.style.display = 'none'); }
+  };
+  acomoda(); alCambiarTamano = acomoda;
+  if (!eq) traerEquipo(c).then(r => { if (r.ok && pila[pila.length - 1] === c) pinta(true); });
+}
+function capaEmbajador(c) {
+  const e = c.id ? (c.eq.embajadores.find(x => x.id === c.id) || {}) : {};
+  const nuevo = !c.id;
+  marco(nuevo ? 'Agregar embajador' : e.nombre, '', `<form class="hoja editando pasos" id="f" novalidate style="align-self:start">
+    ${nuevo ? '' : `<p class="mini">${e.demos} recepcionista${e.demos === 1 ? '' : 's'} armado${e.demos === 1 ? '' : 's'} · ${e.cierres} cierre${e.cierres === 1 ? '' : 's'}${e.con_clave ? '' : ' · todavía no entra'}</p>`}
+    <label class="grupo" for="nom"><span class="eti">Nombre</span><input class="campo" id="nom" maxlength="60" autocomplete="off" value="${esc(e.nombre || '')}" placeholder="Ejemplo: Joe Madrid"></label>
+    <div class="dos-campos"><label class="grupo" for="tel"><span class="eti">WhatsApp</span><input class="campo" id="tel" type="tel" inputmode="tel" value="${esc(e.tel || '')}" placeholder="10 números"></label>
+    <label class="grupo" for="tope"><span class="eti">Al día</span><input class="campo" id="tope" type="number" inputmode="numeric" min="0" max="100" value="${esc(e.tope_demos ?? 10)}" aria-label="Recepcionistas que puede armar al día"></label></div>
+    <p class="mini">"Al día": cuántos recepcionistas puede armar cada día.</p>
+    <div class="botones"><button class="boton">${nuevo ? 'Agregar' : 'Guardar'}</button></div>
+    ${nuevo ? '' : `<div class="botones apilados"><button type="button" class="boton dos" id="link"${e.activo ? '' : ' disabled'}>Mandar su link de entrada</button><button type="button" class="boton dos" id="acceso">${e.activo ? 'Quitar acceso' : 'Regresar acceso'}</button></div>`}
+    <div class="aviso" id="aviso"></div></form>`);
+  const av = document.getElementById('aviso'), v = id => document.getElementById(id).value;
+  const errores = { tel: 'El WhatsApp debe tener 10 números.', tel_usado: 'Ese WhatsApp ya lo tiene otra persona.', nombre: 'Escribe su nombre.' };
+  document.getElementById('f').onsubmit = async ev => {
+    ev.preventDefault(); av.textContent = '';
+    if (!v('nom').trim()) { av.textContent = errores.nombre; return; }
+    const r = await api('embajador_guardar', { id: c.id || '', nombre: v('nom'), tel: v('tel'), tope: v('tope') });
+    if (!r.ok) { av.textContent = errores[r.error] || 'No se pudo guardar. Intenta de nuevo.'; return; }
+    await Promise.all([recargar(true), traerEquipo(c)]);
+    if (nuevo) { reemplazar({ tipo: 'embajador', id: r.id, eq: c.eq }); avisoFlotante('Listo. Ahora mándale su link de entrada.'); }
+    else { avisoFlotante('Guardado'); cerrar(); }
+  };
+  if (nuevo) return;
+  document.getElementById('link').onclick = async () => {
+    const r = await api('embajador_invitar', { id: e.id });
+    if (!r.ok) { av.textContent = 'No se pudo crear el link. Intenta de nuevo.'; return; }
+    compartir(`${e.nombre}: tu entrada al tablero de MOON`, r.link);
+    av.style.color = 'var(--suave)'; av.textContent = 'El link sirve 7 días y una sola vez. Con él crea su contraseña.';
+  };
+  let seguro = false;
+  document.getElementById('acceso').onclick = async ev => {
+    if (e.activo && !seguro) { seguro = true; ev.target.textContent = 'Toca otra vez para quitarlo'; return; }
+    const r = await api('embajador_guardar', { id: e.id, activo: !e.activo });
+    if (r.ok) { await Promise.all([recargar(true), traerEquipo(c)]); cerrar(); avisoFlotante(e.activo ? `${e.nombre} ya no puede entrar` : `${e.nombre} puede entrar otra vez`); }
+  };
+}
+function capaComision(c) {
+  marco('Comisión de embajadores', '', `<form class="hoja editando pasos" id="f" style="align-self:start">
+    <label class="grupo" for="val"><span class="preg">¿Cuánto ganan los embajadores?</span><textarea class="campo" id="val" rows="3" maxlength="200" placeholder="Ejemplo: 10% del primer pago de cada cliente que cierren">${esc(c.valor)}</textarea></label>
+    <p class="mini">Lo ven todos los embajadores en "Mis comisiones". Si lo dejas vacío dice "Por definir".</p>
+    <div class="botones"><button class="boton">Guardar</button></div><div class="aviso" id="aviso"></div></form>`);
+  document.getElementById('f').onsubmit = async ev => {
+    ev.preventDefault();
+    const r = await api('comision_guardar', { valor: document.getElementById('val').value.trim() });
+    if (r.ok) { const eqc = pila.find(x => x.tipo === 'equipo'); if (eqc) eqc.eq = null; cerrar(); } else document.getElementById('aviso').textContent = 'No se pudo guardar. Intenta de nuevo.';
+  };
+}
+function capaBitacora(c) {
+  marco('Quién movió qué', '', `<div class="cuerpo" style="grid-template-rows:auto minmax(0,1fr)"><p class="mini">Todo lo que se cambia en el tablero queda anotado aquí, con quién y cuándo.</p><div class="lista"></div></div>`);
+  paginar(app.querySelector('.cuerpo'), c.lista || [], a => `<div class="fila chica" style="cursor:default">${ava(a.quien, 1)}<span class="q"><b>${esc((gente(a.quien) || CLAUDE).n)}</b><span>${esc(a.texto)} · ${cuando(a.fecha)}</span></span></div>`, { vacio: c.lista ? '<b>Nada todavía</b>' : '<b>Cargando…</b>' });
+  if (!c.lista) api('bitacora').then(r => { if (r.ok) { c.lista = r.lista; if (pila[pila.length - 1] === c) pinta(true); } });
+}
+function capaPapelera(c) {
+  marco('Papelera', '', `<div class="cuerpo" style="grid-template-rows:auto minmax(0,1fr)"><p class="mini">Nada se borra de golpe: lo que se quita llega aquí y se puede recuperar. Además, la base entera tiene respaldo de los últimos 30 días.</p><div class="lista"></div></div>`);
+  paginar(app.querySelector('.cuerpo'), c.lista || [], p => `<div class="fila" style="cursor:default"><span class="punto"></span><span class="q"><b>${esc(p.negocio || p.nombre || p.tel)}</b><span>Se quitó ${cuando(p.borrado)}</span></span><button class="boton dos chico" data-r="${esc(p.tel)}">Recuperar</button></div>`,
+    { vacio: c.lista ? '<b>Vacía</b>No se ha quitado nada.' : '<b>Cargando…</b>', alPintar: l => l.querySelectorAll('[data-r]').forEach(b => b.onclick = async () => { b.disabled = true; const r = await api('recuperar_persona', { tel: b.dataset.r }); if (r.ok) { c.lista = c.lista.filter(x => x.tel !== b.dataset.r); await recargar(true); pinta(true); avisoFlotante('Recuperado'); } else b.disabled = false; }) });
+  if (!c.lista) api('papelera').then(r => { if (r.ok) { c.lista = r.lista; if (pila[pila.length - 1] === c) pinta(true); } });
 }
 
 /* ---------- Tu credencial: la abre tu foto de arriba ---------- */
