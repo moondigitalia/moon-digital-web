@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="color-scheme" content="light">
+<link rel="icon" href="data:,">
+<script src="/idiomas/idioma.js"></script>
+<title data-t="pres.titulo_pagina">¿Quién contesta cuando no estás?</title>
+<link rel="preload" href="/fuentes/material/anton-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fuentes/material/dm-sans-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/fuentes/material/letras.css">
+<link rel="stylesheet" href="/idiomas/letras.css">
+<script src="/material/marca.js"></script>
+<style>
+/* Presentación "¿Quién contesta cuando no estás?" (26-oct-2026), con las notas de Dan:
+   1) quiénes somos, 2) el problema de perder llamadas + pregunta, 3) persona vs. recepcionista con IA + pregunta + demo.
+   Mismo estilo que las de Dondé y Tere: láminas de lo esencial, letra grande (Anton), cursiva (Fraunces) y círculos.
+   Cada lámina tiene DOS diseños: acostada (1920×1080) y parada (1080×1920). Se usa el que llena mejor la pantalla.
+   El único scroll es el de las láminas (una por pantalla, se detiene en cada una). Nada se mueve: todo se mide antes de mostrarse. */
+:root{--c:#0b4fd6;--c-sobre:#fff;--c2:#141a3c;--c2-sobre:#fff;--c-tinta:#0b4fd6;--c-claro:#e3eafa;--c-hondo:#0a1f55;--crema:#F8F7F2;--tinta:#1b1b20;--suave:#5c5c66;
+  --letra:'DM Sans','Archivo','KV Mundo',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;--grande:'Anton','KV Mundo',Impact,'Arial Narrow',sans-serif;--fina:'Fraunces','KV Mundo',Georgia,serif}
+*{box-sizing:border-box;margin:0;-webkit-text-size-adjust:none;text-size-adjust:none}   /* el celular nunca agranda letras por su cuenta (las láminas miden 1920 px y se escalan: Android las "inflaba" y se salían) */
+html,body{height:100%;overflow:hidden;overscroll-behavior:none;background:var(--c-hondo);-webkit-text-size-adjust:100%;text-size-adjust:100%;-webkit-font-smoothing:antialiased}
+body{visibility:hidden}
+body.listo{visibility:visible}
+#rollo{position:fixed;inset:0;overflow-y:auto;overflow-x:hidden;scroll-snap-type:y mandatory;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+#rollo::-webkit-scrollbar{display:none}
+.slot{position:relative;width:100%;overflow:hidden;scroll-snap-align:start;scroll-snap-stop:always}
+.stage{position:absolute;left:0;top:0;transform-origin:0 0}
+.lamina{position:relative;overflow:hidden;font-family:var(--letra);--e:1;display:flex;flex-direction:column}
+.h .lamina{width:1920px;height:1080px;padding:120px 128px 96px}
+.v .lamina{width:1080px;height:1920px;padding:150px 88px 110px}
+.lamina img,.lamina svg{display:block}
+/* fondos */
+.f-c{background:var(--c);color:var(--c-sobre)}
+.f-crema{background:var(--crema);color:var(--tinta)}
+.f-hondo{background:var(--c-hondo);color:#fff}
+/* renglón de arriba: de quién es y en qué lámina vas */
+.arriba{position:absolute;top:56px;inset-inline:128px;display:flex;justify-content:space-between;gap:40px;font-size:24px;font-weight:700;letter-spacing:4px;text-transform:uppercase;opacity:.86}
+.v .arriba{top:64px;inset-inline:88px}
+.arriba span{white-space:nowrap}
+.arriba span:last-child{flex:none}
+.f-crema .arriba span:first-child{color:var(--c-tinta)}
+/* letras */
+.titulo{font-family:var(--grande);font-weight:400;text-transform:uppercase;line-height:.92;letter-spacing:.004em;font-size:calc(var(--e)*150px);text-wrap:balance}
+.titulo em{font-style:normal}
+.f-crema .titulo em{color:var(--c-tinta)}
+.f-c .titulo em,.f-hondo .titulo em{font-family:var(--fina);font-style:italic;font-weight:500;text-transform:none;letter-spacing:-.01em;line-height:1}
+.eti{font-size:calc(var(--e)*26px);font-weight:800;letter-spacing:.2em;text-transform:uppercase}
+.f-crema .eti{color:var(--c-tinta)}
+.frase{font-family:var(--fina);font-style:italic;font-weight:500;font-size:calc(var(--e)*60px);line-height:1.1}
+.texto{font-size:calc(var(--e)*32px);line-height:1.42;font-weight:400}
+.nota{font-family:var(--fina);font-style:italic;font-weight:500;font-size:calc(var(--e)*40px);line-height:1.2}
+.chico{font-size:calc(var(--e)*24px);line-height:1.35;font-weight:600;opacity:.8}
+.circulo{border-radius:50%;display:grid;place-items:center;flex:none}
+.ic{width:42%;height:auto}
+.logo-moon{display:block;aspect-ratio:2496/682;background:currentColor;-webkit-mask:url(/centro/logo.svg) center/contain no-repeat;mask:url(/centro/logo.svg) center/contain no-repeat}
+/* ---------- 1. Portada ---------- */
+.portada{display:grid;grid-template-columns:minmax(0,1fr) 520px;grid-template-rows:minmax(0,1fr) auto;column-gap:80px;align-items:center}
+.portada .titulo{font-size:calc(var(--e)*170px);grid-column:1;grid-row:1;align-self:center}
+.portada .marca{grid-column:2;grid-row:1/3;position:relative;width:520px;height:520px;background:var(--crema);box-shadow:0 0 0 18px color-mix(in srgb,var(--c-sobre) 16%,transparent)}
+.portada .marca img{width:68%;height:68%;object-fit:contain}
+.portada .marca .logo-moon{width:72%;color:var(--c2)}
+.portada .sello{position:absolute;inset-inline-end:-30px;top:-40px;width:220px;height:220px;background:var(--c2);color:var(--c2-sobre);transform:rotate(-12deg);padding:26px;text-align:center;font-size:22px;font-weight:800;letter-spacing:2px;line-height:1.2;text-transform:uppercase}
+.portada .para{grid-column:1;grid-row:2;font-size:calc(var(--e)*36px);font-weight:700;line-height:1.3}
+.v .portada{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto;row-gap:60px;align-items:start}
+.v .portada .marca{grid-column:1;grid-row:1;width:440px;height:440px;justify-self:start;margin-top:30px}
+.v .portada .titulo{grid-row:2;font-size:calc(var(--e)*190px);align-self:center}
+.v .portada .para{grid-row:3}
+.v .portada .sello{inset-inline-end:-150px;top:30px}
+.pista{position:absolute;bottom:40px;inset-inline:0;text-align:center;font-size:22px;font-weight:700;letter-spacing:3px;text-transform:uppercase;opacity:.7}
+/* ---------- 2. Quiénes somos ---------- */
+.nosotros{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);column-gap:100px;align-items:center;height:100%}
+.nosotros .izq{display:flex;flex-direction:column;gap:calc(var(--e)*34px)}
+.nosotros .izq .logo-moon{width:calc(var(--e)*560px);color:var(--c2)}
+.tres{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:36px}
+.tres div{display:flex;flex-direction:column;align-items:center;gap:26px;text-align:center}
+.tres .circulo{width:100%;max-width:calc(var(--e)*260px);aspect-ratio:1;background:var(--c);color:var(--c-sobre)}
+.tres:nth-child(n) div:nth-child(2) .circulo{background:var(--c2);color:var(--c2-sobre)}
+.tres b{font-size:calc(var(--e)*34px);font-weight:800;line-height:1.2}
+.v .nosotros{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto;row-gap:90px;align-items:center}
+.v .nosotros .izq .logo-moon{width:calc(var(--e)*620px)}
+/* ---------- 3. El problema ---------- */
+.problema{display:flex;flex-direction:column;justify-content:space-between;height:100%;gap:60px}
+.horas{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:40px}
+.hora{display:flex;flex-direction:column;gap:22px}
+.hora .circulo{width:calc(var(--e)*140px);height:calc(var(--e)*140px);background:var(--c);color:var(--c-sobre)}
+.hora b{font-family:var(--grande);font-weight:400;text-transform:uppercase;font-size:calc(var(--e)*60px);line-height:.95;color:var(--c-claro)}
+.hora span{font-size:calc(var(--e)*30px);line-height:1.35;opacity:.9}
+.v .horas{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:80px;column-gap:56px}
+/* ---------- 4. Llaman al siguiente ---------- */
+.siguiente{display:grid;grid-template-columns:minmax(0,1fr) 760px;column-gap:90px;align-items:center;height:100%}
+.siguiente .izq{display:flex;flex-direction:column;gap:44px}
+.camino{display:flex;align-items:center;justify-content:space-between;gap:24px}
+.camino>div{display:flex;flex-direction:column;align-items:center;gap:22px;text-align:center;width:calc(var(--e)*300px)}
+.camino .circulo{width:calc(var(--e)*280px);height:calc(var(--e)*280px)}
+.camino .uno .circulo{background:transparent;border:8px dashed color-mix(in srgb,var(--tinta) 35%,transparent);color:color-mix(in srgb,var(--tinta) 55%,transparent)}
+.camino .dos .circulo{background:var(--c);color:var(--c-sobre)}
+.camino b{font-size:calc(var(--e)*34px);font-weight:800}
+.camino small{font-size:calc(var(--e)*26px);font-weight:600;color:var(--suave)}
+.camino .flecha{width:110px;flex:none;color:var(--c-tinta)}
+.v .siguiente{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);row-gap:40px}
+.v .camino{justify-content:center;gap:40px}
+/* ---------- 5 y 8. Preguntas ---------- */
+.pregunta{display:grid;grid-template-columns:minmax(0,1fr) 360px;column-gap:80px;align-items:center;height:100%}
+.pregunta .izq{display:flex;flex-direction:column;gap:56px}
+.pregunta .titulo{font-size:calc(var(--e)*168px)}
+.pregunta .circulo{width:360px;height:360px;background:var(--c2);color:var(--c2-sobre);font-family:var(--grande);font-size:260px;line-height:1}
+.v .pregunta{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);row-gap:70px;align-items:start}
+.v .pregunta .circulo{grid-row:1;width:300px;height:300px;font-size:210px}
+.v .pregunta .izq{grid-row:2;align-self:center}
+.v .pregunta .titulo{font-size:calc(var(--e)*176px)}
+/* ---------- 6. Lo que pesa ---------- */
+.peso{display:flex;flex-direction:column;gap:56px;height:100%}
+.tarjetas{flex:1;min-height:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:36px}
+.tarjeta{background:#fff;border-radius:56px;padding:44px;display:flex;flex-direction:column;gap:18px}
+.tarjeta .eti{color:var(--suave)}
+.tarjeta .monto{font-family:var(--grande);font-weight:400;font-size:calc(var(--e)*92px);line-height:.95;color:var(--c-tinta);white-space:nowrap}
+.tarjeta .monto small{font-family:var(--letra);font-size:.3em;font-weight:800;letter-spacing:.08em;margin-inline-start:.25em}
+.tarjeta .mes{font-size:calc(var(--e)*28px);font-weight:700;color:var(--suave);margin-top:-8px}
+.tarjeta ul{list-style:none;padding:0;margin-top:auto;display:grid;gap:10px;border-top:2px solid #ece7df;padding-top:22px}
+.tarjeta li{font-size:calc(var(--e)*26px);line-height:1.3;font-weight:600;color:var(--tinta)}
+.v .tarjetas{grid-template-columns:minmax(0,1fr);grid-template-rows:repeat(3,minmax(0,1fr))}
+.v .tarjeta{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto 1fr;column-gap:30px;row-gap:12px;padding:40px 48px}
+.v .tarjeta .eti{grid-column:1/-1}
+.v .tarjeta .monto{grid-column:1;grid-row:2}
+.v .tarjeta .mes{grid-column:1;grid-row:3;margin-top:0}
+.v .tarjeta ul{grid-column:2;grid-row:2/4;margin-top:0;border-top:0;padding-top:0;border-inline-start:2px solid #ece7df;padding-inline-start:30px;align-content:center;max-width:430px}
+/* ---------- 7. Persona vs. recepcionista con IA ---------- */
+.compara{display:flex;flex-direction:column;gap:50px;height:100%}
+.tabla{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1fr) minmax(0,1fr);grid-auto-rows:minmax(0,1fr);column-gap:0}
+.tabla>*{display:flex;align-items:center;padding:0 30px;border-top:2px solid rgba(255,255,255,.14);font-size:calc(var(--e)*30px);line-height:1.25}
+.tabla .cab{border-top:0;font-size:calc(var(--e)*26px);font-weight:800;letter-spacing:.14em;text-transform:uppercase;opacity:.8}
+.tabla .cab.ia{opacity:1}
+.tabla .rot{font-weight:800;opacity:.7;font-size:calc(var(--e)*24px);letter-spacing:.12em;text-transform:uppercase}
+.tabla .ia{background:var(--c);color:var(--c-sobre);font-weight:700;border-top-color:color-mix(in srgb,var(--c-sobre) 20%,transparent)}
+.tabla .cab.ia{border-radius:40px 40px 0 0}
+.tabla .ia.fin{border-radius:0 0 40px 40px}
+.v .tabla{grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-auto-rows:auto;align-content:space-between;column-gap:20px;row-gap:14px}
+.v .tabla>*{border-top:0;padding:0}
+.v .tabla .rot-cab{display:none}
+.v .tabla .cab,.v .tabla .cab.ia{background:none;color:inherit;border-radius:0;padding:0 6px}
+.v .tabla .cab.ia{color:var(--c-claro)}
+.v .tabla .rot{grid-column:1/-1;padding:24px 6px 0;border-top:2px solid rgba(255,255,255,.14)}
+.v .tabla .rot+span,.v .tabla .rot+span+span{border-radius:32px;padding:22px 26px;align-items:center;min-height:calc(var(--e)*120px)}
+.v .tabla .rot+span{background:rgba(255,255,255,.08)}
+.v .tabla .ia.fin{border-radius:32px}
+/* ---------- 9. Demo ---------- */
+.demo{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:80px;align-items:center;height:100%}
+.demo .izq{display:flex;flex-direction:column;gap:46px}
+.boton{width:calc(var(--e)*500px);height:calc(var(--e)*500px);background:var(--c);color:var(--c-sobre);text-decoration:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;font-size:calc(var(--e)*44px);font-weight:800;text-align:center;padding:60px;box-shadow:0 0 0 22px var(--c-claro);transition:transform .25s cubic-bezier(.22,.8,.24,1)}
+.boton:active{transform:scale(.97)}
+.boton:focus-visible{outline:8px solid var(--c2);outline-offset:30px}
+.boton svg{width:150px;height:150px}
+.url{font-size:calc(var(--e)*24px);font-weight:700;color:var(--c-tinta);overflow-wrap:anywhere;margin-top:-20px}
+.gracias{display:flex;align-items:center;gap:30px;margin-top:20px}
+.gracias .logo-moon{width:200px;color:var(--c2);flex:none}
+.v .demo{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto;row-gap:60px}
+.v .demo .boton{grid-row:2;justify-self:center;align-self:center;width:calc(var(--e)*520px);height:calc(var(--e)*520px)}
+.v .demo .izq{grid-row:1}
+.v .demo .gracias{grid-row:3}
+/* alfabetos con letras más altas (árabe, hindi, tailandés…): renglones con más aire para que no se encimen */
+:is(:lang(ar),:lang(hi),:lang(bn),:lang(th),:lang(ja),:lang(ko),:lang(zh),:lang(vi)) .titulo{line-height:1.18}
+:is(:lang(ar),:lang(hi),:lang(bn),:lang(th)) .frase,:is(:lang(ar),:lang(hi),:lang(bn),:lang(th)) .nota,:is(:lang(ar),:lang(hi),:lang(bn),:lang(th)) .titulo em{line-height:1.35}
+@media (prefers-reduced-motion:reduce){.boton{transition:transform .25s cubic-bezier(.22,.8,.24,1)}}
+</style>
+</head>
+<body>
+<div id="rollo" aria-roledescription="presentación"></div>
+<template id="laminas">
+<!-- 1. Portada -->
+<section class="lamina f-c" data-n="portada">
+  <div class="portada">
+    <h1 class="titulo" data-r="pres.portada_titulo"></h1>
+    <div class="marca circulo"><span class="logo-cliente"></span><p class="sello circulo" data-t="comun.propuesta"></p></div>
+    <p class="para" id="para"></p>
+  </div>
+  <p class="pista"><span data-t="pres.pista"></span> ↓</p>
+</section>
+<!-- 2. Quiénes somos -->
+<section class="lamina f-crema">
+  <div class="nosotros">
+    <div class="izq">
+      <span class="eti" data-t="pres.nosotros_eti"></span>
+      <span class="logo-moon" role="img" aria-label="MOON Digital"></span>
+      <p class="frase" data-t="pres.nosotros_frase"></p>
+      <p class="texto" data-t="pres.nosotros_texto"></p>
+    </div>
+    <div class="tres">
+      <div><span class="circulo"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg></span><b data-t="pres.nosotros_1"></b></div>
+      <div><span class="circulo"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18M9 15l2 2 4-4"/></svg></span><b data-t="pres.nosotros_2"></b></div>
+      <div><span class="circulo"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></span><b data-t="pres.nosotros_3"></b></div>
+    </div>
+  </div>
+</section>
+<!-- 3. El problema -->
+<section class="lamina f-hondo">
+  <div class="problema">
+    <div style="display:flex;flex-direction:column;gap:30px"><span class="eti" data-t="pres.problema_eti"></span><h2 class="titulo" data-r="pres.problema_titulo"></h2></div>
+    <div class="horas">
+      <div class="hora"><span class="circulo"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></span><b data-t="pres.hora_1"></b><span data-t="pres.hora_1_txt"></span></div>
+      <div class="hora"><span class="circulo"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M17 18a5 5 0 0 0-10 0M12 2v7M4.2 10.2l1.4 1.4M1 18h2M21 18h2M18.4 11.6l1.4-1.4M23 22H1M8 6l4-4 4 4"/></svg></span><b data-t="pres.hora_2"></b><span data-t="pres.hora_2_txt"></span></div>
+      <div class="hora"><span class="circulo"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><b data-t="pres.hora_3"></b><span data-t="pres.hora_3_txt"></span></div>
+      <div class="hora"><span class="circulo"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18"/><circle cx="16" cy="16" r="2"/></svg></span><b data-t="pres.hora_4"></b><span data-t="pres.hora_4_txt"></span></div>
+    </div>
+  </div>
+</section>
+<!-- 4. Llaman al siguiente -->
+<section class="lamina f-crema">
+  <div class="siguiente">
+    <div class="izq"><span class="eti" data-t="pres.siguiente_eti"></span><h2 class="titulo" data-r="pres.siguiente_titulo"></h2><p class="texto" data-t="pres.siguiente_texto"></p></div>
+    <div class="camino">
+      <div class="uno"><span class="circulo"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M10.7 13.3a16 16 0 0 0 3.4 2.6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.4 19.4 0 0 1-3.3-2.7M5.2 13A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8M22 2 2 22"/></svg></span><b data-t="pres.siguiente_tu"></b><small data-t="pres.siguiente_sin"></small></div>
+      <svg class="flecha" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15M13 6l6 6-6 6"/></svg>
+      <div class="dos"><span class="circulo"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2zM15 4l2 2 4-4"/></svg></span><b data-t="pres.siguiente_otro"></b><small data-t="pres.siguiente_si"></small></div>
+    </div>
+  </div>
+</section>
+<!-- 5. Pregunta: la semana pasada -->
+<section class="lamina f-c">
+  <div class="pregunta">
+    <div class="izq"><span class="eti" data-t="pres.pregunta_eti"></span><h2 class="titulo" data-r="pres.pregunta1"></h2><p class="nota" data-t="pres.pregunta1_nota"></p></div>
+    <span class="circulo" aria-hidden="true">?</span>
+  </div>
+</section>
+<!-- 6. Lo que pesa -->
+<section class="lamina f-crema">
+  <div class="peso">
+    <div style="display:flex;flex-direction:column;gap:26px"><span class="eti" data-t="pres.peso_eti"></span><h2 class="titulo" data-r="pres.peso_titulo" style="font-size:calc(var(--e)*120px)"></h2></div>
+    <div class="tarjetas" id="tarjetas"></div>
+    <p class="chico" data-t="pres.peso_nota" style="opacity:1;color:var(--suave)"></p>
+  </div>
+</section>
+<!-- 7. Persona vs. recepcionista con IA -->
+<section class="lamina f-hondo">
+  <div class="compara">
+    <div style="display:flex;flex-direction:column;gap:26px"><span class="eti" data-t="pres.compara_eti"></span><h2 class="titulo" data-r="pres.compara_titulo" style="font-size:calc(var(--e)*120px)"></h2></div>
+    <div class="tabla" id="tabla"></div>
+  </div>
+</section>
+<!-- 8. Pregunta: quién te ayuda -->
+<section class="lamina f-c">
+  <div class="pregunta">
+    <div class="izq"><span class="eti" data-t="pres.pregunta_eti"></span><h2 class="titulo" data-r="pres.pregunta2"></h2><p class="nota" data-t="pres.pregunta2_nota"></p></div>
+    <span class="circulo" aria-hidden="true">?</span>
+  </div>
+</section>
+<!-- 9. El demo -->
+<section class="lamina f-crema">
+  <div class="demo">
+    <div class="izq"><span class="eti" data-t="pres.demo_eti"></span><h2 class="titulo" id="demoTitulo"></h2><p class="nota" data-t="pres.demo_nota" style="color:var(--suave)"></p><p class="url" id="demoUrl"></p></div>
+    <a class="boton circulo" id="demo" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2.5" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3.5"/></svg><span data-t="pres.demo_boton"></span></a>
+    <div class="gracias"><span class="logo-moon" role="img" aria-label="MOON Digital"></span><p class="frase" id="gracias" style="font-size:calc(var(--e)*48px)"></p></div>
+  </div>
+</section>
+</template>
+<script>
+(function () {
+  var rollo = document.getElementById('rollo');
+  var num = new Intl.NumberFormat(KVI.region);
+  var dinero = function (n) { return MOON_ESC(KVI.precio(n)).replace(/\s?MXN/, '<small>MXN</small>'); };
+  /* ejemplos de la lámina 6 (sí son ejemplos: la lámina lo dice). Cuenta: llamadas al día × 30 × (de cada 10 / 10) × precio */
+  var EJEMPLOS = [['pres.chico', 2, 800, 2], ['pres.mediano', 5, 1500, 2], ['pres.grande', 12, 2500, 2]];
+  var FILAS = ['horario', 'pago', 'faltas', 'vez', 'va'];
+  var M = null, orientacion = '';
+
+  function armar(m) {
+    var plantilla = document.getElementById('laminas').content.cloneNode(true);
+    var laminas = [].slice.call(plantilla.querySelectorAll('.lamina'));
+    rollo.innerHTML = '';
+    laminas.forEach(function (l, i) {
+      var slot = document.createElement('div'); slot.className = 'slot';
+      var st = document.createElement('div'); st.className = 'stage';
+      var arriba = document.createElement('p'); arriba.className = 'arriba';
+      arriba.innerHTML = '<span>' + MOON_ESC(m.negocio || 'MOON Digital') + '</span><span>' + num.format(i + 1).padStart(2, num.format(0)) + ' — ' + num.format(laminas.length).padStart(2, num.format(0)) + '</span>';
+      l.insertBefore(arriba, l.firstChild);
+      st.appendChild(l); slot.appendChild(st); rollo.appendChild(slot);
+    });
+    KVI.aplicar(rollo);
+    [].forEach.call(rollo.querySelectorAll('[data-r]'), function (e) { e.innerHTML = MOON_RESALTA(KVI.t(e.getAttribute('data-r'))); });
+    var $ = function (s) { return rollo.querySelector(s); };
+    // portada: su logo (o el de MOON), para quién es
+    var lc = $('.logo-cliente');
+    if (m.logo) { var im = new Image(); im.alt = m.negocio; im.src = m.logo; lc.replaceWith(im); }
+    else { var lm = document.createElement('span'); lm.className = 'logo-moon'; lm.setAttribute('role', 'img'); lm.setAttribute('aria-label', 'MOON Digital'); lc.replaceWith(lm); }
+    $('#para').textContent = m.responsable ? KVI.t('pres.portada_para', { nombre: m.responsable }) : m.negocio ? KVI.t('comun.para', { negocio: m.negocio }) : KVI.t('pres.portada_general');
+    // lámina 6: tres ejemplos
+    $('#tarjetas').innerHTML = EJEMPLOS.map(function (x) {
+      var mes = x[1] * 30 * x[3] / 10 * x[2];
+      return '<div class="tarjeta"><span class="eti">' + MOON_ESC(KVI.t(x[0])) + '</span><p class="monto">' + dinero(mes) + '</p><p class="mes">' + MOON_ESC(KVI.t('pres.peso_mes')) + '</p><ul>' +
+        '<li>' + MOON_ESC(KVI.t('pres.peso_llamadas', { n: x[1] }).replace(String(x[1]), num.format(x[1]))) + '</li>' +
+        '<li>' + MOON_ESC(KVI.t('pres.peso_precio', { precio: KVI.precio(x[2]) })) + '</li>' +
+        '<li>' + MOON_ESC(KVI.t('pres.peso_de', { n: num.format(x[3]) })) + '</li></ul></div>';
+    }).join('');
+    // lámina 7: la tabla
+    var t = '<span class="cab rot-cab"></span><span class="cab">' + MOON_ESC(KVI.t('pres.compara_persona')) + '</span><span class="cab ia">' + MOON_ESC(KVI.t('pres.compara_ia')) + '</span>';
+    FILAS.forEach(function (f, i) {
+      t += '<span class="rot">' + MOON_ESC(KVI.t('pres.fila_' + f)) + '</span><span>' + MOON_ESC(KVI.t('pres.fila_' + f + '_p')) + '</span><span class="ia' + (i === FILAS.length - 1 ? ' fin' : '') + '">' + MOON_ESC(KVI.t('pres.fila_' + f + '_ia')) + '</span>';
+    });
+    $('#tabla').innerHTML = t;
+    // lámina 9: el demo de su recepcionista
+    $('#demoTitulo').innerHTML = m.negocio ? MOON_RESALTA(KVI.t('pres.demo_titulo_negocio', { negocio: m.negocio })) : MOON_RESALTA(KVI.t('pres.demo_titulo'));
+    $('#demo').href = m.demo; $('#demoUrl').textContent = m.demo;   // el link completo escrito, para quien la vea impresa
+    $('#gracias').textContent = m.responsable ? KVI.t('pres.gracias', { nombre: m.responsable }) : KVI.t('pres.gracias_general');
+  }
+
+  /* Cada lámina se dibuja en su tamaño fijo y se escala a la pantalla. Si algún texto no cabe (idioma largo, nombre largo),
+     esa lámina baja su letra (--e) hasta que todo cabe: nada cortado, nada encimado. */
+  function noCabe(l) {
+    var L = l.getBoundingClientRect(), k = L.width / l.offsetWidth, cs = getComputedStyle(l);
+    var abajo = L.bottom - parseFloat(cs.paddingBottom) * k * 0.5, lado = parseFloat(cs.paddingInlineEnd || cs.paddingRight) * k * 0.4;
+    var piezas = l.querySelectorAll('.url,.titulo,.frase,.texto,.nota,.eti,.chico,b,small,li,.hora span,.monto,.mes,.tabla>*,.boton,.para,.tres .circulo,.camino .circulo,.pregunta .circulo,.tarjeta');
+    for (var i = 0; i < piezas.length; i++) {
+      var e = piezas[i]; if (e.closest('.marca')) continue;
+      var r = e.getBoundingClientRect();
+      if (!r.width && !r.height) continue;
+      if (r.bottom > abajo + 1 || r.right > L.right - lado + 1 || r.left < L.left + lado - 1) return true;          // se sale de la lámina
+      if (e.scrollWidth > e.clientWidth + 1 && getComputedStyle(e).display !== 'inline') return true;             // una palabra no cabe a lo ancho
+    }
+    var hileras = l.querySelectorAll('.portada,.nosotros,.siguiente,.pregunta,.demo,.problema,.peso,.compara,.izq,.tres,.horas,.camino,.tarjetas');   // nada se encima con lo de al lado
+    for (var a = 0; a < hileras.length; a++) { var hs0 = [].filter.call(hileras[a].children, function (x) { return !x.classList.contains('marca') && x.getBoundingClientRect().width; });
+      for (var u = 0; u < hs0.length; u++) for (var v2 = u + 1; v2 < hs0.length; v2++) { var A = hs0[u].getBoundingClientRect(), B = hs0[v2].getBoundingClientRect();
+        if (A.left < B.right - 2 && B.left < A.right - 2 && A.top < B.bottom - 2 && B.top < A.bottom - 2) return true; } }
+    var cajas = l.querySelectorAll('.tarjeta,.tabla>*');                                                             // lo de adentro de una caja no se sale de ella
+    for (var j = 0; j < cajas.length; j++) { var c = cajas[j], rc = c.getBoundingClientRect(); var hs = c.children; for (var q = 0; q < hs.length; q++) { var rh = hs[q].getBoundingClientRect(); if (rh.bottom > rc.bottom + 1 || rh.right > rc.right + 1) return true; } if (c.scrollHeight > c.clientHeight + 2 && !c.children.length) return true; }
+    return false;
+  }
+  function acomodar() {
+    var w = rollo.clientWidth, h = rollo.clientHeight;
+    var v = h > w * 1.1, W = v ? 1080 : 1920, H = v ? 1920 : 1080;
+    var o = v ? 'v' : 'h';
+    var arriba = rollo.scrollTop / Math.max(1, rollo.clientHeight);
+    rollo.className = o;
+    var s = Math.min(w / W, h / H), x = (w - W * s) / 2, y = (h - H * s) / 2;
+    [].forEach.call(rollo.querySelectorAll('.slot'), function (slot) {
+      slot.style.height = h + 'px';
+      var st = slot.firstChild, l = st.firstChild;
+      st.style.transform = 'translate(' + x + 'px,' + y + 'px) scale(' + s + ')';
+      slot.style.background = getComputedStyle(l).backgroundColor;
+      if (o !== orientacion || !l.__e) {
+        var e = o === 'v' ? 1.6 : 1.3; l.style.setProperty('--e', e);   // se empieza grande (que llene, sin aire de sobra) y se baja hasta que cabe
+        while (noCabe(l) && e > 0.45) { e -= 0.03; l.style.setProperty('--e', e); }
+        l.__e = e;
+        var ar = l.querySelector('.arriba'), fa = 24; ar.style.fontSize = '';          // el renglón de arriba: el nombre completo, nunca cortado
+        while (ar.scrollWidth > ar.clientWidth + 1 && fa > 12) { fa -= 1; ar.style.fontSize = fa + 'px'; }
+        if (ar.scrollWidth > ar.clientWidth + 1) { ar.firstChild.style.whiteSpace = 'normal'; }
+      }
+    });
+    orientacion = o;
+    rollo.scrollTop = Math.round(arriba) * h;
+  }
+
+  /* solo baja la letra de las láminas que, ya dibujadas, no caben */
+  function revisar() {
+    [].forEach.call(rollo.querySelectorAll('.lamina'), function (l) { var e = l.__e || 1; while (noCabe(l) && e > 0.45) { e -= 0.03; l.style.setProperty('--e', e); } l.__e = e; });
+  }
+  MOON_MARCA('pres', function (m) {
+    M = m;
+    if (m.negocio) document.title = m.negocio + ' · ' + KVI.t('pres.titulo_pagina');
+    armar(m);
+    var letras = document.fonts ? Promise.all(['400 1em Anton', '700 1em "DM Sans"', '800 1em "DM Sans"', '400 1em "DM Sans"', 'italic 500 1em Fraunces', '400 1em "KV Mundo"', '700 1em "KV Mundo"', '400 1em Archivo', '700 1em Archivo'].map(function (f) { return document.fonts.load(f, rollo.textContent).catch(function () {}); })) : 0;
+    var img = rollo.querySelector('.marca img');
+    // Los celulares Android a veces agrandan letras chicas por su cuenta un instante después de dibujar.
+    // Por eso se vuelve a revisar dos cuadros después (aún sin mostrar) y solo entonces se enseña: nunca brinca a la vista.
+    var cuadro = function () { return new Promise(function (z) { requestAnimationFrame(function () { requestAnimationFrame(z); }); }); };
+    var mostrar = function () { acomodar(); cuadro().then(function () { revisar(); return cuadro(); }).then(function () { revisar(); document.body.classList.add('listo'); }); };
+    Promise.all([letras, img && img.decode ? img.decode().catch(function () {}) : 0]).then(mostrar, mostrar);
+  });
+  var ultimo = '';
+  addEventListener('resize', function () { var a = innerWidth + 'x' + innerHeight; if (a !== ultimo && M) { ultimo = a; acomodar(); revisar(); } });
+  /* teclado: flechas y espacio pasan de lámina (para presentar en computadora) */
+  addEventListener('keydown', function (e) {
+    var d = { ArrowDown: 1, PageDown: 1, ' ': 1, ArrowRight: 1, ArrowUp: -1, PageUp: -1, ArrowLeft: -1 }[e.key];
+    if (!d || e.target.closest('a')) return;
+    e.preventDefault();
+    var h = rollo.clientHeight; rollo.scrollTo({ top: (Math.round(rollo.scrollTop / h) + d) * h, behavior: 'smooth' });
+  });
+})();
+</script>
+</body>
+</html>

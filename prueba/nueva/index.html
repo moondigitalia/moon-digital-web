@@ -198,6 +198,32 @@ html.dentro,html.dentro body{background:transparent}
 .o{display:flex;align-items:center;gap:10px;color:var(--tenue);font-size:13px;font-weight:700}
 .o::before,.o::after{content:"";flex:1;height:1px;background:rgba(127,127,127,.22)}
 .aviso.bien{color:var(--verde)}
+/* (26-oct) Marca del cliente: el demo, la calculadora y la presentación salen con su logo, sus colores y el nombre de quien los va a ver. */
+.dan .pastillas{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.dan .pastilla{min-height:var(--alto)}
+.marca-fila{display:flex;align-items:center;gap:14px}
+.marca-logo{flex:none;width:calc(var(--alto) * 1.6);aspect-ratio:1;border-radius:50%;background:#fff;box-shadow:var(--hundido);display:grid;place-items:center;overflow:hidden}
+.marca-logo img{width:76%;height:76%;object-fit:contain}
+.marca-logo span{font-size:12px;font-weight:700;color:var(--tenue);text-align:center;padding:6px;line-height:1.2}
+.marca-fila .subir{flex:1}
+.colores{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.color{display:flex;align-items:center;gap:10px;height:var(--alto);border-radius:999px;background:var(--campo);box-shadow:var(--hundido);padding:0 14px 0 6px;font-weight:700;font-size:14px;cursor:pointer;position:relative;overflow:hidden}
+.color i{flex:none;width:calc(var(--alto) - 12px);aspect-ratio:1;border-radius:50%;background:var(--muestra,#ccc);box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)}
+.color input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}
+/* Los tres links del cliente: demo, calculadora y presentación. Tocar el renglón lo abre; el botón verde lo manda por WhatsApp. */
+.enlaces{display:grid;gap:var(--hueco)}
+.enlace{display:flex;align-items:center;gap:12px;min-height:calc(var(--alto) + 14px);border-radius:24px;background:var(--campo);box-shadow:var(--hundido);padding:7px 7px 7px 8px}
+.enlace>a{flex:1;min-width:0;display:flex;align-items:center;gap:12px;color:inherit;text-decoration:none}
+.enlace .ic{flex:none;width:calc(var(--alto) - 4px);aspect-ratio:1;border-radius:50%;background:var(--cobalto);color:#fff;display:grid;place-items:center}
+.enlace .ic svg{width:48%;height:auto}
+.enlace .q{min-width:0;display:grid;line-height:1.2}
+.enlace b{font-size:15.5px;font-weight:800}
+.enlace small{font-size:12.5px;font-weight:600;color:var(--tenue)}
+.enlace .wa{flex:none;width:calc(var(--alto) - 2px);aspect-ratio:1;border-radius:50%;background:#1f9d55;color:#fff;display:grid;place-items:center}
+.enlace .wa svg{width:50%;height:auto}
+.fila .ver{color:var(--cobalto);font-weight:700;white-space:nowrap;flex:none}
+/* Pantallas muy bajitas (celular chico dentro del tablero): se quita primero lo que se entiende solo. */
+@media (max-height:520px){.dan .pastilla{min-height:34px;padding-block:4px}.dan #vozEti{display:none}.dan #resTexto{display:none}.enlace{min-height:calc(var(--alto) + 6px)}.enlace small{display:none}}
 </style>
 </head>
 <body>
@@ -215,7 +241,7 @@ html.dentro,html.dentro body{background:transparent}
   </div>
 
   <!-- El link de la puerta abierta, siempre a la mano de Dan -->
-  <button class="tira" id="tira" hidden type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3M7 8l5-5 5 5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg><span id="compartir">Compartir link para clientes</span></button>
+  <button class="tira" id="tira" hidden type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3M7 8l5-5 5 5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg><span id="compartir">Links para cualquier cliente</span></button>
 
   <!-- Puerta abierta: bienvenida. Quien llega de un anuncio entiende en segundos qué es y qué sigue. -->
   <section class="bienvenida vista" id="bienvenida" hidden>
@@ -261,14 +287,16 @@ html.dentro,html.dentro body{background:transparent}
       <button type="button" class="pastilla ia" id="lector"><b id="lectorTitulo">Llenar solo</b><span>con tu link</span></button>
       <button type="button" class="pastilla" id="pServicios"><b>Precios</b><span>Opcional</span></button>
       <button type="button" class="pastilla" id="pHorario"><b>Horario</b><span>Opcional</span></button>
+      <button type="button" class="pastilla" id="pMarca" hidden><b>Marca</b><span>Logo y colores</span></button>
     </div>
-    <div class="campo">Voz y nombre del asistente
+    <div class="campo"><span id="vozEti">Voz y nombre del asistente</span>
       <div class="voz-fila">
         <div class="segmento" role="group" aria-label="Voz del asistente"><button type="button" class="voz" data-voz="mujer" aria-pressed="true">Mujer</button><button type="button" class="voz" data-voz="hombre" aria-pressed="false">Hombre</button></div>
         <label class="nombre-as"><small>Nombre</small><input name="asistente" maxlength="30" value="Sofía" aria-label="Nombre del asistente" enterkeyhint="done"></label>
       </div>
     </div>
     <input type="hidden" name="servicios"><input type="hidden" name="horario"><input type="hidden" name="ubicacion">
+    <input type="hidden" name="logo"><input type="hidden" name="color"><input type="hidden" name="color2"><input type="hidden" name="responsable">
     <p class="aviso" id="aviso" hidden></p>
     <button class="boton" id="crear">Crear demo</button>
   </form>
@@ -277,12 +305,7 @@ html.dentro,html.dentro body{background:transparent}
   <section class="tarjeta vista" id="resultado" hidden>
     <p class="listo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M7.5 12.5l3 3 6-6.5"/></svg>Demo listo</p>
     <p class="nota" id="resTexto"></p>
-    <div class="link" id="resLink"></div>
-    <a class="boton wa" id="mandar" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.4a.5.5 0 0 0 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.4.8 3.2.7a2.8 2.8 0 0 0 1.8-1.3 2.3 2.3 0 0 0 .2-1.3c-.1-.1-.3-.2-.5-.3z"/></svg>Mandar por WhatsApp</a>
-    <div class="par">
-      <button class="boton dos" id="copiar" type="button">Copiar link</button>
-      <a class="boton dos" id="probar" target="_blank" rel="noopener">Probarlo yo</a>
-    </div>
+    <div class="enlaces" id="resEnlaces"></div>
     <button class="boton dos" id="otro" type="button">Armar otro demo</button>
   </section>
 
@@ -379,6 +402,9 @@ function pintarPastillas() {
   $('pServicios').querySelector('span').textContent = s ? 'Listo ✓' : 'Opcional';
   $('pHorario').classList.toggle('lleno', !!(h || u));
   $('pHorario').querySelector('span').textContent = h && u ? 'Listo ✓' : h ? 'Horario ✓' : u ? 'Dirección ✓' : 'Opcional';
+  const lg = F().logo.value, rs = F().responsable.value;
+  $('pMarca').classList.toggle('lleno', !!(lg || rs));
+  $('pMarca').querySelector('span').textContent = lg && rs ? 'Listo ✓' : lg ? 'Logo ✓' : rs ? 'Nombre ✓' : 'Logo y colores';
 }
 $('pServicios').onclick = () => {
   abrirHoja('Servicios y precios',
@@ -392,6 +418,114 @@ $('pHorario').onclick = () => {
      <label class="campo">Dirección o ciudad<input id="hUbicacion" maxlength="200" placeholder="Ej. Av. Tulum 200, Cancún" value="${esc(F().ubicacion.value)}"></label>`,
     'Listo', () => { F().horario.value = $('hHorario').value.trim(); F().ubicacion.value = $('hUbicacion').value.trim(); pintarPastillas(); });
 };
+
+/* ---------- Marca del cliente (26-oct-2026): logo, colores y nombre de quien lo va a ver ---------- */
+// El logo se achica en el celular (máx. 360 px, conserva lo transparente) y de ahí se sacan sus dos colores principales.
+function logoChico(archivo) {
+  return new Promise((ok, mal) => {
+    const img = new Image(), u = URL.createObjectURL(archivo);
+    img.onload = () => {
+      let lado = 360, url = '';
+      for (let i = 0; i < 4; i++) {
+        const k = Math.min(1, lado / Math.max(img.width, img.height)), c = document.createElement('canvas');
+        c.width = Math.max(1, Math.round(img.width * k)); c.height = Math.max(1, Math.round(img.height * k));
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        url = c.toDataURL('image/webp', 0.9); if (!/^data:image\/webp/.test(url)) url = c.toDataURL('image/png');
+        if (url.length <= 240000) { URL.revokeObjectURL(u); return ok({ url, colores: coloresDe(c) }); }
+        lado = Math.round(lado * 0.7);
+      }
+      URL.revokeObjectURL(u); mal();
+    };
+    img.onerror = () => { URL.revokeObjectURL(u); mal(); };
+    img.src = u;
+  });
+}
+function coloresDe(c) {
+  const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data, cubos = {};
+  for (let i = 0; i < d.length; i += 16) {
+    const r = d[i], g = d[i + 1], b = d[i + 2], a = d[i + 3];
+    if (a < 160) continue;
+    const mx = Math.max(r, g, b), mn = Math.min(r, g, b);
+    if (mx - mn < 28 || mx < 40 || mn > 225) continue;   // blancos, negros y grises no cuentan como color de marca
+    const k = (r >> 5) + '-' + (g >> 5) + '-' + (b >> 5);
+    const x = cubos[k] || (cubos[k] = { n: 0, r: 0, g: 0, b: 0 }); x.n++; x.r += r; x.g += g; x.b += b;
+  }
+  const hex = x => '#' + [x.r / x.n, x.g / x.n, x.b / x.n].map(v => ('0' + Math.round(v).toString(16)).slice(-2)).join('');
+  const lista = Object.values(cubos).sort((a, b) => b.n - a.n);
+  if (!lista.length) return [];
+  const uno = lista[0], dist = (a, b) => Math.hypot(a.r / a.n - b.r / b.n, a.g / a.n - b.g / b.n, a.b / a.n - b.b / b.n);
+  const dos = lista.find(x => dist(x, uno) > 90 && x.n >= uno.n * 0.08);   // el segundo color tiene que ser de verdad parte del logo, no la orilla suavizada
+  return dos ? [hex(uno), hex(dos)] : [hex(uno)];
+}
+const MARCA_VACIA = { logo: '', color: '', color2: '', responsable: '' };
+// Hoja de la marca. Sirve al armar un demo nuevo y para cambiar la de uno ya hecho.
+function hojaMarca(actual, alGuardar) {
+  const m = Object.assign({}, MARCA_VACIA, actual);
+  abrirHoja('Marca del cliente',
+    `<p class="nota">Con esto, su demo, su calculadora y su presentación salen con su logo y sus colores.</p>
+     <div class="marca-fila"><span class="marca-logo" id="mLogo"></span>
+       <label class="subir"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3M7 8l5-5 5 5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg><span id="mLogoTxt">Subir logo</span><input id="mArchivo" type="file" accept="image/png,image/jpeg,image/webp"></label></div>
+     <div class="campo">Colores<div class="colores">
+       <label class="color"><i id="mC1"></i><span>Principal</span><input type="color" id="mColor"></label>
+       <label class="color"><i id="mC2"></i><span>Segundo</span><input type="color" id="mColor2"></label></div></div>
+     <label class="campo">¿Quién lo va a ver?<input id="mResp" maxlength="60" placeholder="Ej. Don Jorge" value="${esc(m.responsable)}" enterkeyhint="done"></label>
+     <p class="aviso" id="mAviso" hidden></p>`,
+    'Listo', () => { m.responsable = $('mResp').value.trim(); return alGuardar(m); });
+  const pinta = () => {
+    $('mLogo').innerHTML = m.logo ? `<img alt="" src="${m.logo}">` : '<span>Sin logo</span>';
+    $('mLogoTxt').textContent = m.logo ? 'Cambiar logo' : 'Subir logo';
+    $('mColor').value = m.color || '#0b4fd6'; $('mColor2').value = m.color2 || '#141a3c';
+    $('mC1').style.setProperty('--muestra', m.color || '#0b4fd6'); $('mC2').style.setProperty('--muestra', m.color2 || '#141a3c');
+  };
+  pinta();
+  $('mArchivo').onchange = async e => {
+    const f = e.target.files[0]; if (!f) return;
+    $('mAviso').hidden = true;
+    try { const r = await logoChico(f); m.logo = r.url; if (r.colores[0]) m.color = r.colores[0]; if (r.colores[1]) m.color2 = r.colores[1]; pinta(); }
+    catch (err) { $('mAviso').textContent = 'No se pudo usar esa imagen. Prueba con un PNG o JPG.'; $('mAviso').hidden = false; }
+  };
+  $('mColor').oninput = e => { m.color = e.target.value; pinta(); };
+  $('mColor2').oninput = e => { m.color2 = e.target.value; pinta(); };
+}
+const marcaDelForm = () => ({ logo: F().logo.value, color: F().color.value, color2: F().color2.value, responsable: F().responsable.value });
+$('pMarca').onclick = () => hojaMarca(marcaDelForm(), m => { ['logo', 'color', 'color2', 'responsable'].forEach(k => F()[k].value = m[k] || ''); pintarPastillas(); });
+
+/* ---------- Los tres links de un cliente (y los generales de MOON) ---------- */
+const IC = {
+  demo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>',
+  calc: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2.5" width="14" height="19" rx="3"/><path d="M8.5 7h7M9 12h.01M12 12h.01M15 12h.01M9 16h.01M12 16h.01M15 16h.01"/></svg>',
+  pres: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="3"/><path d="M12 16v4M8 20h8"/></svg>',
+  wa: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.4a.5.5 0 0 0 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.4.8 3.2.7a2.8 2.8 0 0 0 1.8-1.3 2.3 2.3 0 0 0 .2-1.3c-.1-.1-.3-.2-.5-.3z"/></svg>' };
+// codigo vacío = los links generales (con la marca de MOON)
+function enlacesDe(codigo, negocio, responsable) {
+  const base = 'https://moondigitalia.com';
+  const hola = responsable ? `Hola, ${responsable}` : 'Hola';
+  const de = negocio ? ` de ${negocio}` : '';
+  const L = codigo ? [
+    ['demo', 'Su recepcionista', 'El demo para hablarle', `${base}/prueba/${codigo}`, `${hola}, te preparé una muestra de cómo atendería un asistente virtual a los clientes${de}. Ábrela y háblale como si fueras un cliente: ${base}/prueba/${codigo}`],
+    ['calc', 'Calculadora', 'Lo que le cuestan las llamadas', `${base}/calculadora/${codigo}`, `${hola}, te comparto una calculadora para ver cuánto pueden costarle${de ? ' a ' + negocio : ''} las llamadas que no se alcanzan a contestar: ${base}/calculadora/${codigo}`],
+    ['pres', 'Presentación', '¿Quién contesta cuando no estás?', `${base}/presentacion/${codigo}`, `${hola}, te comparto la presentación que preparamos para ti: ${base}/presentacion/${codigo}`],
+  ] : [
+    ['demo', 'Crea tu recepcionista', 'Cualquiera arma su demo', `${base}/prueba/nueva`, `¿Te gustaría que un asistente virtual contestara a tus clientes a cualquier hora? Arma el tuyo en un minuto y háblale tú mismo: ${base}/prueba/nueva`],
+    ['calc', 'Calculadora', 'Con la marca de MOON', `${base}/calculadora`, `Te comparto una calculadora para ver cuánto pueden costarle a tu negocio las llamadas que no se alcanzan a contestar: ${base}/calculadora`],
+    ['pres', 'Presentación', 'Con la marca de MOON', `${base}/presentacion`, `Te comparto una presentación corta sobre las llamadas que llegan cuando tu negocio ya cerró: ${base}/presentacion`],
+  ];
+  return L.map(([k, n, f, url, txt]) => `<div class="enlace"><a href="${esc(url)}" target="_blank" rel="noopener"><span class="ic">${IC[k]}</span><span class="q"><b>${esc(n)}</b><small>${esc(f)}</small></span></a><a class="wa" href="https://wa.me/?text=${encodeURIComponent(txt)}" target="_blank" rel="noopener" aria-label="Mandar ${esc(n.toLowerCase())} por WhatsApp">${IC.wa}</a></div>`).join('');
+}
+// Links de un demo ya hecho (desde el tablero), con su marca para cambiarla.
+async function hojaLinks(x) {
+  abrirHoja(x.negocio, `<div class="enlaces">${enlacesDe(x.codigo, x.negocio, x.responsable || '')}</div>`, 'Cambiar marca', async () => {
+    const r = await fetch('/api/prueba', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ accion: 'marca', codigo: x.codigo, pagina: 'dan' }) }).then(z => z.json()).catch(() => ({}));
+    const actual = r.ok ? r.marca : {};
+    setTimeout(() => hojaMarca(actual, async m => {
+      $('hojaListo').disabled = true;
+      const g = await api('editar_marca', Object.assign({ codigo: x.codigo }, m));
+      $('hojaListo').disabled = false;
+      if (!g.ok) { $('mAviso').textContent = 'No se pudo guardar. Vuelve a intentar.'; $('mAviso').hidden = false; return false; }
+      x.responsable = m.responsable;
+    }), 380);
+  });
+}
 
 /* ---------- Llenar solo: leer su página web, o una foto o PDF de su menú ---------- */
 const ERRORES_LECTOR = {
@@ -481,15 +615,11 @@ F().addEventListener('submit', async e => {
   // Puerta abierta: directo a hablarle a su asistente.
   if (modo === 'abierta') { location.href = r.link; return; }
   const negocio = datos.negocio.trim();
-  $('resTexto').textContent = `Mándale este link a ${negocio}. Lo abre en su celular, pica el botón y le habla a su asistente.`;
-  $('resLink').innerHTML = esc(r.link.replace(/^https:\/\//, '')).replace(/([\/-])/g, '$1<wbr>'); // se ve corto y solo se parte en / o -; al mandarlo va completo con https://
-  $('probar').href = r.link;
-  const mensaje = `Hola, te preparé una muestra de cómo atendería un asistente virtual a los clientes de ${negocio}. Ábrela y háblale como si fueras un cliente: ${r.link}`;
-  $('mandar').href = 'https://wa.me/?text=' + encodeURIComponent(mensaje);
-  $('copiar').onclick = async () => { try { await navigator.clipboard.writeText(r.link); $('copiar').textContent = 'Copiado'; } catch (e) { $('copiar').textContent = 'Mantén presionado el link'; } setTimeout(() => $('copiar').textContent = 'Copiar link', 2200); };
+  $('resTexto').textContent = `Tres links para ${negocio}, cada uno por separado. Toca uno para verlo o el botón verde para mandarlo por WhatsApp.`;
+  $('resEnlaces').innerHTML = enlacesDe(r.codigo, negocio, datos.responsable || '');
   mostrar('resultado');
 });
-$('otro').onclick = () => { $('lectorTitulo').textContent = 'Llenar solo'; $('aviso').hidden = true; F().reset(); ['servicios', 'horario', 'ubicacion'].forEach(n => F()[n].value = ''); voz = 'mujer'; document.querySelectorAll('.voz').forEach(x => x.setAttribute('aria-pressed', x.dataset.voz === 'mujer')); pintarPastillas(); $('resultado').hidden = true; mostrar('forma'); };
+$('otro').onclick = () => { $('lectorTitulo').textContent = 'Llenar solo'; $('aviso').hidden = true; F().reset(); ['servicios', 'horario', 'ubicacion', 'logo', 'color', 'color2', 'responsable'].forEach(n => F()[n].value = ''); voz = 'mujer'; document.querySelectorAll('.voz').forEach(x => x.setAttribute('aria-pressed', x.dataset.voz === 'mujer')); pintarPastillas(); $('resultado').hidden = true; mostrar('forma'); };
 
 /* ---------- Tablero ---------- */
 function cuando(iso) {
@@ -499,7 +629,7 @@ function cuando(iso) {
 }
 const RESP = { quiero: 'Quiere uno', llamada: 'Quiere llamada', no: 'Ahorita no' };
 const quien = x => x.contacto ? `${x.contacto} · ${x.negocio}` : x.negocio;
-const filaDemo = x => `<div class="fila"><div><b>${esc(quien(x))}${x.cerrado ? '<span class="marca si">Cerrado</span>' : x.respuesta ? `<span class="marca${x.respuesta === 'no' ? '' : ' si'}">${RESP[x.respuesta]}</span>` : ''}</b><small>${x.puerta === 'abierta' ? 'Lo armó solo' : 'Lo armó el equipo'} · ${esc(cuando(x.creado))} · ${x.usos ? `le habló ${x.usos} ${x.usos === 1 ? 'vez' : 'veces'}` : 'aún no le habla'}</small></div><a href="/prueba/${esc(x.codigo)}" target="_blank" rel="noopener">Abrir</a></div>`;
+const filaDemo = x => `<div class="fila"><div><b>${esc(quien(x))}${x.cerrado ? '<span class="marca si">Cerrado</span>' : x.respuesta ? `<span class="marca${x.respuesta === 'no' ? '' : ' si'}">${RESP[x.respuesta]}</span>` : ''}</b><small>${x.puerta === 'abierta' ? 'Lo armó solo' : 'Lo armó el equipo'} · ${esc(cuando(x.creado))} · ${x.usos ? `le habló ${x.usos} ${x.usos === 1 ? 'vez' : 'veces'}` : 'aún no le habla'}</small></div><button class="ver" type="button" data-links="${esc(x.codigo)}">Links</button></div>`;
 const PASOS = [
   ['armados', 'Armados', x => true, 'Todos los demos, del más nuevo al más viejo.'],
   ['abiertos', 'Los abrieron', x => x.vistas > 0, 'Abrieron su link al menos una vez.'],
@@ -529,6 +659,7 @@ $('tEmbudo').onclick = e => {
   const [, n, f, d] = PASOS.find(p => p[0] === k);
   const lista = T.demos.filter(f);
   abrirHoja(n, `<p class="nota">${d}</p><div class="lista">${lista.length ? lista.map(filaDemo).join('') : '<p class="nota">Todavía no hay ninguno aquí.</p>'}</div>`, 'Cerrar');
+  $('hojaCuerpo').querySelectorAll('[data-links]').forEach(bt => bt.onclick = () => { const x = lista.find(y => y.codigo === bt.dataset.links); cerrarHoja(); setTimeout(() => hojaLinks(x), 380); });
 };
 $('tGasto').onclick = () => {
   const g = T.gasto;
@@ -611,12 +742,8 @@ document.querySelectorAll('main form').forEach(f => { const l = [...f.querySelec
 
 /* ---------- Compartir el link de la puerta abierta ---------- */
 const LINK_ABIERTA = 'https://moondigitalia.com/prueba/nueva';
-$('tira').onclick = async () => {
-  const texto = `¿Te gustaría que un asistente virtual contestara a tus clientes a cualquier hora? Arma el tuyo en un minuto y háblale tú mismo: ${LINK_ABIERTA}`;
-  try { if (navigator.share) { await navigator.share({ text: texto }); return; } } catch (e) { if (e && e.name === 'AbortError') return; }
-  try { await navigator.clipboard.writeText(texto); $('compartir').textContent = 'Link copiado'; } catch (e) { $('compartir').textContent = 'No se pudo copiar'; }
-  setTimeout(() => $('compartir').textContent = 'Compartir link para clientes', 2200);
-};
+// (26-oct) Los links que sirven para cualquier cliente, con la marca de MOON: crea tu recepcionista, calculadora y presentación.
+$('tira').onclick = () => abrirHoja('Links para cualquier cliente', `<p class="nota">Con la marca de MOON. Para un cliente en especial, arma su demo: sus links salen con su logo.</p><div class="enlaces">${enlacesDe('', '', '')}</div>`, 'Cerrar');
 
 /* ---------- Arranque: con sesión del Centro es Dan; sin sesión es la puerta abierta ---------- */
 function entrarAbierta() {
@@ -638,7 +765,7 @@ function entrarAbierta() {
   if (!sesion() || !PARAMS.get('dentro')) return entrarAbierta();
   $('cabEti').textContent = 'MOON Digital';
   $('cabTitulo').textContent = 'Crea tu recepcionista'; document.documentElement.classList.add('dan');
-  $('pestanas').hidden = false;
+  $('pestanas').hidden = false; $('pMarca').hidden = false;
   mostrar(PARAMS.get('ver') === 'tablero' ? 'tablero' : 'forma');
   const r = await api('mios');
   if (!r.ok && r.error === 'sesion') entrarAbierta();

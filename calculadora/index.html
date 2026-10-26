@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#F8F7F2">
+<link rel="icon" href="data:,">
+<script src="/idiomas/idioma.js"></script>
+<title data-t="calc.titulo_pagina">Lo que te cuestan las llamadas perdidas</title>
+<link rel="preload" href="/fuentes/material/anton-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fuentes/material/dm-sans-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/fuentes/material/letras.css">
+<link rel="stylesheet" href="/idiomas/letras.css">
+<script src="/material/marca.js"></script>
+<style>
+/* Calculadora de llamadas perdidas (26-oct-2026). Idea del video de Connor Cahill, en español y para gente de oficio:
+   "contratar", no "reservar". Reglas de Kid: todo cabe en UNA pantalla (vertical y horizontal), nada se mueve ni un pixel,
+   sin scroll, nada cortado. Todo se mide con --k: si algo no cabe (pantalla chica, letra grande, idioma largo), --k baja hasta que cabe. */
+:root{--c:#0b4fd6;--c-sobre:#fff;--c2:#141a3c;--c-tinta:#0b4fd6;--c-claro:#e3eafa;--c-hondo:#0a1f55;--crema:#F8F7F2;--tinta:#1b1b20;--suave:#5c5c66;--k:1;
+  --letra:'DM Sans','Archivo','KV Mundo',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;--grande:'Anton','KV Mundo',Impact,'Arial Narrow',sans-serif;--fina:'Fraunces','KV Mundo',Georgia,serif}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%;overflow:hidden;overscroll-behavior:none;background:var(--crema);color:var(--tinta);font-family:var(--letra);-webkit-text-size-adjust:100%;text-size-adjust:100%;-webkit-font-smoothing:antialiased}
+body{visibility:hidden}
+body.listo{visibility:visible}
+main{height:100%;max-width:1180px;margin:0 auto;padding:max(calc(18px*var(--k)),env(safe-area-inset-top)) max(calc(18px*var(--k)),env(safe-area-inset-right)) max(calc(16px*var(--k)),env(safe-area-inset-bottom)) max(calc(18px*var(--k)),env(safe-area-inset-left));
+  display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto auto;gap:calc(14px*var(--k));align-content:center}
+.cab{display:flex;align-items:center;gap:calc(14px*var(--k))}
+.cab .logo-c{flex:none;width:calc(60px*var(--k));aspect-ratio:1;border-radius:50%;background:#fff;display:grid;place-items:center;overflow:hidden;box-shadow:0 0 0 1px rgba(0,0,0,.06)}
+.cab .logo-c img{width:74%;height:74%;object-fit:contain}
+.cab .logo-c i{width:72%;aspect-ratio:2496/682;background:var(--c2);-webkit-mask:url(/centro/logo.svg) center/contain no-repeat;mask:url(/centro/logo.svg) center/contain no-repeat}
+.eti{font-size:calc(12px*var(--k));font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--c-tinta);overflow-wrap:anywhere}
+h1{font-family:var(--grande);font-weight:400;text-transform:uppercase;font-size:calc(31px*var(--k));line-height:1.02;letter-spacing:.005em;color:var(--tinta);text-wrap:balance;margin-top:calc(4px*var(--k))}
+h1 em{font-style:normal;color:var(--c-tinta)}
+.preguntas{display:grid;gap:calc(14px*var(--k));align-content:center;min-height:0}
+.q{background:#fff;border-radius:calc(26px*var(--k));padding:calc(14px*var(--k)) calc(18px*var(--k)) calc(12px*var(--k));display:grid;gap:calc(8px*var(--k))}
+.q-cab{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.q label{font-size:calc(15.5px*var(--k));font-weight:700;line-height:1.25;color:var(--tinta)}
+.q output{flex:none;text-align:end;font-size:calc(22px*var(--k));font-weight:800;color:var(--tinta);font-variant-numeric:tabular-nums;white-space:nowrap}
+.q output small{font-size:.58em;font-weight:700;color:var(--suave);margin-inline-start:2px}
+.q .ayuda{font-size:calc(12.5px*var(--k));font-weight:600;color:var(--suave);line-height:1.3;margin-top:calc(-4px*var(--k))}
+/* Barra: gruesa y fácil de agarrar con el dedo; lo recorrido va del color del cliente. */
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:calc(34px*var(--k));background:transparent;cursor:pointer;touch-action:pan-y;margin:0}
+input[type=range]::-webkit-slider-runnable-track{height:calc(10px*var(--k));border-radius:999px;background:linear-gradient(to right,var(--c) 0 var(--p,50%),#e7e3dc var(--p,50%) 100%)}
+input[type=range]::-moz-range-track{height:calc(10px*var(--k));border-radius:999px;background:#e7e3dc}
+input[type=range]::-moz-range-progress{height:calc(10px*var(--k));border-radius:999px;background:var(--c)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:calc(30px*var(--k));height:calc(30px*var(--k));border-radius:50%;background:#fff;border:calc(7px*var(--k)) solid var(--c);margin-top:calc(-10px*var(--k));box-shadow:0 2px 8px rgba(0,0,0,.18)}
+input[type=range]::-moz-range-thumb{width:calc(16px*var(--k));height:calc(16px*var(--k));border-radius:50%;background:#fff;border:calc(7px*var(--k)) solid var(--c);box-shadow:0 2px 8px rgba(0,0,0,.18)}
+input[type=range]:focus-visible{outline:none}
+input[type=range]:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 5px var(--c-claro)}
+[dir=rtl] input[type=range]::-webkit-slider-runnable-track{background:linear-gradient(to left,var(--c) 0 var(--p,50%),#e7e3dc var(--p,50%) 100%)}
+.res{background:var(--c);color:var(--c-sobre);border-radius:calc(30px*var(--k));padding:calc(18px*var(--k)) calc(22px*var(--k));display:grid;grid-template-columns:minmax(0,1fr);gap:calc(10px*var(--k));min-width:0}
+.res .eti{color:inherit;opacity:.82}
+.monto{font-family:var(--grande);font-weight:400;font-size:calc(64px*var(--k));line-height:.95;font-variant-numeric:tabular-nums;white-space:nowrap;letter-spacing:.01em}
+.monto small,.fila b small,.q output small{margin-inline-start:.22em}
+.monto small{font-family:var(--letra);font-size:.3em;font-weight:800;letter-spacing:.08em;margin-inline-start:.25em;opacity:.85}
+.filas{display:grid;gap:calc(2px*var(--k))}
+.fila{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:calc(7px*var(--k)) 0;border-top:1px solid color-mix(in srgb,currentColor 22%,transparent)}
+.fila span{font-size:calc(14px*var(--k));font-weight:600;opacity:.9;line-height:1.25}
+.fila b{font-size:calc(17px*var(--k));font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}
+.cierre{font-family:var(--fina);font-style:italic;font-weight:500;font-size:calc(18px*var(--k));line-height:1.3;color:var(--tinta);text-wrap:pretty}
+.pie{display:flex;align-items:center;gap:10px;font-size:calc(12px*var(--k));font-weight:700;color:var(--suave)}
+.pie i{height:calc(13px*var(--k));aspect-ratio:2496/682;background:currentColor;-webkit-mask:url(/centro/logo.svg) center/contain no-repeat;mask:url(/centro/logo.svg) center/contain no-repeat;flex:none}
+/* Horizontal (computadora, tablet, celular acostado): preguntas a un lado, resultado al otro. */
+html.ancho main{grid-template-columns:minmax(0,1.08fr) minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto;column-gap:calc(26px*var(--k));row-gap:calc(16px*var(--k))}
+html.ancho .cab{grid-column:1/-1}
+html.ancho .preguntas{grid-column:1;grid-row:2/4}
+html.ancho .lado{grid-column:2;grid-row:2;display:grid;gap:calc(16px*var(--k));align-content:center}
+html.ancho .pie{grid-column:2;grid-row:3}
+.lado{display:grid;grid-template-columns:minmax(0,1fr);gap:calc(14px*var(--k))}
+</style>
+</head>
+<body>
+<main>
+  <header class="cab">
+    <span class="logo-c" id="logo"></span>
+    <div style="min-width:0"><p class="eti" id="para"></p><h1 id="titulo"></h1></div>
+  </header>
+  <section class="preguntas">
+    <div class="q">
+      <div class="q-cab"><label for="r1" data-t="calc.q1"></label><output id="o1" for="r1"></output></div>
+      <p class="ayuda" data-t="calc.q1_ayuda"></p>
+      <input type="range" id="r1" min="0" max="40" step="1" value="3">
+    </div>
+    <div class="q">
+      <div class="q-cab"><label for="r2" data-t="calc.q2"></label><output id="o2" for="r2"></output></div>
+      <input type="range" id="r2" min="0" max="24" step="1" value="9">
+    </div>
+    <div class="q">
+      <div class="q-cab"><label for="r3" data-t="calc.q3"></label><output id="o3" for="r3"></output></div>
+      <input type="range" id="r3" min="1" max="10" step="1" value="3">
+    </div>
+  </section>
+  <div class="lado">
+    <section class="res" aria-live="polite">
+      <p class="eti" data-t="calc.pierdes"></p>
+      <p class="monto" id="monto"></p>
+      <div class="filas">
+        <div class="fila"><span data-t="calc.llamadas_mes"></span><b id="f1"></b></div>
+        <div class="fila"><span data-t="calc.trabajos"></span><b id="f2"></b></div>
+        <div class="fila"><span data-t="calc.al_ano"></span><b id="f3"></b></div>
+      </div>
+    </section>
+    <p class="cierre" data-t="calc.cierre"></p>
+  </div>
+  <footer class="pie"><i aria-hidden="true"></i><span data-t="comun.moon"></span></footer>
+</main>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  /* "lo menos que cobras": pasos redondos, de 100 a 50,000 pesos */
+  var PRECIOS = [100, 150, 200, 250, 300, 400, 500, 600, 700, 800, 1000, 1200, 1500, 2000, 2500, 3000, 4000, 5000, 6000, 8000, 10000, 15000, 20000, 30000, 50000];
+  $('r2').max = PRECIOS.length - 1;
+  var num = new Intl.NumberFormat(KVI.region);
+  var dinero = function (n) { return MOON_ESC(KVI.precio(n)).replace(/\s?MXN/, '<small>MXN</small>'); };
+
+  function calcula() {
+    var llamadas = +$('r1').value, precio = PRECIOS[+$('r2').value], de10 = +$('r3').value;
+    var mes = llamadas * 30, trabajos = llamadas * 3 * de10, pierde = trabajos * precio;
+    $('o1').textContent = num.format(llamadas);
+    $('o2').innerHTML = dinero(precio);
+    $('o3').textContent = KVI.t('calc.q3_valor', { n: num.format(de10) });
+    $('monto').innerHTML = dinero(pierde);
+    $('f1').textContent = num.format(mes);
+    $('f2').textContent = num.format(trabajos);
+    $('f3').innerHTML = dinero(pierde * 12);
+    ['r1', 'r2', 'r3'].forEach(function (id) { var r = $(id); r.style.setProperty('--p', ((r.value - r.min) / (r.max - r.min) * 100) + '%'); });
+  }
+  ['r1', 'r2', 'r3'].forEach(function (id) { $(id).addEventListener('input', function () { calcula(); acomodaSiCrece(); }); });
+
+  /* Que todo quepa: se prueba de grande a chico (--k) hasta que la página no se sale de la pantalla y ningún texto se sale de su lugar.
+     Se mide con la cifra más larga posible, para que mover las barras nunca haga brincar nada. */
+  var fijo = false;
+  function noCabe() {
+    var d = document.scrollingElement;
+    if (d.scrollHeight > innerHeight + 1 || d.scrollWidth > innerWidth + 1) return true;
+    var m = document.querySelector('main');
+    if (m.scrollHeight > m.clientHeight + 1) return true;
+    if ([].some.call(document.querySelectorAll('.preguntas,.lado'), function (e) { return e.scrollHeight > e.clientHeight + 1; })) return true;
+    return [].some.call(document.querySelectorAll('.monto,.q output,.fila b,.q-cab,.fila,h1,.eti'), function (e) { return e.scrollWidth > e.clientWidth + 1; });
+  }
+  function acomoda() {
+    var ancho = innerWidth >= 700 && innerWidth > innerHeight * 1.05;
+    document.documentElement.classList.toggle('ancho', ancho);
+    var r = [+$('r1').value, +$('r2').value, +$('r3').value];
+    $('r1').value = 40; $('r2').value = PRECIOS.length - 1; $('r3').value = 10; calcula();   // la cifra más larga
+    var salidas = ['o1', 'o2', 'o3'].map(function (id) { var o = $(id); o.style.minWidth = ''; return o; });
+    /* se empieza grande (que llene la pantalla, sin aire de sobra) y se baja hasta que cabe */
+    var k = ancho ? Math.min(innerWidth / 880, 2.2) : Math.min(innerWidth / 330, 1.7);
+    var raiz = document.documentElement.style;
+    raiz.setProperty('--k', k);
+    while (noCabe() && k > 0.5) { k -= 0.02; raiz.setProperty('--k', k); }
+    // cada cifra se queda con el ancho de su valor más largo: al mover la barra, el texto de al lado nunca cambia de renglón
+    salidas.forEach(function (o) { o.style.minWidth = Math.ceil(o.getBoundingClientRect().width) + 'px'; });
+    $('r1').value = r[0]; $('r2').value = r[1]; $('r3').value = r[2]; calcula();
+  }
+  function acomodaSiCrece() { if (noCabe()) acomoda(); }
+
+  MOON_MARCA('calc', function (m) {
+    KVI.aplicar(document);
+    $('titulo').innerHTML = MOON_RESALTA(KVI.t('calc.titulo'));
+    $('para').textContent = m.negocio ? KVI.t('comun.para', { negocio: m.negocio }) : 'MOON Digital';
+    if (m.logo) { var im = new Image(); im.alt = m.negocio; im.src = m.logo; $('logo').appendChild(im); }
+    else $('logo').innerHTML = '<i role="img" aria-label="MOON Digital"></i>';
+    if (m.negocio) document.title = m.negocio + ' · ' + KVI.t('calc.titulo_pagina');
+    var mostrar = function () { acomoda(); document.body.classList.add('listo'); };
+    var img = $('logo').querySelector('img');
+    var letras = document.fonts ? Promise.all(['400 1em Anton', '700 1em "DM Sans"', '800 1em "DM Sans"', '600 1em "DM Sans"', 'italic 500 1em Fraunces', '400 1em "KV Mundo"', '700 1em "KV Mundo"', '400 1em Archivo', '700 1em Archivo'].map(function (f) { return document.fonts.load(f, document.body.textContent).catch(function () {}); })) : 0;
+    Promise.all([letras, img && img.decode ? img.decode().catch(function () {}) : 0]).then(mostrar, mostrar);
+  });
+  var ultimo = innerWidth + 'x' + innerHeight;
+  addEventListener('resize', function () { var a = innerWidth + 'x' + innerHeight; if (a !== ultimo) { ultimo = a; acomoda(); } });
+})();
+</script>
+</body>
+</html>

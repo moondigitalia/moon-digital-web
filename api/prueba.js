@@ -29,7 +29,7 @@ function leer(req) {
   if (req.body && typeof req.body === 'object') return Promise.resolve(req.body);
   return new Promise(ok => {
     let s = '';
-    req.on('data', c => { s += c; if (s.length > 40000) req.destroy(); });
+    req.on('data', c => { s += c; if (s.length > 300000) req.destroy(); });
     req.on('end', () => { try { ok(JSON.parse(s || '{}')); } catch (e) { ok({}); } });
     req.on('error', () => ok({}));
   });
@@ -57,6 +57,12 @@ async function codigoLibre(negocio) {
   return c;
 }
 
+// Logo: imagen chica ya achicada en el celular de Dan (máx. ~180 KB). Colores: #rrggbb. Si algo no es válido, se queda vacío y se usa lo de MOON.
+function marcaValida(d) {
+  const logo = String(d.logo || '');
+  const color = c => /^#[0-9a-f]{6}$/i.test(String(c || '')) ? String(c).toLowerCase() : '';
+  return { responsable: t(d.responsable, 60), logo: /^data:image\/(png|webp|jpeg);base64,[a-z0-9+/=]+$/i.test(logo) && logo.length <= 250000 ? logo : '', color: color(d.color), color2: color(d.color2) };
+}
 const publico = d => ({ negocio: d.negocio, giro: d.giro, servicios: d.servicios, horario: d.horario, ubicacion: d.ubicacion, asistente: d.asistente, voz: d.voz, puerta: d.puerta || 'dan', conocido: !!d.whatsapp, respuesta: d.respuesta || '' });
 const link = c => 'https://moondigitalia.com/prueba/' + c;
 
@@ -117,7 +123,7 @@ async function gastoDemos(desdeIso) {
 async function tablero() {
   const hoy = inicioHoy(), mes = inicioMes();
   const [demos, usosHoy, cobros, cerrados] = await Promise.all([
-    sql(`SELECT codigo, negocio, asistente, puerta, contacto, whatsapp, creado, vistas, usos, ultimo_uso, respuesta, respuesta_fecha FROM demos ORDER BY creado DESC LIMIT 500`),
+    sql(`SELECT codigo, negocio, asistente, puerta, contacto, whatsapp, creado, vistas, usos, ultimo_uso, respuesta, respuesta_fecha, responsable, vistas_calc, vistas_pres FROM demos ORDER BY creado DESC LIMIT 500`),
     sql('SELECT puerta, COUNT(*) n FROM demo_usos WHERE fecha >= ? GROUP BY puerta', [hoy]),
     sql(`SELECT tel, nombre, negocio, etapa, cobro_total, cobro_mensual, cobro_fecha FROM personas WHERE (cobro_total > 0 OR cobro_mensual > 0) AND es_prueba = 0 ORDER BY cobro_fecha DESC`),
     sql(`SELECT d.codigo FROM demos d JOIN personas p ON p.tel = d.whatsapp WHERE d.whatsapp <> '' AND p.etapa IN ('cerrado', 'en órbita')`),
@@ -147,6 +153,16 @@ module.exports = async (req, res) => {
       if (!x) { res.status(200).json({ ok: false, error: 'no_existe' }); return; }
       await sql('UPDATE demos SET vistas = vistas + 1 WHERE codigo = ?', [codigo]);
       res.status(200).json({ ok: true, agente: AGENTES[x.puerta] || AGENTES.dan, voz_id: VOCES[x.voz] || VOCES.mujer, demo: publico(x) });
+      return;
+    }
+    // Marca del cliente para la calculadora y la presentación (26-oct-2026): logo, colores, nombre del negocio y del responsable.
+    if (d.accion === 'marca') {
+      const x = (await sql('SELECT codigo, negocio, responsable, logo, color, color2 FROM demos WHERE codigo = ?', [codigo]))[0];
+      if (!x) { res.status(200).json({ ok: false, error: 'no_existe' }); return; }
+      const col = d.pagina === 'pres' ? 'vistas_pres' : d.pagina === 'calc' ? 'vistas_calc' : '';   // Dan revisando la marca no cuenta como vista
+      if (col) await sql(`UPDATE demos SET ${col} = COALESCE(${col}, 0) + 1 WHERE codigo = ?`, [codigo]).catch(() => {});
+      res.setHeader('Cache-Control', 'no-store');
+      res.status(200).json({ ok: true, marca: { negocio: x.negocio, responsable: x.responsable || '', logo: x.logo || '', color: x.color || '', color2: x.color2 || '', demo: link(codigo) } });
       return;
     }
     if (d.accion === 'uso') {
@@ -217,10 +233,20 @@ module.exports = async (req, res) => {
       const voz = d.voz === 'hombre' ? 'hombre' : 'mujer';
       const asistente = t(d.asistente, 30) || (voz === 'hombre' ? 'Mateo' : 'Sofía');
       const nuevo = await codigoLibre(negocio);
-      await sql('INSERT INTO demos (codigo, negocio, giro, servicios, horario, ubicacion, asistente, voz, creado, creado_por, puerta) VALUES (?,?,?,?,?,?,?,?,?,?,?)',
-        [nuevo, negocio, giro, t(d.servicios, 1500), t(d.horario, 200), t(d.ubicacion, 200), asistente, voz, ahora(), yo.id, 'dan']);
+      const m = marcaValida(d);
+      await sql('INSERT INTO demos (codigo, negocio, giro, servicios, horario, ubicacion, asistente, voz, creado, creado_por, puerta, responsable, logo, color, color2) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
+        [nuevo, negocio, giro, t(d.servicios, 1500), t(d.horario, 200), t(d.ubicacion, 200), asistente, voz, ahora(), yo.id, 'dan', m.responsable, m.logo, m.color, m.color2]);
       await sql('INSERT INTO actividad (fecha, quien, texto) VALUES (?,?,?)', [ahora(), yo.id, t(`armó un demo para ${negocio}`, 200)]).catch(() => {});
       res.status(200).json({ ok: true, codigo: nuevo, link: link(nuevo) });
+      return;
+    }
+
+    if (d.accion === 'editar_marca') {
+      const m = marcaValida(d);
+      const x = (await sql('SELECT codigo FROM demos WHERE codigo = ?', [codigo]))[0];
+      if (!x) { res.status(200).json({ ok: false, error: 'no_existe' }); return; }
+      await sql('UPDATE demos SET responsable = ?, logo = ?, color = ?, color2 = ? WHERE codigo = ?', [m.responsable, m.logo, m.color, m.color2, codigo]);
+      res.status(200).json({ ok: true });
       return;
     }
 

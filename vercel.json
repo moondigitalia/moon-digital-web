@@ -22,6 +22,14 @@
     {
       "source": "/prueba/:codigo",
       "destination": "/prueba/index.html"
+    },
+    {
+      "source": "/calculadora/:codigo",
+      "destination": "/calculadora/index.html"
+    },
+    {
+      "source": "/presentacion/:codigo",
+      "destination": "/presentacion/index.html"
     }
   ],
   "redirects": [

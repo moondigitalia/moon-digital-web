@@ -72,10 +72,21 @@ const srv = http.createServer((q, r) => {
       await p.click('#lector'); await revisa('hoja-lector'); await p.click('#velo', { position: { x: 5, y: 5 } }); await p.waitForTimeout(400);
       await p.click('#pServicios'); await revisa('hoja-servicios'); await p.click('#hojaListo'); await p.waitForTimeout(400);
       await p.click('#pHorario'); await revisa('hoja-horario'); await p.click('#hojaListo'); await p.waitForTimeout(400);
+      // (26-oct) Marca del cliente: hoja vacía, con logo subido y con el nombre de quien lo verá.
+      await p.click('#pMarca'); await revisa('hoja-marca');
+      await p.setInputFiles('#mArchivo', path.join(raiz, 'pruebas/material/logo-prueba.png')); await p.waitForTimeout(500); await revisa('hoja-marca-logo');
+      await p.fill('#mResp', 'Licenciada María Fernanda Contreras'); await p.click('#hojaListo'); await p.waitForTimeout(400);
+      const mc = await p.evaluate(() => ({ logo: document.querySelector('input[name=logo]').value.slice(0, 15), color: document.querySelector('input[name=color]').value }));
+      if (mc.logo !== 'data:image/webp' && mc.logo !== 'data:image/png;') fallas.push(`${nom} marca: el logo no quedó guardado`);
+      if (!/^#[0-9a-f]{6}$/.test(mc.color)) fallas.push(`${nom} marca: no sacó el color del logo`);
+      await revisa('forma-con-marca');
       await p.fill('input[name=negocio]', 'Clínica Dental Sonrisa'); await p.fill('input[name=giro]', 'Clínica dental'); await p.click('#crear'); await p.waitForTimeout(400);
       await revisa('resultado');
+      await p.click('#tira'); await revisa('hoja-links-generales'); await p.click('#velo', { position: { x: 5, y: 5 } }); await p.waitForTimeout(400);
       await p.click('.pestana[data-v=tablero]'); await revisa('tablero');
-      await p.click('[data-paso=quieren]'); await revisa('hoja-quieren'); await p.click('#velo', { position: { x: 5, y: 5 } }); await p.waitForTimeout(400);
+      await p.click('[data-paso=quieren]'); await revisa('hoja-quieren');
+      await p.click('[data-links]'); await p.waitForTimeout(800); await revisa('hoja-links');
+      await p.click('#hojaListo'); await p.waitForTimeout(900); await revisa('hoja-cambiar-marca'); await p.click('#velo', { position: { x: 5, y: 5 } }); await p.waitForTimeout(400);
       await p.click('#tGasto'); await revisa('hoja-gasto'); await p.click('#velo', { position: { x: 5, y: 5 } }); await p.waitForTimeout(400);
       await p.click('#anotar'); await p.waitForTimeout(500); await revisa('hoja-cierre');
       await p.click('#resultados [data-i="0"]'); await revisa('hoja-cierre-montos');
