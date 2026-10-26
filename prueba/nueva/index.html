@@ -283,7 +283,7 @@ html.dentro,html.dentro body{background:transparent}
   <!-- Puerta abierta, paso 1: quién eres -->
   <form class="tarjeta vista" id="paso1" hidden autocomplete="on">
     <label class="campo">Tu nombre
-      <input name="contacto" required maxlength="80" autocomplete="name" placeholder="Ej. Laura">
+      <input name="contacto" required maxlength="80" autocomplete="name" placeholder="Ejemplo: Laura">
     </label>
     <label class="campo">Tu WhatsApp
       <input name="whatsapp" required type="tel" inputmode="tel" maxlength="20" autocomplete="tel" placeholder="10 dígitos">
@@ -295,10 +295,10 @@ html.dentro,html.dentro body{background:transparent}
   <!-- Formulario del negocio: cabe completo en una pantalla -->
   <form class="tarjeta vista" id="forma" hidden autocomplete="off">
     <label class="campo"><span id="lNegocio">Nombre del negocio</span>
-      <input name="negocio" required maxlength="80" placeholder="Ej. Clínica Dental Sonrisa">
+      <input name="negocio" required maxlength="80" placeholder="Ejemplo: Clínica Sonrisa">
     </label>
     <label class="campo"><span id="lGiro">¿A qué se dedica?</span>
-      <input name="giro" required maxlength="200" placeholder="Ej. Clínica dental en Cancún">
+      <input name="giro" required maxlength="200" placeholder="Ejemplo: Clínica dental">
     </label>
     <div class="pastillas">
       <button type="button" class="pastilla ia" id="lector"><b id="lectorTitulo">Subir su material</b><span>Link, fotos o PDF</span></button>
@@ -310,7 +310,7 @@ html.dentro,html.dentro body{background:transparent}
     <div class="campo"><span id="vozEti">Voz y nombre del asistente</span>
       <div class="voz-fila">
         <div class="segmento" role="group" aria-label="Voz del asistente"><button type="button" class="voz" data-voz="mujer" aria-pressed="true">Mujer</button><button type="button" class="voz" data-voz="hombre" aria-pressed="false">Hombre</button></div>
-        <label class="nombre-as"><small>Nombre</small><input name="asistente" maxlength="30" value="Sofía" aria-label="Nombre del asistente" enterkeyhint="done"></label>
+        <label class="nombre-as"><small>Nombre del agente</small><input name="asistente" maxlength="30" value="Sofía" aria-label="Nombre del agente" enterkeyhint="done"></label>
       </div>
     </div>
     <input type="hidden" name="servicios"><input type="hidden" name="horario"><input type="hidden" name="ubicacion">
@@ -438,19 +438,19 @@ function pintarPastillas() {
 $('pServicios').onclick = () => {
   abrirHoja('Servicios y precios',
     `<p class="nota">Lo que el asistente puede decir. Si no sabes los precios, déjalo vacío y dirá que el equipo los confirma.</p>
-     <textarea id="hServicios" maxlength="1500" placeholder="Ej. Limpieza $600, blanqueamiento $2,500, consulta de valoración gratis">${esc(F().servicios.value)}</textarea>`,
+     <textarea id="hServicios" maxlength="1500" placeholder="Ejemplo: Limpieza $600, blanqueamiento $2,500, consulta de valoración gratis">${esc(F().servicios.value)}</textarea>`,
     'Listo', () => { F().servicios.value = $('hServicios').value.trim(); pintarPastillas(); });
 };
 $('pHorario').onclick = () => {
   abrirHoja('Horario',
     `<p class="nota">Cuándo atiende. Si lo dejas vacío, dirá que el equipo lo confirma.</p>
-     <label class="campo">Horario<input id="hHorario" maxlength="200" placeholder="Ej. Lunes a sábado de 9 a 7" value="${esc(F().horario.value)}" enterkeyhint="done"></label>`,
+     <label class="campo">Horario<input id="hHorario" maxlength="200" placeholder="Ejemplo: Lunes a sábado de 9 a 7" value="${esc(F().horario.value)}" enterkeyhint="done"></label>`,
     'Listo', () => { F().horario.value = $('hHorario').value.trim(); pintarPastillas(); });
 };
 $('pUbicacion').onclick = () => {
   abrirHoja('Ubicación',
     `<p class="nota">Dónde está. Si lo dejas vacío, dirá que el equipo lo confirma.</p>
-     <label class="campo">Dirección o ciudad<input id="hUbicacion" maxlength="200" placeholder="Ej. Av. Tulum 200, Cancún" value="${esc(F().ubicacion.value)}" enterkeyhint="done"></label>`,
+     <label class="campo">Dirección o ciudad<input id="hUbicacion" maxlength="200" placeholder="Ejemplo: Av. Tulum 200, Cancún" value="${esc(F().ubicacion.value)}" enterkeyhint="done"></label>`,
     'Listo', () => { F().ubicacion.value = $('hUbicacion').value.trim(); pintarPastillas(); });
 };
 
@@ -503,7 +503,7 @@ function hojaMarca(actual, alGuardar) {
      <div class="campo">Colores<div class="colores">
        <label class="color"><i id="mC1"></i><span>Principal</span><input type="color" id="mColor"></label>
        <label class="color"><i id="mC2"></i><span>Segundo</span><input type="color" id="mColor2"></label></div></div>
-     <label class="campo">¿Quién lo va a ver?<input id="mResp" maxlength="60" placeholder="Ej. Don Jorge" value="${esc(m.responsable)}" enterkeyhint="done"></label>
+     <label class="campo">¿Quién lo va a ver?<input id="mResp" maxlength="60" placeholder="Ejemplo: Don Jorge" value="${esc(m.responsable)}" enterkeyhint="done"></label>
      <p class="aviso" id="mAviso" hidden></p>`,
     'Listo', () => { m.responsable = $('mResp').value.trim(); return alGuardar(m); });
   const pinta = () => {
@@ -619,7 +619,7 @@ $('lector').onclick = () => {
   let archivo = null;
   abrirHoja(modo === 'abierta' ? 'Subir tu material' : 'Subir su material',
     `<p class="nota">Leemos tu información y llenamos los datos. Tú solo revisas que esté bien.</p>
-     <label class="campo">Link de la página web<input id="lUrl" type="url" inputmode="url" autocomplete="url" placeholder="Ej. tunegocio.com"></label>
+     <label class="campo">Link de la página web<input id="lUrl" type="url" inputmode="url" autocomplete="url" placeholder="Ejemplo: tunegocio.com"></label>
      <p class="o">o</p>
      <label class="subir"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3M7 8l5-5 5 5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg><span id="lArchivoTxt">Subir foto o PDF del menú</span><input id="lArchivo" type="file" accept="image/*,application/pdf"></label>
      <p class="aviso" id="lAviso" hidden></p>`,

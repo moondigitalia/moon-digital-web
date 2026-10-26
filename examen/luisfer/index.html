@@ -83,7 +83,7 @@ button[disabled]{opacity:.6;cursor:default}
       <h2><span>01</span>Su proyecto</h2>
       <p class="why">Empecemos por lo más importante: lo que quieren lograr.</p>
       <div class="q"><label for="varita">Si tuvieran una varita mágica, ¿qué resolverían mañana mismo en su negocio?</label><textarea id="varita" name="Varita mágica: qué resolverían mañana" placeholder="Lo primero que les venga a la mente"></textarea></div>
-      <div class="q"><label for="desarrollo">Cuéntennos del desarrollo que quieren impulsar: dónde está y qué ofrece</label><textarea id="desarrollo" name="Desarrollo: ubicación, tipos de departamento y precios" placeholder="Ej. 1 recámara, 62 m², desde 3.8 M · 2 recámaras, 90 m², desde…"></textarea></div>
+      <div class="q"><label for="desarrollo">Cuéntennos del desarrollo que quieren impulsar: dónde está y qué ofrece</label><textarea id="desarrollo" name="Desarrollo: ubicación, tipos de departamento y precios" placeholder="Ejemplo: 1 recámara, 62 m², desde 3.8 M · 2 recámaras, 90 m², desde…"></textarea></div>
       <div class="q"><span class="lbl">¿Qué tipo de comprador es el que más les compra?</span><span class="hint">Pueden elegir varios.</span>
         <div class="opts" data-name="Comprador que más les compra">
           <label class="opt"><input type="checkbox" value="Para vivir"><span>Para vivir</span></label>
@@ -96,7 +96,7 @@ button[disabled]{opacity:.6;cursor:default}
       </div>
       <div class="row">
         <div class="q"><label for="unidades">Unidades disponibles</label><input class="num" type="number" id="unidades" name="Unidades disponibles" inputmode="numeric"></div>
-        <div class="q"><label for="meta">¿Qué meta tienen para venderlas?</label><input type="text" id="meta" name="Meta de venta (fecha o ritmo)" placeholder="Ej. 6 unidades antes de marzo"></div>
+        <div class="q"><label for="meta">¿Qué meta tienen para venderlas?</label><input type="text" id="meta" name="Meta de venta (fecha o ritmo)" placeholder="Ejemplo: 6 unidades antes de marzo"></div>
       </div>
       <div class="q"><label for="exito">Pensando en los próximos 3 meses, ¿qué tendría que pasar para que digan "valió la pena"?</label><textarea id="exito" name="Qué significa que valió la pena (3 meses)" placeholder="En sus palabras: apartados, citas, más interesados, tranquilidad…"></textarea></div>
     </section>
@@ -105,10 +105,10 @@ button[disabled]{opacity:.6;cursor:default}
       <h2><span>02</span>Lo que ya les funcionó</h2>
       <p class="why">Ustedes ya encontraron algo que dio buenos resultados con PW Capital. Queremos entenderlo para construir sobre eso.</p>
       <div class="q"><label for="funciono">Según su experiencia, ¿qué hizo que esa etapa funcionara mejor?</label><textarea id="funciono" name="Qué hizo que la etapa buena funcionara" placeholder="El anuncio, el tipo de persona que llegaba, la forma de dar seguimiento…"></textarea></div>
-      <div class="q"><label for="fechas">¿Más o menos en qué meses fue?</label><input type="text" id="fechas" name="Meses de la etapa buena" placeholder="Ej. de marzo a junio"></div>
+      <div class="q"><label for="fechas">¿Más o menos en qué meses fue?</label><input type="text" id="fechas" name="Meses de la etapa buena" placeholder="Ejemplo: de marzo a junio"></div>
       <div class="q"><span class="lbl">Si tienen los números a la mano, nos ayudan mucho</span><span class="hint">Aproximados está perfecto. Si no los tienen, no pasa nada.</span></div>
       <div class="row">
-        <div class="q"><label for="inv">Inversión al mes en anuncios</label><input class="num" type="text" id="inv" name="Inversión mensual en esa etapa" inputmode="numeric" placeholder="Ej. 15,000"></div>
+        <div class="q"><label for="inv">Inversión al mes en anuncios</label><input class="num" type="text" id="inv" name="Inversión mensual en esa etapa" inputmode="numeric" placeholder="Ejemplo: 15,000"></div>
         <div class="q"><label for="leads">Interesados al mes</label><input class="num" type="text" id="leads" name="Interesados al mes en esa etapa" inputmode="numeric"></div>
       </div>
       <div class="row">
@@ -283,5 +283,29 @@ button[disabled]{opacity:.6;cursor:default}
 })();
 </script>
 
+<script>
+/* Ejemplos completos, nunca cortados (Kid, 26-oct): si el ejemplo de un campo no cabe adentro, se escribe completo debajo del campo. */
+(function () {
+  var cv = document.createElement('canvas').getContext('2d');
+  function acomoda() {
+    document.querySelectorAll('input[placeholder], input[data-ejemplo]').forEach(function (e) {
+      if (!e.offsetWidth) return;
+      var t = e.getAttribute('data-ejemplo') || e.placeholder, cs = getComputedStyle(e);
+      cv.font = cs.fontWeight + ' ' + cs.fontSize + ' ' + cs.fontFamily;
+      var libre = e.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+      var h = e.nextElementSibling && e.nextElementSibling.classList.contains('ejemplo-abajo') ? e.nextElementSibling : null;
+      if (cv.measureText(t).width > libre + 1) {
+        e.setAttribute('data-ejemplo', t); e.placeholder = '';
+        if (!h) { h = document.createElement('small'); h.className = 'ejemplo-abajo'; h.style.cssText = 'display:block;margin-top:6px;font-size:13px;font-weight:600;opacity:.7;line-height:1.35'; e.after(h); }
+        h.textContent = t;
+      } else { e.placeholder = t; if (h) h.remove(); }
+    });
+  }
+  addEventListener('load', acomoda); addEventListener('resize', acomoda);
+  document.addEventListener('click', function () { setTimeout(acomoda, 60); });
+  document.addEventListener('change', function () { setTimeout(acomoda, 60); });
+  setTimeout(acomoda, 300);
+})();
+</script>
 </body>
 </html>

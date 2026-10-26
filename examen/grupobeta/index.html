@@ -240,7 +240,7 @@ button[disabled]{opacity:.6;cursor:default}
       </div>
       <div class="q"><label for="detalle">Si les diste un precio o una fecha, ¿cuál fue?</label><input type="text" id="detalle" name="Precio o fecha que se platicó" placeholder="Aproximado está perfecto"></div>
 
-      <div class="q"><label for="devoluciones">¿Te dijeron más o menos cuántas piezas les regresan al mes?</label><span class="hint">Si no te dijeron, déjalo en blanco.</span><input type="text" id="devoluciones" name="Piezas que regresan al mes (aprox.)" placeholder="Ej. unas 200 al mes"></div>
+      <div class="q"><label for="devoluciones">¿Te dijeron más o menos cuántas piezas les regresan al mes?</label><span class="hint">Si no te dijeron, déjalo en blanco.</span><input type="text" id="devoluciones" name="Piezas que regresan al mes (aprox.)" placeholder="Ejemplo: unas 200 al mes"></div>
 
       <div class="q"><span class="lbl">¿Crees que nos pasarían un Excel con su lista de piezas y otro con las piezas que les regresan?</span>
         <div class="opts" data-name="Nos pasarían los Excel de piezas y devoluciones" data-single>
@@ -396,5 +396,29 @@ button[disabled]{opacity:.6;cursor:default}
 })();
 </script>
 
+<script>
+/* Ejemplos completos, nunca cortados (Kid, 26-oct): si el ejemplo de un campo no cabe adentro, se escribe completo debajo del campo. */
+(function () {
+  var cv = document.createElement('canvas').getContext('2d');
+  function acomoda() {
+    document.querySelectorAll('input[placeholder], input[data-ejemplo]').forEach(function (e) {
+      if (!e.offsetWidth) return;
+      var t = e.getAttribute('data-ejemplo') || e.placeholder, cs = getComputedStyle(e);
+      cv.font = cs.fontWeight + ' ' + cs.fontSize + ' ' + cs.fontFamily;
+      var libre = e.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+      var h = e.nextElementSibling && e.nextElementSibling.classList.contains('ejemplo-abajo') ? e.nextElementSibling : null;
+      if (cv.measureText(t).width > libre + 1) {
+        e.setAttribute('data-ejemplo', t); e.placeholder = '';
+        if (!h) { h = document.createElement('small'); h.className = 'ejemplo-abajo'; h.style.cssText = 'display:block;margin-top:6px;font-size:13px;font-weight:600;opacity:.7;line-height:1.35'; e.after(h); }
+        h.textContent = t;
+      } else { e.placeholder = t; if (h) h.remove(); }
+    });
+  }
+  addEventListener('load', acomoda); addEventListener('resize', acomoda);
+  document.addEventListener('click', function () { setTimeout(acomoda, 60); });
+  document.addEventListener('change', function () { setTimeout(acomoda, 60); });
+  setTimeout(acomoda, 300);
+})();
+</script>
 </body>
 </html>
