@@ -64,7 +64,11 @@ input,textarea{background:var(--campo);box-shadow:var(--hundido);border-radius:1
 textarea{height:auto;padding:13px 16px;resize:none;line-height:1.4}
 input:focus,textarea:focus{outline:2px solid var(--cobalto);outline-offset:1px}
 /* Pastillas que abren una hoja: dicen si ya tienen algo o si faltan. */
-.pastillas{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr);gap:8px}
+/* (26-oct, Kid) arriba: Subir su material y Marca; abajo: Precios, Horario y Ubicación */
+.pastillas{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
+.pastillas #lector{grid-column:span 6}
+.dan .pastillas #lector,.pastillas #pMarca{grid-column:span 3}
+#pServicios,#pHorario,#pUbicacion{grid-column:span 2}
 .pastilla{min-height:calc(var(--alto) + 12px);border-radius:20px;background:var(--campo);box-shadow:var(--hundido);padding:8px clamp(9px,2.6vw,12px);overflow:hidden;text-align:start;display:flex;flex-direction:column;justify-content:center;gap:2px}
 .pastilla b{font-size:14px;line-height:1.2}
 .pastilla span{font-size:12px;font-weight:600;color:var(--tenue)}
@@ -115,8 +119,8 @@ html.dentro,html.dentro body{background:transparent}
 @keyframes asienta{from{opacity:.45}to{opacity:1}}
 .tecleando main>.vista{animation:none}
 /* Pestañas de Dan: Armar demo · Tablero */
-.pestanas{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:var(--campo);box-shadow:var(--hundido);border-radius:999px;padding:5px}
-.pestana{height:calc(var(--alto) - 6px);border-radius:999px;font-weight:800;font-size:15px;color:var(--suave);transition:background .25s var(--ease),color .25s var(--ease)}
+.pestanas{display:flex;gap:4px;background:var(--campo);box-shadow:var(--hundido);border-radius:999px;padding:5px}
+.pestana{flex:1 1 auto;min-width:0;padding:0 10px;white-space:nowrap;height:calc(var(--alto) - 6px);border-radius:999px;font-weight:800;font-size:var(--fp,15px);color:var(--suave);transition:background .25s var(--ease),color .25s var(--ease)}
 .pestana[aria-selected="true"]{background:var(--tarjeta);color:var(--tinta);box-shadow:0 6px 14px -8px rgba(0,0,0,.35)}
 /* Tablero: tres tarjetas que llenan la pantalla */
 #tablero{min-height:0;display:grid;grid-template-rows:minmax(0,1.15fr) minmax(0,1fr) minmax(0,1fr);gap:var(--hueco)}
@@ -152,7 +156,7 @@ html.dentro,html.dentro body{background:transparent}
 .nombre-as input{background:none;box-shadow:none;border-radius:0;padding:0;height:auto;line-height:1.25;font-weight:700;outline:0}
 .nombre-as:focus-within{outline:2px solid var(--cobalto);outline-offset:1px}
 /* Con el teclado abierto solo se ve el campo que estás llenando, arriba y completo (nada gris, nada tapado). */
-.tecleando #cabeza,.tecleando #pestanas,.tecleando #tira,.tecleando main>.vista:not(:focus-within),
+.tecleando #cabeza,.tecleando #pestanas,.tecleando #guia,.tecleando main>.vista:not(:focus-within),
 .tecleando main>.vista>:not(.campo),.tecleando main>.vista>.campo:not(:focus-within){display:none!important}
 .tecleando main{justify-content:flex-start}
 .bienvenida{display:flex;flex-direction:column;align-items:stretch;text-align:start;gap:clamp(10px,2.2vh,20px)}
@@ -199,7 +203,6 @@ html.dentro,html.dentro body{background:transparent}
 .o::before,.o::after{content:"";flex:1;height:1px;background:rgba(127,127,127,.22)}
 .aviso.bien{color:var(--verde)}
 /* (26-oct) Marca del cliente: el demo, la calculadora y la presentación salen con su logo, sus colores y el nombre de quien los va a ver. */
-.dan .pastillas{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
 .dan .pastilla{min-height:var(--alto)}
 .marca-fila{display:flex;align-items:center;gap:14px}
 .marca-logo{flex:none;width:calc(var(--alto) * 1.6);aspect-ratio:1;border-radius:50%;background:#fff;box-shadow:var(--hundido);display:grid;place-items:center;overflow:hidden}
@@ -221,9 +224,21 @@ html.dentro,html.dentro body{background:transparent}
 .enlace small{font-size:12.5px;font-weight:600;color:var(--tenue)}
 .enlace .wa{flex:none;width:calc(var(--alto) - 2px);aspect-ratio:1;border-radius:50%;background:#1f9d55;color:#fff;display:grid;place-items:center}
 .enlace .wa svg{width:50%;height:auto}
+.guia{font-size:14px;font-weight:600;line-height:1.35;color:var(--suave);padding:0 6px;text-wrap:pretty}
+.guia b{color:var(--cobalto);font-weight:800}
+#tEmbudo{cursor:pointer}
 .fila .ver{color:var(--cobalto);font-weight:700;white-space:nowrap;flex:none}
+#material{flex:1 1 auto;min-height:0;display:grid;grid-template-rows:auto minmax(0,1fr);gap:var(--hueco)}
+.mat-cab{display:flex;align-items:center;gap:12px}
+.mat-cab>div{min-width:0}
+.mat-cab b{font-size:18px;font-weight:800;display:block}
+.mat-ic{flex:none;width:calc(var(--alto) + 4px);aspect-ratio:1;border-radius:50%;background:var(--cobalto);color:#fff;display:grid;place-items:center}
+.mat-ic svg{width:48%;height:auto}
+.mat-lista{min-height:0}
+.mat-lista .lista{display:grid;align-content:start;gap:8px;padding-bottom:2px}
+.mat-lista .eti{letter-spacing:.14em}
 /* Pantallas muy bajitas (celular chico dentro del tablero): se quita primero lo que se entiende solo. */
-@media (max-height:520px){.dan .pastilla{min-height:34px;padding-block:4px}.dan #vozEti{display:none}.dan #resTexto{display:none}.enlace{min-height:calc(var(--alto) + 6px)}.enlace small{display:none}}
+@media (max-height:520px){.dan .pastilla{min-height:34px;padding-block:4px}.dan #vozEti{display:none}.dan #resTexto{display:none}.enlace{min-height:calc(var(--alto) + 6px)}.enlace small{display:none}.guiaMas{display:none}}
 </style>
 </head>
 <body>
@@ -236,12 +251,14 @@ html.dentro,html.dentro body{background:transparent}
   </header>
 
   <div class="pestanas" id="pestanas" role="tablist" hidden>
-    <button class="pestana" role="tab" data-v="forma" aria-selected="true">Armar demo</button>
+    <button class="pestana" role="tab" data-v="forma" aria-selected="true">Demo</button>
+    <button class="pestana" role="tab" data-v="calc" aria-selected="false">Calculadora</button>
+    <button class="pestana" role="tab" data-v="pres" aria-selected="false">Presentación</button>
     <button class="pestana" role="tab" data-v="tablero" aria-selected="false">Tablero</button>
   </div>
 
   <!-- El link de la puerta abierta, siempre a la mano de Dan -->
-  <button class="tira" id="tira" hidden type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3M7 8l5-5 5 5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg><span id="compartir">Links para cualquier cliente</span></button>
+  <p class="guia" id="guia" hidden>Llena esto y te doy <b>3 links</b> para el cliente<span class="guiaMas">: su recepcionista, su calculadora y su presentación</span>.</p>
 
   <!-- Puerta abierta: bienvenida. Quien llega de un anuncio entiende en segundos qué es y qué sigue. -->
   <section class="bienvenida vista" id="bienvenida" hidden>
@@ -284,10 +301,11 @@ html.dentro,html.dentro body{background:transparent}
       <input name="giro" required maxlength="200" placeholder="Ej. Clínica dental en Cancún">
     </label>
     <div class="pastillas">
-      <button type="button" class="pastilla ia" id="lector"><b id="lectorTitulo">Llenar solo</b><span>con tu link</span></button>
+      <button type="button" class="pastilla ia" id="lector"><b id="lectorTitulo">Subir su material</b><span>Link, fotos o PDF</span></button>
+      <button type="button" class="pastilla" id="pMarca" hidden><b>Marca</b><span>Para sus 3 links</span></button>
       <button type="button" class="pastilla" id="pServicios"><b>Precios</b><span>Opcional</span></button>
       <button type="button" class="pastilla" id="pHorario"><b>Horario</b><span>Opcional</span></button>
-      <button type="button" class="pastilla" id="pMarca" hidden><b>Marca</b><span>Logo y colores</span></button>
+      <button type="button" class="pastilla" id="pUbicacion"><b>Ubicación</b><span>Opcional</span></button>
     </div>
     <div class="campo"><span id="vozEti">Voz y nombre del asistente</span>
       <div class="voz-fila">
@@ -298,7 +316,7 @@ html.dentro,html.dentro body{background:transparent}
     <input type="hidden" name="servicios"><input type="hidden" name="horario"><input type="hidden" name="ubicacion">
     <input type="hidden" name="logo"><input type="hidden" name="color"><input type="hidden" name="color2"><input type="hidden" name="responsable">
     <p class="aviso" id="aviso" hidden></p>
-    <button class="boton" id="crear">Crear demo</button>
+    <button class="boton" id="crear">Crear sus 3 links</button>
   </form>
 
   <!-- Resultado (Dan) -->
@@ -309,9 +327,18 @@ html.dentro,html.dentro body{background:transparent}
     <button class="boton dos" id="otro" type="button">Armar otro demo</button>
   </section>
 
+  <!-- (26-oct) Calculadora y Presentación: la general de MOON y la de cada cliente con su logo -->
+  <section id="material" class="vista" hidden>
+    <div class="tarjeta mat">
+      <div class="mat-cab"><span class="mat-ic" id="matIc"></span><div><b id="matTitulo"></b><p class="nota" id="matNota"></p></div></div>
+      <div class="enlaces" id="matGeneral"></div>
+    </div>
+    <div class="tarjeta mat-lista"><span class="eti">Con el logo de cada cliente</span><div class="lista enlaces" id="matClientes"></div></div>
+  </section>
+
   <!-- Tablero de Dan: se actualiza solo -->
   <section id="tablero" class="vista" hidden>
-    <button class="tt" id="tEmbudo" type="button"><span class="eti">Cómo van los demos</span><div class="embudo" id="embudo"></div></button>
+    <div class="tt" id="tEmbudo" role="button" tabindex="0"><div class="tt-cab"><span class="eti">Cómo van los demos</span><button class="chico" id="linkTodos" type="button">Link para todos</button></div><div class="embudo" id="embudo"></div></div>
     <button class="tt" id="tGasto" type="button"><span class="eti">Gasto en llamadas</span><span class="cifra" id="gHoy"></span><span class="renglon" id="gRenglon"></span></button>
     <div class="tt" id="tCobro" role="button" tabindex="0">
       <div class="tt-cab"><span class="eti">Lo cobrado</span><button class="chico" id="anotar" type="button">Anotar un cierre</button></div>
@@ -348,7 +375,7 @@ async function api(accion, datos) {
 }
 
 function mostrar(id) {
-  ['bienvenida', 'paso1', 'forma', 'resultado', 'tablero'].forEach(x => $(x).hidden = x !== id);
+  ['bienvenida', 'paso1', 'forma', 'resultado', 'material', 'tablero'].forEach(x => $(x).hidden = x !== id);
   if (modo === 'abierta') {
     const PASO = { paso1: [1, '¿Con quién tengo el gusto?', 'Para mandarte tu asistente si te gusta.'], forma: [2, 'Cuéntanos de tu negocio', 'Así sabrá qué contestar a tus clientes.'] }[id];
     $('cabeza').hidden = !PASO;
@@ -357,12 +384,14 @@ function mostrar(id) {
       [...$('puntos').children].forEach((p, i) => { p.className = i + 1 < PASO[0] ? 'ya' : i + 1 === PASO[0] ? 'aqui' : ''; });
     }
   }
-  $('tira').hidden = modo !== 'dan' || id === 'tablero' || id === 'paso1';
-  document.querySelectorAll('.pestana').forEach(b => b.setAttribute('aria-selected', b.dataset.v === (id === 'tablero' ? 'tablero' : 'forma')));
+  $('guia').hidden = modo !== 'dan' || id !== 'forma';
+  const pild = id === 'tablero' ? 'tablero' : id === 'material' ? herramienta : 'forma';
+  document.querySelectorAll('.pestana').forEach(b => b.setAttribute('aria-selected', b.dataset.v === pild));
+  if (id === 'material') { pintarMaterial(); cargarClientes(); }
   clearInterval(reloj);
   if (id === 'tablero') { cargarTablero(); reloj = setInterval(() => { if (!document.hidden && $('hoja').hidden) cargarTablero(); }, 20000); }
 }
-document.querySelectorAll('.pestana').forEach(b => b.onclick = () => mostrar(b.dataset.v === 'tablero' ? 'tablero' : ($('resultado').hidden ? 'forma' : 'resultado')));
+document.querySelectorAll('.pestana').forEach(b => b.onclick = () => { const v = b.dataset.v; if (v === 'calc' || v === 'pres') { herramienta = v; return mostrar('material'); } mostrar(v === 'tablero' ? 'tablero' : ($('resultado').hidden ? 'forma' : 'resultado')); });
 
 document.querySelectorAll('.voz').forEach(b => b.onclick = () => {
   voz = b.dataset.voz;
@@ -400,11 +429,11 @@ function pintarPastillas() {
   const s = F().servicios.value.trim(), h = F().horario.value.trim(), u = F().ubicacion.value.trim();
   $('pServicios').classList.toggle('lleno', !!s);
   $('pServicios').querySelector('span').textContent = s ? 'Listo ✓' : 'Opcional';
-  $('pHorario').classList.toggle('lleno', !!(h || u));
-  $('pHorario').querySelector('span').textContent = h && u ? 'Listo ✓' : h ? 'Horario ✓' : u ? 'Dirección ✓' : 'Opcional';
+  $('pHorario').classList.toggle('lleno', !!h); $('pHorario').querySelector('span').textContent = h ? 'Listo ✓' : 'Opcional';
+  $('pUbicacion').classList.toggle('lleno', !!u); $('pUbicacion').querySelector('span').textContent = u ? 'Listo ✓' : 'Opcional';
   const lg = F().logo.value, rs = F().responsable.value;
   $('pMarca').classList.toggle('lleno', !!(lg || rs));
-  $('pMarca').querySelector('span').textContent = lg && rs ? 'Listo ✓' : lg ? 'Logo ✓' : rs ? 'Nombre ✓' : 'Logo y colores';
+  $('pMarca').querySelector('span').textContent = lg && rs ? 'Listo ✓' : lg ? 'Logo ✓' : rs ? 'Nombre ✓' : 'Para sus 3 links';
 }
 $('pServicios').onclick = () => {
   abrirHoja('Servicios y precios',
@@ -413,10 +442,16 @@ $('pServicios').onclick = () => {
     'Listo', () => { F().servicios.value = $('hServicios').value.trim(); pintarPastillas(); });
 };
 $('pHorario').onclick = () => {
-  abrirHoja('Horario y dirección',
-    `<label class="campo">Horario<input id="hHorario" maxlength="200" placeholder="Ej. Lunes a sábado de 9 a 7" value="${esc(F().horario.value)}"></label>
-     <label class="campo">Dirección o ciudad<input id="hUbicacion" maxlength="200" placeholder="Ej. Av. Tulum 200, Cancún" value="${esc(F().ubicacion.value)}"></label>`,
-    'Listo', () => { F().horario.value = $('hHorario').value.trim(); F().ubicacion.value = $('hUbicacion').value.trim(); pintarPastillas(); });
+  abrirHoja('Horario',
+    `<p class="nota">Cuándo atiende. Si lo dejas vacío, dirá que el equipo lo confirma.</p>
+     <label class="campo">Horario<input id="hHorario" maxlength="200" placeholder="Ej. Lunes a sábado de 9 a 7" value="${esc(F().horario.value)}" enterkeyhint="done"></label>`,
+    'Listo', () => { F().horario.value = $('hHorario').value.trim(); pintarPastillas(); });
+};
+$('pUbicacion').onclick = () => {
+  abrirHoja('Ubicación',
+    `<p class="nota">Dónde está. Si lo dejas vacío, dirá que el equipo lo confirma.</p>
+     <label class="campo">Dirección o ciudad<input id="hUbicacion" maxlength="200" placeholder="Ej. Av. Tulum 200, Cancún" value="${esc(F().ubicacion.value)}" enterkeyhint="done"></label>`,
+    'Listo', () => { F().ubicacion.value = $('hUbicacion').value.trim(); pintarPastillas(); });
 };
 
 /* ---------- Marca del cliente (26-oct-2026): logo, colores y nombre de quien lo va a ver ---------- */
@@ -496,21 +531,51 @@ const IC = {
   calc: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2.5" width="14" height="19" rx="3"/><path d="M8.5 7h7M9 12h.01M12 12h.01M15 12h.01M9 16h.01M12 16h.01M15 16h.01"/></svg>',
   pres: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="3"/><path d="M12 16v4M8 20h8"/></svg>',
   wa: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.4a.5.5 0 0 0 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.4.8 3.2.7a2.8 2.8 0 0 0 1.8-1.3 2.3 2.3 0 0 0 .2-1.3c-.1-.1-.3-.2-.5-.3z"/></svg>' };
-// codigo vacío = los links generales (con la marca de MOON)
-function enlacesDe(codigo, negocio, responsable) {
+// Un link: [tipo, nombre, frase, url, mensaje de WhatsApp]. codigo vacío = la versión general (con la marca de MOON).
+function datosLink(k, codigo, negocio, responsable) {
   const base = 'https://moondigitalia.com';
   const hola = responsable ? `Hola, ${responsable}` : 'Hola';
   const de = negocio ? ` de ${negocio}` : '';
-  const L = codigo ? [
-    ['demo', 'Su recepcionista', 'El demo para hablarle', `${base}/prueba/${codigo}`, `${hola}, te preparé una muestra de cómo atendería un asistente virtual a los clientes${de}. Ábrela y háblale como si fueras un cliente: ${base}/prueba/${codigo}`],
-    ['calc', 'Calculadora', 'Lo que le cuestan las llamadas', `${base}/calculadora/${codigo}`, `${hola}, te comparto una calculadora para ver cuánto pueden costarle${de ? ' a ' + negocio : ''} las llamadas que no se alcanzan a contestar: ${base}/calculadora/${codigo}`],
-    ['pres', 'Presentación', '¿Quién contesta cuando no estás?', `${base}/presentacion/${codigo}`, `${hola}, te comparto la presentación que preparamos para ti: ${base}/presentacion/${codigo}`],
-  ] : [
-    ['demo', 'Crea tu recepcionista', 'Cualquiera arma su demo', `${base}/prueba/nueva`, `¿Te gustaría que un asistente virtual contestara a tus clientes a cualquier hora? Arma el tuyo en un minuto y háblale tú mismo: ${base}/prueba/nueva`],
-    ['calc', 'Calculadora', 'Con la marca de MOON', `${base}/calculadora`, `Te comparto una calculadora para ver cuánto pueden costarle a tu negocio las llamadas que no se alcanzan a contestar: ${base}/calculadora`],
-    ['pres', 'Presentación', 'Con la marca de MOON', `${base}/presentacion`, `Te comparto una presentación corta sobre las llamadas que llegan cuando tu negocio ya cerró: ${base}/presentacion`],
-  ];
-  return L.map(([k, n, f, url, txt]) => `<div class="enlace"><a href="${esc(url)}" target="_blank" rel="noopener"><span class="ic">${IC[k]}</span><span class="q"><b>${esc(n)}</b><small>${esc(f)}</small></span></a><a class="wa" href="https://wa.me/?text=${encodeURIComponent(txt)}" target="_blank" rel="noopener" aria-label="Mandar ${esc(n.toLowerCase())} por WhatsApp">${IC.wa}</a></div>`).join('');
+  if (codigo) return {
+    demo: ['demo', 'Su recepcionista', 'El demo para hablarle', `${base}/prueba/${codigo}`, `${hola}, te preparé una muestra de cómo atendería un asistente virtual a los clientes${de}. Ábrela y háblale como si fueras un cliente: ${base}/prueba/${codigo}`],
+    calc: ['calc', 'Calculadora', 'Lo que le cuestan las llamadas', `${base}/calculadora/${codigo}`, `${hola}, te comparto una calculadora para ver cuánto pueden costarle${negocio ? ' a ' + negocio : ''} las llamadas que no se alcanzan a contestar: ${base}/calculadora/${codigo}`],
+    pres: ['pres', 'Presentación', 'Todo junto: su recepcionista y la calculadora', `${base}/presentacion/${codigo}`, `${hola}, te comparto la presentación que preparamos para ti: ${base}/presentacion/${codigo}`],
+  }[k];
+  return {
+    demo: ['demo', 'Crea tu recepcionista', 'Cualquiera arma su demo', `${base}/prueba/nueva`, `¿Te gustaría que un asistente virtual contestara a tus clientes a cualquier hora? Arma el tuyo en un minuto y háblale tú mismo: ${base}/prueba/nueva`],
+    calc: ['calc', 'Calculadora general', 'Con la marca de MOON', `${base}/calculadora`, `Te comparto una calculadora para ver cuánto pueden costarle a tu negocio las llamadas que no se alcanzan a contestar: ${base}/calculadora`],
+    pres: ['pres', 'Presentación general', 'Con la marca de MOON', `${base}/presentacion`, `Te comparto una presentación corta sobre las llamadas que llegan cuando tu negocio ya cerró: ${base}/presentacion`],
+  }[k];
+}
+function enlaceHtml([k, n, f, url, txt], icono) {
+  return `<div class="enlace"><a href="${esc(url)}" target="_blank" rel="noopener"><span class="ic">${icono === false ? '' : IC[k]}</span><span class="q"><b>${esc(n)}</b><small>${esc(f)}</small></span></a><a class="wa" href="https://wa.me/?text=${encodeURIComponent(txt)}" target="_blank" rel="noopener" aria-label="Mandar ${esc(n.toLowerCase())} por WhatsApp">${IC.wa}</a></div>`;
+}
+function enlacesDe(codigo, negocio, responsable) { return ['pres', 'demo', 'calc'].map(k => enlaceHtml(datosLink(k, codigo, negocio, responsable))).join(''); }
+
+/* Las cuatro píldoras siempre caben completas: si la pantalla es angosta, la letra baja un poco (nunca se cortan). */
+function ajustarPildoras() {
+  const caja = $('pestanas'); let f = 15; caja.style.setProperty('--fp', f + 'px');
+  const sale = () => [...caja.children].some(b => b.scrollWidth > b.clientWidth + 1) || caja.scrollWidth > caja.clientWidth + 1;
+  while (sale() && f > 11) { f -= 0.5; caja.style.setProperty('--fp', f + 'px'); }
+}
+/* ---------- Píldoras Calculadora y Presentación ---------- */
+const MATERIAL = {
+  calc: ['Calculadora', 'El cliente mueve tres barras y ve cuánto dinero se le va por las llamadas que no contesta.'],
+  pres: ['Presentación', 'Todo en un solo link: el problema de las llamadas, la calculadora y su recepcionista para hablarle, con su logo y colores.'],
+};
+let herramienta = 'calc', clientes = null;
+function pintarMaterial() {
+  const [t, nota] = MATERIAL[herramienta];
+  $('matIc').innerHTML = IC[herramienta]; $('matTitulo').textContent = t; $('matNota').textContent = nota;
+  $('matGeneral').innerHTML = enlaceHtml(datosLink(herramienta, '', '', ''));
+  if (!clientes) { $('matClientes').innerHTML = '<p class="nota">Cargando clientes…</p>'; return; }
+  $('matClientes').innerHTML = clientes.length
+    ? clientes.map(x => { const d = datosLink(herramienta, x.codigo, x.negocio, x.responsable || ''); d[1] = x.negocio; d[2] = x.con_logo ? (x.responsable ? `Con su logo · para ${x.responsable}` : 'Con su logo') : 'Sin logo: sale con la marca de MOON'; return enlaceHtml(d); }).join('')
+    : '<p class="nota">Todavía no hay clientes aquí. Arma su demo en la píldora Demo, sube su logo en Marca y aparece en esta lista.</p>';
+}
+async function cargarClientes() {
+  const r = await api('mios');
+  if (r.ok) { clientes = (r.demos || []).filter(x => x.negocio); if (!$('material').hidden) pintarMaterial(); }
 }
 // Links de un demo ya hecho (desde el tablero), con su marca para cambiarla.
 async function hojaLinks(x) {
@@ -552,7 +617,7 @@ function achicar(archivo) {
 const comoDataUrl = f => new Promise((ok, mal) => { const r = new FileReader(); r.onload = () => ok(r.result); r.onerror = mal; r.readAsDataURL(f); });
 $('lector').onclick = () => {
   let archivo = null;
-  abrirHoja(modo === 'abierta' ? 'Llenar solo' : 'Llenar con su página o menú',
+  abrirHoja(modo === 'abierta' ? 'Subir tu material' : 'Subir su material',
     `<p class="nota">Leemos tu información y llenamos los datos. Tú solo revisas que esté bien.</p>
      <label class="campo">Link de la página web<input id="lUrl" type="url" inputmode="url" autocomplete="url" placeholder="Ej. tunegocio.com"></label>
      <p class="o">o</p>
@@ -577,7 +642,7 @@ $('lector').onclick = () => {
       if (x.ubicacion) f.ubicacion.value = x.ubicacion;
       pintarPastillas();
       $('lectorTitulo').textContent = 'Ya se llenó';
-      $('aviso').textContent = 'Llenamos lo que encontramos. Revisa Precios y Horario antes de crear.'; $('aviso').classList.add('bien'); $('aviso').hidden = false;
+      $('aviso').textContent = 'Llenamos lo que encontramos. Revisa Precios, Horario y Ubicación antes de crear.'; $('aviso').classList.add('bien'); $('aviso').hidden = false;
     });
   $('lArchivo').onchange = e => {
     archivo = e.target.files[0] || null;
@@ -615,11 +680,11 @@ F().addEventListener('submit', async e => {
   // Puerta abierta: directo a hablarle a su asistente.
   if (modo === 'abierta') { location.href = r.link; return; }
   const negocio = datos.negocio.trim();
-  $('resTexto').textContent = `Tres links para ${negocio}, cada uno por separado. Toca uno para verlo o el botón verde para mandarlo por WhatsApp.`;
+  $('resTexto').textContent = `Listo para ${negocio}. La presentación ya trae su recepcionista y la calculadora adentro. Toca uno para verlo o el botón verde para mandarlo por WhatsApp.`;
   $('resEnlaces').innerHTML = enlacesDe(r.codigo, negocio, datos.responsable || '');
   mostrar('resultado');
 });
-$('otro').onclick = () => { $('lectorTitulo').textContent = 'Llenar solo'; $('aviso').hidden = true; F().reset(); ['servicios', 'horario', 'ubicacion', 'logo', 'color', 'color2', 'responsable'].forEach(n => F()[n].value = ''); voz = 'mujer'; document.querySelectorAll('.voz').forEach(x => x.setAttribute('aria-pressed', x.dataset.voz === 'mujer')); pintarPastillas(); $('resultado').hidden = true; mostrar('forma'); };
+$('otro').onclick = () => { $('lectorTitulo').textContent = 'Subir su material'; $('aviso').hidden = true; F().reset(); ['servicios', 'horario', 'ubicacion', 'logo', 'color', 'color2', 'responsable'].forEach(n => F()[n].value = ''); voz = 'mujer'; document.querySelectorAll('.voz').forEach(x => x.setAttribute('aria-pressed', x.dataset.voz === 'mujer')); pintarPastillas(); $('resultado').hidden = true; mostrar('forma'); };
 
 /* ---------- Tablero ---------- */
 function cuando(iso) {
@@ -655,6 +720,7 @@ async function cargarTablero() {
   if (r.ok) { T = r; pintarTablero(); try { localStorage.setItem(COPIA_T, JSON.stringify(r)); } catch (e) {} }
 }
 $('tEmbudo').onclick = e => {
+  if (e.target.closest('#linkTodos')) return;
   const el = e.target.closest('[data-paso]'); const k = el ? el.dataset.paso : 'armados';
   const [, n, f, d] = PASOS.find(p => p[0] === k);
   const lista = T.demos.filter(f);
@@ -743,7 +809,13 @@ document.querySelectorAll('main form').forEach(f => { const l = [...f.querySelec
 /* ---------- Compartir el link de la puerta abierta ---------- */
 const LINK_ABIERTA = 'https://moondigitalia.com/prueba/nueva';
 // (26-oct) Los links que sirven para cualquier cliente, con la marca de MOON: crea tu recepcionista, calculadora y presentación.
-$('tira').onclick = () => abrirHoja('Links para cualquier cliente', `<p class="nota">Con la marca de MOON. Para un cliente en especial, arma su demo: sus links salen con su logo.</p><div class="enlaces">${enlacesDe('', '', '')}</div>`, 'Cerrar');
+$('linkTodos').onclick = async e => {
+  e.stopPropagation();
+  const texto = datosLink('demo', '', '', '')[4];
+  try { if (navigator.share) { await navigator.share({ text: texto }); return; } } catch (e) { if (e && e.name === 'AbortError') return; }
+  try { await navigator.clipboard.writeText(texto); $('linkTodos').textContent = 'Link copiado'; } catch (err) { $('linkTodos').textContent = 'No se pudo copiar'; }
+  setTimeout(() => $('linkTodos').textContent = 'Link para todos', 2200);
+};
 
 /* ---------- Arranque: con sesión del Centro es Dan; sin sesión es la puerta abierta ---------- */
 function entrarAbierta() {
@@ -752,6 +824,7 @@ function entrarAbierta() {
   $('cabEti').textContent = 'MOON Digital';
   $('cabTitulo').textContent = 'Prueba tu propio recepcionista';
   $('empezar').onclick = () => { mostrar('paso1'); };
+  $('lectorTitulo').textContent = 'Subir tu material';
   $('lNegocio').textContent = 'Nombre de tu negocio';
   $('lGiro').textContent = '¿A qué se dedica tu negocio?';
   $('crear').textContent = 'Crear mi demo y hablarle';
@@ -766,6 +839,7 @@ function entrarAbierta() {
   $('cabEti').textContent = 'MOON Digital';
   $('cabTitulo').textContent = 'Crea tu recepcionista'; document.documentElement.classList.add('dan');
   $('pestanas').hidden = false; $('pMarca').hidden = false;
+  ajustarPildoras(); addEventListener('resize', ajustarPildoras);
   mostrar(PARAMS.get('ver') === 'tablero' ? 'tablero' : 'forma');
   const r = await api('mios');
   if (!r.ok && r.error === 'sesion') entrarAbierta();

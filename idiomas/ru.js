@@ -71,13 +71,13 @@
   "peso_nota": "Это примеры для ориентира. Твои цифры посчитаем вместе в калькуляторе.",
   "compara_eti": "Человек или ИИ-секретарь",
   "compara_titulo": "Оба помогают. [Но по-разному.]",
-  "compara_persona": "Человек",
+  "compara_persona": "Нанять человека",
   "compara_ia": "ИИ-секретарь",
   "fila_horario": "График",
   "fila_horario_p": "Своя смена, пн–сб",
   "fila_horario_ia": "24 часа, 7 дней",
   "fila_pago": "Оплата",
-  "fila_pago_p": "Зарплата, соцпакет и премии",
+  "fila_pago_p": "Зарплата от {de} до {a} в месяц плюс льготы",
   "fila_pago_ia": "Ежемесячная оплата",
   "fila_faltas": "Пропуски",
   "fila_faltas_p": "Отпуска, отгулы и больничные",
@@ -96,7 +96,9 @@
   "demo_boton": "Попробовать демо",
   "demo_nota": "Говори с ним, как будто ты клиент.",
   "gracias": "Спасибо, {nombre}",
-  "gracias_general": "Спасибо за твоё время"
+  "gracias_general": "Спасибо за твоё время",
+  "numeros_titulo": "Давай [посчитаем.]",
+  "numeros_boton": "Открыть калькулятор"
  }
 }
 );})(window.KVI_DICS=window.KVI_DICS||{},"ru");

@@ -69,13 +69,13 @@
   "peso_nota": "Bunlar fikir vermek için örnekler. Senin rakamlarını hesaplayıcıda birlikte çıkarırız.",
   "compara_eti": "İnsan mı, yapay zekâ mı",
   "compara_titulo": "İkisi de yardım eder. [Ama farklı.]",
-  "compara_persona": "Bir insan",
+  "compara_persona": "Birini işe almak",
   "compara_ia": "Yapay zekâ resepsiyonist",
   "fila_horario": "Saatler",
   "fila_horario_p": "Kendi vardiyası, Pzt–Cmt",
   "fila_horario_ia": "7 gün 24 saat",
   "fila_pago": "Ödeme",
-  "fila_pago_p": "Maaş, yan haklar ve ikramiye",
+  "fila_pago_p": "Ayda {de} ile {a} arası maaş, artı yan haklar",
   "fila_pago_ia": "Aylık bir ücret",
   "fila_faltas": "İzinler",
   "fila_faltas_p": "İzin, tatil ve hastalık",
@@ -94,7 +94,9 @@
   "demo_boton": "Demoyu dene",
   "demo_nota": "Ona müşterinmiş gibi konuş.",
   "gracias": "Teşekkürler, {nombre}",
-  "gracias_general": "Vaktin için sağ ol"
+  "gracias_general": "Vaktin için sağ ol",
+  "numeros_titulo": "Hadi [hesap yapalım.]",
+  "numeros_boton": "Hesaplayıcıyı kullan"
  }
 }
 );})(window.KVI_DICS=window.KVI_DICS||{},"tr");

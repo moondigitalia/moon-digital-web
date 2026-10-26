@@ -68,13 +68,13 @@
   "peso_nota": "这些只是举例，让你有个概念。你的数字我们一起用计算器算。",
   "compara_eti": "真人还是 AI 接线员",
   "compara_titulo": "两个都能帮忙，[但做法不同。]",
-  "compara_persona": "真人",
+  "compara_persona": "雇一个人",
   "compara_ia": "AI 接线员",
   "fila_horario": "工作时间",
   "fila_horario_p": "排班，周一到周六",
   "fila_horario_ia": "全天24小时，每周7天",
   "fila_pago": "费用",
-  "fila_pago_p": "工资、福利和年终奖",
+  "fila_pago_p": "月薪{de}到{a}，外加福利",
   "fila_pago_ia": "月费",
   "fila_faltas": "缺勤",
   "fila_faltas_p": "休假、请假和生病",
@@ -93,7 +93,9 @@
   "demo_boton": "试试演示",
   "demo_nota": "就当你是客户，跟它说说话吧。",
   "gracias": "谢谢你，{nombre}",
-  "gracias_general": "感谢你抽出时间"
+  "gracias_general": "感谢你抽出时间",
+  "numeros_titulo": "来[算一算。]",
+  "numeros_boton": "使用计算器"
  }
 }
 );})(window.KVI_DICS=window.KVI_DICS||{},"zh");

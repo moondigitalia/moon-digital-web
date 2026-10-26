@@ -70,13 +70,13 @@
   "peso_nota": "Ce sont des exemples pour te donner une idée. Tes chiffres, on les fait ensemble.",
   "compara_eti": "Personne ou réceptionniste IA",
   "compara_titulo": "Les deux aident. [Pas de la même façon.]",
-  "compara_persona": "Une personne",
+  "compara_persona": "Embaucher une personne",
   "compara_ia": "Réceptionniste IA",
   "fila_horario": "Horaires",
   "fila_horario_p": "Son service, du lundi au samedi",
   "fila_horario_ia": "24 h/24, 7 j/7",
   "fila_pago": "Coût",
-  "fila_pago_p": "Salaire, charges et primes",
+  "fila_pago_p": "Salaire de {de} à {a} par mois, plus les avantages",
   "fila_pago_ia": "Un abonnement mensuel",
   "fila_faltas": "Absences",
   "fila_faltas_p": "Congés, jours off et maladie",
@@ -95,7 +95,9 @@
   "demo_boton": "Essayer la démo",
   "demo_nota": "Parle-lui comme si tu étais ton client.",
   "gracias": "Merci, {nombre}",
-  "gracias_general": "Merci pour ton temps"
+  "gracias_general": "Merci pour ton temps",
+  "numeros_titulo": "Faisons les [calculs.]",
+  "numeros_boton": "Utiliser la calculatrice"
  }
 }
 );})(window.KVI_DICS=window.KVI_DICS||{},"fr");

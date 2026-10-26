@@ -70,13 +70,13 @@
   "peso_nota": "São exemplos para te dar uma ideia. Seus números a gente calcula junto na calculadora.",
   "compara_eti": "Pessoa ou recepcionista com IA",
   "compara_titulo": "Os dois ajudam. [Mas não do mesmo jeito.]",
-  "compara_persona": "Uma pessoa",
+  "compara_persona": "Contratar uma pessoa",
   "compara_ia": "Recepcionista com IA",
   "fila_horario": "Horário",
   "fila_horario_p": "Turno fixo, de segunda a sábado",
   "fila_horario_ia": "24 horas, 7 dias",
   "fila_pago": "Custo",
-  "fila_pago_p": "Salário, benefícios e 13º",
+  "fila_pago_p": "Salário de {de} a {a} por mês, mais benefícios",
   "fila_pago_ia": "Uma mensalidade",
   "fila_faltas": "Faltas",
   "fila_faltas_p": "Férias, folgas e doenças",
@@ -95,7 +95,9 @@
   "demo_boton": "Testar a demo",
   "demo_nota": "Fale como se fosse seu cliente.",
   "gracias": "Obrigado, {nombre}",
-  "gracias_general": "Obrigado pelo seu tempo"
+  "gracias_general": "Obrigado pelo seu tempo",
+  "numeros_titulo": "Vamos fazer as [contas.]",
+  "numeros_boton": "Usar a calculadora"
  }
 }
 );})(window.KVI_DICS=window.KVI_DICS||{},"pt");

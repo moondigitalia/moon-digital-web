@@ -252,7 +252,7 @@ module.exports = async (req, res) => {
 
     if (d.accion === 'mios') {
       const [lista, cuenta] = await Promise.all([
-        sql('SELECT codigo, negocio, asistente, creado, creado_por, puerta, contacto, vistas, usos, ultimo_uso, respuesta FROM demos ORDER BY creado DESC LIMIT 60'),
+        sql("SELECT codigo, negocio, asistente, creado, creado_por, puerta, contacto, vistas, usos, ultimo_uso, respuesta, responsable, CASE WHEN COALESCE(logo, '') <> '' THEN 1 ELSE 0 END AS con_logo FROM demos ORDER BY creado DESC LIMIT 60"),
         sql("SELECT COUNT(*) AS n FROM demo_usos WHERE fecha >= ? AND COALESCE(puerta,'dan') = 'dan'", [inicioHoy()])]);
       const hoy = ((cuenta || [])[0] || {}).n || 0;
       res.status(200).json({ ok: true, yo, demos: lista, hoy, tope: TOPES.dan });

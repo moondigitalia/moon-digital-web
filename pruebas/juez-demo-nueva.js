@@ -72,6 +72,7 @@ const srv = http.createServer((q, r) => {
       await p.click('#lector'); await revisa('hoja-lector'); await p.click('#velo', { position: { x: 5, y: 5 } }); await p.waitForTimeout(400);
       await p.click('#pServicios'); await revisa('hoja-servicios'); await p.click('#hojaListo'); await p.waitForTimeout(400);
       await p.click('#pHorario'); await revisa('hoja-horario'); await p.click('#hojaListo'); await p.waitForTimeout(400);
+      await p.click('#pUbicacion'); await revisa('hoja-ubicacion'); await p.click('#hojaListo'); await p.waitForTimeout(400);
       // (26-oct) Marca del cliente: hoja vacía, con logo subido y con el nombre de quien lo verá.
       await p.click('#pMarca'); await revisa('hoja-marca');
       await p.setInputFiles('#mArchivo', path.join(raiz, 'pruebas/material/logo-prueba.png')); await p.waitForTimeout(500); await revisa('hoja-marca-logo');
@@ -82,7 +83,11 @@ const srv = http.createServer((q, r) => {
       await revisa('forma-con-marca');
       await p.fill('input[name=negocio]', 'Clínica Dental Sonrisa'); await p.fill('input[name=giro]', 'Clínica dental'); await p.click('#crear'); await p.waitForTimeout(400);
       await revisa('resultado');
-      await p.click('#tira'); await revisa('hoja-links-generales'); await p.click('#velo', { position: { x: 5, y: 5 } }); await p.waitForTimeout(400);
+      // (26-oct) Las cuatro píldoras caben completas; Calculadora y Presentación con su lista de clientes.
+      const pild = await p.evaluate(() => [...document.querySelectorAll('.pestana')].filter(b => b.scrollWidth > b.clientWidth + 1).map(b => b.textContent));
+      if (pild.length) fallas.push(`${nom} píldoras cortadas: ${pild.join(', ')}`);
+      await p.click('.pestana[data-v=calc]'); await p.waitForTimeout(1700); await revisa('calculadora');
+      await p.click('.pestana[data-v=pres]'); await p.waitForTimeout(300); await revisa('presentacion');
       await p.click('.pestana[data-v=tablero]'); await revisa('tablero');
       await p.click('[data-paso=quieren]'); await revisa('hoja-quieren');
       await p.click('[data-links]'); await p.waitForTimeout(800); await revisa('hoja-links');

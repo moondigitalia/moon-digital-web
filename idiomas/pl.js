@@ -71,13 +71,13 @@
   "peso_nota": "To przykłady, żeby dać ci pojęcie. Twoje liczby policzymy razem w kalkulatorze.",
   "compara_eti": "Człowiek czy recepcjonista AI",
   "compara_titulo": "Obaj pomagają. [Ale inaczej.]",
-  "compara_persona": "Człowiek",
+  "compara_persona": "Zatrudnienie osoby",
   "compara_ia": "Recepcjonista AI",
   "fila_horario": "Godziny",
   "fila_horario_p": "Swoja zmiana, pon.–sob.",
   "fila_horario_ia": "24 godziny, 7 dni",
   "fila_pago": "Koszt",
-  "fila_pago_p": "Pensja, składki i premie",
+  "fila_pago_p": "Pensja od {de} do {a} miesięcznie, plus świadczenia",
   "fila_pago_ia": "Miesięczna opłata",
   "fila_faltas": "Absencje",
   "fila_faltas_p": "Urlopy, wolne i choroby",
@@ -96,7 +96,9 @@
   "demo_boton": "Wypróbuj demo",
   "demo_nota": "Mów do niego jak twój klient.",
   "gracias": "Dzięki, {nombre}",
-  "gracias_general": "Dzięki za twój czas"
+  "gracias_general": "Dzięki za twój czas",
+  "numeros_titulo": "Policzmy [to.]",
+  "numeros_boton": "Użyj kalkulatora"
  }
 }
 );})(window.KVI_DICS=window.KVI_DICS||{},"pl");

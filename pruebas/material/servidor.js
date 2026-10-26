@@ -14,11 +14,12 @@ http.createServer((q, r) => {
   if (u === '/api/prueba') {
     let b = ''; q.on('data', c => b += c);
     q.on('end', () => { const d = JSON.parse(b || '{}'); const m = MARCAS[d.codigo]; r.setHeader('Content-Type', 'application/json');
-      r.end(JSON.stringify(m ? { ok: true, marca: Object.assign({ demo: 'https://moondigitalia.com/prueba/' + d.codigo }, m) } : { ok: false, error: 'no_existe' })); });
+      r.end(JSON.stringify(d.accion === 'datos' ? (m ? { ok: true, agente: 'agente-de-prueba', voz_id: 'x', demo: { negocio: m.negocio, giro: 'Negocio de prueba', asistente: 'Sofía', voz: 'mujer', puerta: 'dan' } } : { ok: false, error: 'no_existe' }) : m ? { ok: true, marca: Object.assign({ demo: 'https://moondigitalia.com/prueba/' + d.codigo }, m) } : { ok: false, error: 'no_existe' })); });
     return;
   }
   let f = u;
   if (/^\/(calculadora|presentacion)(\/[a-z0-9-]+)?\/?$/.test(u)) f = '/' + u.split('/')[1] + '/index.html';
+  if (/^\/prueba\/(?!nueva)[a-z0-9-]+\/?$/.test(u)) f = '/prueba/index.html';
   const ruta = path.join(R, f);
   if (!ruta.startsWith(R) || !fs.existsSync(ruta) || fs.statSync(ruta).isDirectory()) { r.statusCode = 404; r.end('no'); return; }
   r.setHeader('Content-Type', TIPOS[path.extname(ruta)] || 'application/octet-stream');

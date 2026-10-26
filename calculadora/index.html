@@ -7,6 +7,7 @@
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F8F7F2">
 <link rel="icon" href="data:,">
+<script>if (/[?&]dentro=/.test(location.search)) document.documentElement.classList.add("dentro");   /* dentro de la presentación: sin encabezado ni pie (la lámina ya los tiene) */</script>
 <script src="/idiomas/idioma.js"></script>
 <title data-t="calc.titulo_pagina">Lo que te cuestan las llamadas perdidas</title>
 <link rel="preload" href="/fuentes/material/anton-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
@@ -69,6 +70,12 @@ html.ancho .preguntas{grid-column:1;grid-row:2/4}
 html.ancho .lado{grid-column:2;grid-row:2;display:grid;gap:calc(16px*var(--k));align-content:center}
 html.ancho .pie{grid-column:2;grid-row:3}
 .lado{display:grid;grid-template-columns:minmax(0,1fr);gap:calc(14px*var(--k))}
+html.dentro .cab,html.dentro .pie{display:none}
+html.dentro main{padding:calc(6px*var(--k))}
+html.dentro:not(.ancho) main{grid-template-rows:minmax(0,1fr) auto}
+html.dentro.ancho main{grid-template-rows:minmax(0,1fr)}
+html.dentro.ancho .preguntas{grid-row:1}
+html.dentro.ancho .lado{grid-row:1}
 </style>
 </head>
 <body>

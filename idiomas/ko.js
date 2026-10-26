@@ -68,13 +68,13 @@
   "peso_nota": "감을 잡기 위한 예시예요. 실제 숫자는 계산기로 함께 뽑아 봐요.",
   "compara_eti": "사람 vs AI 전화 비서",
   "compara_titulo": "둘 다 도움이 돼요. [일하는 방식이 다를 뿐.]",
-  "compara_persona": "사람",
+  "compara_persona": "사람을 고용하면",
   "compara_ia": "AI 전화 비서",
   "fila_horario": "근무 시간",
   "fila_horario_p": "정해진 근무, 월~토",
   "fila_horario_ia": "하루 24시간, 주 7일",
   "fila_pago": "비용",
-  "fila_pago_p": "월급, 복리후생, 보너스",
+  "fila_pago_p": "월급 {de}~{a}, 여기에 복리후생까지",
   "fila_pago_ia": "월 이용료",
   "fila_faltas": "결근",
   "fila_faltas_p": "휴가, 개인 사정, 병가",
@@ -93,7 +93,9 @@
   "demo_boton": "데모 해 보기",
   "demo_nota": "손님인 것처럼 말을 걸어 보세요.",
   "gracias": "{nombre}님, 감사해요",
-  "gracias_general": "시간 내 주셔서 감사해요"
+  "gracias_general": "시간 내 주셔서 감사해요",
+  "numeros_titulo": "[계산해 봐요.]",
+  "numeros_boton": "계산기 사용하기"
  }
 }
 );})(window.KVI_DICS=window.KVI_DICS||{},"ko");

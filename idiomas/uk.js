@@ -71,13 +71,13 @@
   "peso_nota": "Це приклади для орієнтиру. Твої цифри порахуємо разом у калькуляторі.",
   "compara_eti": "Людина чи ШІ-секретар",
   "compara_titulo": "Обидва допомагають. [Але по-різному.]",
-  "compara_persona": "Людина",
+  "compara_persona": "Найняти людину",
   "compara_ia": "ШІ-секретар",
   "fila_horario": "Графік",
   "fila_horario_p": "Своя зміна, пн–сб",
   "fila_horario_ia": "24 години, 7 днів",
   "fila_pago": "Оплата",
-  "fila_pago_p": "Зарплата, соцпакет і премії",
+  "fila_pago_p": "Зарплата від {de} до {a} на місяць плюс пільги",
   "fila_pago_ia": "Щомісячна оплата",
   "fila_faltas": "Пропуски",
   "fila_faltas_p": "Відпустки, відгули й лікарняні",
@@ -96,7 +96,9 @@
   "demo_boton": "Спробувати демо",
   "demo_nota": "Говори з ним, ніби ти клієнт.",
   "gracias": "Дякуємо, {nombre}",
-  "gracias_general": "Дякуємо за твій час"
+  "gracias_general": "Дякуємо за твій час",
+  "numeros_titulo": "Давай [порахуємо.]",
+  "numeros_boton": "Відкрити калькулятор"
  }
 }
 );})(window.KVI_DICS=window.KVI_DICS||{},"uk");

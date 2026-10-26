@@ -69,13 +69,13 @@
   "peso_nota": "Das sind nur Beispiele. Deine Zahlen rechnen wir zusammen im Rechner aus.",
   "compara_eti": "Mensch oder KI-Rezeption",
   "compara_titulo": "Beide helfen. [Nur anders.]",
-  "compara_persona": "Ein Mensch",
+  "compara_persona": "Eine Person einstellen",
   "compara_ia": "KI-Rezeption",
   "fila_horario": "Zeiten",
   "fila_horario_p": "Feste Schicht, Mo. bis Sa.",
   "fila_horario_ia": "24 Stunden, 7 Tage",
   "fila_pago": "Kosten",
-  "fila_pago_p": "Lohn, Abgaben und Sonderzahlungen",
+  "fila_pago_p": "Gehalt von {de} bis {a} im Monat, plus Zusatzleistungen",
   "fila_pago_ia": "Eine Monatsgebühr",
   "fila_faltas": "Ausfälle",
   "fila_faltas_p": "Urlaub, freie Tage und Krankheit",
@@ -94,7 +94,9 @@
   "demo_boton": "Demo testen",
   "demo_nota": "Sprich mit ihr wie einer deiner Kunden.",
   "gracias": "Danke, {nombre}",
-  "gracias_general": "Danke für deine Zeit"
+  "gracias_general": "Danke für deine Zeit",
+  "numeros_titulo": "Lass uns [rechnen.]",
+  "numeros_boton": "Rechner benutzen"
  }
 }
 );})(window.KVI_DICS=window.KVI_DICS||{},"de");

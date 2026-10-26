@@ -70,13 +70,13 @@
   "peso_nota": "Sono esempi per darti un'idea. I tuoi numeri li calcoliamo insieme con la calcolatrice.",
   "compara_eti": "Persona o receptionist IA",
   "compara_titulo": "Aiutano entrambi. [Ma in modo diverso.]",
-  "compara_persona": "Una persona",
+  "compara_persona": "Assumere una persona",
   "compara_ia": "Receptionist IA",
   "fila_horario": "Orario",
   "fila_horario_p": "Il suo turno, lun–sab",
   "fila_horario_ia": "24 ore su 24, 7 giorni su 7",
   "fila_pago": "Costo",
-  "fila_pago_p": "Stipendio, contributi e tredicesima",
+  "fila_pago_p": "Stipendio da {de} a {a} al mese, più benefit",
   "fila_pago_ia": "Un canone mensile",
   "fila_faltas": "Assenze",
   "fila_faltas_p": "Ferie, permessi e malattie",
@@ -95,7 +95,9 @@
   "demo_boton": "Prova la demo",
   "demo_nota": "Parlagli come se fossi un tuo cliente.",
   "gracias": "Grazie, {nombre}",
-  "gracias_general": "Grazie per il tuo tempo"
+  "gracias_general": "Grazie per il tuo tempo",
+  "numeros_titulo": "Facciamo due [conti.]",
+  "numeros_boton": "Usa la calcolatrice"
  }
 }
 );})(window.KVI_DICS=window.KVI_DICS||{},"it");

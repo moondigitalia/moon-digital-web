@@ -69,13 +69,13 @@
   "peso_nota": "এগুলো শুধু ধারণা দেওয়ার উদাহরণ। আপনার হিসাব আমরা ক্যালকুলেটরে একসাথে করব।",
   "compara_eti": "মানুষ নাকি AI রিসেপশনিস্ট",
   "compara_titulo": "দুজনেই সাহায্য করে। [কাজের ধরন আলাদা।]",
-  "compara_persona": "একজন মানুষ",
+  "compara_persona": "একজন মানুষ নিয়োগ",
   "compara_ia": "AI রিসেপশনিস্ট",
   "fila_horario": "সময়",
   "fila_horario_p": "নিজের শিফট, সোম থেকে শনি",
   "fila_horario_ia": "24 ঘণ্টা, সপ্তাহে 7 দিন",
   "fila_pago": "খরচ",
-  "fila_pago_p": "বেতন, সুবিধা আর বোনাস",
+  "fila_pago_p": "মাসে {de} থেকে {a} বেতন, সাথে সুবিধা",
   "fila_pago_ia": "মাসিক ফি",
   "fila_faltas": "অনুপস্থিতি",
   "fila_faltas_p": "ছুটি, ব্যক্তিগত কাজ আর অসুখ",
@@ -94,7 +94,9 @@
   "demo_boton": "ডেমো চেষ্টা করুন",
   "demo_nota": "গ্রাহক হয়ে কথা বলে দেখুন।",
   "gracias": "ধন্যবাদ, {nombre}",
-  "gracias_general": "সময় দেওয়ার জন্য ধন্যবাদ"
+  "gracias_general": "সময় দেওয়ার জন্য ধন্যবাদ",
+  "numeros_titulo": "চলো [হিসাব করি।]",
+  "numeros_boton": "ক্যালকুলেটর ব্যবহার করুন"
  }
 }
 );})(window.KVI_DICS=window.KVI_DICS||{},"bn");

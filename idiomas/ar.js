@@ -73,13 +73,13 @@
   "peso_nota": "هذه أمثلة لتقريب الفكرة. أرقامك نحسبها معًا في الحاسبة.",
   "compara_eti": "شخص أم موظف استقبال ذكي",
   "compara_titulo": "كلاهما يساعد. [لكن ليس بالطريقة نفسها.]",
-  "compara_persona": "شخص",
+  "compara_persona": "توظيف شخص",
   "compara_ia": "موظف استقبال ذكي",
   "fila_horario": "الدوام",
   "fila_horario_p": "دوامه، من الاثنين إلى السبت",
   "fila_horario_ia": "24 ساعة، 7 أيام",
   "fila_pago": "الأجر",
-  "fila_pago_p": "راتب ومزايا ومكافآت",
+  "fila_pago_p": "راتب من {de} إلى {a} شهريًا، بالإضافة إلى المزايا",
   "fila_pago_ia": "اشتراك شهري",
   "fila_faltas": "الغياب",
   "fila_faltas_p": "إجازات وأذونات ومرض",
@@ -98,7 +98,9 @@
   "demo_boton": "جرّب العرض",
   "demo_nota": "تحدّث إليه كأنك عميل.",
   "gracias": "شكرًا، {nombre}",
-  "gracias_general": "شكرًا على وقتك"
+  "gracias_general": "شكرًا على وقتك",
+  "numeros_titulo": "لنحسبها [بالأرقام.]",
+  "numeros_boton": "استخدم الحاسبة"
  }
 }
 );})(window.KVI_DICS=window.KVI_DICS||{},"ar");

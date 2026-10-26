@@ -69,13 +69,13 @@
   "peso_nota": "Dit zijn voorbeelden om je een idee te geven. Jouw cijfers berekenen we samen met de rekentool.",
   "compara_eti": "Mens of AI-receptionist",
   "compara_titulo": "Allebei helpen ze. [Maar anders.]",
-  "compara_persona": "Een mens",
+  "compara_persona": "Iemand aannemen",
   "compara_ia": "AI-receptionist",
   "fila_horario": "Tijden",
   "fila_horario_p": "Eigen dienst, ma t/m za",
   "fila_horario_ia": "24 uur, 7 dagen",
   "fila_pago": "Kosten",
-  "fila_pago_p": "Loon, premies en extra's",
+  "fila_pago_p": "Salaris van {de} tot {a} per maand, plus extra's",
   "fila_pago_ia": "Een maandbedrag",
   "fila_faltas": "Verzuim",
   "fila_faltas_p": "Vakantie, verlof en ziekte",
@@ -94,7 +94,9 @@
   "demo_boton": "Probeer de demo",
   "demo_nota": "Praat ertegen alsof je een klant bent.",
   "gracias": "Bedankt, {nombre}",
-  "gracias_general": "Bedankt voor je tijd"
+  "gracias_general": "Bedankt voor je tijd",
+  "numeros_titulo": "Laten we [rekenen.]",
+  "numeros_boton": "Gebruik de rekenmachine"
  }
 }
 );})(window.KVI_DICS=window.KVI_DICS||{},"nl");

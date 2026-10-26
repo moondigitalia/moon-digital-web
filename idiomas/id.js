@@ -68,13 +68,13 @@
   "peso_nota": "Ini cuma contoh biar kebayang. Angkamu kita hitung bareng di kalkulator.",
   "compara_eti": "Orang atau resepsionis AI",
   "compara_titulo": "Dua-duanya membantu. [Caranya beda.]",
-  "compara_persona": "Orang",
+  "compara_persona": "Merekrut satu orang",
   "compara_ia": "Resepsionis AI",
   "fila_horario": "Jam kerja",
   "fila_horario_p": "Sesuai shift, Senin–Sabtu",
   "fila_horario_ia": "24 jam, 7 hari",
   "fila_pago": "Biaya",
-  "fila_pago_p": "Gaji, tunjangan, dan THR",
+  "fila_pago_p": "Gaji {de} sampai {a} per bulan, plus tunjangan",
   "fila_pago_ia": "Biaya bulanan",
   "fila_faltas": "Absen",
   "fila_faltas_p": "Cuti, izin, dan sakit",
@@ -93,7 +93,9 @@
   "demo_boton": "Coba demonya",
   "demo_nota": "Ajak bicara seolah kamu pelanggannya.",
   "gracias": "Terima kasih, {nombre}",
-  "gracias_general": "Terima kasih atas waktumu"
+  "gracias_general": "Terima kasih atas waktumu",
+  "numeros_titulo": "Yuk [hitung.]",
+  "numeros_boton": "Pakai kalkulator"
  }
 }
 );})(window.KVI_DICS=window.KVI_DICS||{},"id");

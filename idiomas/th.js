@@ -68,13 +68,13 @@
   "peso_nota": "เป็นแค่ตัวอย่างให้เห็นภาพ ตัวเลขจริงของคุณ เรามาคิดด้วยกันในเครื่องคิดเลข",
   "compara_eti": "คนหรือพนักงานรับสาย AI",
   "compara_titulo": "ช่วยได้ทั้งคู่ [แต่ทำงานไม่เหมือนกัน]",
-  "compara_persona": "พนักงานคน",
+  "compara_persona": "จ้างคนหนึ่งคน",
   "compara_ia": "พนักงานรับสาย AI",
   "fila_horario": "เวลาทำงาน",
   "fila_horario_p": "ตามกะ จันทร์ถึงเสาร์",
   "fila_horario_ia": "24 ชั่วโมง ทุกวัน",
   "fila_pago": "ค่าใช้จ่าย",
-  "fila_pago_p": "เงินเดือน สวัสดิการ และโบนัส",
+  "fila_pago_p": "เงินเดือน {de} ถึง {a} ต่อเดือน บวกสวัสดิการ",
   "fila_pago_ia": "ค่าบริการรายเดือน",
   "fila_faltas": "การลา",
   "fila_faltas_p": "ลาพักร้อน ลากิจ ลาป่วย",
@@ -93,7 +93,9 @@
   "demo_boton": "ลองเดโม",
   "demo_nota": "คุยกับมันเหมือนคุณเป็นลูกค้า",
   "gracias": "ขอบคุณนะ {nombre}",
-  "gracias_general": "ขอบคุณที่สละเวลา"
+  "gracias_general": "ขอบคุณที่สละเวลา",
+  "numeros_titulo": "มา[คำนวณกัน]",
+  "numeros_boton": "ใช้เครื่องคิดเลข"
  }
 }
 );})(window.KVI_DICS=window.KVI_DICS||{},"th");

@@ -69,13 +69,13 @@
   "peso_nota": "These are just examples. We'll work out your numbers together in the calculator.",
   "compara_eti": "Person or AI receptionist",
   "compara_titulo": "Both help. [They work differently.]",
-  "compara_persona": "A person",
+  "compara_persona": "Hiring a person",
   "compara_ia": "AI receptionist",
   "fila_horario": "Hours",
   "fila_horario_p": "Their shift, Monday to Saturday",
   "fila_horario_ia": "24 hours, 7 days",
   "fila_pago": "Cost",
-  "fila_pago_p": "Salary, benefits and bonuses",
+  "fila_pago_p": "Salary of {de} to {a} a month, plus benefits",
   "fila_pago_ia": "A monthly fee",
   "fila_faltas": "Absences",
   "fila_faltas_p": "Vacations, time off and sick days",
@@ -94,7 +94,9 @@
   "demo_boton": "Try the demo",
   "demo_nota": "Talk to it like one of your customers.",
   "gracias": "Thanks, {nombre}",
-  "gracias_general": "Thanks for your time"
+  "gracias_general": "Thanks for your time",
+  "numeros_titulo": "Let's run the [numbers.]",
+  "numeros_boton": "Use the calculator"
  }
 }
 );})(window.KVI_DICS=window.KVI_DICS||{},"en");

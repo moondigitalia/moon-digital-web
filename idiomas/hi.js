@@ -69,13 +69,13 @@
   "peso_nota": "ये बस अंदाज़ा देने के लिए उदाहरण हैं। आपके आँकड़े हम कैलकुलेटर में साथ मिलकर निकालेंगे।",
   "compara_eti": "इंसान या AI रिसेप्शनिस्ट",
   "compara_titulo": "दोनों मदद करते हैं। [पर तरीका अलग है।]",
-  "compara_persona": "एक इंसान",
+  "compara_persona": "किसी व्यक्ति को रखना",
   "compara_ia": "AI रिसेप्शनिस्ट",
   "fila_horario": "समय",
   "fila_horario_p": "अपनी शिफ़्ट, सोम से शनि",
   "fila_horario_ia": "24 घंटे, सातों दिन",
   "fila_pago": "खर्च",
-  "fila_pago_p": "तनख्वाह, भत्ते और बोनस",
+  "fila_pago_p": "{de} से {a} प्रति माह वेतन, साथ में सुविधाएँ",
   "fila_pago_ia": "मासिक शुल्क",
   "fila_faltas": "छुट्टियाँ",
   "fila_faltas_p": "छुट्टी, निजी काम और बीमारी",
@@ -94,7 +94,9 @@
   "demo_boton": "डेमो आज़माएँ",
   "demo_nota": "ऐसे बात करें जैसे आप ग्राहक हों।",
   "gracias": "शुक्रिया, {nombre}",
-  "gracias_general": "समय देने के लिए शुक्रिया"
+  "gracias_general": "समय देने के लिए शुक्रिया",
+  "numeros_titulo": "चलो [हिसाब लगाएँ।]",
+  "numeros_boton": "कैलकुलेटर इस्तेमाल करें"
  }
 }
 );})(window.KVI_DICS=window.KVI_DICS||{},"hi");

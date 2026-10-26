@@ -765,7 +765,7 @@ function pintaInicio(sil) {
       <div class="t t-proy" role="button" tabindex="0" data-ir="clientes"><span class="flecha">${I.abre}</span><span class="eti">Clientes</span><div class="extra">${xProy}</div><span class="num">${clientes.length}</span><span class="sub">demos, propuestas y material</span></div>
       <div class="t t-equipo" role="button" tabindex="0" data-ir="equipo"><span class="flecha">${I.abre}</span><span class="eti">Equipo</span><div class="extra">${xEq}</div><span class="num">${Object.keys(GENTE).length}</span><span class="sub">integrantes</span></div>
       <div class="t t-moon" role="button" tabindex="0" data-ir="casa"><span class="flecha">${I.abre}</span><span class="eti">Hecho en casa</span><div class="extra">${xMoon}</div><span class="sub" style="margin-top:auto">Visión, Jason y presentación</span></div>
-      <div class="t t-demo" role="button" tabindex="0" data-ir="demo"><span class="mic">${I.mic}</span><span class="q"><b>Crea tu recepcionista</b><span class="sub">Arma uno y mira cómo van</span></span><span class="flecha">${I.abre}</span></div>
+      <div class="t t-demo" role="button" tabindex="0" data-ir="demo"><span class="mic">${I.mic}</span><span class="q"><b>Para tus clientes</b><span class="sub">Demo, calculadora y presentación</span></span><span class="flecha">${I.abre}</span></div>
       <div class="t t-ultimo">${ult ? ava(ult.quien, 1) : ''}<span class="txt">${ult ? `Lo último: <b>${esc((GENTE[ult.quien] || CLAUDE).n)}</b> ${esc(ult.texto)} · ${cuando(ult.fecha)}` : 'Aquí aparece lo último que pasó en MOON.'}</span></div>
     </main>
   </div>`;
@@ -1526,7 +1526,7 @@ function capaCasa() {
 
 /* ---------- Armar demo: la página de demos vive aquí adentro (mismo Centro, misma sesión) ---------- */
 function capaDemo() {
-  marco('Crea tu recepcionista', '', `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr)"><div class="hoja visor" style="background:transparent;box-shadow:none;border-radius:0;overflow:visible"><iframe class="doc-html" src="/prueba/nueva?dentro=1" title="Crea tu recepcionista" allow="clipboard-write; microphone"></iframe></div></div>`);
+  marco('Para tus clientes', '', `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr)"><div class="hoja visor" style="background:transparent;box-shadow:none;border-radius:0;overflow:visible"><iframe class="doc-html" src="/prueba/nueva?dentro=1" title="Para tus clientes" allow="clipboard-write; microphone"></iframe></div></div>`);
   const fr = app.querySelector('.doc-html');
   // Cuando la página de adentro abre una hoja, oscurece solo su recuadro; aquí se oscurece todo lo demás, igual y al mismo tiempo,
   // para que se vea UNA sola sombra en toda la pantalla (nunca un rectángulo más oscuro). Tocar afuera cierra la hoja.

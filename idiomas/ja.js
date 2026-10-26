@@ -68,13 +68,13 @@
   "peso_nota": "イメージのための例です。あなたの数字は、計算ツールで一緒に出しましょう。",
   "compara_eti": "人か、AI受付か",
   "compara_titulo": "どちらも助けになる。[でも働き方は違う。]",
-  "compara_persona": "人",
+  "compara_persona": "人を雇う場合",
   "compara_ia": "AI受付",
   "fila_horario": "時間",
   "fila_horario_p": "シフト制、月〜土",
   "fila_horario_ia": "24時間・週7日",
   "fila_pago": "支払い",
-  "fila_pago_p": "給料・福利厚生・ボーナス",
+  "fila_pago_p": "月給{de}〜{a}、さらに福利厚生",
   "fila_pago_ia": "月額料金",
   "fila_faltas": "休み",
   "fila_faltas_p": "休暇、私用、病気",
@@ -93,7 +93,9 @@
   "demo_boton": "デモを試す",
   "demo_nota": "お客さんになったつもりで話しかけてみて。",
   "gracias": "ありがとう、{nombre}さん",
-  "gracias_general": "お時間ありがとうございました"
+  "gracias_general": "お時間ありがとうございました",
+  "numeros_titulo": "[計算してみよう。]",
+  "numeros_boton": "計算機を使う"
  }
 }
 );})(window.KVI_DICS=window.KVI_DICS||{},"ja");

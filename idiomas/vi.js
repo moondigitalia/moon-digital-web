@@ -68,13 +68,13 @@
   "peso_nota": "Đây chỉ là ví dụ để bạn dễ hình dung. Số của bạn, mình cùng tính bằng công cụ tính nhé.",
   "compara_eti": "Người hay lễ tân AI",
   "compara_titulo": "Cả hai đều giúp. [Nhưng làm khác nhau.]",
-  "compara_persona": "Một người",
+  "compara_persona": "Thuê một người",
   "compara_ia": "Lễ tân AI",
   "fila_horario": "Giờ làm",
   "fila_horario_p": "Theo ca, thứ Hai đến thứ Bảy",
   "fila_horario_ia": "24 giờ, 7 ngày",
   "fila_pago": "Chi phí",
-  "fila_pago_p": "Lương, phúc lợi và thưởng Tết",
+  "fila_pago_p": "Lương từ {de} đến {a} mỗi tháng, cộng phúc lợi",
   "fila_pago_ia": "Một khoản phí hằng tháng",
   "fila_faltas": "Vắng mặt",
   "fila_faltas_p": "Nghỉ phép, việc riêng và ốm đau",
@@ -93,7 +93,9 @@
   "demo_boton": "Thử demo",
   "demo_nota": "Hãy nói chuyện như thể bạn là khách hàng.",
   "gracias": "Cảm ơn {nombre}",
-  "gracias_general": "Cảm ơn bạn đã dành thời gian"
+  "gracias_general": "Cảm ơn bạn đã dành thời gian",
+  "numeros_titulo": "Cùng [tính toán nhé.]",
+  "numeros_boton": "Dùng máy tính"
  }
 }
 );})(window.KVI_DICS=window.KVI_DICS||{},"vi");
