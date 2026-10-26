@@ -364,7 +364,7 @@ body.listo{visibility:visible}
     var img = rollo.querySelector('.marca img');
     // Los celulares Android a veces agrandan letras chicas por su cuenta un instante después de dibujar.
     // Por eso se vuelve a revisar dos cuadros después (aún sin mostrar) y solo entonces se enseña: nunca brinca a la vista.
-    var cuadro = function () { return new Promise(function (z) { requestAnimationFrame(function () { requestAnimationFrame(z); }); }); };
+    var cuadro = function () { return new Promise(function (z) { requestAnimationFrame(function () { requestAnimationFrame(z); }); setTimeout(z, 120); }); };   // (si la pestaña está escondida no hay cuadros: no se espera de más)
     var mostrar = function () { acomodar(); cuadro().then(function () { revisar(); return cuadro(); }).then(function () { revisar(); document.body.classList.add('listo'); }); };
     Promise.all([letras, img && img.decode ? img.decode().catch(function () {}) : 0]).then(mostrar, mostrar);
   });
