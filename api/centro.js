@@ -43,7 +43,7 @@ async function nuevaSesion(usuario, req) {
 // ---------- Entrada (sin sesión) ----------
 async function entrada(d, req) {
   if (d.accion === 'quienes') {
-    const us = await sql('SELECT id, nombre, correo, hash FROM usuarios ORDER BY CASE id WHEN \'daniel\' THEN 1 WHEN \'dan\' THEN 2 ELSE 3 END');
+    const us = await sql('SELECT id, nombre, correo, hash FROM usuarios WHERE tipo = \'socio\' ORDER BY CASE id WHEN \'daniel\' THEN 1 WHEN \'dan\' THEN 2 ELSE 3 END');
     return { ok: true, usuarios: us.map(u => ({ id: u.id, nombre: u.nombre, correo: ocultar(u.correo), tieneClave: !!u.hash })) };
   }
   if (!['pedir_codigo', 'revisar_codigo', 'crear_clave', 'entrar'].includes(d.accion)) return null;
@@ -102,7 +102,7 @@ async function entrada(d, req) {
 // ---------- Con sesión ----------
 async function inicio(yo) {
   const [usuarios, personas, proyectos, tareas, actividad, usoMes, paneles, documentos] = await Promise.all([
-    sql('SELECT id, nombre, color, rol, lema, creado FROM usuarios'),
+    sql("SELECT id, nombre, color, rol, lema, creado FROM usuarios WHERE tipo = 'socio'"),
     sql('SELECT tel, telefono, correo, foto, nombre, negocio, giro, temperatura, etapa, servicio, origen, necesidad, proxima_cita, encargados, notas_equipo, ultimo_contacto, contactos, es_prueba FROM personas ORDER BY ultimo_contacto DESC LIMIT 1000'),
     sql("SELECT id, tel, nombre, fase, enlace, encargados, nota, creado, actualizado, (clave != '' OR llave_uso != '') AS conectado FROM proyectos ORDER BY actualizado DESC"),
     sql("SELECT * FROM tareas WHERE estado != 'hecha' OR hecho > ? ORDER BY id DESC", [new Date(Date.now() - 14 * 864e5).toISOString()]),
