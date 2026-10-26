@@ -38,8 +38,9 @@ function leer(req) {
 async function quienEs(req) {
   const tok = String(req.headers['x-sesion'] || '');
   if (tok.length < 40) return null;
-  const s = (await sql('SELECT s.usuario, u.nombre FROM sesiones s JOIN usuarios u ON u.id = s.usuario WHERE s.token = ?', [huella(tok)]))[0];
-  return s ? { id: s.usuario, nombre: s.nombre } : null;
+  const s = (await sql('SELECT s.usuario, u.nombre, u.tipo, u.activo, u.tope_demos FROM sesiones s JOIN usuarios u ON u.id = s.usuario WHERE s.token = ?', [huella(tok)]))[0];
+  if (!s || Number(s.activo) === 0) return null;
+  return { id: s.usuario, nombre: s.nombre, tipo: s.tipo === 'embajador' ? 'embajador' : 'socio', tope: Number(s.tope_demos) || 10 };
 }
 
 // Código corto y fácil de dictar: parte del nombre + 4 letras/números sin confusiones (sin 0/O, 1/l).
@@ -67,7 +68,7 @@ const publico = d => ({ negocio: d.negocio, giro: d.giro, servicios: d.servicios
 const link = c => 'https://moondigitalia.com/prueba/' + c;
 
 // Deja o actualiza a la persona en el CRM (una ficha por teléfono) y suma el contacto a su historial.
-async function alCRM(tel10, telefono, nombre, negocio, giro, resumen, ref) {
+async function alCRM(tel10, telefono, nombre, negocio, giro, resumen, ref, embajador) {
   const f = ahora();
   const prev = (await sql('SELECT tel, etapa FROM personas WHERE tel = ?', [tel10]))[0];
   if (!prev) {
@@ -78,6 +79,8 @@ async function alCRM(tel10, telefono, nombre, negocio, giro, resumen, ref) {
                giro = CASE WHEN COALESCE(giro,'') = '' THEN ? ELSE giro END, etapa = CASE WHEN etapa = 'archivo' THEN 'pendiente' ELSE etapa END,
                actualizado = ?, ultimo_contacto = ? WHERE tel = ?`, [nombre, negocio, giro, f, f, tel10]);
   }
+  // El prospecto queda a nombre del embajador que le armó su recepcionista (el primero que lo trajo se lo queda).
+  if (embajador) await sql("UPDATE personas SET embajador = ? WHERE tel = ? AND COALESCE(embajador, '') = ''", [embajador, tel10]).catch(() => {});
   await sql('INSERT OR REPLACE INTO contactos (id, tel, canal, tipo, fecha, resumen, datos) VALUES (?,?,?,?,?,?,?)', [ref, tel10, 'web', 'demo', f, resumen, '{}']).catch(() => {});
   await sql('UPDATE personas SET contactos = (SELECT COUNT(*) FROM contactos WHERE tel = ?) WHERE tel = ?', [tel10, tel10]).catch(() => {});
 }
@@ -120,8 +123,18 @@ async function gastoDemos(desdeIso) {
   return { todas: false, platicas: r.n || 0, mxn: Math.round((r.s || 0) / 60 * USD_MIN * MXN_USD) };
 }
 
-async function tablero() {
+async function tablero(emb) {
   const hoy = inicioHoy(), mes = inicioMes();
+  // Un embajador solo ve sus propios recepcionistas; el gasto y lo cobrado los ven los socios.
+  if (emb) {
+    const [demos, cerrados] = await Promise.all([
+      sql('SELECT codigo, negocio, asistente, puerta, contacto, creado, vistas, usos, ultimo_uso, respuesta, respuesta_fecha, responsable, vistas_calc, vistas_pres FROM demos WHERE creado_por = ? ORDER BY creado DESC LIMIT 500', [emb.id]),
+      sql("SELECT d.codigo FROM demos d JOIN personas p ON p.tel = d.whatsapp WHERE d.creado_por = ? AND d.whatsapp <> '' AND p.etapa IN ('cerrado', 'en órbita')", [emb.id]),
+    ]);
+    const cerr = new Set(cerrados.map(x => x.codigo));
+    demos.forEach(x => { x.cerrado = cerr.has(x.codigo); });
+    return { ok: true, embajador: true, demos, cobros: [], hoy: { dan: 0, abierta: 0 }, topes: TOPES, gasto: null };
+  }
   const [demos, usosHoy, cobros, cerrados] = await Promise.all([
     sql(`SELECT codigo, negocio, asistente, puerta, contacto, whatsapp, creado, vistas, usos, ultimo_uso, respuesta, respuesta_fecha, responsable, vistas_calc, vistas_pres FROM demos ORDER BY creado DESC LIMIT 500`),
     sql('SELECT puerta, COUNT(*) n FROM demo_usos WHERE fecha >= ? GROUP BY puerta', [hoy]),
@@ -192,12 +205,17 @@ module.exports = async (req, res) => {
       await sql('UPDATE demos SET respuesta = ?, respuesta_fecha = ?, whatsapp = CASE WHEN whatsapp = \'\' THEN ? ELSE whatsapp END, contacto = CASE WHEN contacto = \'\' THEN ? ELSE contacto END WHERE codigo = ?',
         [opcion, ahora(), tel10 || '', nombre || '', codigo]);
       const texto = { quiero: 'Le gustó su demo y quiere su asistente', llamada: 'Quiere agendar una llamada', no: 'Probó su demo: ahorita no' }[opcion];
-      if (tel10) await alCRM(tel10, t(d.whatsapp, 30) || tel10, nombre, x.negocio, x.giro, `${texto} (demo de ${x.asistente})`, 'demo:' + codigo);
+      const emb = (await sql("SELECT id, nombre FROM usuarios WHERE id = ? AND tipo = 'embajador'", [x.creado_por || '']))[0];
+      if (tel10) await alCRM(tel10, t(d.whatsapp, 30) || tel10, nombre, x.negocio, x.giro, `${texto} (demo de ${x.asistente})`, 'demo:' + codigo, emb ? emb.id : '');
       if (opcion !== 'no') {
         const quien = nombre ? `${nombre} (${x.negocio})` : x.negocio;
         await sql('INSERT INTO tareas (proyecto, titulo, detalle, para, de, estado, vence, creado) VALUES (?,?,?,?,?,?,?,?)',
           [0, t(`${quien}: ${opcion === 'quiero' ? 'quiere su asistente' : 'quiere una llamada'}`, 160),
-           t(`${texto}.\nWhatsApp: ${tel10}\nNegocio: ${x.negocio} (${x.giro})\nSu demo: ${link(codigo)}`, 2000), 'dan', 'claude', 'nueva', '', ahora()]);
+           t(`${texto}.\nWhatsApp: ${tel10}\nNegocio: ${x.negocio} (${x.giro})${emb ? `\nLo trajo: ${emb.nombre} (embajador)` : ''}\nSu demo: ${link(codigo)}`, 2000), 'dan', 'claude', 'nueva', '', ahora()]);
+        // Si lo trajo un embajador, él también recibe la tarea para darle seguimiento.
+        if (emb) await sql('INSERT INTO tareas (proyecto, titulo, detalle, para, de, estado, vence, creado) VALUES (?,?,?,?,?,?,?,?)',
+          [0, t(`${quien}: ${opcion === 'quiero' ? 'quiere su asistente' : 'quiere una llamada'}`, 160),
+           t(`${texto}.\nWhatsApp: ${tel10}\nNegocio: ${x.negocio}\nDan también lo ve.`, 2000), emb.id, 'claude', 'nueva', '', ahora()]);
       }
       await sql('INSERT INTO actividad (fecha, quien, texto) VALUES (?,?,?)', [ahora(), 'claude', t(`${x.negocio} probó su demo: ${texto.toLowerCase()}`, 200)]).catch(() => {});
       res.status(200).json({ ok: true });
@@ -226,6 +244,13 @@ module.exports = async (req, res) => {
     const yo = await quienEs(req);
     if (!yo) { res.status(401).json({ ok: false, error: 'sesion' }); return; }
 
+    // Embajadores: solo lo suyo, con su propio tope diario (cada recepcionista gasta minutos de llamadas).
+    const emb = yo.tipo === 'embajador';
+    if (emb && ['buscar_persona', 'cobro'].includes(d.accion)) { res.status(200).json({ ok: false, error: 'permiso' }); return; }
+    if (d.accion === 'crear' && emb) {
+      const hoyN = ((await sql('SELECT COUNT(*) n FROM demos WHERE creado_por = ? AND creado >= ?', [yo.id, inicioHoy()]))[0] || {}).n || 0;
+      if (hoyN >= yo.tope) { res.status(200).json({ ok: false, error: 'lleno' }); return; }
+    }
     if (d.accion === 'crear') {
       const negocio = t(d.negocio, 80);
       const giro = t(d.giro, 200);
@@ -243,23 +268,26 @@ module.exports = async (req, res) => {
 
     if (d.accion === 'editar_marca') {
       const m = marcaValida(d);
-      const x = (await sql('SELECT codigo FROM demos WHERE codigo = ?', [codigo]))[0];
-      if (!x) { res.status(200).json({ ok: false, error: 'no_existe' }); return; }
+      const x = (await sql('SELECT codigo, creado_por FROM demos WHERE codigo = ?', [codigo]))[0];
+      if (!x || (emb && x.creado_por !== yo.id)) { res.status(200).json({ ok: false, error: 'no_existe' }); return; }
       await sql('UPDATE demos SET responsable = ?, logo = ?, color = ?, color2 = ? WHERE codigo = ?', [m.responsable, m.logo, m.color, m.color2, codigo]);
       res.status(200).json({ ok: true });
       return;
     }
 
     if (d.accion === 'mios') {
-      const [lista, cuenta] = await Promise.all([
-        sql("SELECT codigo, negocio, asistente, creado, creado_por, puerta, contacto, vistas, usos, ultimo_uso, respuesta, responsable, CASE WHEN COALESCE(logo, '') <> '' THEN 1 ELSE 0 END AS con_logo FROM demos ORDER BY creado DESC LIMIT 60"),
+      const campos = "codigo, negocio, asistente, creado, creado_por, puerta, contacto, vistas, usos, ultimo_uso, respuesta, responsable, CASE WHEN COALESCE(logo, '') <> '' THEN 1 ELSE 0 END AS con_logo";
+      const [lista, cuenta] = await Promise.all(emb ? [
+        sql(`SELECT ${campos} FROM demos WHERE creado_por = ? ORDER BY creado DESC LIMIT 60`, [yo.id]),
+        sql('SELECT COUNT(*) AS n FROM demos WHERE creado_por = ? AND creado >= ?', [yo.id, inicioHoy()])] : [
+        sql(`SELECT ${campos} FROM demos ORDER BY creado DESC LIMIT 60`),
         sql("SELECT COUNT(*) AS n FROM demo_usos WHERE fecha >= ? AND COALESCE(puerta,'dan') = 'dan'", [inicioHoy()])]);
       const hoy = ((cuenta || [])[0] || {}).n || 0;
-      res.status(200).json({ ok: true, yo, demos: lista, hoy, tope: TOPES.dan });
+      res.status(200).json({ ok: true, yo, demos: lista, hoy, tope: emb ? yo.tope : TOPES.dan });
       return;
     }
 
-    if (d.accion === 'tablero') { res.status(200).json(await tablero()); return; }
+    if (d.accion === 'tablero') { res.status(200).json(await tablero(emb ? yo : null)); return; }
 
     if (d.accion === 'buscar_persona') {
       const q = '%' + t(d.q, 60).toLowerCase() + '%';

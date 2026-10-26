@@ -80,6 +80,19 @@ button{cursor:pointer}
 .t-demo .q{min-width:0;display:grid;gap:2px}
 .t-demo .q b{font-size:clamp(16px,calc(2.6 * var(--u)),22px);font-weight:800;letter-spacing:-.01em;line-height:1.15}
 .t-demo .q span{font-size:13px;line-height:1.25;color:var(--suave);font-weight:600}
+/* Inicio del embajador: solo lo suyo, en una columna, sin scroll. */
+.mosaico.emb{grid-template-columns:minmax(0,1fr);grid-template-rows:1fr 1.45fr .62fr .62fr .62fr;grid-template-areas:none}
+.t-com{background:#1f6f43;color:#fff;box-shadow:0 18px 30px -16px rgba(31,111,67,.6),inset 0 1px 0 rgba(255,255,255,.2)}
+.t-rec{background:var(--cobalto);color:#fff;box-shadow:0 18px 30px -14px rgba(11,79,214,.65),inset 0 1px 0 rgba(255,255,255,.25)}
+.t-com>.eti,.t-rec>.eti{color:#fff}.t-com .sub,.t-rec .sub{color:rgba(255,255,255,.85)}.t-rec .sub.fuerte{color:#fff;font-weight:800}
+.t-com .flecha,.t-rec .flecha{background:rgba(255,255,255,.16);box-shadow:none}
+.t-rec .mic{width:clamp(38px,calc(6 * var(--u)),52px);aspect-ratio:1;border-radius:50%;background:rgba(255,255,255,.18);display:grid;place-items:center;flex:none;margin-bottom:auto}
+.t-rec .mic svg{width:46%;height:auto}
+.t-fila{flex-direction:row;align-items:center;gap:12px;padding:8px 14px 8px 10px}
+.t-fila .flecha{position:static;flex:none}
+.t-fila .q{min-width:0;flex:1;display:grid;gap:1px}
+.t-fila .q b{font-size:clamp(15px,calc(2.4 * var(--u)),19px);font-weight:800;line-height:1.2}
+.bola{flex:none;width:clamp(36px,calc(5.6 * var(--u)),46px);aspect-ratio:1;border-radius:50%;background:var(--c);color:#fff;display:grid;place-items:center;font-weight:800;font-size:16px}
 .t-demo .flecha{position:static;margin-left:auto;flex:none}
 .t-ultimo{grid-area:ultimo;flex-direction:row;align-items:center;gap:12px;padding:10px 16px}
 .t-ultimo .txt{min-width:0;font-size:13px;line-height:1.3;font-weight:600;color:var(--suave)}
@@ -137,6 +150,17 @@ textarea.campo{height:auto;border-radius:22px;padding:14px 18px;resize:none}
 .quien button{display:flex;align-items:center;gap:8px;border-radius:99px;padding:5px 14px 5px 5px;background:var(--tarjeta);box-shadow:var(--sombra-chica);font-weight:700;font-size:14px;opacity:.6;transition:opacity .25s,box-shadow .25s}
 .quien button .ava{width:30px;height:30px;font-size:12px}
 .quien button.on{opacity:1;box-shadow:var(--sombra-chica),inset 0 0 0 2px var(--cobalto)}
+/* Nueva tarea: una pregunta a la vez */
+.pasos-cab{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.puntos{display:flex;gap:6px}.puntos i{width:9px;height:9px;border-radius:50%;background:var(--niebla)}.puntos i.on{background:var(--cobalto)}
+.pasos-cuerpo{min-height:0;display:flex;flex-direction:column;gap:16px;overflow:hidden}
+.grupo{display:grid;gap:8px;min-width:0}
+.preg{font-size:clamp(19px,calc(5 * var(--w)),24px);font-weight:800;line-height:1.2}
+.quien.grande button{opacity:1;font-size:15px}.quien.grande button.on{background:var(--azulf)}
+.segmento.fechas{display:grid;grid-template-columns:1fr 1fr;border-radius:24px}
+.fecha-dice{font-weight:800;color:var(--cobalto);font-size:16px}
+#sug{flex:1;min-height:0}
+.teclado .pasos-cab{display:none}.teclado .pasos .grupo:not(:focus-within){display:none}.teclado .pasos .grupo .grupo{display:grid}.teclado .pasos .fecha-dice{display:none}
 .fases{display:grid;gap:clamp(4px,calc(1 * var(--u)),10px);justify-self:center;width:min(100%,320px)}
 .fases button{display:flex;align-items:center;gap:12px;font-size:15px;font-weight:700;color:var(--tenue);text-align:start}
 .fases button i{width:30px;height:30px;border-radius:50%;background:var(--campo);box-shadow:var(--hundido);display:grid;place-items:center;font-style:normal;font-size:12px;font-weight:800}
@@ -481,7 +505,11 @@ async function prepararFotos(mapa) {
   }));
   return out;
 }
-function ava(id, chico) { const g = GENTE[id] || (id === 'sistema' ? CLAUDE : { n: '?', c: 'var(--tenue)', i: '?' }); const f = FOTOS[id]; return `<span class="ava${chico ? ' chico' : ''}" style="--c:${g.c}${f ? `;background:var(--c) url(${f}) center 30%/cover` : ''}" title="${esc(g.n)}">${f ? '' : esc(g.i)}</span>`; }
+// Embajadores: se agregan aquí al cargar (los socios siguen fijos en GENTE).
+const EMB = {};
+const gente = id => GENTE[id] || EMB[id];
+function registrarEmbajadores() { for (const k in EMB) delete EMB[k]; (D.embajadores || []).concat(D.rol === 'embajador' && D.yoDatos ? [D.yoDatos] : []).forEach(e => { EMB[e.id] = { n: e.nombre, c: e.color || '#e8892f', i: String(e.nombre || '?').split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase() }; }); }
+function ava(id, chico) { const g = gente(id) || (id === 'sistema' ? CLAUDE : { n: '?', c: 'var(--tenue)', i: '?' }); const f = FOTOS[id]; return `<span class="ava${chico ? ' chico' : ''}" style="--c:${g.c}${f ? `;background:var(--c) url(${f}) center 30%/cover` : ''}" title="${esc(g.n)}">${f ? '' : esc(g.i)}</span>`; }
 function avas(lista) { const ids = String(lista || '').split(',').filter(x => GENTE[x]); return ids.length ? `<span class="avas">${ids.map(x => ava(x, 1)).join('')}</span>` : ''; }
 function cuando(iso) {
   if (!iso) return '';
@@ -568,7 +596,8 @@ function transicion(f) {
 
 /* ---------- Entrada ---------- */
 async function pantallaQuien() {
-  app.innerHTML = `<div class="top"><div class="marca"><span class="logo" role="img" aria-label="MOON Digital"></span><i>/</i>TABLERO</div></div><div class="entrada"><div class="caja"><span class="eti">Bienvenido</span><h1>¿Quién eres?</h1><div class="gente" id="gente"><span class="mini">Cargando…</span></div></div></div>`;
+  app.innerHTML = `<div class="top"><div class="marca"><span class="logo" role="img" aria-label="MOON Digital"></span><i>/</i>TABLERO</div></div><div class="entrada"><div class="caja"><span class="eti">Bienvenido</span><h1>¿Quién eres?</h1><div class="gente" id="gente"><span class="mini">Cargando…</span></div><button class="enlace" id="soyEmb">Soy embajador</button></div></div>`;
+  document.getElementById('soyEmb').onclick = () => transicion(pantallaEmbajador);
   const r = await api('quienes');
   const g = document.getElementById('gente');
   if (!r.ok) { g.innerHTML = '<span class="aviso">No hay conexión. Revisa tu internet y vuelve a abrir.</span>'; return; }
@@ -589,7 +618,7 @@ function activarOjos() {
   });
 }
 function marcoEntrada(u, html) {
-  app.innerHTML = `<div class="top"><button class="redondo" id="volver" aria-label="Regresar">${I.atras}</button><div class="marca"><span class="logo" role="img" aria-label="MOON Digital"></span><i>/</i>TABLERO</div></div><div class="entrada"><div class="caja">${ava(u.id)}${html}</div></div>`;
+  app.innerHTML = `<div class="top"><button class="redondo" id="volver" aria-label="Regresar">${I.atras}</button><div class="marca"><span class="logo" role="img" aria-label="MOON Digital"></span><i>/</i>TABLERO</div></div><div class="entrada"><div class="caja">${u ? ava(u.id) : ''}${html}</div></div>`;
   document.getElementById('volver').onclick = () => transicion(pantallaQuien);
   activarOjos();
 }
@@ -657,6 +686,8 @@ const reales = () => D.personas.filter(p => !p.es_prueba);
 function atrasada(x) { return x.estado !== 'hecha' && x.vence && x.vence < new Date().toISOString().slice(0, 10); }
 
 async function arrancar() {
+  const invita = new URLSearchParams(location.search).get('invita');
+  if (invita) return pantallaInvita(invita);   // la sesión de este aparato no se toca hasta que el link funcione
   if (!sesionGuardada()) return pantallaQuien();
   // Si ya se había abierto en este aparato, se pinta al instante con lo último que se vio (nunca una pantalla vacía);
   // lo nuevo llega por detrás y, si algo cambió, se actualiza sin animar nada.
@@ -721,10 +752,13 @@ function pinta(silencioso) {
   // Una sola pantalla a la vez: la anterior se borra, nada queda escondido detrás.
   // Si solo se actualizan datos (llegó la ficha, la foto o la recarga de cada minuto), se cambia sin animar nada.
   alCambiarTamano = null;
+  registrarEmbajadores();
+  // Un embajador solo puede estar en sus pantallas: si algo lo manda a otra, regresa a su inicio.
+  if (esEmb() && pila.some(x => !CAPAS_EMB.includes(x.tipo))) pila = [];
   const c = pila[pila.length - 1];
   if (!c || c.tipo !== 'demo') veloFuera(false);
-  if (!c) return pintaInicio(silencioso);
-  ({ tareas: capaTareas, tarea: capaTarea, nuevaTarea: capaNuevaTarea, crm: capaCRM, crmLista: capaCRMLista, editarContacto: capaEditarContacto, subir: capaSubir, ficha: capaFicha, nuevoCliente: capaNuevoCliente, proyectos: capaProyectos, proyecto: capaProyecto, nuevoProyecto: capaProyecto, equipo: capaEquipo, moon: capaMoon, lector: capaLector, clientes: capaClientes, cliente: capaCliente, seccion: capaSeccion, documento: capaDocumento, casa: capaCasa, demo: capaDemo, nota: capaNota, editarProyecto: capaProyecto, qr: capaQR, cuenta: capaCuenta, frase: capaFrase, foto: capaFoto })[c.tipo](c, silencioso);
+  if (!c) return esEmb() ? pintaInicioEmbajador(silencioso) : pintaInicio(silencioso);
+  ({ tareas: capaTareas, tarea: capaTarea, nuevaTarea: capaNuevaTarea, crm: capaCRM, crmLista: capaCRMLista, editarContacto: capaEditarContacto, subir: capaSubir, ficha: capaFicha, nuevoCliente: capaNuevoCliente, proyectos: capaProyectos, proyecto: capaProyecto, nuevoProyecto: capaProyecto, equipo: capaEquipo, moon: capaMoon, lector: capaLector, clientes: capaClientes, cliente: capaCliente, seccion: capaSeccion, documento: capaDocumento, casa: capaCasa, demo: capaDemo, nota: capaNota, editarProyecto: capaProyecto, qr: capaQR, cuenta: capaCuenta, frase: capaFrase, foto: capaFoto, emProspectos: capaEmProspectos, emComisiones: capaEmComisiones, emMaterial: capaEmMaterial, emCuenta: capaEmCuenta })[c.tipo](c, silencioso);
 }
 function marco(titulo, accion, cuerpo, icono) {
   app.innerHTML = `<div class="top"><button class="redondo" id="volver" aria-label="Regresar">${I.atras}</button><div class="cabeza" style="flex:1;min-width:0"><h2>${esc(titulo)}</h2>${accion ? `<button class="redondo accion" id="accion" aria-label="${esc(accion)}" title="${esc(accion)}">${icono || I.mas}</button>` : ''}</div></div><div class="vista" style="grid-template-rows:minmax(0,1fr)">${cuerpo}</div>`;
@@ -746,7 +780,7 @@ function pintaInicio(sil) {
   const hora = Number(new Date().toLocaleString('en-US', { hour: 'numeric', hour12: false, timeZone: 'America/Cancun' }));
   const saludo = hora < 12 ? 'Buenos días' : hora < 19 ? 'Buenas tardes' : 'Buenas noches';
   const barrita = ['pendiente', 'en proceso', 'cerrado', 'en órbita'].map(e => cuenta(e) ? `<i style="--n:${cuenta(e)};--c:${ETAPA[e].c}"></i>` : '').join('');
-  const xTareas = mias.map(x => { const p = proyectoDe(x.proyecto); return `<button class="xi${x.estado === 'nueva' ? ' nueva' : ''}" data-t="${x.id}"><span class="q">${esc(x.titulo)}</span><small>${esc(p ? p.nombre : 'General')}</small></button>`; }).join('');
+  const xTareas = mias.map(x => { const p = proyectoDe(x.proyecto); return `<button class="xi${x.estado === 'nueva' ? ' nueva' : ''}" data-t="${x.id}"><span class="q">${esc(x.titulo)}</span><small>${esc(deQuien(x))}</small></button>`; }).join('');
   const xCrm = Object.keys(ETAPA).filter(e => e !== 'archivo' && cuenta(e)).map(e => `<button class="xi" data-g="${e}"><span class="punto" style="--c:${ETAPA[e].c}"></span><span class="q">${ETAPA[e].n}</span><small>${cuenta(e)}</small></button>`).join('');
   const clientes = panelesCliente();
   const xProy = clientes.map(({ p, per }) => `<button class="xi" data-c="${esc(p.tel)}"><span class="punto" style="--c:${p.color}"></span><span class="q">${esc(nombreCorto(per))}</span><small>${esc((ETAPA[per.etapa] || ETAPA.pendiente).n)}</small></button>`).join('');
@@ -757,7 +791,7 @@ function pintaInicio(sil) {
   <div class="vista"${sil ? ' style="animation:none"' : ''}>
     <h1 class="hola">${saludo}, ${esc(GENTE[yo()] ? GENTE[yo()].n : D.yo.nombre)}<small>${mias.length ? `Tienes ${mias.length} tarea${mias.length === 1 ? '' : 's'} abierta${mias.length === 1 ? '' : 's'}` : 'No tienes tareas pendientes'}</small></h1>
     <main class="mosaico">
-      <div class="t t-tuyo" role="button" tabindex="0" data-ir="tareas"><span class="flecha">${I.abre}</span><span class="eti">Lo tuyo</span>
+      <div class="t t-tuyo" role="button" tabindex="0" data-ir="tareas"><span class="flecha">${I.abre}</span><span class="eti">Tareas</span>
         ${nuevas ? `<span class="brilla latido"><i>${nuevas}</i>nueva${nuevas === 1 ? '' : 's'} para ti</span>` : ''}
         <div class="extra">${xTareas}</div>
         <span class="num">${mias.length}</span><span class="sub">${vencen ? `${vencen} atrasada${vencen === 1 ? '' : 's'} · ` : ''}tareas abiertas</span></div>
@@ -766,7 +800,7 @@ function pintaInicio(sil) {
       <div class="t t-equipo" role="button" tabindex="0" data-ir="equipo"><span class="flecha">${I.abre}</span><span class="eti">Equipo</span><div class="extra">${xEq}</div><span class="num">${Object.keys(GENTE).length}</span><span class="sub">integrantes</span></div>
       <div class="t t-moon" role="button" tabindex="0" data-ir="casa"><span class="flecha">${I.abre}</span><span class="eti">Hecho en casa</span><div class="extra">${xMoon}</div><span class="sub" style="margin-top:auto">Visión, Jason y presentación</span></div>
       <div class="t t-demo" role="button" tabindex="0" data-ir="demo"><span class="mic">${I.mic}</span><span class="q"><b>Para tus clientes</b><span class="sub">Demo, calculadora y presentación</span></span><span class="flecha">${I.abre}</span></div>
-      <div class="t t-ultimo">${ult ? ava(ult.quien, 1) : ''}<span class="txt">${ult ? `Lo último: <b>${esc((GENTE[ult.quien] || CLAUDE).n)}</b> ${esc(ult.texto)} · ${cuando(ult.fecha)}` : 'Aquí aparece lo último que pasó en MOON.'}</span></div>
+      <div class="t t-ultimo">${ult ? ava(ult.quien, 1) : ''}<span class="txt">${ult ? `Lo último: <b>${esc((gente(ult.quien) || CLAUDE).n)}</b> ${esc(ult.texto)} · ${cuando(ult.fecha)}` : 'Aquí aparece lo último que pasó en MOON.'}</span></div>
     </main>
   </div>`;
   app.querySelectorAll('[data-ir]').forEach(b => { b.onclick = () => abrir({ tipo: b.dataset.ir }); b.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); b.click(); } }; });
@@ -804,70 +838,124 @@ function llenarExtras() {
 }
 
 /* ---------- Tareas ---------- */
+const DIAS = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+const MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+function fechaBonita(f) { if (!f) return ''; const [a, m, d] = f.split('-').map(Number); const x = new Date(a, m - 1, d); return `${DIAS[x.getDay()]} ${d} de ${MESES[m - 1]}`; }
+const hoyISO = (mas = 0) => { const [a, m, d] = fechaCancun(Date.now()).split('-').map(Number); const x = new Date(a, m - 1, d + mas); return `${x.getFullYear()}-${String(x.getMonth() + 1).padStart(2, '0')}-${String(x.getDate()).padStart(2, '0')}`; };
+function finDeSemana() { const [a, m, d] = hoyISO().split('-').map(Number); const dia = new Date(a, m - 1, d).getDay(); return hoyISO(dia <= 5 ? 5 - dia : 7 - dia); }   // el viernes (o el domingo si ya es fin de semana)
+const sinAcento = x => String(x || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+const deQuien = x => x.cliente || (proyectoDe(x.proyecto) || {}).nombre || 'General';
 function capaTareas(c) {
-  const de = c.persona || yo();
-  const ajena = de !== yo();
-  const todas = D.tareas.filter(x => x.para === de);
-  const grupos = { abiertas: todas.filter(x => x.estado !== 'hecha'), hechas: todas.filter(x => x.estado === 'hecha') };
-  c.grupo = c.grupo || 'abiertas';
-  const titulo = ajena ? `Tareas de ${GENTE[de].n}` : 'Lo tuyo';
-  marco(titulo, 'Nueva tarea', `<div class="cuerpo"><div class="pils">
-    <button class="pil${c.grupo === 'abiertas' ? ' on' : ''}" data-g="abiertas" style="--c:var(--cobalto);--cf:var(--azulf)"><i>${grupos.abiertas.length}</i>Abiertas</button>
-    <button class="pil${c.grupo === 'hechas' ? ' on' : ''}" data-g="hechas" style="--c:var(--verde);--cf:var(--verdef)"><i>${grupos.hechas.length}</i>Hechas</button></div>
+  const de = c.persona && c.persona !== yo() ? c.persona : '';
+  c.grupo = c.grupo || (de ? 'abiertas' : 'mias');
+  const ab = x => x.estado !== 'hecha';
+  const grupos = de
+    ? [['abiertas', 'Abiertas', D.tareas.filter(x => x.para === de && ab(x)), 'var(--cobalto)', 'var(--azulf)'], ['hechas', 'Hechas', D.tareas.filter(x => x.para === de && !ab(x)), 'var(--verde)', 'var(--verdef)']]
+    : [['mias', 'Mías', misTareas().filter(ab), 'var(--cobalto)', 'var(--azulf)']].concat(esEmb() ? [] : [['todos', 'De todos', D.tareas.filter(ab), 'var(--morado)', 'var(--moradof)']]).concat([['hechas', 'Hechas', misTareas().filter(x => !ab(x)), 'var(--verde)', 'var(--verdef)']]);
+  const g = grupos.find(x => x[0] === c.grupo) || grupos[0];
+  marco(de ? `Tareas de ${(gente(de) || { n: de }).n}` : esEmb() ? 'Mis tareas' : 'Tareas', esEmb() ? '' : 'Nueva tarea', `<div class="cuerpo"><div class="pils">
+    ${grupos.map(([k, n, l, col, cf]) => `<button class="pil${k === g[0] ? ' on' : ''}" data-g="${k}" style="--c:${col};--cf:${cf}"><i>${l.length}</i>${n}</button>`).join('')}</div>
     <div class="lista dos"></div><div class="pie"></div></div>`);
-  app.querySelectorAll('[data-g]').forEach(b => b.onclick = () => { c.grupo = b.dataset.g; c.p = 0; pinta(true); });
-  document.getElementById('accion').onclick = () => abrir({ tipo: 'nuevaTarea', para: de });
-  const items = grupos[c.grupo].sort((a, b) => (a.estado === 'nueva' ? -1 : 0) - (b.estado === 'nueva' ? -1 : 0) || b.id - a.id);
-  alCambiarTamano = paginar(app.querySelector('.cuerpo'), items, filaTarea, { pagina: c.p, vacio: c.grupo === 'abiertas' ? '<b>Nada pendiente</b>Cuando alguien te deje algo, aparece aquí brillando.' : '<b>Aún nada</b>Lo terminado en las últimas 2 semanas.', alPintar: l => l.querySelectorAll('[data-t]').forEach(b => b.onclick = () => abrir({ tipo: 'tarea', id: Number(b.dataset.t) })) });
+  app.querySelectorAll('[data-g]').forEach(b => b.onclick = () => { c.grupo = b.dataset.g; c.ps = 0; pinta(true); });
+  if (!esEmb()) document.getElementById('accion').onclick = () => abrir({ tipo: 'nuevaTarea', para: de || yo() });
+  const items = g[2].slice().sort((a, b) => (a.estado === 'nueva' ? -1 : 0) - (b.estado === 'nueva' ? -1 : 0) || b.id - a.id);
+  const vacio = { mias: '<b>Nada pendiente</b>Cuando alguien te deje algo, aparece aquí brillando.', todos: '<b>Nada pendiente</b>Nadie del equipo tiene tareas abiertas.', abiertas: '<b>Nada pendiente</b>No tiene tareas abiertas.', hechas: '<b>Aún nada</b>Lo terminado en las últimas 2 semanas.' }[g[0]];
+  alCambiarTamano = paginar(app.querySelector('.cuerpo'), items, x => filaTarea(x, g[0] === 'todos'), { vacio, alPintar: l => l.querySelectorAll('[data-t]').forEach(b => b.onclick = () => abrir({ tipo: 'tarea', id: Number(b.dataset.t) })) });
 }
-function filaTarea(x) {
-  const p = proyectoDe(x.proyecto);
+function filaTarea(x, dePara) {
   const st = x.estado === 'hecha' ? ['Hecha', 'var(--verde)', 'var(--verdef)'] : x.estado === 'nueva' ? ['Nueva', '#fff', 'var(--cobalto)'] : atrasada(x) ? ['Atrasada', 'var(--rojo)', 'var(--rojof)'] : ['Vista', 'var(--suave)', 'var(--campo)'];
-  return `<button class="fila${x.estado === 'nueva' ? ' nueva' : ''}" data-t="${x.id}">${ava(x.de, 1)}<span class="q"><b>${esc(x.titulo)}</b><span>${esc(p ? p.nombre : 'General')} · ${cuando(x.creado)}</span></span><span class="estado" style="--c:${st[1]};--cf:${st[2]}">${st[0]}</span></button>`;
+  const quien = dePara ? `Para ${(gente(x.para) || { n: x.para }).n} · ` : '';
+  return `<button class="fila${x.estado === 'nueva' ? ' nueva' : ''}" data-t="${x.id}">${ava(dePara ? x.para : x.de, 1)}<span class="q"><b>${esc(x.titulo)}</b><span>${esc(quien + deQuien(x))} · ${x.vence ? 'para el ' + fechaBonita(x.vence) : cuando(x.creado)}</span></span><span class="estado" style="--c:${st[1]};--cf:${st[2]}">${st[0]}</span></button>`;
 }
 async function capaTarea(c) {
   const x = D.tareas.find(t => t.id === c.id);
   if (!x) return cerrar();
   if (x.para === yo() && x.estado === 'nueva') { x.estado = 'vista'; x.visto = new Date().toISOString(); api('tarea_vista', { id: x.id }); }
-  const p = proyectoDe(x.proyecto);
+  const par = (n, v) => v ? `<div class="par"><span>${n}</span><b>${esc(v)}</b></div>` : '';
   marco('Tarea', '', `<div class="hoja" style="grid-template-rows:auto auto minmax(0,1fr) auto">
-    <div class="eti">${esc(p ? p.nombre : 'General')}</div>
-    <h3 style="font-size:clamp(19px,calc(5 * var(--w)),24px);font-weight:800;line-height:1.2">${esc(x.titulo)}</h3>
+    <div class="eti">${esc(deQuien(x))}</div>
+    <h3 style="font-size:clamp(19px,calc(5 * var(--w)),24px);font-weight:800;line-height:1.2;overflow-wrap:anywhere">${esc(x.titulo)}</h3>
     <div id="caja" style="min-height:0;overflow:hidden;display:grid;align-content:start;gap:10px">
       ${x.detalle ? `<p id="detalle" style="color:var(--suave);font-weight:600;white-space:pre-line">${esc(x.detalle)}</p>` : ''}
-      <div class="par"><span>Para</span><b>${esc(GENTE[x.para] ? GENTE[x.para].n : x.para)}</b></div>
-      <div class="par"><span>La dejó</span><b>${esc(GENTE[x.de] ? GENTE[x.de].n : 'Claude')} · ${cuando(x.creado)}</b></div>
-      ${x.vence ? `<div class="par"><span>Para el</span><b>${esc(x.vence)}</b></div>` : ''}
+      ${par('Ya quedó cuando', x.listo)}${par('Necesita', x.necesita)}
+      <div class="par"><span>Para</span><b>${esc(gente(x.para) ? gente(x.para).n : x.para)}</b></div>
+      <div class="par"><span>La dejó</span><b>${esc(gente(x.de) ? gente(x.de).n : 'Claude')} · ${cuando(x.creado)}</b></div>
+      ${x.vence ? `<div class="par"><span>Para el</span><b>${esc(fechaBonita(x.vence))}</b></div>` : ''}
       <div class="par"><span>La vio</span><b>${x.visto ? cuando(x.visto) : 'Todavía no'}</b></div>
     </div>
-    <div class="botones">${x.estado === 'hecha' ? '<button class="boton dos" id="hecho">Volver a abrir</button>' : '<button class="boton" id="hecho">Ya lo hice</button>'}</div></div>`);
-  // Si el detalle no cabe completo, se esconde y aparece un botón para leerlo entero.
-  const caja = document.getElementById('caja'), det = document.getElementById('detalle');
-  if (det && caja.scrollHeight > caja.clientHeight + 1) {
-    det.outerHTML = '<button class="boton dos" id="leer" style="justify-self:start">Leer el detalle completo</button>';
-    document.getElementById('leer').onclick = () => abrir({ tipo: 'lector', titulo: x.titulo, texto: x.detalle });
+    <div class="botones">${x.enlace ? `<a class="boton dos" href="${esc(x.enlace)}" target="_blank" rel="noopener">Abrir el link</a>` : ''}${x.para !== yo() && esEmb() ? '' : x.estado === 'hecha' ? '<button class="boton dos" id="hecho">Volver a abrir</button>' : '<button class="boton" id="hecho">Ya lo hice</button>'}</div></div>`);
+  // Si lo escrito no cabe completo, se esconde y aparece un botón para leerlo entero (nunca se corta).
+  const caja = document.getElementById('caja');
+  if (caja.scrollHeight > caja.clientHeight + 1) {
+    const todo = [x.detalle, x.listo && 'Ya quedó cuando: ' + x.listo, x.necesita && 'Necesita: ' + x.necesita].filter(Boolean).join('\n\n');
+    caja.querySelectorAll('#detalle,.par').forEach((e, i) => { if (e.id === 'detalle' || i < 3 && /Ya quedó|Necesita/.test(e.textContent)) e.remove(); });
+    caja.insertAdjacentHTML('afterbegin', '<button class="boton dos" id="leer" style="justify-self:start">Leer todo lo que dice</button>');
+    document.getElementById('leer').onclick = () => abrir({ tipo: 'lector', titulo: x.titulo, texto: todo });
   }
-  document.getElementById('hecho').onclick = async () => {
-    const hecha = x.estado !== 'hecha';
-    const r = await api('tarea_hecha', { id: x.id, hecha });
+  const h = document.getElementById('hecho');
+  if (h) h.onclick = async () => {
+    const r = await api('tarea_hecha', { id: x.id, hecha: x.estado !== 'hecha' });
     if (r.ok) { await recargar(); cerrar(); }
   };
 }
+// Nueva tarea: una pregunta a la vez (nunca un formulario largo que el teclado tape).
 function capaNuevaTarea(c) {
-  let para = c.para || yo();
-  const proys = D.proyectos.filter(activo);
-  marco('Nueva tarea', '', `<form class="hoja editando" id="f" style="align-self:start">
-    <input class="campo" name="titulo" placeholder="¿Qué hay que hacer?" required maxlength="160">
-    <div><div class="eti" style="margin-bottom:8px">Para</div><div class="quien" id="para">${Object.keys(GENTE).map(id => `<button type="button" data-u="${id}" class="${id === para ? 'on' : ''}">${ava(id)}${GENTE[id].n}</button>`).join('')}</div></div>
-    <select class="campo" name="proyecto"><option value="0">General (sin proyecto)</option>${proys.map(p => `<option value="${p.id}"${p.id == c.proyecto ? ' selected' : ''}>${esc(p.nombre)}</option>`).join('')}</select>
-    <textarea class="campo" name="detalle" rows="3" placeholder="Detalle (opcional)"></textarea>
-    <div class="botones"><input class="campo" name="vence" type="date" style="flex:1 1 140px" aria-label="Fecha límite"><button class="boton">Dejar tarea</button></div><div class="aviso" id="aviso"></div></form>`);
-  app.querySelectorAll('#para button').forEach(b => b.onclick = () => { para = b.dataset.u; app.querySelectorAll('#para button').forEach(x => x.classList.toggle('on', x === b)); });
-  const f = document.getElementById('f');
+  const t = c.t = c.t || { titulo: '', para: c.para || yo(), cliente: (proyectoDe(c.proyecto) || {}).nombre || '', vence: '', listo: '', necesita: '', enlace: '' };
+  c.paso = c.paso || 1;
+  const N = 5, paso = c.paso;
+  const gentes = ['daniel', 'dan', 'kid'].concat((D.embajadores || []).map(e => e.id));
+  const grupo = (id, eti, campo) => `<label class="grupo" for="${id}"><span class="preg">${eti}</span>${campo}</label>`;
+  let cuerpo = '';
+  if (paso === 1) cuerpo = grupo('q1', '¿Qué hay que hacer?', `<textarea class="campo" id="q1" rows="2" maxlength="160" placeholder="Ejemplo: Mandarle la propuesta a Clínica Sonrisa">${esc(t.titulo)}</textarea>`);
+  if (paso === 2) cuerpo = `<div class="grupo"><span class="preg">¿Para quién?</span><div class="quien grande" id="para">${gentes.map(id => `<button type="button" data-u="${id}" class="${id === t.para ? 'on' : ''}">${ava(id)}<span>${esc(gente(id).n)}</span></button>`).join('')}</div></div>`;
+  if (paso === 3) cuerpo = grupo('q3', '¿De qué cliente?', `<input class="campo" id="q3" autocomplete="off" maxlength="120" value="${esc(t.cliente)}" placeholder="Escribe el nombre o déjalo vacío">`) + `<div class="lista" id="sug"></div>`;
+  if (paso === 4) cuerpo = `<div class="grupo"><span class="preg">¿Para cuándo?</span><div class="segmento fechas" id="cuando">${[['hoy', 'Hoy', hoyISO()], ['manana', 'Mañana', hoyISO(1)], ['semana', 'Esta semana', finDeSemana()], ['sin', 'Sin fecha', '']].map(([k, n, v]) => `<button type="button" data-v="${v}" class="${t.vence === v && (v || t.sinFecha) ? 'on' : ''}">${n}</button>`).join('')}</div>
+    <label class="grupo" for="q4"><span class="mini">O elige el día:</span><input class="campo" id="q4" type="date" min="${hoyISO()}" value="${esc(t.vence)}"></label>
+    <p class="fecha-dice" id="dice">${t.vence ? 'Para el ' + fechaBonita(t.vence) : t.sinFecha ? 'Sin fecha' : 'Elige una opción'}</p></div>`;
+  if (paso === 5) cuerpo = grupo('q5', '¿Cómo sabemos que ya quedó?', `<textarea class="campo" id="q5" rows="2" maxlength="600" placeholder="Ejemplo: El cliente ya contestó que le llegó">${esc(t.listo)}</textarea>`)
+    + grupo('q6', '¿Qué necesita para hacerla?', `<textarea class="campo" id="q6" rows="2" maxlength="600" placeholder="Ejemplo: El logo y los precios del cliente">${esc(t.necesita)}</textarea>`)
+    + grupo('q7', 'Agregar link (opcional)', `<input class="campo" id="q7" type="url" inputmode="url" maxlength="500" value="${esc(t.enlace)}" placeholder="https://…">`);
+  marco('Nueva tarea', '', `<form class="hoja editando pasos" id="f" novalidate style="grid-template-rows:auto minmax(0,1fr) auto auto">
+    <div class="pasos-cab"><span class="mini">Paso ${paso} de ${N}</span><span class="puntos">${Array.from({ length: N }, (_, i) => `<i class="${i < paso ? 'on' : ''}"></i>`).join('')}</span></div>
+    <div class="pasos-cuerpo">${cuerpo}</div>
+    <div class="botones"><button type="button" class="boton dos" id="atras">${paso === 1 ? 'Cancelar' : 'Atrás'}</button><button class="boton" id="sigue">${paso === N ? 'Dejar tarea' : 'Siguiente'}</button></div>
+    <div class="aviso" id="aviso"></div></form>`);
+  const f = document.getElementById('f'), av = document.getElementById('aviso'), v = id => (document.getElementById(id) || {}).value || '';
+  const guarda = () => {
+    if (paso === 1) t.titulo = v('q1').trim();
+    if (paso === 3) t.cliente = v('q3').trim();
+    if (paso === 5) { t.listo = v('q5').trim(); t.necesita = v('q6').trim(); t.enlace = v('q7').trim(); }
+  };
+  const ir = n => { guarda(); c.paso = n; pinta(true); const e = app.querySelector('.pasos-cuerpo .campo'); if (e && innerWidth >= 800) e.focus(); };
+  document.getElementById('atras').onclick = () => paso === 1 ? cerrar() : ir(paso - 1);
+  if (paso === 1) document.getElementById('q1').onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); f.requestSubmit(); } };
+  if (paso === 2) app.querySelectorAll('#para button').forEach(b => b.onclick = () => { t.para = b.dataset.u; ir(3); });
+  if (paso === 3) {
+    const q = document.getElementById('q3'), sug = document.getElementById('sug');
+    const nombres = [...new Set(panelesCliente().map(x => nombreCorto(x.per)).concat(reales().filter(p => p.etapa !== 'archivo').map(p => p.negocio || p.nombre)).filter(Boolean))];
+    const pinta3 = () => {
+      const k = sinAcento(q.value), l = (k ? nombres.filter(n => sinAcento(n).includes(k)) : nombres).slice(0, 30);
+      sug.innerHTML = l.map(n => `<button type="button" class="fila chica" data-n="${esc(n)}"><span class="q"><b>${esc(n)}</b></span></button>`).join('') || (k ? `<div class="mini">No está en la lista: se guarda tal cual lo escribiste.</div>` : '');
+      sug.querySelectorAll('[data-n]').forEach(b => b.onclick = () => { q.value = b.dataset.n; ir(4); });
+    };
+    sug.classList.add('desliza'); q.oninput = pinta3; pinta3();
+  }
+  if (paso === 4) {
+    const dice = document.getElementById('dice'), d4 = document.getElementById('q4');
+    const pon = (val, sin) => { t.vence = val; t.sinFecha = !!sin; dice.textContent = val ? 'Para el ' + fechaBonita(val) : sin ? 'Sin fecha' : 'Elige una opción'; app.querySelectorAll('#cuando button').forEach(b => b.classList.toggle('on', b.dataset.v === val && (val || sin))); if (d4.value !== val) d4.value = val; };
+    app.querySelectorAll('#cuando button').forEach(b => b.onclick = () => pon(b.dataset.v, !b.dataset.v));
+    d4.onchange = () => pon(d4.value, !d4.value);
+  }
   f.onsubmit = async e => {
-    e.preventDefault(); const fd = new FormData(f);
-    const r = await api('tarea', { titulo: fd.get('titulo'), detalle: fd.get('detalle'), proyecto: fd.get('proyecto'), vence: fd.get('vence'), para });
-    if (r.ok) { await recargar(); cerrar(); } else document.getElementById('aviso').textContent = 'No se pudo guardar. Intenta de nuevo.';
+    e.preventDefault(); guarda(); av.textContent = '';
+    if (paso === 1 && !t.titulo) { av.textContent = 'Escribe qué hay que hacer.'; return; }
+    if (paso === 4 && !t.vence && !t.sinFecha) { av.textContent = 'Elige para cuándo (o "Sin fecha").'; return; }
+    if (paso === 5 && t.enlace && !/^https?:\/\/\S+$/i.test(t.enlace)) { av.textContent = 'El link debe empezar con https://'; return; }
+    if (paso < N) return ir(paso + 1);
+    const b = document.getElementById('sigue'); b.disabled = true;
+    const r = await api('tarea', { titulo: t.titulo, para: t.para, cliente: t.cliente, vence: t.vence, listo: t.listo, necesita: t.necesita, enlace: t.enlace, proyecto: c.proyecto || 0 });
+    b.disabled = false;
+    if (r.ok) { await recargar(); cerrar(); } else av.textContent = 'No se pudo guardar. Intenta de nuevo.';
   };
 }
 
@@ -1724,10 +1812,126 @@ function capaFoto(c) {
   };
 }
 
+/* ---------- Embajadores: entran con su link o con su WhatsApp, y solo ven lo suyo ---------- */
+const esEmb = () => D && D.rol === 'embajador';
+const CAPAS_EMB = ['demo', 'emProspectos', 'emComisiones', 'emMaterial', 'tareas', 'tarea', 'documento', 'lector', 'emCuenta'];
+function pantallaEmbajador() {
+  marcoEntrada(null, `<span class="eti">Embajadores de MOON</span><h1>Entra con tu WhatsApp</h1>
+    <form id="f" style="display:grid;gap:12px;width:100%"><input class="campo" id="tel" type="tel" inputmode="tel" autocomplete="tel" placeholder="Tu WhatsApp (10 números)" required>
+    ${campoClave('clave', 'Tu contraseña', 'current-password')}
+    <button class="boton">Entrar</button><div class="aviso" id="aviso"></div></form>
+    <p>¿Primera vez u olvidaste tu contraseña? Pídele tu link a Dan o a Kid.</p>`);
+  const f = document.getElementById('f'), av = document.getElementById('aviso');
+  f.onsubmit = async e => {
+    e.preventDefault(); av.textContent = '';
+    const tel = document.getElementById('tel').value.replace(/\D/g, '');
+    if (tel.length < 10) { av.textContent = 'Escribe tus 10 números de WhatsApp.'; return; }
+    const b = f.querySelector('.boton'); b.disabled = true;
+    const r = await api('entrar_embajador', { tel, clave: document.getElementById('clave').value });
+    b.disabled = false;
+    if (r.ok) { guardarSesion(r.sesion); return arrancar(); }
+    av.textContent = { clave: 'El WhatsApp o la contraseña no coinciden.', pausa: 'Muchos intentos. Espera 15 minutos.', red: 'Sin conexión. Intenta de nuevo.' }[r.error] || 'No se pudo. Intenta de nuevo.';
+  };
+}
+// El link personal (…/tablero?invita=…): la primera vez crea su contraseña y queda adentro.
+async function pantallaInvita(token) {
+  try { history.replaceState(null, '', location.pathname); } catch (e) {}   // el link no se queda en la barra ni en el historial
+  app.innerHTML = '<div class="top"><div class="marca"><span class="logo" role="img" aria-label="MOON Digital"></span><i>/</i>TABLERO</div></div><div class="entrada"><span class="mini">Cargando…</span></div>';
+  const r = await api('invitacion', { token });
+  if (!r.ok) {
+    marcoEntrada(null, `<h1>Este link ya no sirve</h1><p>${r.error === 'red' ? 'No hay conexión. Revisa tu internet y vuelve a abrir el link.' : 'Ya se usó o pasaron 7 días. Pídele uno nuevo a Dan o a Kid.'}</p>`);
+    document.getElementById('volver').onclick = () => transicion(arrancar);
+    return;
+  }
+  marcoEntrada(null, `<span class="eti">Embajadores de MOON</span><h1>Hola, ${esc(r.nombre)}</h1><p>Crea tu contraseña. Mínimo 6 letras o números.</p>
+    <form id="f" style="display:grid;gap:12px;width:100%">${r.pideTel ? '<input class="campo" id="tel" type="tel" inputmode="tel" autocomplete="tel" placeholder="Tu WhatsApp (10 números)" required>' : ''}
+    ${campoClave('c1', 'Contraseña nueva', 'new-password')}${campoClave('c2', 'Repítela', 'new-password')}
+    <button class="boton">Entrar al tablero</button><div class="aviso" id="aviso"></div></form>`);
+  document.getElementById('volver').onclick = () => transicion(arrancar);
+  const f = document.getElementById('f'), av = document.getElementById('aviso');
+  f.onsubmit = async e => {
+    e.preventDefault(); av.textContent = '';
+    const c1 = document.getElementById('c1').value, c2 = document.getElementById('c2').value, t = document.getElementById('tel');
+    const tel = t ? t.value.replace(/\D/g, '') : '';
+    if (t && tel.length < 10) { av.textContent = 'Escribe tus 10 números de WhatsApp.'; return; }
+    if (c1.length < 6) { av.textContent = 'Mínimo 6 letras o números.'; return; }
+    if (c1 !== c2) { av.textContent = 'Las dos contraseñas no son iguales.'; return; }
+    const b = f.querySelector('.boton'); b.disabled = true;
+    const x = await api('crear_clave_invita', { token, clave: c1, tel });
+    b.disabled = false;
+    if (x.ok) { guardarSesion(x.sesion); return arrancar(); }
+    av.textContent = { vencido: 'Este link ya no sirve. Pídele uno nuevo a Dan o a Kid.', tel: 'Escribe tus 10 números de WhatsApp.', tel_usado: 'Ese WhatsApp ya lo usa otra persona del equipo.' }[x.error] || 'No se pudo. Intenta de nuevo.';
+  };
+}
+const fechaCancun = iso => new Date(iso).toLocaleDateString('en-CA', { timeZone: 'America/Cancun' });
+const cerradosEmb = () => D.personas.filter(p => ['cerrado', 'en órbita', 'portafolio'].includes(p.etapa));
+// En qué va cada prospecto, en palabras de alguien que no conoce el CRM (una persona, no un grupo).
+const VA_EN = { pendiente: 'Pendiente', 'en proceso': 'Platicando', cerrado: 'Ya contrató', 'en órbita': 'Ya contrató', portafolio: 'Ya contrató', archivo: 'No por ahora' };
+function pintaInicioEmbajador(sil) {
+  const yoD = D.yoDatos || {}, nombre = String(yoD.nombre || D.yo.nombre || '').split(' ')[0];
+  const abiertas = D.tareas.filter(x => x.estado !== 'hecha'), nuevas = abiertas.filter(x => x.estado === 'nueva').length;
+  const hoy = fechaCancun(Date.now()), armadosHoy = (D.demos || []).filter(d => d.creado && fechaCancun(d.creado) === hoy).length, tope = Number(yoD.tope_demos) || 10;
+  const cer = cerradosEmb().length;
+  const hora = Number(new Date().toLocaleString('en-US', { hour: 'numeric', hour12: false, timeZone: 'America/Cancun' }));
+  const saludo = hora < 12 ? 'Buenos días' : hora < 19 ? 'Buenas tardes' : 'Buenas noches';
+  app.innerHTML = `
+  <div class="top"><div class="marca"><span class="logo" role="img" aria-label="MOON Digital"></span><i>/</i>TABLERO</div><div class="esp"></div><button id="salir" aria-label="Mi cuenta">${ava(yo())}</button></div>
+  <div class="vista"${sil ? ' style="animation:none"' : ''}>
+    <h1 class="hola">${saludo}, ${esc(nombre)}<small>Aquí solo ves lo tuyo</small></h1>
+    <main class="mosaico emb">
+      <div class="t t-com" role="button" tabindex="0" data-ir="emComisiones"><span class="flecha">${I.abre}</span><span class="eti">Mis comisiones</span><span class="num">${cer}</span><span class="sub">cliente${cer === 1 ? '' : 's'} cerrado${cer === 1 ? '' : 's'} · ${D.comision ? 'ver comisión' : 'comisión por definir'}</span></div>
+      <div class="t t-rec" role="button" tabindex="0" data-ir="demo"><span class="flecha">${I.abre}</span><span class="mic">${I.mic}</span><span class="eti">Crea tu recepcionista</span><span class="sub">Arma uno para tu prospecto y mándale el link para que le hable</span><span class="sub fuerte">Hoy llevas ${armadosHoy} de ${tope}</span></div>
+      <div class="t t-fila" role="button" tabindex="0" data-ir="emProspectos"><span class="bola" style="--c:var(--naranja)">${D.personas.length}</span><span class="q"><b>Mis prospectos</b><span class="sub">Los que tú trajiste y en qué van</span></span><span class="flecha">${I.abre}</span></div>
+      <div class="t t-fila" role="button" tabindex="0" data-ir="tareas"><span class="bola${nuevas ? ' latido' : ''}" style="--c:var(--cobalto)">${abiertas.length}</span><span class="q"><b>Mis tareas</b><span class="sub">${nuevas ? `${nuevas} nueva${nuevas === 1 ? '' : 's'} para ti` : 'Lo que te toca hacer'}</span></span><span class="flecha">${I.abre}</span></div>
+      <div class="t t-fila" role="button" tabindex="0" data-ir="emMaterial"><span class="bola" style="--c:var(--morado)">M</span><span class="q"><b>Material de MOON</b><span class="sub">Presentación y página para enseñar</span></span><span class="flecha">${I.abre}</span></div>
+    </main>
+  </div>`;
+  app.querySelectorAll('[data-ir]').forEach(b => { b.onclick = () => abrir({ tipo: b.dataset.ir }); b.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); b.click(); } }; });
+  document.getElementById('salir').onclick = () => abrir({ tipo: 'emCuenta' });
+  // Si no cabe (celular bajito o letra grande), se quitan primero las explicaciones; nunca se corta un título.
+  const acomoda = () => {
+    const quitar = ['.t-rec .sub:not(.fuerte)', '.t-fila .sub', '.t-com .sub', '.t-rec .mic'];
+    quitar.forEach(q => app.querySelectorAll(q).forEach(e => e.style.display = ''));
+    const sobra = () => [...app.querySelectorAll('.mosaico .t')].some(t => t.scrollHeight > t.clientHeight + 1);
+    for (const q of quitar) { if (!sobra()) break; app.querySelectorAll(q).forEach(e => e.style.display = 'none'); }
+  };
+  acomoda(); alCambiarTamano = () => pintaInicioEmbajador(true);
+}
+function filaProspecto(p) {
+  const e = ETAPA[p.etapa] || ETAPA.pendiente;
+  return `<div class="fila" style="cursor:default"><span class="punto" style="--c:${e.c}"></span><span class="q"><b>${esc(p.negocio || p.nombre || 'Sin nombre')}</b><span>${p.negocio && p.nombre ? esc(p.nombre) + ' · ' : ''}${p.ultimo_contacto ? 'Último contacto ' + cuando(p.ultimo_contacto) : 'Sin contacto todavía'}</span></span><span class="estado" style="--c:${e.c};--cf:${e.cf}">${VA_EN[p.etapa] || 'Pendiente'}</span></div>`;
+}
+function capaEmProspectos(c) {
+  marco('Mis prospectos', '', `<div class="cuerpo" style="grid-template-rows:auto minmax(0,1fr)"><p class="mini">Los que probaron un recepcionista que tú armaste. Dan les da seguimiento y aquí ves en qué van.</p><div class="lista"></div></div>`);
+  const orden = { cerrado: 0, 'en órbita': 0, portafolio: 0, 'en proceso': 1, pendiente: 2 };
+  const items = D.personas.slice().sort((a, b) => (orden[a.etapa] ?? 3) - (orden[b.etapa] ?? 3));
+  paginar(app.querySelector('.cuerpo'), items, filaProspecto, { vacio: '<b>Aún no hay nadie</b>Cuando alguien pruebe un recepcionista que tú armaste, aparece aquí.' });
+}
+function capaEmComisiones(c) {
+  const cer = cerradosEmb();
+  marco('Mis comisiones', '', `<div class="cuerpo" style="grid-template-rows:auto auto minmax(0,1fr)">
+    <div class="hoja" style="gap:6px"><span class="eti">Tu comisión</span><p style="font-size:17px;font-weight:700;line-height:1.35;white-space:pre-line">${D.comision ? esc(D.comision) : 'Por definir. Daniel, Dan y Kid la acuerdan contigo y aquí aparece.'}</p></div>
+    <span class="eti">Clientes que cerraste (${cer.length})</span><div class="lista"></div></div>`);
+  paginar(app.querySelector('.cuerpo'), cer, filaProspecto, { vacio: '<b>Todavía ninguno</b>Cuando un prospecto tuyo contrate, aparece aquí.' });
+}
+function capaEmMaterial() {
+  const items = [['presentacion', 'Presentación de MOON Digital', 'Quiénes somos y qué hacemos'], ['pagina', 'Página web de MOON', 'moondigitalia.com']];
+  marco('Material de MOON', '', `<div class="cuerpo" style="grid-template-rows:auto auto;align-content:start"><p class="mini">Para enseñarle a tu prospecto quiénes somos.</p><div class="casa-filas" style="align-content:start">${items.map(([k, n, f]) => { const ok = docsDe('moon', k).length; return `<button class="fila chica${ok ? '' : ' sin'}" data-k="${k}"><span class="casa-ic">${CASA_IC[k]}</span><span class="q"><b>${n}</b><span>${ok ? f : 'Aún no está aquí'}</span></span><span class="flecha-f">${I.der}</span></button>`; }).join('')}</div></div>`);
+  app.querySelectorAll('[data-k]').forEach(b => b.onclick = () => { const ds = docsDe('moon', b.dataset.k); if (ds.length) abrirDoc(ds[0]); });
+}
+function capaEmCuenta() {
+  const z = letra();
+  marco('Tu cuenta', '', `<div class="hoja" style="align-content:center;justify-items:center;text-align:center;gap:14px">${ava(yo())}<h3 style="font-size:22px;font-weight:800">${esc((D.yoDatos || {}).nombre || D.yo.nombre)}</h3><span class="eti">Embajador de MOON</span>
+    <div style="width:100%"><div class="eti" style="margin-bottom:6px">Tamaño de letra en este dispositivo</div><div class="segmento" id="letra">${tamanosQueCaben().map(([n, v], i, todos) => `<button data-z="${v}" class="${v === z || (i === todos.length - 1 && z > v) ? 'on' : ''}" style="font-size:${Math.round(13 * v)}px">${n}</button>`).join('')}</div></div>
+    <p class="mini">Este dispositivo está recordado. Solo cierra sesión si es un dispositivo prestado.</p><button class="boton dos" id="cerrar">Cerrar sesión en este dispositivo</button></div>`);
+  app.querySelectorAll('#letra [data-z]').forEach(b => b.onclick = () => { try { localStorage.setItem(LETRA, b.dataset.z); } catch (e) {} transicion(() => { medir(); pinta(true); }); });
+  document.getElementById('cerrar').onclick = async () => { await api('salir'); guardarSesion(''); D = null; pila = []; transicion(pantallaQuien); };
+}
+
 /* ---------- MOON ---------- */
 function capaMoon(c) {
   if (c.cuenta) {
-    marco('Tu cuenta', '', `<div class="hoja" style="align-content:center;justify-items:center;text-align:center;gap:16px">${ava(yo())}<h3 style="font-size:22px;font-weight:800">${esc(GENTE[yo()].n)}</h3><p class="mini">Este dispositivo está recordado. Solo cierra sesión si es un dispositivo prestado.</p><button class="boton dos" id="cerrar">Cerrar sesión en este dispositivo</button></div>`);
+    marco('Tu cuenta', '', `<div class="hoja" style="align-content:center;justify-items:center;text-align:center;gap:16px">${ava(yo())}<h3 style="font-size:22px;font-weight:800">${esc((gente(yo()) || { n: D.yo.nombre }).n)}</h3><p class="mini">Este dispositivo está recordado. Solo cierra sesión si es un dispositivo prestado.</p><button class="boton dos" id="cerrar">Cerrar sesión en este dispositivo</button></div>`);
     document.getElementById('cerrar').onclick = async () => { await api('salir'); guardarSesion(''); D = null; pila = []; pantallaQuien(); };
     return;
   }

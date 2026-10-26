@@ -124,6 +124,7 @@ html.dentro,html.dentro body{background:transparent}
 .pestana[aria-selected="true"]{background:var(--tarjeta);color:var(--tinta);box-shadow:0 6px 14px -8px rgba(0,0,0,.35)}
 /* Tablero: tres tarjetas que llenan la pantalla */
 #tablero{min-height:0;display:grid;grid-template-rows:minmax(0,1.15fr) minmax(0,1fr) minmax(0,1fr);gap:var(--hueco)}
+.embajador #tGasto,.embajador #tCobro{display:none}.embajador #tablero{grid-template-rows:minmax(0,1fr)}
 .tt{min-height:0;background:var(--tarjeta);border-radius:var(--r);box-shadow:var(--sombra);padding:var(--pad);display:flex;flex-direction:column;gap:8px;text-align:start;overflow:hidden;width:100%}
 .tt .eti{letter-spacing:.16em}
 .embudo{flex:1;min-height:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;align-items:center}
@@ -705,6 +706,9 @@ const PASOS = [
 function pintarTablero() {
   if (!T) return;
   $('embudo').innerHTML = PASOS.map(([k, n, f], i) => `<div class="paso${i === 3 ? ' fuerte' : i === 4 ? ' verde' : ''}" data-paso="${k}"><i>${T.demos.filter(f).length}</i><span>${n}</span></div>`).join('');
+  // Un embajador ve solo sus recepcionistas: el gasto y lo cobrado son de los socios.
+  document.documentElement.classList.toggle('embajador', !!T.embajador);
+  if (!T.gasto) return;
   const g = T.gasto;
   $('gHoy').innerHTML = `${pesos(g.hoy.mxn)}<small>hoy · ${g.hoy.platicas} ${g.hoy.platicas === 1 ? 'plática' : 'pláticas'}</small>`;
   $('gRenglon').textContent = `Este mes ${pesos(g.mes.mxn)} · Demos de Dan ${T.hoy.dan} de ${T.topes.dan} · Puerta abierta ${T.hoy.abierta} de ${T.topes.abierta}`;

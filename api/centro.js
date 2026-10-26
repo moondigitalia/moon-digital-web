@@ -2,7 +2,7 @@
 // Tres usuarios fijos (Kid, Dan, Daniel). La primera vez cada quien recibe un código en SU correo y crea su contraseña;
 // después el aparato queda recordado con una sesión larga (solo se guarda su huella, nunca la sesión en sí).
 // Jason y, después, el Claude de cada quien pueden escribir aquí con la clave interna (JASON_CLAVE).
-const { crypto, ETAPAS, TEMPERATURAS, SERVICIOS, ORIGENES, FASES, igual, leer, sql, t, llave, normal } = require('./_base');
+const { crypto, ETAPAS, TEMPERATURAS, SERVICIOS, ORIGENES, FASES, igual, leer, sql, t, llave, normal, clave10 } = require('./_base');
 
 const AGENDA = 'https://script.google.com/macros/s/AKfycbzmjh39HaP39rdzK3PJdKMULk43T9uvQNwcriSdpzbIRgLC3Xppu9MezL4byJTb4kgX/exec';
 const USUARIOS = ['kid', 'dan', 'daniel'];
@@ -23,14 +23,14 @@ async function anotar(quien, texto) {
 }
 
 async function sesion(req, d) {
-  if (igual(req.headers['x-clave'], process.env.JASON_CLAVE)) return { id: 'sistema', nombre: d.como ? t(d.como, 20) : 'Claude' };
+  if (igual(req.headers['x-clave'], process.env.JASON_CLAVE)) return { id: 'sistema', nombre: d.como ? t(d.como, 20) : 'Claude', tipo: 'socio' };
   const tok = String(req.headers['x-sesion'] || '');
   if (tok.length < 40) return null;
-  const s = (await sql('SELECT s.usuario, s.visto, u.nombre FROM sesiones s JOIN usuarios u ON u.id = s.usuario WHERE s.token = ?', [huella(tok)]))[0];
-  if (!s) return null;
+  const s = (await sql('SELECT s.usuario, s.visto, u.nombre, u.tipo, u.activo FROM sesiones s JOIN usuarios u ON u.id = s.usuario WHERE s.token = ?', [huella(tok)]))[0];
+  if (!s || Number(s.activo) === 0) return null;   // si se le quitó el acceso, su sesión deja de servir al instante
   // Se actualiza "visto" a lo mucho una vez por hora, para no escribir en cada vuelta.
   if (!s.visto || Date.now() - Date.parse(s.visto) > 3600e3) await sql('UPDATE sesiones SET visto = ? WHERE token = ?', [ahora(), huella(tok)]);
-  return { id: s.usuario, nombre: s.nombre };
+  return { id: s.usuario, nombre: s.nombre, tipo: s.tipo === 'embajador' ? 'embajador' : 'socio' };
 }
 
 async function nuevaSesion(usuario, req) {
@@ -45,6 +45,40 @@ async function entrada(d, req) {
   if (d.accion === 'quienes') {
     const us = await sql('SELECT id, nombre, correo, hash FROM usuarios WHERE tipo = \'socio\' ORDER BY CASE id WHEN \'daniel\' THEN 1 WHEN \'dan\' THEN 2 ELSE 3 END');
     return { ok: true, usuarios: us.map(u => ({ id: u.id, nombre: u.nombre, correo: ocultar(u.correo), tieneClave: !!u.hash })) };
+  }
+  // ---- Embajadores: entran con el link personal que les mandan los socios, y después con su WhatsApp y contraseña ----
+  if (d.accion === 'invitacion' || d.accion === 'crear_clave_invita') {
+    const tok = String(d.token || '');
+    const u = tok.length >= 30 ? (await sql("SELECT * FROM usuarios WHERE tipo = 'embajador' AND activo = 1 AND invita = ? AND invita_vence > ?", [huella(tok), ahora()]))[0] : null;
+    if (!u) return { ok: false, error: 'vencido' };
+    if (d.accion === 'invitacion') return { ok: true, nombre: u.nombre, tieneClave: !!u.hash, pideTel: !u.tel };
+    const clave = String(d.clave || '');
+    if (clave.length < 6 || clave.length > 200) return { ok: false, error: 'corta' };
+    // Si los socios todavía no anotaron su WhatsApp, lo pone él aquí (es con lo que entrará después desde cualquier aparato).
+    let tel = u.tel;
+    if (!tel) {
+      tel = clave10(d.tel);
+      if (!tel) return { ok: false, error: 'tel' };
+      if ((await sql("SELECT id FROM usuarios WHERE tel = ? AND id <> ?", [tel, u.id]))[0]) return { ok: false, error: 'tel_usado' };
+    }
+    const sal = crypto.randomBytes(16).toString('hex');
+    await sql("UPDATE usuarios SET hash = ?, sal = ?, tel = ?, invita = '', invita_vence = '' WHERE id = ?", [await scrypt(clave, sal), sal, tel, u.id]);
+    await anotar(u.id, 'entró por primera vez al tablero');
+    return { ok: true, sesion: await nuevaSesion(u.id, req) };
+  }
+  if (d.accion === 'entrar_embajador') {
+    const tel = clave10(d.tel);
+    const u = tel ? (await sql("SELECT * FROM usuarios WHERE tipo = 'embajador' AND activo = 1 AND tel = ?", [tel]))[0] : null;
+    if (!u || !u.hash) return { ok: false, error: 'clave' };
+    const c = (await sql('SELECT * FROM codigos WHERE usuario = ?', [u.id]))[0];
+    if (c && c.intentos >= 8 && Date.now() - Date.parse(c.ventana || 0) < 15 * 60e3) return { ok: false, error: 'pausa' };
+    if (!igual(u.hash, await scrypt(d.clave || '', u.sal))) {
+      await sql(`INSERT INTO codigos (usuario, hash, vence, intentos, enviados, ventana) VALUES (?, '', '', 1, 0, ?)
+                 ON CONFLICT(usuario) DO UPDATE SET intentos = intentos + 1, ventana = excluded.ventana`, [u.id, ahora()]);
+      return { ok: false, error: 'clave' };
+    }
+    await sql("DELETE FROM codigos WHERE usuario = ? AND hash = ''", [u.id]);
+    return { ok: true, sesion: await nuevaSesion(u.id, req) };
   }
   if (!['pedir_codigo', 'revisar_codigo', 'crear_clave', 'entrar'].includes(d.accion)) return null;
   const id = USUARIOS.includes(d.usuario) ? d.usuario : '';
@@ -101,24 +135,127 @@ async function entrada(d, req) {
 
 // ---------- Con sesión ----------
 async function inicio(yo) {
-  const [usuarios, personas, proyectos, tareas, actividad, usoMes, paneles, documentos] = await Promise.all([
+  const [usuarios, personas, proyectos, tareas, actividad, usoMes, paneles, documentos, embajadores] = await Promise.all([
     sql("SELECT id, nombre, color, rol, lema, creado FROM usuarios WHERE tipo = 'socio'"),
-    sql('SELECT tel, telefono, correo, foto, nombre, negocio, giro, temperatura, etapa, servicio, origen, necesidad, proxima_cita, encargados, notas_equipo, ultimo_contacto, contactos, es_prueba FROM personas ORDER BY ultimo_contacto DESC LIMIT 1000'),
+    sql('SELECT tel, telefono, correo, foto, nombre, negocio, giro, temperatura, etapa, servicio, origen, necesidad, proxima_cita, encargados, notas_equipo, ultimo_contacto, contactos, es_prueba FROM personas WHERE COALESCE(borrado, \'\') = \'\' ORDER BY ultimo_contacto DESC LIMIT 1000'),
     sql("SELECT id, tel, nombre, fase, enlace, encargados, nota, creado, actualizado, (clave != '' OR llave_uso != '') AS conectado FROM proyectos ORDER BY actualizado DESC"),
     sql("SELECT * FROM tareas WHERE estado != 'hecha' OR hecho > ? ORDER BY id DESC", [new Date(Date.now() - 14 * 864e5).toISOString()]),
     sql('SELECT * FROM actividad ORDER BY id DESC LIMIT 12'),
     sql('SELECT proyecto, COUNT(*) n FROM uso WHERE fecha >= ? AND quien NOT IN (SELECT tel FROM personas WHERE es_prueba = 1) GROUP BY proyecto', [new Date(Date.now() - 30 * 864e5).toISOString()]),
     sql('SELECT tel, orden, demo, color, imagen, icono FROM paneles ORDER BY orden'),
     sql("SELECT id, tel, seccion, orden, titulo, frase, url, formato FROM documentos WHERE seccion != 'oculto' AND NOT (formato = 'archivo' AND fuente NOT LIKE '%\"listo\":1%') ORDER BY tel, seccion, orden"),
+    sql("SELECT id, nombre, color FROM usuarios WHERE tipo = 'embajador' AND activo = 1 ORDER BY creado"),
   ]);
   const usos = Object.fromEntries(usoMes.map(x => [x.proyecto, x.n]));
   proyectos.forEach(p => { p.uso_mes = usos[p.id] || 0; });
-  return { ok: true, yo, usuarios, personas, proyectos, tareas, actividad, paneles, documentos, listas: { etapas: ETAPAS, temperaturas: TEMPERATURAS, servicios: SERVICIOS, origenes: ORIGENES, fases: FASES } };
+  return { ok: true, yo, rol: 'socio', usuarios, embajadores, personas, proyectos, tareas, actividad, paneles, documentos, listas: { etapas: ETAPAS, temperaturas: TEMPERATURAS, servicios: SERVICIOS, origenes: ORIGENES, fases: FASES } };
 }
 
 const listaUsuarios = v => (Array.isArray(v) ? v : String(v || '').split(',')).map(x => String(x).trim()).filter(x => USUARIOS.includes(x)).join(',');
 
+// ---------- Embajadores: solo ven y hacen lo suyo (esto lo decide el servidor, no la pantalla) ----------
+const DOCS_EMBAJADOR = "tel = 'moon' AND seccion IN ('presentacion', 'pagina')";
+async function inicioEmbajador(yo) {
+  const [yoBD, personas, demos, tareas, documentos, ajuste] = await Promise.all([
+    sql('SELECT id, nombre, color, rol, lema, creado, tope_demos FROM usuarios WHERE id = ?', [yo.id]),
+    sql(`SELECT tel, nombre, negocio, giro, etapa, ultimo_contacto, cobro_total, cobro_mensual, cobro_fecha FROM personas
+         WHERE COALESCE(borrado, '') = '' AND es_prueba = 0 AND (embajador = ? OR tel IN (SELECT whatsapp FROM demos WHERE creado_por = ? AND whatsapp <> ''))
+         ORDER BY ultimo_contacto DESC LIMIT 500`, [yo.id, yo.id]),
+    sql('SELECT codigo, negocio, asistente, creado, vistas, usos, respuesta, contacto FROM demos WHERE creado_por = ? ORDER BY creado DESC LIMIT 200', [yo.id]),
+    sql("SELECT * FROM tareas WHERE para = ? AND (estado != 'hecha' OR hecho > ?) ORDER BY id DESC", [yo.id, new Date(Date.now() - 14 * 864e5).toISOString()]),
+    sql(`SELECT id, tel, seccion, orden, titulo, frase, url, formato FROM documentos WHERE ${DOCS_EMBAJADOR} ORDER BY seccion, orden`),
+    sql("SELECT valor FROM ajustes WHERE clave = 'comision'"),
+  ]);
+  return { ok: true, rol: 'embajador', yo, yoDatos: yoBD[0] || {}, usuarios: [], personas, demos, proyectos: [], tareas, actividad: [], paneles: [], documentos,
+    comision: (ajuste[0] || {}).valor || '', listas: { etapas: ETAPAS, temperaturas: TEMPERATURAS, servicios: SERVICIOS, origenes: ORIGENES, fases: FASES } };
+}
+async function conEmbajador(d, yo) {
+  if (d.accion === 'inicio') return inicioEmbajador(yo);
+  if (d.accion === 'salir') return { ok: true };
+  if (d.accion === 'documento' || d.accion === 'archivo_parte') {
+    const id = String(d.id || d.doc || '');
+    const ok = (await sql(`SELECT id FROM documentos WHERE id = ? AND ${DOCS_EMBAJADOR}`, [id]))[0];
+    if (!ok) return { ok: false, error: 'permiso' };
+    return conSocio(d, yo);
+  }
+  if (d.accion === 'tarea_vista' || d.accion === 'tarea_hecha') {
+    const x = (await sql('SELECT para FROM tareas WHERE id = ?', [Number(d.id)]))[0];
+    if (!x || x.para !== yo.id) return { ok: false, error: 'permiso' };
+    return conSocio(d, yo);
+  }
+  return { ok: false, error: 'permiso' };
+}
+
+const slug = s => String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 30);
 async function conSesion(d, yo) {
+  if (yo.tipo === 'embajador') return conEmbajador(d, yo);
+  return conSocio(d, yo);
+}
+async function conSocio(d, yo) {
+  // ---- Equipo: embajadores, sus números, su acceso y la comisión (solo socios) ----
+  if (yo.tipo === 'socio' && d.accion === 'equipo') {
+    const [emb, demos, cierres, ajuste] = await Promise.all([
+      sql("SELECT id, nombre, tel, color, activo, tope_demos, creado, (hash <> '') AS con_clave FROM usuarios WHERE tipo = 'embajador' ORDER BY creado"),
+      sql("SELECT creado_por AS id, COUNT(*) n FROM demos GROUP BY creado_por"),
+      sql(`SELECT u.id, COUNT(DISTINCT p.tel) n, COALESCE(SUM(p.cobro_total), 0) total, COALESCE(SUM(p.cobro_mensual), 0) mensual FROM usuarios u
+           JOIN personas p ON (p.embajador = u.id OR p.tel IN (SELECT whatsapp FROM demos WHERE creado_por = u.id AND whatsapp <> ''))
+           WHERE u.tipo = 'embajador' AND p.etapa IN ('cerrado', 'en órbita') AND COALESCE(p.borrado, '') = '' GROUP BY u.id`),
+      sql("SELECT valor FROM ajustes WHERE clave = 'comision'"),
+    ]);
+    const nd = Object.fromEntries(demos.map(x => [x.id, x.n])), nc = Object.fromEntries(cierres.map(x => [x.id, x]));
+    return { ok: true, comision: (ajuste[0] || {}).valor || '', embajadores: emb.map(e => Object.assign(e, { demos: nd[e.id] || 0, cierres: (nc[e.id] || {}).n || 0, cobrado: (nc[e.id] || {}).total || 0, mensual: (nc[e.id] || {}).mensual || 0 })) };
+  }
+  if (yo.tipo === 'socio' && d.accion === 'embajador_guardar') {
+    const nombre = t(d.nombre, 60), tel = d.tel ? clave10(d.tel) : '';
+    if (d.tel && !tel) return { ok: false, error: 'tel' };
+    const tope = Math.max(0, Math.min(100, Number(d.tope) || 10));
+    if (d.id) {
+      const e = (await sql("SELECT * FROM usuarios WHERE id = ? AND tipo = 'embajador'", [String(d.id)]))[0];
+      if (!e) return { ok: false };
+      if (tel && (await sql("SELECT id FROM usuarios WHERE tel = ? AND id <> ?", [tel, e.id]))[0]) return { ok: false, error: 'tel_usado' };
+      const activo = d.activo === undefined ? e.activo : (d.activo ? 1 : 0);
+      await sql('UPDATE usuarios SET nombre = ?, tel = ?, tope_demos = ?, activo = ? WHERE id = ?', [nombre || e.nombre, d.tel !== undefined ? tel : e.tel, d.tope !== undefined ? tope : e.tope_demos, activo, e.id]);
+      if (activo === 0) await sql('DELETE FROM sesiones WHERE usuario = ?', [e.id]);
+      await anotar(yo.id, activo === 0 && e.activo ? `le quitó el acceso a ${e.nombre}` : activo && !e.activo ? `le regresó el acceso a ${e.nombre}` : `cambió los datos de ${nombre || e.nombre}`);
+      return { ok: true, id: e.id };
+    }
+    if (!nombre) return { ok: false, error: 'nombre' };
+    if (tel && (await sql("SELECT id FROM usuarios WHERE tel = ?", [tel]))[0]) return { ok: false, error: 'tel_usado' };
+    let id = slug(nombre) || 'embajador';
+    if ((await sql('SELECT id FROM usuarios WHERE id = ?', [id]))[0]) id += '-' + crypto.randomBytes(2).toString('hex');
+    await sql("INSERT INTO usuarios (id, nombre, correo, color, creado, rol, tipo, tel, activo, tope_demos) VALUES (?,?,'','#e8892f',?,'Embajador','embajador',?,1,?)", [id, nombre, ahora(), tel, tope]);
+    await anotar(yo.id, `agregó a ${nombre} como embajador`);
+    return { ok: true, id };
+  }
+  if (yo.tipo === 'socio' && d.accion === 'embajador_invitar') {
+    const e = (await sql("SELECT * FROM usuarios WHERE id = ? AND tipo = 'embajador' AND activo = 1", [String(d.id)]))[0];
+    if (!e) return { ok: false };
+    const tok = crypto.randomBytes(24).toString('base64url');
+    await sql('UPDATE usuarios SET invita = ?, invita_vence = ? WHERE id = ?', [huella(tok), new Date(Date.now() + 7 * 864e5).toISOString(), e.id]);
+    await anotar(yo.id, `le generó a ${e.nombre} su link de entrada`);
+    return { ok: true, link: 'https://moondigitalia.com/tablero?invita=' + tok };
+  }
+  if (yo.tipo === 'socio' && d.accion === 'comision_guardar') {
+    await sql("INSERT INTO ajustes (clave, valor) VALUES ('comision', ?) ON CONFLICT(clave) DO UPDATE SET valor = excluded.valor", [t(d.valor, 200)]);
+    await anotar(yo.id, `cambió la comisión de los embajadores: ${t(d.valor, 120) || 'por definir'}`);
+    return { ok: true };
+  }
+  if (yo.tipo === 'socio' && d.accion === 'bitacora') {
+    const antes = Number(d.antes) || 1e12;
+    return { ok: true, lista: await sql('SELECT * FROM actividad WHERE id < ? ORDER BY id DESC LIMIT 100', [antes]) };
+  }
+  // ---- Papelera: nada se borra de golpe; se quita y se puede recuperar ----
+  if (yo.tipo === 'socio' && (d.accion === 'quitar_persona' || d.accion === 'recuperar_persona')) {
+    const p = (await sql('SELECT tel, nombre, negocio FROM personas WHERE tel = ?', [String(d.tel || '')]))[0];
+    if (!p) return { ok: false };
+    const quitar = d.accion === 'quitar_persona';
+    await sql('UPDATE personas SET borrado = ? WHERE tel = ?', [quitar ? ahora() : '', p.tel]);
+    await anotar(yo.id, `${quitar ? 'mandó a la papelera' : 'recuperó de la papelera'} a ${p.negocio || p.nombre || p.tel}`);
+    return { ok: true };
+  }
+  if (yo.tipo === 'socio' && d.accion === 'papelera') {
+    return { ok: true, lista: await sql("SELECT tel, nombre, negocio, borrado FROM personas WHERE COALESCE(borrado, '') <> '' ORDER BY borrado DESC LIMIT 200") };
+  }
   if (d.accion === 'inicio') return inicio(yo);
   if (d.accion === 'fotos') {
     // Foto que cada quien subió; si no ha subido, la de su credencial.
@@ -298,11 +435,14 @@ async function conSesion(d, yo) {
 
   if (d.accion === 'tarea') {
     const titulo = t(d.titulo, 160);
-    const para = USUARIOS.includes(d.para) ? d.para : '';
+    const emb = !USUARIOS.includes(d.para) && d.para ? (await sql("SELECT nombre FROM usuarios WHERE id = ? AND tipo = 'embajador' AND activo = 1", [String(d.para)]))[0] : null;
+    const para = USUARIOS.includes(d.para) || emb ? String(d.para) : '';
     if (!titulo || !para) return { ok: false, error: 'datos' };
-    await sql('INSERT INTO tareas (proyecto, titulo, detalle, para, de, estado, vence, creado) VALUES (?,?,?,?,?,?,?,?)',
-      [Number(d.proyecto) || 0, titulo, t(d.detalle, 2000), para, yo.id, 'nueva', t(d.vence, 10), ahora()]);
-    await anotar(yo.id, `le dejó una tarea a ${para === 'daniel' ? 'Daniel' : para === 'dan' ? 'Dan' : 'Kid'}: ${titulo}`);
+    const enlace = /^https?:\/\/\S+$/i.test(String(d.enlace || '').trim()) ? t(String(d.enlace).trim(), 500) : '';
+    const vence = /^\d{4}-\d{2}-\d{2}$/.test(String(d.vence || '')) ? String(d.vence) : '';
+    await sql('INSERT INTO tareas (proyecto, titulo, detalle, para, de, estado, vence, creado, cliente, listo, necesita, enlace) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)',
+      [Number(d.proyecto) || 0, titulo, t(d.detalle, 2000), para, yo.id, 'nueva', vence, ahora(), t(d.cliente, 120), t(d.listo, 600), t(d.necesita, 600), enlace]);
+    await anotar(yo.id, `le dejó una tarea a ${emb ? emb.nombre : para === 'daniel' ? 'Daniel' : para === 'dan' ? 'Dan' : 'Kid'}: ${titulo}`);
     return { ok: true };
   }
 
