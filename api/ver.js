@@ -38,7 +38,7 @@ module.exports = async (req, res) => {
   const codigo = String((req.query && req.query.t) || '');
   if (!/^[A-Za-z0-9_-]{20,40}$/.test(codigo)) { res.status(404).send(NO_ESTA); return; }
   try {
-    const d = (await sql('SELECT id, tel, seccion, titulo, frase, formato, contenido, url, fuente FROM documentos WHERE enlace = ?', [codigo]))[0];
+    const d = (await sql('SELECT id, tel, seccion, titulo, frase, formato, contenido, url, fuente FROM documentos WHERE enlace = ? AND COALESCE(borrado, \'\') = \'\'', [codigo]))[0];
     if (!d || d.seccion === 'oculto' || !enviable(d)) { res.status(404).send(NO_ESTA); return; }
     const cifrado = leerCifrado(d.id); if (cifrado) Object.assign(d, cifrado);
     const url = 'https://moondigitalia.com/ver/' + codigo;

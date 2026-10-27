@@ -41,6 +41,7 @@ const corridas = RAPIDO ? [['light', 320, 568, 1], ['light', 1280, 800, 1]] : [[
     for (const t of ['Mis comisiones', 'Crea tu recepcionista', 'Mis prospectos', 'Mis tareas', 'Material de MOON']) if (!ve.txt.includes(t)) fallas.push(`${w} falta "${t}" en su inicio`);
     for (const ir of ['emComisiones', 'emProspectos', 'emMaterial', 'tareas', 'demo']) {
       await p.click(`[data-ir="${ir}"]`, { position: { x: 12, y: 12 } }); await p.waitForTimeout(ir === 'demo' ? 900 : 300); await revisa(ir);
+      if (ir === 'emMaterial') { const d = await p.$('[data-k]:not(.sin)'); if (d) { await d.click(); await p.waitForTimeout(700); if (await p.$('#opcionesDoc')) fallas.push(`${w} el embajador puede cambiar o quitar archivos de MOON`); await p.click('#volver'); await p.waitForTimeout(300); } else fallas.push(`${w} el embajador no tiene material para abrir`); }
       if (ir === 'tareas') { if (await p.$('#accion')) fallas.push(`${w} el embajador puede crear tareas`); await p.click('[data-t]'); await revisa('tarea'); await p.click('#volver'); await p.waitForTimeout(300); }
       await p.click('#volver'); await p.waitForTimeout(300);
     }

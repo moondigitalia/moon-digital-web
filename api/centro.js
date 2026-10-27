@@ -10,6 +10,7 @@ const { leerCifrado, preparar, enviable, mdAHoja } = require('./_visor');
 // Foto o logo: una imagen chica ya reducida en el celular (data:image/…), nunca un archivo cualquiera.
 const fotoValida = f => { if (f === '' || f == null) return ''; f = String(f); return /^data:image\/(webp|jpeg|png);base64,[A-Za-z0-9+/=]+$/.test(f) && f.length < 160000 ? f : null; };
 const SECCIONES_CLIENTE = ['propuesta', 'contrato', 'material', 'avance'];
+const SECCIONES_MOON = ['presentacion', 'pagina', 'bienvenida'];   // lo de MOON: también se sube, se cambia y se quita
 const huella = s => crypto.createHash('sha256').update(String(s)).digest('hex');
 const ahora = () => new Date().toISOString();
 const ocultar = c => { const [u, d] = String(c).split('@'); return u.slice(0, 2) + '•••@' + d; };
@@ -143,7 +144,7 @@ async function inicio(yo) {
     sql('SELECT * FROM actividad ORDER BY id DESC LIMIT 12'),
     sql('SELECT proyecto, COUNT(*) n FROM uso WHERE fecha >= ? AND quien NOT IN (SELECT tel FROM personas WHERE es_prueba = 1) GROUP BY proyecto', [new Date(Date.now() - 30 * 864e5).toISOString()]),
     sql('SELECT tel, orden, demo, color, imagen, icono FROM paneles ORDER BY orden'),
-    sql("SELECT id, tel, seccion, orden, titulo, frase, url, formato FROM documentos WHERE seccion != 'oculto' AND NOT (formato = 'archivo' AND fuente NOT LIKE '%\"listo\":1%') ORDER BY tel, seccion, orden"),
+    sql("SELECT id, tel, seccion, orden, titulo, frase, url, formato FROM documentos WHERE seccion != 'oculto' AND COALESCE(borrado, '') = '' AND NOT (formato = 'archivo' AND fuente NOT LIKE '%\"listo\":1%') ORDER BY tel, seccion, orden"),
     sql("SELECT id, nombre, color FROM usuarios WHERE tipo = 'embajador' AND activo = 1 ORDER BY creado"),
   ]);
   const usos = Object.fromEntries(usoMes.map(x => [x.proyecto, x.n]));
@@ -154,7 +155,7 @@ async function inicio(yo) {
 const listaUsuarios = v => (Array.isArray(v) ? v : String(v || '').split(',')).map(x => String(x).trim()).filter(x => USUARIOS.includes(x)).join(',');
 
 // ---------- Embajadores: solo ven y hacen lo suyo (esto lo decide el servidor, no la pantalla) ----------
-const DOCS_EMBAJADOR = "tel = 'moon' AND seccion IN ('presentacion', 'pagina')";
+const DOCS_EMBAJADOR = "tel = 'moon' AND seccion IN ('presentacion', 'pagina') AND COALESCE(borrado, '') = ''";
 async function inicioEmbajador(yo) {
   const [yoBD, personas, demos, tareas, documentos, ajuste] = await Promise.all([
     sql('SELECT id, nombre, color, rol, lema, creado, tope_demos FROM usuarios WHERE id = ?', [yo.id]),
@@ -254,7 +255,26 @@ async function conSocio(d, yo) {
     return { ok: true };
   }
   if (yo.tipo === 'socio' && d.accion === 'papelera') {
-    return { ok: true, lista: await sql("SELECT tel, nombre, negocio, borrado FROM personas WHERE COALESCE(borrado, '') <> '' ORDER BY borrado DESC LIMIT 200") };
+    const [per, docs] = await Promise.all([
+      sql("SELECT tel, nombre, negocio, borrado FROM personas WHERE COALESCE(borrado, '') <> '' ORDER BY borrado DESC LIMIT 200"),
+      sql("SELECT id, tel, titulo, borrado FROM documentos WHERE COALESCE(borrado, '') <> '' ORDER BY borrado DESC LIMIT 200"),
+    ]);
+    return { ok: true, lista: per, docs };
+  }
+  // ---- Archivos: solo los socios cambian el nombre o los mandan a la papelera (nunca se borran de golpe) ----
+  if (yo.tipo === 'socio' && ['doc_renombrar', 'doc_quitar', 'doc_recuperar'].includes(d.accion)) {
+    const doc = (await sql('SELECT id, tel, titulo FROM documentos WHERE id = ?', [t(d.id, 80)]))[0];
+    if (!doc) return { ok: false };
+    if (d.accion === 'doc_renombrar') {
+      const titulo = t(d.titulo, 120); if (!titulo) return { ok: false, error: 'titulo' };
+      await sql('UPDATE documentos SET titulo = ? WHERE id = ?', [titulo, doc.id]);
+      await anotar(yo.id, `le cambió el nombre a "${doc.titulo}": ahora es "${titulo}"`);
+    } else {
+      const quitar = d.accion === 'doc_quitar';
+      await sql('UPDATE documentos SET borrado = ? WHERE id = ?', [quitar ? ahora() : '', doc.id]);
+      await anotar(yo.id, `${quitar ? 'mandó a la papelera' : 'recuperó de la papelera'} el archivo "${doc.titulo}"`);
+    }
+    return { ok: true };
   }
   if (d.accion === 'inicio') return inicio(yo);
   if (d.accion === 'fotos') {
@@ -287,9 +307,9 @@ async function conSocio(d, yo) {
   // Subir un archivo (presentación, contrato, fotos…) a la sección de un cliente. Va en partes para que pase
   // por cualquier internet; hasta que llega la última parte no aparece en el panel.
   if (d.accion === 'subir_inicio') {
-    const tel = llave(d.tel), seccion = String(d.seccion || '');
-    if (!tel || !SECCIONES_CLIENTE.includes(seccion)) return { ok: false };
-    if (!(await sql('SELECT tel FROM personas WHERE tel = ?', [tel]))[0]) return { ok: false };
+    const moon = d.tel === 'moon', tel = moon ? 'moon' : llave(d.tel), seccion = String(d.seccion || '');
+    if (!tel || !(moon ? SECCIONES_MOON : SECCIONES_CLIENTE).includes(seccion)) return { ok: false };
+    if (!moon && !(await sql('SELECT tel FROM personas WHERE tel = ?', [tel]))[0]) return { ok: false };
     const tamano = Number(d.tamano) || 0; if (tamano <= 0 || tamano > 25e6) return { ok: false, error: 'tamano' };
     const id = 'a-' + crypto.randomBytes(6).toString('hex');
     const orden = (((await sql('SELECT MAX(orden) m FROM documentos WHERE tel = ? AND seccion = ?', [tel, seccion]))[0] || {}).m || 0) + 1;
@@ -307,13 +327,19 @@ async function conSocio(d, yo) {
   }
   if (d.accion === 'subir_fin') {
     const id = String(d.id || ''); if (!/^a-[0-9a-f]{12}$/.test(id)) return { ok: false };
-    const doc = (await sql('SELECT tel, titulo, fuente FROM documentos WHERE id = ?', [id]))[0]; if (!doc) return { ok: false };
+    const doc = (await sql('SELECT tel, seccion, orden, titulo, fuente FROM documentos WHERE id = ?', [id]))[0]; if (!doc) return { ok: false };
     const n = ((await sql('SELECT COUNT(*) n FROM partes WHERE doc = ?', [id]))[0] || {}).n;
     if (n !== Number(d.partes)) return { ok: false, error: 'faltan' };
     const f = JSON.parse(doc.fuente || '{}'); f.listo = 1; f.partes = n;
     await sql('UPDATE documentos SET fuente = ? WHERE id = ?', [JSON.stringify(f), id]);
-    const p = (await sql('SELECT nombre, negocio FROM personas WHERE tel = ?', [doc.tel]))[0] || {};
-    await anotar(yo.id, `subió "${doc.titulo}" a ${p.negocio || p.nombre || 'un cliente'}`);
+    const p = doc.tel === 'moon' ? { nombre: 'MOON' } : (await sql('SELECT nombre, negocio FROM personas WHERE tel = ?', [doc.tel]))[0] || {};
+    // "Cambiar por otro archivo": el nuevo toma el lugar del anterior y el anterior se va a la papelera (se puede recuperar).
+    const viejo = d.reemplaza ? (await sql("SELECT id, titulo, orden FROM documentos WHERE id = ? AND tel = ? AND seccion = ? AND COALESCE(borrado, '') = ''", [String(d.reemplaza), doc.tel, doc.seccion]))[0] : null;
+    if (viejo) {
+      await sql('UPDATE documentos SET borrado = ? WHERE id = ?', [ahora(), viejo.id]);
+      await sql('UPDATE documentos SET orden = ? WHERE id = ?', [viejo.orden, id]);
+      await anotar(yo.id, `cambió "${viejo.titulo}" por "${doc.titulo}" en ${p.negocio || p.nombre || 'un cliente'}`);
+    } else await anotar(yo.id, `subió "${doc.titulo}" a ${p.negocio || p.nombre || 'un cliente'}`);
     return { ok: true };
   }
   if (d.accion === 'archivo_parte') {

@@ -151,6 +151,7 @@ textarea.campo{height:auto;border-radius:22px;padding:14px 18px;resize:none}
 .botones .boton{flex:1 1 140px}
 .tope{display:grid;grid-template-columns:minmax(0,1fr) 84px;gap:10px;align-items:center;font-size:14px;font-weight:700}
 .botones.apilados{display:grid;gap:8px}.botones.apilados .boton{height:44px}
+.boton.rojo{color:var(--rojo)}
 .boton.chico{height:38px;padding:0 14px;font-size:13.5px;flex:none}
 /* Equipo */
 .socios{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
@@ -822,7 +823,7 @@ async function precargar(capa) {
   if (capa.tipo === 'qr') await espera(cargarQR().catch(() => null));
   if (capa.tipo === 'equipo' && !capa.eq) await espera(traerEquipo(capa));
   if (capa.tipo === 'fichaMas' && !(capa.ext && capa.ext.ok)) await espera(traerFicha(capa.tel).then(r => { if (r && r.ok) capa.ext = r; }));
-  if ((capa.tipo === 'bitacora' || capa.tipo === 'papelera') && !capa.lista) await espera(api(capa.tipo).then(r => { if (r.ok) capa.lista = r.lista; }));
+  if ((capa.tipo === 'bitacora' || capa.tipo === 'papelera') && !capa.lista) await espera(api(capa.tipo).then(r => { if (r.ok) { capa.lista = r.lista; capa.docs = r.docs || []; } }));
   if (capa.tipo === 'proyecto' && capa.tab === 'uso' && !capa.uso) await espera(api('uso', { id: capa.id }).then(r => { if (r.ok) capa.uso = r; }));
 }
 // Las fichas se piden una vez y se guardan un momento: si ya venía en camino, se usa esa misma respuesta.
@@ -842,6 +843,13 @@ function reemplazar(capa) { pila[pila.length - 1] = capa; transicion(() => pinta
 // Si un documento abierto (página de otro sitio) guardó pasos en el historial, "atrás" solo movería ese documento:
 // por eso, si la capa no se cerró sola en un momento, se cierra aquí. El botón Regresar siempre regresa.
 let cerrandoAdrede = false;
+// Regresar varias pantallas de un jalón (por ejemplo, al quitar un archivo, también se cierra el archivo que ya no existe).
+function volverA(nivel) {
+  const n = pila.length - nivel; if (n <= 0) return;
+  pila.length = nivel; cerrandoAdrede = true; setTimeout(() => { cerrandoAdrede = false; }, 600);
+  if (history.state && history.state.capa) try { history.go(-n); } catch (e) {}
+  transicion(() => pinta());
+}
 function cerrar() {
   const capa = pila[pila.length - 1];
   cerrandoAdrede = true; setTimeout(() => { cerrandoAdrede = false; }, 600);
@@ -864,7 +872,8 @@ function pinta(silencioso) {
   const c = pila[pila.length - 1];
   if (!c || c.tipo !== 'demo') veloFuera(false);
   if (!c) return esEmb() ? pintaInicioEmbajador(silencioso) : pintaInicio(silencioso);
-  ({ tareas: capaTareas, tarea: capaTarea, nuevaTarea: capaNuevaTarea, crm: capaCRM, crmLista: capaCRMLista, editarContacto: capaEditarContacto, subir: capaSubir, ficha: capaFicha, fichaMas: capaFichaMas, nuevoCliente: capaNuevoCliente, proyectos: capaProyectos, proyecto: capaProyecto, nuevoProyecto: capaProyecto, equipo: capaEquipo, moon: capaMoon, lector: capaLector, clientes: capaClientes, cliente: capaCliente, seccion: capaSeccion, documento: capaDocumento, casa: capaCasa, demo: capaDemo, nota: capaNota, editarProyecto: capaProyecto, qr: capaQR, cuenta: capaCuenta, frase: capaFrase, foto: capaFoto, emProspectos: capaEmProspectos, emComisiones: capaEmComisiones, emMaterial: capaEmMaterial, emCuenta: capaEmCuenta, embajador: capaEmbajador, comision: capaComision, bitacora: capaBitacora, papelera: capaPapelera })[c.tipo](c, silencioso);
+  if (c.tipo === 'documento') setTimeout(() => ponOpcionesDoc(c), 0);
+  ({ tareas: capaTareas, tarea: capaTarea, nuevaTarea: capaNuevaTarea, crm: capaCRM, crmLista: capaCRMLista, editarContacto: capaEditarContacto, subir: capaSubir, ficha: capaFicha, fichaMas: capaFichaMas, nuevoCliente: capaNuevoCliente, proyectos: capaProyectos, proyecto: capaProyecto, nuevoProyecto: capaProyecto, equipo: capaEquipo, moon: capaMoon, lector: capaLector, clientes: capaClientes, cliente: capaCliente, seccion: capaSeccion, documento: capaDocumento, casa: capaCasa, demo: capaDemo, nota: capaNota, editarProyecto: capaProyecto, qr: capaQR, cuenta: capaCuenta, frase: capaFrase, foto: capaFoto, docOpciones: capaDocOpciones, emProspectos: capaEmProspectos, emComisiones: capaEmComisiones, emMaterial: capaEmMaterial, emCuenta: capaEmCuenta, embajador: capaEmbajador, comision: capaComision, bitacora: capaBitacora, papelera: capaPapelera })[c.tipo](c, silencioso);
 }
 function marco(titulo, accion, cuerpo, icono) {
   app.innerHTML = `<div class="top"><button class="redondo" id="volver" aria-label="Regresar">${I.atras}</button><div class="cabeza" style="flex:1;min-width:0"><h2>${esc(titulo)}</h2>${accion ? `<button class="redondo accion" id="accion" aria-label="${esc(accion)}" title="${esc(accion)}">${icono || I.mas}</button>` : ''}</div></div><div class="vista" style="grid-template-rows:minmax(0,1fr)">${cuerpo}</div>`;
@@ -1601,11 +1610,14 @@ function capaCliente(c) {
   if (c.tab === 'cliente') { const ac = document.getElementById('accion'); ac.innerHTML = I.subir; ac.onclick = () => abrir({ tipo: 'subir', tel: c.tel }); document.getElementById('demo').onclick = () => window.open(p.demo, '_blank', 'noopener'); document.getElementById('demoEnviar').onclick = () => compartir('Demo · ' + nombreCorto(per), p.demo); activarRects(c.tel, SECCIONES); }
   if (c.tab === 'proyectos') alCambiarTamano = paginar(app.querySelector('.vista .cuerpo .cuerpo'), proys, filaProyecto, { pagina: c.p, vacio: '<b>Sin proyectos</b>', alPintar: l => l.querySelectorAll('[data-y]').forEach(b => b.onclick = () => abrir({ tipo: 'proyecto', id: Number(b.dataset.y) })) });
 }
+const SECCIONES_MOON = [['presentacion', 'Presentación de MOON'], ['pagina', 'Página web de MOON'], ['bienvenida', 'Bienvenida de Jason']];
 function capaSubir(c) {
-  const per = personaDe(c.tel); if (!per) return cerrar();
-  c.sec = c.sec || 'propuesta';
-  marco('Subir a ' + nombreCorto(per), '', `<form class="hoja editando pasos" id="f" novalidate style="align-self:start">
-    <div><div class="eti" style="margin-bottom:8px">¿Dónde va?</div><div class="pils">${SECCIONES.map(([k, n]) => `<button type="button" class="pil solo${c.sec === k ? ' on' : ''}" data-sec="${k}">${n}</button>`).join('')}</div></div>
+  const moon = c.tel === 'moon', per = personaDe(c.tel); if (!moon && !per) return cerrar();
+  const secs = moon ? SECCIONES_MOON : SECCIONES;
+  c.sec = c.sec || secs[0][0];
+  const viejo = c.reemplaza && (D.documentos || []).find(x => x.id === c.reemplaza);
+  marco(viejo ? 'Cambiar archivo' : 'Subir a ' + (moon ? 'MOON' : nombreCorto(per)), '', `<form class="hoja editando pasos" id="f" novalidate style="align-self:start">
+    ${viejo ? `<p class="mini">El nuevo archivo toma el lugar de "${esc(viejo.titulo)}". El anterior se va a la papelera (se puede recuperar).</p>` : `<div><div class="eti" style="margin-bottom:8px">¿Dónde va?</div><div class="pils">${secs.map(([k, n]) => `<button type="button" class="pil solo${c.sec === k ? ' on' : ''}" data-sec="${k}">${n}</button>`).join('')}</div></div>`}
     <label class="campo-foto"><span class="cf-vista">${I.subir}</span><span><b id="archNombre">Elegir archivo</b><small>PDF, foto o cualquier archivo · hasta 25 MB</small></span><input type="file" id="arch" hidden></label>
     <label class="et-campo">Nombre que verá el equipo<input class="campo" name="titulo" id="titulo" maxlength="120" placeholder="Ejemplo: Contrato firmado"></label>
     <button class="boton" id="subirBtn">Subir</button><div class="aviso" id="aviso"></div></form>`);
@@ -1629,19 +1641,53 @@ function capaSubir(c) {
       if (!r.ok) { if (tam > 40000) { tam = Math.floor(tam / 2); continue; } aviso.textContent = 'Se cortó la subida. Revisa tu internet y vuelve a intentar.'; btn.disabled = false; return; }
       pos += trozo.length; n++; aviso.textContent = `Subiendo… ${Math.round(pos / bytes.length * 100)}%`;
     }
-    const fin = await api('subir_fin', { id: ini.id, partes: n });
+    const fin = await api('subir_fin', { id: ini.id, partes: n, reemplaza: c.reemplaza || '' });
     if (!fin.ok) { aviso.textContent = 'No se pudo terminar. Vuelve a intentar.'; btn.disabled = false; return; }
-    await recargar(); avisoFlotante('Listo: ya está en ' + (SECCIONES.find(x => x[0] === c.sec) || [, ''])[1] + '.'); cerrar();
+    await recargar(); avisoFlotante(viejo ? 'Listo: archivo cambiado' : 'Listo: ya está en ' + (secs.find(x => x[0] === c.sec) || [, ''])[1] + '.');
+    const i = viejo ? pila.findIndex(x => x.tipo === 'documento' && x.id === viejo.id) : -1;
+    if (i > -1) volverA(i); else cerrar();
   };
 }
 function capaSeccion(c) {
   const ds = docsDe(c.tel, c.seccion), per = personaDe(c.tel);
-  const cliente = c.tel !== 'moon' && SECCIONES.some(x => x[0] === c.seccion);
+  const cliente = !esEmb() && (c.tel === 'moon' ? SECCIONES_MOON : SECCIONES).some(x => x[0] === c.seccion);
   marco(`${c.nombre || 'Documentos'} · ${nombreCorto(per) || 'MOON'}`, cliente ? 'Subir archivo' : '', `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr) auto"><div class="lista dos"></div><div class="pie"></div></div>`, I.subir);
   if (cliente) document.getElementById('accion').onclick = () => abrir({ tipo: 'subir', tel: c.tel, sec: c.seccion });
   const vacio = (SECCIONES.find(x => x[0] === c.seccion) || [, , 'Aún no hay nada aquí'])[2];
   alCambiarTamano = paginar(app.querySelector('.cuerpo'), ds, d => `<button class="fila" data-d="${esc(d.id)}" style="grid-template-columns:auto minmax(0,1fr) auto"><span class="doc-ic">${d.formato === 'archivo' ? I.subir : I.enviar}</span><span class="q"><b>${esc(d.titulo)}</b><span>${esc(d.frase || (d.formato === 'archivo' ? 'Archivo subido' : 'Se abre aquí mismo'))}</span></span><span class="flecha-f">${I.der}</span></button>`,
     { pagina: c.p, vacio: `<b>${esc(vacio)}</b>${cliente ? 'Súbelo con el botón de arriba.' : ''}`, alPintar: l => l.querySelectorAll('[data-d]').forEach(b => b.onclick = () => abrirDoc(ds.find(x => x.id === b.dataset.d))) });
+}
+
+
+/* ---------- Archivos: cambiar, renombrar o mandar a la papelera (solo Daniel, Dan y Kid) ---------- */
+function ponOpcionesDoc(c) {
+  if (esEmb() || pila[pila.length - 1] !== c) return;
+  const d = (D.documentos || []).find(x => x.id === c.id); if (!d) return;
+  const cab = app.querySelector('.cabeza'); if (!cab || cab.querySelector('#opcionesDoc')) return;
+  cab.insertAdjacentHTML('beforeend', `<button class="redondo" id="opcionesDoc" aria-label="Cambiar o quitar este archivo" title="Cambiar o quitar">${I.lapiz}</button>`);
+  document.getElementById('opcionesDoc').onclick = () => abrir({ tipo: 'docOpciones', id: d.id });
+}
+function capaDocOpciones(c) {
+  const d = (D.documentos || []).find(x => x.id === c.id); if (!d) return cerrar();
+  marco('Cambiar o quitar', '', `<form class="hoja editando pasos" id="f" novalidate style="align-self:start">
+    <label class="et-campo">Nombre que ve el equipo<input class="campo" id="tit" maxlength="120" value="${esc(d.titulo)}"></label>
+    <div class="botones"><button class="boton">Guardar nombre</button></div>
+    <div class="botones apilados">${d.formato === 'link' ? '' : '<button type="button" class="boton dos" id="cambiar">Cambiar por otro archivo</button>'}<button type="button" class="boton dos rojo" id="quitar">Mandar a la papelera</button></div>
+    <div class="aviso" id="aviso"></div></form>`);
+  const av = document.getElementById('aviso');
+  document.getElementById('f').onsubmit = async e => {
+    e.preventDefault(); const titulo = document.getElementById('tit').value.trim();
+    if (!titulo) { av.textContent = 'Escribe el nombre.'; return; }
+    const r = await api('doc_renombrar', { id: d.id, titulo });
+    if (r.ok) { d.titulo = titulo; pila.forEach(x => { if (x.tipo === 'documento' && x.id === d.id) { x.titulo = titulo; if (x.doc) x.doc.titulo = titulo; } }); await recargar(true); avisoFlotante('Nombre guardado'); cerrar(); } else av.textContent = 'No se pudo guardar. Intenta de nuevo.';
+  };
+  if (d.formato !== 'link') document.getElementById('cambiar').onclick = () => reemplazar({ tipo: 'subir', tel: d.tel, sec: d.seccion, reemplaza: d.id });
+  let seguro = false;
+  document.getElementById('quitar').onclick = async ev => {
+    if (!seguro) { seguro = true; ev.target.textContent = '¿Seguro? Toca otra vez'; return; }
+    const r = await api('doc_quitar', { id: d.id });
+    if (r.ok) { await recargar(true); avisoFlotante('Está en la papelera (Equipo › Papelera)'); const i = pila.findIndex(x => x.tipo === 'documento' && x.id === d.id); i > -1 ? volverA(i) : cerrar(); }
+  };
 }
 
 /* ---------- Documento guardado: se lee aquí, sin necesitar Claude ---------- */
@@ -1739,7 +1785,7 @@ function capaCasa() {
       <div class="j-centro"><span class="j-orbe" aria-hidden="true"></span>${num ? `<a class="boton j-probar" href="${esc(num.url)}">${I.tel} Probar a Jason</a><span class="j-num">${esc(num.frase || '')}</span>` : '<span class="j-num">Aún no tiene número</span>'}</div>
       <div class="j-mas">${JAS.map(([k, n, d]) => `<button data-j="${k}"${d ? '' : ' disabled'}>${n}</button>`).join('')}</div>
     </div>
-    <div class="casa-filas">${CASA.map(([k, n, f]) => { const ok = k === 'proyectos' || docsDe('moon', k).length; return `<button class="fila chica${ok ? '' : ' sin'}" data-k="${k}"><span class="casa-ic">${CASA_IC[k]}</span><span class="q"><b>${n}</b><span>${ok ? f : 'Aún no está aquí'}</span></span><span class="flecha-f">${I.der}</span></button>`; }).join('')}</div></div>`);
+    <div class="casa-filas">${CASA.map(([k, n, f]) => { const ok = k === 'proyectos' || docsDe('moon', k).length; return `<button class="fila chica${ok ? '' : ' sin'}" data-k="${k}"><span class="casa-ic">${CASA_IC[k]}</span><span class="q"><b>${n}</b><span>${ok ? f : 'Aún no está: tócalo para subirlo'}</span></span><span class="flecha-f">${I.der}</span></button>`; }).join('')}</div></div>`);
   app.querySelectorAll('[data-j]').forEach(b => b.onclick = () => { const d = (JAS.find(x => x[0] === b.dataset.j) || [])[2]; if (d) abrirDoc(d); });
   // Si no cabe todo (celulares bajitos, barras del navegador, letra grande), se quita primero lo que es adorno
   // y luego lo secundario — nunca se enciman botones sobre texto.
@@ -1755,7 +1801,8 @@ function capaCasa() {
   app.querySelectorAll('[data-k]').forEach(b => b.onclick = () => {
     const k = b.dataset.k;
     if (k === 'proyectos') return abrir({ tipo: 'proyectos', f: 'activos', soloMoon: true });
-    const ds = docsDe('moon', k); if (ds.length) abrirDoc(ds[0]);
+    const ds = docsDe('moon', k);
+    if (ds.length) abrirDoc(ds[0]); else if (k === 'presentacion' || k === 'pagina') abrir({ tipo: 'subir', tel: 'moon', sec: k });   // vacío: tocarlo es para subirlo
   });
 }
 
@@ -1930,10 +1977,16 @@ function capaBitacora(c) {
   if (!c.lista) api('bitacora').then(r => { if (r.ok) { c.lista = r.lista; if (pila[pila.length - 1] === c) pinta(true); } });
 }
 function capaPapelera(c) {
-  marco('Papelera', '', `<div class="cuerpo" style="grid-template-rows:auto minmax(0,1fr)"><p class="mini">Nada se borra de golpe: lo que se quita llega aquí y se puede recuperar. Además, la base entera tiene respaldo de los últimos 30 días.</p><div class="lista"></div></div>`);
-  paginar(app.querySelector('.cuerpo'), c.lista || [], p => `<div class="fila" style="cursor:default"><span class="punto"></span><span class="q"><b>${esc(p.negocio || p.nombre || p.tel)}</b><span>Se quitó ${cuando(p.borrado)}</span></span><button class="boton dos chico" data-r="${esc(p.tel)}">Recuperar</button></div>`,
-    { vacio: c.lista ? '<b>Vacía</b>No se ha quitado nada.' : '<b>Cargando…</b>', alPintar: l => l.querySelectorAll('[data-r]').forEach(b => b.onclick = async () => { b.disabled = true; const r = await api('recuperar_persona', { tel: b.dataset.r }); if (r.ok) { c.lista = c.lista.filter(x => x.tel !== b.dataset.r); await recargar(true); pinta(true); avisoFlotante('Recuperado'); } else b.disabled = false; }) });
-  if (!c.lista) api('papelera').then(r => { if (r.ok) { c.lista = r.lista; if (pila[pila.length - 1] === c) pinta(true); } });
+  marco('Papelera', '', `<div class="cuerpo" style="grid-template-rows:auto minmax(0,1fr)"><p class="mini">Lo que se quita llega aquí y se puede recuperar cuando quieras.</p><div class="lista"></div></div>`);
+  const todo = (c.lista || []).map(p => ({ k: 'p', id: p.tel, n: p.negocio || p.nombre || p.tel, que: 'Persona del CRM', b: p.borrado }))
+    .concat((c.docs || []).map(d => ({ k: 'd', id: d.id, n: d.titulo, que: 'Archivo de ' + (d.tel === 'moon' ? 'MOON' : nombreCorto(personaDe(d.tel)) || 'un cliente'), b: d.borrado })))
+    .sort((a, b) => String(b.b).localeCompare(String(a.b)));
+  paginar(app.querySelector('.cuerpo'), todo, x => `<div class="fila" style="cursor:default"><span class="punto"></span><span class="q"><b>${esc(x.n)}</b><span>${esc(x.que)} · se quitó ${cuando(x.b)}</span></span><button class="boton dos chico" data-r="${esc(x.id)}" data-k="${x.k}">Recuperar</button></div>`,
+    { vacio: c.lista ? '<b>Vacía</b>No se ha quitado nada.' : '<b>Cargando…</b>', alPintar: l => l.querySelectorAll('[data-r]').forEach(b => b.onclick = async () => {
+      b.disabled = true; const doc = b.dataset.k === 'd';
+      const r = await api(doc ? 'doc_recuperar' : 'recuperar_persona', doc ? { id: b.dataset.r } : { tel: b.dataset.r });
+      if (r.ok) { if (doc) c.docs = c.docs.filter(x => x.id !== b.dataset.r); else c.lista = c.lista.filter(x => x.tel !== b.dataset.r); await recargar(true); pinta(true); avisoFlotante('Recuperado: regresó a su lugar'); } else b.disabled = false; }) });
+  if (!c.lista) api('papelera').then(r => { if (r.ok) { c.lista = r.lista; c.docs = r.docs || []; if (pila[pila.length - 1] === c) pinta(true); } });
 }
 
 /* ---------- Tu credencial: la abre tu foto de arriba ---------- */

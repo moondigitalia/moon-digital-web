@@ -19,7 +19,7 @@ http.createServer((q,r)=>{
   else if(d.accion==='embajador_guardar'){o.id=d.id||'nuevo-emb';}
   else if(d.accion==='embajador_invitar'){o.link='https://moondigitalia.com/tablero?invita='+'T'.repeat(32);}
   else if(d.accion==='bitacora'){o.lista=Array.from({length:40},(_,i)=>({id:i+1,fecha:ahora,quien:['kid','dan','daniel','joe-madrid','sistema'][i%5],texto:'cambió algo en el tablero número '+i}));}
-  else if(d.accion==='papelera'){o.lista=[{tel:'99x',nombre:'Persona quitada',negocio:'Refaccionaria y Autopartes del Sureste Hermanos Contreras',borrado:ahora}];}
+  else if(d.accion==='papelera'){o.lista=[{tel:'99x',nombre:'Persona quitada',negocio:'Refaccionaria y Autopartes del Sureste Hermanos Contreras',borrado:ahora}];o.docs=[{id:'a-000000000009',tel:'moon',titulo:'Presentación vieja de MOON con un nombre bastante largo',borrado:ahora}];}
   else if(d.accion==='entrar_embajador'){if(String(d.tel).slice(-10)==='9981234567'&&d.clave==='123456')o.sesion=EMBS;else o={ok:false,error:'clave'};}
   else if(d.accion==='invitacion'){if(d.token==='T'.repeat(30))Object.assign(o,{nombre:'Joe Madrid',tieneClave:false,pideTel:true});else o={ok:false,error:'vencido'};}
   else if(d.accion==='crear_clave_invita'){if(d.token==='T'.repeat(30)&&String(d.tel).length>=10)o.sesion=EMBS;else o={ok:false,error:'vencido'};}
