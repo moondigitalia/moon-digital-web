@@ -786,12 +786,14 @@ $('anotar').onclick = e => {
 
 /* ---------- Teclado abierto: se enfoca en un solo campo ---------- */
 // La pantalla se achica cuando sale el teclado (también dentro del tablero). Si ya no cabe todo, se muestra solo el campo que se está llenando.
-let altoMax = innerHeight, anchoTec = innerWidth;
+// En el celular el teclado no achica la página: achica lo que SE VE (visualViewport). Se mide eso.
+const altoVisto = () => window.visualViewport ? visualViewport.height : innerHeight;
+let altoMax = altoVisto(), anchoTec = innerWidth;
 function revisarTeclado() {
-  if (Math.abs(innerWidth - anchoTec) > 40) { anchoTec = innerWidth; altoMax = innerHeight; }   // giró el celular
-  altoMax = Math.max(altoMax, innerHeight);
+  if (Math.abs(innerWidth - anchoTec) > 40) { anchoTec = innerWidth; altoMax = altoVisto(); }   // giró el celular
+  altoMax = Math.max(altoMax, altoVisto());
   const a = document.activeElement, enCampo = a && /^(INPUT|TEXTAREA)$/.test(a.tagName) && a.type !== 'hidden' && a.closest('main');
-  const sale = !!enCampo && innerHeight < altoMax * 0.8;
+  const sale = !!enCampo && altoVisto() < altoMax * 0.8;
   if (sale !== document.documentElement.classList.contains('tecleando')) {
     document.documentElement.classList.toggle('tecleando', sale);
     document.querySelector('main').scrollTop = 0; scrollTo(0, 0);
@@ -800,6 +802,15 @@ function revisarTeclado() {
 addEventListener('resize', revisarTeclado);
 if (window.visualViewport) visualViewport.addEventListener('resize', revisarTeclado);
 document.addEventListener('focusin', () => setTimeout(revisarTeclado, 60));
+// La pantalla nunca se arrastra con un dedo (tampoco con el teclado abierto): solo se mueve lo que de verdad tiene más abajo.
+document.addEventListener('touchmove', e => {
+  if (e.touches.length !== 1 || !e.cancelable) return;
+  for (let x = e.target; x && x !== document.body; x = x.parentElement) { const cs = getComputedStyle(x); if ((/(auto|scroll)/.test(cs.overflowY) || x.tagName === 'TEXTAREA') && x.scrollHeight > x.clientHeight + 1) return; }
+  e.preventDefault();
+}, { passive: false });
+addEventListener('scroll', () => { if (scrollY || scrollX) scrollTo(0, 0); });
+// Tocar un botón mientras escribes no cierra el teclado antes: un solo toque basta.
+document.addEventListener('mousedown', e => { const a = document.activeElement; if (a && /^(INPUT|TEXTAREA)$/.test(a.tagName) && e.target.closest && e.target.closest('button,a,[role=button]')) e.preventDefault(); });
 document.addEventListener('focusout', () => setTimeout(revisarTeclado, 60));
 // "Siguiente" en el teclado pasa al siguiente campo; en el último se cierra el teclado.
 document.querySelectorAll('main form').forEach(f => f.addEventListener('keydown', e => {

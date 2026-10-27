@@ -163,14 +163,15 @@ textarea.campo{height:auto;border-radius:22px;padding:14px 18px;resize:none}
 /* Nueva tarea: una pregunta a la vez */
 .pasos-cab{display:flex;justify-content:space-between;align-items:center;gap:10px}
 .puntos{display:flex;gap:6px}.puntos i{width:9px;height:9px;border-radius:50%;background:var(--niebla)}.puntos i.on{background:var(--cobalto)}
-.pasos-cuerpo{min-height:0;display:flex;flex-direction:column;gap:16px;overflow:hidden}
+.pasos-cuerpo{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;gap:16px;overflow:hidden}.pasos>.botones,.pasos>.aviso,.pasos>.pasos-cab{flex:none}
 .grupo{display:grid;gap:8px;min-width:0}
 .preg{font-size:clamp(19px,calc(5 * var(--w)),24px);font-weight:800;line-height:1.2}
 .quien.grande button{opacity:1;font-size:15px}.quien.grande button.on{background:var(--azulf)}
 .segmento.fechas{display:grid;grid-template-columns:1fr 1fr;border-radius:24px}
 .fecha-dice{font-weight:800;color:var(--cobalto);font-size:16px}
 #sug{flex:1;min-height:0}
-.teclado .pasos-cab{display:none}.teclado .pasos .grupo:not(:focus-within){display:none}.teclado .pasos .grupo .grupo{display:grid}.teclado .pasos .fecha-dice{display:none}
+.sig-campo{display:none}.teclado form.pasos.no-ultimo .sig-campo{display:block;width:100%}.teclado form.pasos.no-ultimo>.botones{display:none}.teclado form.pasos.no-ultimo>.boton:not(.sig-campo){display:none}.teclado form.pasos .botones.apilados{display:none}
+.teclado .pasos-cab{display:none}.teclado form.pasos>:not(:focus-within):not(.botones):not(.boton):not(.aviso):not(.pasos-cuerpo){display:none}.teclado .pasos .grupo:not(:focus-within){display:none}.teclado .pasos .grupo .grupo{display:grid}.teclado .pasos .fecha-dice{display:none}
 .fases{display:grid;gap:clamp(4px,calc(1 * var(--u)),10px);justify-self:center;width:min(100%,320px)}
 .fases button{display:flex;align-items:center;gap:12px;font-size:15px;font-weight:700;color:var(--tenue);text-align:start}
 .fases button i{width:30px;height:30px;border-radius:50%;background:var(--campo);box-shadow:var(--hundido);display:grid;place-items:center;font-style:normal;font-size:12px;font-weight:800}
@@ -361,6 +362,17 @@ html:not(.ancho) .agenda>.fila:only-child{border-radius:20px}
 .barras-pie{display:flex;justify-content:space-between;font-size:11px;font-weight:700;color:var(--tenue);margin-top:4px}
 .desc{border-radius:20px;padding:10px 14px;background:var(--cf);color:var(--c);font-weight:700;font-size:13.5px;line-height:1.35}
 .desc b{font-weight:800}
+/* Ficha de una sola pantalla */
+.ficha1{display:flex;flex-direction:column;gap:clamp(10px,calc(1.8 * var(--u)),16px)}
+.f-quien{display:flex;align-items:center;gap:12px;min-width:0}.f-quien .q{min-width:0;display:grid;gap:2px}.f-quien b{font-size:clamp(18px,calc(4.8 * var(--w)),22px);font-weight:800;line-height:1.2;overflow-wrap:anywhere}.f-quien span{font-size:13px;font-weight:600;color:var(--suave)}
+.f-contacto .boton{display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}.boton.verde{background:#1f8a4c;box-shadow:0 12px 20px -10px rgba(31,138,76,.7)}
+.f-bloque{display:grid;gap:8px;flex:none}
+.ficha1.apretada{gap:8px;padding:12px}.ficha1.apretada .boton{height:42px}.ficha1.apretada .f-etapas button{min-height:34px}.ficha1.apretada .f-quien .icono{width:40px!important;height:40px!important}.ficha1.apretada .f-enlaces .enlace{min-height:28px}
+.f-etapas{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.f-etapas button{min-height:40px;border-radius:14px;font-size:13px;font-weight:800;color:var(--suave);background:var(--campo);box-shadow:var(--hundido);padding:4px;line-height:1.15}
+.f-etapas button.on{background:var(--cf);color:var(--c);box-shadow:inset 0 0 0 2px var(--c)}
+.f-nota{flex:1 1 0;min-height:66px;grid-template-rows:auto minmax(0,1fr)}.f-nota.sin-eti{min-height:44px}.f-nota .nota{text-align:start;font:inherit;font-weight:600;min-height:44px}
+.f-enlaces{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 18px}.f-enlaces .enlace{min-height:34px}.enlace.rojo{color:var(--rojo)}
 .nota{flex:1 1 0;min-height:0;overflow:hidden;border-radius:20px;background:var(--campo);box-shadow:var(--hundido);padding:12px 14px;font-weight:600;color:var(--suave);white-space:pre-line}
 /* Tamaños según el espacio que DE VERDAD se ve (ya con el tamaño de letra elegido y el teclado): clases que pone medir() */
 .ancho .mosaico{grid-template-columns:repeat(12,minmax(0,1fr));grid-template-rows:1fr 1fr minmax(64px,.32fr);grid-template-areas:"tuyo tuyo tuyo tuyo tuyo crm crm crm crm proy proy proy" "tuyo tuyo tuyo tuyo tuyo equipo equipo equipo equipo moon moon moon" "demo demo demo demo demo ultimo ultimo ultimo ultimo ultimo ultimo ultimo"}
@@ -592,6 +604,43 @@ addEventListener('orientationchange', () => setTimeout(alMedir, 250));
 // Nada de zoom con los dedos sobre la página (el tamaño se elige en tu credencial); solo se pellizca para acomodar tu foto.
 document.addEventListener('gesturestart', e => { if (!e.target.closest || !e.target.closest('.recorte')) e.preventDefault(); });
 document.addEventListener('touchmove', e => { if (e.touches.length > 1 && !e.target.closest('.recorte')) e.preventDefault(); }, { passive: false });
+// La pantalla nunca se arrastra (ni con el teclado abierto): un dedo solo mueve una lista o un texto que de verdad tenga más abajo.
+function sePuedeDeslizar(el) {
+  for (let x = el; x && x !== document.body; x = x.parentElement) {
+    if (x.closest && x.closest('.recorte,.con-zoom')) return true;
+    const cs = getComputedStyle(x);
+    if (/(auto|scroll)/.test(cs.overflowY) && x.scrollHeight > x.clientHeight + 1) return true;
+    if (x.tagName === 'TEXTAREA' && x.scrollHeight > x.clientHeight + 1) return true;
+  }
+  return false;
+}
+document.addEventListener('touchmove', e => { if (e.touches.length === 1 && e.cancelable && !sePuedeDeslizar(e.target)) e.preventDefault(); }, { passive: false });
+addEventListener('scroll', () => { if (scrollY || scrollX) scrollTo(0, 0); });
+// Tocar un botón mientras escribes NO cierra el teclado primero: así un solo toque basta (antes el primer toque solo cerraba el teclado).
+const escribiendo = () => { const a = document.activeElement; return a && (a.tagName === 'TEXTAREA' || (a.tagName === 'INPUT' && !/^(checkbox|radio|file|range|date|button|submit)$/.test(a.type))); };
+document.addEventListener('mousedown', e => { if (escribiendo() && e.target.closest && e.target.closest('button,.boton,a')) e.preventDefault(); });
+// Formularios con varias preguntas: con el teclado arriba se ve una a la vez, y el botón dice "Siguiente" hasta la última;
+// nunca se guarda sin haber visto las demás.
+const camposDe = f => [...f.querySelectorAll('input:not([type=hidden]):not([type=file]):not([type=checkbox]):not([type=radio]):not([type=range]):not([type=date]),textarea')].filter(x => !x.disabled);
+document.addEventListener('focusin', e => {
+  const f = e.target.closest && e.target.closest('form.pasos'); if (!f) return;
+  const l = camposDe(f), i = l.indexOf(e.target); if (i < 0) return;
+  const ultimo = i === l.length - 1;
+  f.classList.toggle('no-ultimo', !ultimo);
+  if (e.target.tagName === 'INPUT') e.target.enterKeyHint = ultimo ? 'done' : 'next';
+  let b = f.querySelector('.sig-campo');
+  if (!b && l.length > 1) {
+    b = document.createElement('button'); b.type = 'button'; b.className = 'boton sig-campo'; b.textContent = 'Siguiente pregunta';
+    b.onclick = () => { const k = camposDe(f), j = k.indexOf(document.activeElement); if (k[j + 1]) k[j + 1].focus(); };
+    const av = f.querySelector('.aviso'); av ? f.insertBefore(b, av) : f.appendChild(b);
+  }
+});
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Enter' || e.target.tagName !== 'INPUT') return;
+  const f = e.target.closest('form.pasos'); if (!f) return;
+  const l = camposDe(f), i = l.indexOf(e.target);
+  if (i > -1 && i < l.length - 1) { e.preventDefault(); l[i + 1].focus(); }
+});
 let fantasmaVivo = null;
 // Cada marco avisa cuando ya cargó (el evento se escucha aquí para todos, también los que se crean después).
 document.addEventListener('load', e => { const t = e.target; if (t && t.classList && t.classList.contains('doc-html')) t.classList.add('listo'); }, true);
@@ -635,7 +684,7 @@ function marcoEntrada(u, html) {
 
 function pantallaClave(u) {
   marcoEntrada(u, `<h1>Hola, ${esc(u.nombre)}</h1><p>Escribe tu contraseña. Solo te la pedimos esta vez en este dispositivo.</p>
-    <form id="f" style="display:grid;gap:12px;width:100%">${campoClave('clave', 'Tu contraseña', 'current-password')}
+    <form id="f" class="pasos" style="display:grid;gap:12px;width:100%">${campoClave('clave', 'Tu contraseña', 'current-password')}
     <button class="boton">Entrar</button><div class="aviso" id="aviso"></div></form><button class="enlace" id="olvide">Olvidé mi contraseña</button>`);
   const f = document.getElementById('f'), av = document.getElementById('aviso');
   setTimeout(() => { const x = document.getElementById('clave'); if (x) x.focus(); }, 300);
@@ -651,7 +700,7 @@ function pantallaClave(u) {
 
 async function pantallaCodigo(u) {
   marcoEntrada(u, `<h1>Te mandamos un código</h1><p id="txt">Enviando a tu correo…</p>
-    <form id="f" style="display:grid;gap:12px;width:100%"><input class="campo codigo" id="cod" inputmode="numeric" autocomplete="one-time-code" maxlength="7" placeholder="••••••" required>
+    <form id="f" class="pasos" style="display:grid;gap:12px;width:100%"><input class="campo codigo" id="cod" inputmode="numeric" autocomplete="one-time-code" maxlength="7" placeholder="••••••" required>
     <button class="boton">Seguir</button><div class="aviso" id="aviso"></div></form><button class="enlace" id="otra">Mandar otro código</button>`);
   const txt = document.getElementById('txt'), av = document.getElementById('aviso'), f = document.getElementById('f');
   async function mandar() {
@@ -673,7 +722,7 @@ async function pantallaCodigo(u) {
 
 function pantallaNueva(u, codigo) {
   marcoEntrada(u, `<h1>Crea tu contraseña</h1><p>Mínimo 6 letras o números. Este dispositivo quedará recordado.</p>
-    <form id="f" style="display:grid;gap:12px;width:100%">${campoClave('c1', 'Contraseña nueva', 'new-password')}
+    <form id="f" class="pasos" style="display:grid;gap:12px;width:100%">${campoClave('c1', 'Contraseña nueva', 'new-password')}
     ${campoClave('c2', 'Repítela', 'new-password')}
     <button class="boton">Entrar al tablero</button><div class="aviso" id="aviso"></div></form>`);
   const f = document.getElementById('f'), av = document.getElementById('aviso');
@@ -770,7 +819,7 @@ function pinta(silencioso) {
   const c = pila[pila.length - 1];
   if (!c || c.tipo !== 'demo') veloFuera(false);
   if (!c) return esEmb() ? pintaInicioEmbajador(silencioso) : pintaInicio(silencioso);
-  ({ tareas: capaTareas, tarea: capaTarea, nuevaTarea: capaNuevaTarea, crm: capaCRM, crmLista: capaCRMLista, editarContacto: capaEditarContacto, subir: capaSubir, ficha: capaFicha, nuevoCliente: capaNuevoCliente, proyectos: capaProyectos, proyecto: capaProyecto, nuevoProyecto: capaProyecto, equipo: capaEquipo, moon: capaMoon, lector: capaLector, clientes: capaClientes, cliente: capaCliente, seccion: capaSeccion, documento: capaDocumento, casa: capaCasa, demo: capaDemo, nota: capaNota, editarProyecto: capaProyecto, qr: capaQR, cuenta: capaCuenta, frase: capaFrase, foto: capaFoto, emProspectos: capaEmProspectos, emComisiones: capaEmComisiones, emMaterial: capaEmMaterial, emCuenta: capaEmCuenta, embajador: capaEmbajador, comision: capaComision, bitacora: capaBitacora, papelera: capaPapelera })[c.tipo](c, silencioso);
+  ({ tareas: capaTareas, tarea: capaTarea, nuevaTarea: capaNuevaTarea, crm: capaCRM, crmLista: capaCRMLista, editarContacto: capaEditarContacto, subir: capaSubir, ficha: capaFicha, fichaMas: capaFichaMas, nuevoCliente: capaNuevoCliente, proyectos: capaProyectos, proyecto: capaProyecto, nuevoProyecto: capaProyecto, equipo: capaEquipo, moon: capaMoon, lector: capaLector, clientes: capaClientes, cliente: capaCliente, seccion: capaSeccion, documento: capaDocumento, casa: capaCasa, demo: capaDemo, nota: capaNota, editarProyecto: capaProyecto, qr: capaQR, cuenta: capaCuenta, frase: capaFrase, foto: capaFoto, emProspectos: capaEmProspectos, emComisiones: capaEmComisiones, emMaterial: capaEmMaterial, emCuenta: capaEmCuenta, embajador: capaEmbajador, comision: capaComision, bitacora: capaBitacora, papelera: capaPapelera })[c.tipo](c, silencioso);
 }
 function marco(titulo, accion, cuerpo, icono) {
   app.innerHTML = `<div class="top"><button class="redondo" id="volver" aria-label="Regresar">${I.atras}</button><div class="cabeza" style="flex:1;min-width:0"><h2>${esc(titulo)}</h2>${accion ? `<button class="redondo accion" id="accion" aria-label="${esc(accion)}" title="${esc(accion)}">${icono || I.mas}</button>` : ''}</div></div><div class="vista" style="grid-template-rows:minmax(0,1fr)">${cuerpo}</div>`;
@@ -794,8 +843,8 @@ function pintaInicio(sil) {
   const barrita = ['pendiente', 'en proceso', 'cerrado', 'en órbita'].map(e => cuenta(e) ? `<i style="--n:${cuenta(e)};--c:${ETAPA[e].c}"></i>` : '').join('');
   const xTareas = mias.map(x => { const p = proyectoDe(x.proyecto); return `<button class="xi${x.estado === 'nueva' ? ' nueva' : ''}" data-t="${x.id}"><span class="q">${esc(x.titulo)}</span><small>${esc(deQuien(x))}</small></button>`; }).join('');
   const xCrm = Object.keys(ETAPA).filter(e => e !== 'archivo' && cuenta(e)).map(e => `<button class="xi" data-g="${e}"><span class="punto" style="--c:${ETAPA[e].c}"></span><span class="q">${ETAPA[e].n}</span><small>${cuenta(e)}</small></button>`).join('');
-  const clientes = panelesCliente();
-  const xProy = clientes.map(({ p, per }) => `<button class="xi" data-c="${esc(p.tel)}"><span class="punto" style="--c:${p.color}"></span><span class="q">${esc(nombreCorto(per))}</span><small>${esc((ETAPA[per.etapa] || ETAPA.pendiente).n)}</small></button>`).join('');
+  const clientes = r.filter(p => PAGAN.includes(p.etapa)), enCamino = cuenta('en proceso');
+  const xProy = clientes.map(per => { const pn = (D.paneles || []).find(x => x.tel === per.tel); return `<button class="xi" data-c="${esc(per.tel)}"><span class="punto" style="--c:${pn ? pn.color : ETAPA[per.etapa].c}"></span><span class="q">${esc(pn ? nombreCorto(per) : nombreDe(per))}</span><small>${esc(ETAPA[per.etapa].n)}</small></button>`; }).join('');
   const xEq = ['daniel', 'dan', 'kid'].map(id => { const ab = D.tareas.filter(x => x.para === id && x.estado !== 'hecha'); const nv = ab.filter(x => x.estado === 'nueva').length; return `<button class="xi" data-u="${id}">${ava(id, 1)}<span class="q">${GENTE[id].n}</span><small>${nv ? nv + ' sin ver' : ab.length + ' abiertas'}</small></button>`; }).join('');
   const xMoon = `<p class="xtxt">Ser una empresa de inteligencia artificial muy fuerte, muy dinámica y muy intuitiva.</p>` + ['Jason', 'Página de MOON', 'Presentación de MOON'].map(n => `<span class="xi">${n}</span>`).join('');
   app.innerHTML = `
@@ -808,7 +857,7 @@ function pintaInicio(sil) {
         <div class="extra">${xTareas}</div>
         <span class="num">${mias.length}</span><span class="sub">${vencen ? `${vencen} atrasada${vencen === 1 ? '' : 's'} · ` : ''}tareas abiertas</span></div>
       <div class="t t-crm" role="button" tabindex="0" data-ir="crm"><span class="flecha">${I.abre}</span><span class="eti">CRM de MOON</span><div class="extra">${xCrm}</div><span class="num">${cuenta('pendiente') + cuenta('en proceso')}</span><span class="sub">clientes por cerrar</span><span class="barrita">${barrita}</span></div>
-      <div class="t t-proy" role="button" tabindex="0" data-ir="clientes"><span class="flecha">${I.abre}</span><span class="eti">Clientes</span><div class="extra">${xProy}</div><span class="num">${clientes.length}</span><span class="sub">demos, propuestas y material</span></div>
+      <div class="t t-proy" role="button" tabindex="0" data-ir="clientes"><span class="flecha">${I.abre}</span><span class="eti">Clientes</span><div class="extra">${xProy}</div><span class="num">${clientes.length}</span><span class="sub">nos pagan${enCamino ? ` · ${enCamino} en camino` : ''}</span></div>
       <div class="t t-equipo" role="button" tabindex="0" data-ir="equipo"><span class="flecha">${I.abre}</span><span class="eti">Equipo</span><div class="extra">${xEq}</div><span class="num">${Object.keys(GENTE).length}</span><span class="sub">integrantes</span></div>
       <div class="t t-moon" role="button" tabindex="0" data-ir="casa"><span class="flecha">${I.abre}</span><span class="eti">Hecho en casa</span><div class="extra">${xMoon}</div><span class="sub" style="margin-top:auto">Visión, Jason y presentación</span></div>
       <div class="t t-demo" role="button" tabindex="0" data-ir="demo"><span class="mic">${I.mic}</span><span class="q"><b>Para tus clientes</b><span class="sub">Demo, calculadora y presentación</span></span><span class="flecha">${I.abre}</span></div>
@@ -820,7 +869,7 @@ function pintaInicio(sil) {
   atajo('[data-t]', b => abrir({ tipo: 'tarea', id: Number(b.dataset.t) }));
   atajo('[data-g]', b => abrir({ tipo: 'crmLista', g: b.dataset.g }));
   atajo('[data-y]', b => abrir({ tipo: 'proyecto', id: Number(b.dataset.y) }));
-  atajo('[data-c]', b => abrir({ tipo: 'cliente', tel: b.dataset.c }));
+  atajo('[data-c]', b => abrir((D.paneles || []).some(x => x.tel === b.dataset.c) ? { tipo: 'cliente', tel: b.dataset.c } : { tipo: 'ficha', tel: b.dataset.c }));
   atajo('[data-u]', b => abrir({ tipo: 'tareas', persona: b.dataset.u }));
   document.getElementById('salir').onclick = () => abrir({ tipo: 'cuenta' });
   llenarExtras();
@@ -912,9 +961,9 @@ async function capaTarea(c) {
 }
 // Nueva tarea: una pregunta a la vez (nunca un formulario largo que el teclado tape).
 function capaNuevaTarea(c) {
-  const t = c.t = c.t || { titulo: '', para: c.para || yo(), cliente: (proyectoDe(c.proyecto) || {}).nombre || '', vence: '', listo: '', necesita: '', enlace: '' };
+  const t = c.t = c.t || { titulo: '', para: c.para || yo(), cliente: c.cliente || (proyectoDe(c.proyecto) || {}).nombre || '', vence: '', listo: '', necesita: '', enlace: '' };
   c.paso = c.paso || 1;
-  const N = 5, paso = c.paso;
+  const N = 7, paso = c.paso;
   const gentes = ['daniel', 'dan', 'kid'].concat((D.embajadores || []).map(e => e.id));
   const grupo = (id, eti, campo) => `<label class="grupo" for="${id}"><span class="preg">${eti}</span>${campo}</label>`;
   let cuerpo = '';
@@ -924,10 +973,10 @@ function capaNuevaTarea(c) {
   if (paso === 4) cuerpo = `<div class="grupo"><span class="preg">¿Para cuándo?</span><div class="segmento fechas" id="cuando">${[['hoy', 'Hoy', hoyISO()], ['manana', 'Mañana', hoyISO(1)], ['semana', 'Esta semana', finDeSemana()], ['sin', 'Sin fecha', '']].map(([k, n, v]) => `<button type="button" data-v="${v}" class="${t.vence === v && (v || t.sinFecha) ? 'on' : ''}">${n}</button>`).join('')}</div>
     <label class="grupo" for="q4"><span class="mini">O elige el día:</span><input class="campo" id="q4" type="date" min="${hoyISO()}" value="${esc(t.vence)}"></label>
     <p class="fecha-dice" id="dice">${t.vence ? 'Para el ' + fechaBonita(t.vence) : t.sinFecha ? 'Sin fecha' : 'Elige una opción'}</p></div>`;
-  if (paso === 5) cuerpo = grupo('q5', '¿Cómo sabemos que ya quedó?', `<textarea class="campo" id="q5" rows="2" maxlength="600" placeholder="Ejemplo: El cliente ya contestó que le llegó">${esc(t.listo)}</textarea>`)
-    + grupo('q6', '¿Qué necesita para hacerla?', `<textarea class="campo" id="q6" rows="2" maxlength="600" placeholder="Ejemplo: El logo y los precios del cliente">${esc(t.necesita)}</textarea>`)
-    + grupo('q7', 'Agregar link (opcional)', `<input class="campo" id="q7" type="url" inputmode="url" maxlength="500" value="${esc(t.enlace)}" placeholder="https://…">`);
-  marco('Nueva tarea', '', `<form class="hoja editando pasos" id="f" novalidate style="grid-template-rows:auto minmax(0,1fr) auto auto">
+  if (paso === 5) cuerpo = grupo('q5', '¿Cómo sabemos que ya quedó?', `<textarea class="campo" id="q5" rows="2" maxlength="600" enterkeyhint="next" placeholder="Ejemplo: El cliente ya contestó que le llegó">${esc(t.listo)}</textarea>`) + '<p class="mini">Si no aplica, déjalo vacío y toca Siguiente.</p>';
+  if (paso === 6) cuerpo = grupo('q6', '¿Qué necesita para hacerla?', `<textarea class="campo" id="q6" rows="2" maxlength="600" enterkeyhint="next" placeholder="Ejemplo: El logo y los precios del cliente">${esc(t.necesita)}</textarea>`) + '<p class="mini">Si no necesita nada, déjalo vacío y toca Siguiente.</p>';
+  if (paso === 7) cuerpo = grupo('q7', '¿Algún link que ayude? (opcional)', `<input class="campo" id="q7" type="url" inputmode="url" enterkeyhint="done" maxlength="500" value="${esc(t.enlace)}" placeholder="https://…">`) + '<p class="mini">Ejemplo: la carpeta del cliente o un documento. Si no hay, toca Dejar tarea.</p>';
+  marco('Nueva tarea', '', `<form class="hoja editando pasos" id="f" novalidate style="display:flex;flex-direction:column">
     <div class="pasos-cab"><span class="mini">Paso ${paso} de ${N}</span><span class="puntos">${Array.from({ length: N }, (_, i) => `<i class="${i < paso ? 'on' : ''}"></i>`).join('')}</span></div>
     <div class="pasos-cuerpo">${cuerpo}</div>
     <div class="botones"><button type="button" class="boton dos" id="atras">${paso === 1 ? 'Cancelar' : 'Atrás'}</button><button class="boton" id="sigue">${paso === N ? 'Dejar tarea' : 'Siguiente'}</button></div>
@@ -936,11 +985,14 @@ function capaNuevaTarea(c) {
   const guarda = () => {
     if (paso === 1) t.titulo = v('q1').trim();
     if (paso === 3) t.cliente = v('q3').trim();
-    if (paso === 5) { t.listo = v('q5').trim(); t.necesita = v('q6').trim(); t.enlace = v('q7').trim(); }
+    if (paso === 5) t.listo = v('q5').trim();
+    if (paso === 6) t.necesita = v('q6').trim();
+    if (paso === 7) t.enlace = v('q7').trim();
   };
-  const ir = n => { guarda(); c.paso = n; pinta(true); const e = app.querySelector('.pasos-cuerpo .campo'); if (e && innerWidth >= 800) e.focus(); };
+  // Al cambiar de pregunta, el campo nuevo queda listo para escribir (el teclado no se cierra ni la pantalla brinca).
+  const ir = n => { guarda(); c.paso = n; pinta(true); const e = app.querySelector('.pasos-cuerpo .campo:not([type=date])'); if (e) e.focus(); };
   document.getElementById('atras').onclick = () => paso === 1 ? cerrar() : ir(paso - 1);
-  if (paso === 1) document.getElementById('q1').onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); f.requestSubmit(); } };
+  ['q1', 'q5', 'q6'].forEach(id => { const x = document.getElementById(id); if (x) { x.enterKeyHint = 'next'; x.onkeydown = e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); f.requestSubmit(); } }; } });
   if (paso === 2) app.querySelectorAll('#para button').forEach(b => b.onclick = () => { t.para = b.dataset.u; ir(3); });
   if (paso === 3) {
     const q = document.getElementById('q3'), sug = document.getElementById('sug');
@@ -962,7 +1014,7 @@ function capaNuevaTarea(c) {
     e.preventDefault(); guarda(); av.textContent = '';
     if (paso === 1 && !t.titulo) { av.textContent = 'Escribe qué hay que hacer.'; return; }
     if (paso === 4 && !t.vence && !t.sinFecha) { av.textContent = 'Elige para cuándo (o "Sin fecha").'; return; }
-    if (paso === 5 && t.enlace && !/^https?:\/\/\S+$/i.test(t.enlace)) { av.textContent = 'El link debe empezar con https://'; return; }
+    if (paso === 7 && t.enlace && !/^https?:\/\/\S+$/i.test(t.enlace)) { av.textContent = 'El link debe empezar con https://'; return; }
     if (paso < N) return ir(paso + 1);
     const b = document.getElementById('sigue'); b.disabled = true;
     const r = await api('tarea', { titulo: t.titulo, para: t.para, cliente: t.cliente, vence: t.vence, listo: t.listo, necesita: t.necesita, enlace: t.enlace, proyecto: c.proyecto || 0 });
@@ -1034,66 +1086,76 @@ function filaPersona(p, conEtapa) {
   return `<button class="fila chica" data-p="${esc(p.tel)}">${cara}<span class="q"><b>${esc(nombreDe(p))}</b><span>${conEtapa ? `<em style="font-style:normal;font-weight:800;color:${E.c}">${E.n}</em>${sub ? ' · ' : ''}` : ''}${esc(sub || (conEtapa ? '' : 'Tócalo para ver su ficha'))}</span></span><span class="flecha-f">${I.der}</span></button>`;
 }
 
+// Ficha: UNA sola pantalla. Quién es, Llamar / WhatsApp, en qué va, la nota y qué sigue. Lo demás, en "Ver historial y datos".
+const PAGAN = ['cerrado', 'en órbita', 'portafolio'];
 async function capaFicha(c, sil) {
   const p = personaDe(c.tel);
   if (!p) return cerrar();
-  c.tab = c.tab || 'estado';
-  if (!c.cargado) { c.cargado = true; api('ficha', { tel: c.tel }).then(r => { if (r.ok && pila[pila.length - 1] === c) { c.ext = r; pinta(true); } }); }
-  const ext = c.ext || { persona: p, contactos: [] };
-  const P = Object.assign({}, p, ext.persona || {});
-  const proys = D.proyectos.filter(x => x.tel === c.tel);
+  if (!c.cargado) { c.cargado = true; traerFicha(c.tel).then(r => { if (r && r.ok && pila[pila.length - 1] === c) { c.ext = r; pinta(true); } }); }
+  const P = Object.assign({}, p, (c.ext || {}).persona || {});
   const tel = String(P.telefono || '').replace(/\D/g, '');
-  // Un cliente que dimos de alta nosotros (no llegó por Jason) no tiene llamadas: esa pestaña solo aparece si hay algo.
-  const deJason = !/^c-/.test(c.tel), nContactos = (ext.contactos || []).length;
-  const tabs = [['estado', 'Estado'], ['datos', 'Contacto']].concat(c.desdeCliente ? [] : [['proyectos', 'Proyectos']]).concat(deJason || nContactos ? [['historial', 'Historial']] : []);
-  if (!tabs.some(x => x[0] === c.tab)) c.tab = 'estado';
-  let cuerpo = '';
-  if (c.tab === 'estado') {
-    cuerpo = `<div class="hoja" style="display:flex;flex-direction:column;gap:clamp(10px,calc(2 * var(--u)),16px)">
-      <div><div class="eti" style="margin-bottom:8px">¿Dónde va?</div><div class="pils" id="etapas">${Object.keys(ETAPA).map(e => `<button class="pil${(P.etapa || 'pendiente') === e ? ' on' : ''}" data-e="${e}" style="--c:${ETAPA[e].c};--cf:${ETAPA[e].cf}"><i>${ETAPA[e].ic}</i>${ETAPA[e].n}</button>`).join('')}</div></div>
-      <div><div class="eti" style="margin-bottom:8px">Temperatura</div><div class="pils" id="temps">${['caliente', 'tibio', 'frio'].map(x => `<button class="pil solo${P.temperatura === x ? ' on' : ''}" data-x="${x}" style="--c:#fff;--cf:${TEMP[x]}">${x === 'frio' ? 'Frío' : x[0].toUpperCase() + x.slice(1)}</button>`).join('')}</div></div>
-      ${P.proxima_cita ? `<div class="par"><span>Cita</span><b>${esc(P.proxima_cita)}</b></div>` : ''}
-      <div><div class="eti" style="margin-bottom:8px">Notas del equipo</div>${P.notas_equipo ? `<div class="nota" id="nota" style="flex:none">${esc(P.notas_equipo)}</div>` : ''}<div class="botones" style="margin-top:8px"><button class="boton dos" id="escribir" style="height:44px">${P.notas_equipo ? 'Editar nota' : 'Escribir una nota'}</button></div></div>
-      <label class="mini" style="display:flex;gap:8px;align-items:center;margin-top:auto"><input type="checkbox" id="prueba"${P.es_prueba ? ' checked' : ''}> Es una llamada de prueba (no cuenta como cliente)</label></div>`;
-  } else if (c.tab === 'datos') {
-    const util = v => v !== '' && v != null && !/^otros?$/i.test(String(v).trim());
-    const filas = [['Nombre', P.nombre], ['Negocio', P.negocio], ['Giro', P.giro], ['Teléfono', P.telefono || 'Aún no lo tenemos'], ['Correo', P.correo || 'Aún no lo tenemos'], ['Servicio', P.servicio], ['Llegó por', P.origen], ['Necesita', P.necesidad], ['Volumen', P.volumen], ['Urgencia', P.urgencia], ['Decide', P.decide], deJason ? ['Nos llamó', cuando(P.creado)] : null].filter(x => x && util(x[1]));
-    cuerpo = `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr) auto auto"><div class="lista"></div><div class="pie"></div><button class="boton dos" id="editarContacto">${I.lapiz} Editar contacto, foto o logo</button></div>`;
-    c._items = filas;
-  } else if (c.tab === 'proyectos') {
-    cuerpo = `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr) auto auto"><div class="lista"></div><div class="pie"></div><button class="boton dos" id="np">Nuevo proyecto para este cliente</button></div>`;
-  } else if (c.tab === 'historial') {
-    cuerpo = `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr) auto"><div class="lista"></div><div class="pie"></div></div>`;
-  }
-  marco(nombreDe(P), '', `<div class="cuerpo" style="grid-template-rows:auto minmax(0,1fr)"><div class="tabs" role="tablist">${tabs.map(([k, n]) => `<button data-tab="${k}" class="${c.tab === k ? 'on' : ''}">${n}</button>`).join('')}</div>${cuerpo}</div>`);
+  const pan = (D.paneles || []).find(x => x.tel === c.tel), E = ETAPA[P.etapa || 'pendiente'] || ETAPA.pendiente;
+  const cara = pan || P.foto ? icono(Object.assign({ color: E.c }, pan || {}, P.foto ? { icono: P.foto } : {}), P, 52) : `<span class="icono" style="--c:${E.c};width:52px;height:52px;font-size:20px">${esc(nombreDe(P).slice(0, 1).toUpperCase())}</span>`;
+  const segunda = [P.negocio && P.nombre ? P.nombre : '', P.telefono].filter(Boolean).join(' · ');
+  const paga = PAGAN.includes(P.etapa);
+  marco('Ficha', '', `<div class="hoja ficha1">
+    <div class="f-quien">${cara}<div class="q"><b>${esc(nombreDe(P))}</b><span>${esc(segunda || 'Sin teléfono todavía')}</span></div></div>
+    ${tel ? `<div class="botones f-contacto"><a class="boton" href="tel:+52${tel.slice(-10)}">${I.tel} Llamar</a><a class="boton verde" href="https://wa.me/52${tel.slice(-10)}" target="_blank" rel="noopener">${I.wa} WhatsApp</a></div>` : ''}
+    <div class="f-bloque"><span class="eti">¿En qué va?</span><div class="f-etapas" id="etapas">${Object.keys(ETAPA).map(e => `<button class="${(P.etapa || 'pendiente') === e ? 'on' : ''}" data-e="${e}" style="--c:${ETAPA[e].c};--cf:${ETAPA[e].cf}">${ETAPA[e].n}</button>`).join('')}</div></div>
+    ${P.proxima_cita ? `<div class="par"><span>Cita</span><b>${esc(P.proxima_cita)}</b></div>` : ''}
+    <div class="f-bloque f-nota"><span class="eti">Nota del equipo</span>${P.notas_equipo ? `<button class="nota" id="nota">${esc(P.notas_equipo)}</button>` : '<button class="boton dos" id="nota" style="height:44px">Escribir una nota</button>'}</div>
+    <button class="boton" id="sigue">¿Qué sigue? Dejar una tarea</button>
+    <div class="f-enlaces"><button class="enlace" id="mas">Historial y datos</button><button class="enlace" id="editar">Editar contacto</button><button class="enlace rojo" id="quitar">${paga ? 'Quitar de Clientes' : 'Quitar'}</button></div></div>`);
   if (sil) app.querySelector('.vista').style.animation = 'none';
-  // Llamar y WhatsApp viven arriba, siempre a la mano, sin ocupar espacio de la ficha.
-  if (tel) app.querySelector('.cabeza').insertAdjacentHTML('beforeend', `<a class="redondo accion" href="tel:+52${tel.slice(-10)}" aria-label="Llamar">${I.tel}</a><a class="redondo" style="color:var(--verde)" href="https://wa.me/52${tel.slice(-10)}" target="_blank" rel="noopener" aria-label="WhatsApp">${I.wa}</a>`);
-  app.querySelectorAll('[data-tab]').forEach(b => b.onclick = async () => { c.tab = b.dataset.tab; c.p = 0; await precargar(c); pinta(true); });   // pestañas: al instante, como pasar de hoja
-  const guarda = async datos => { const r = await api('editar_persona', Object.assign({ tel: c.tel }, datos)); if (r.ok) { Object.assign(p, datos); if (c.ext && c.ext.persona) Object.assign(c.ext.persona, datos); } return r; };
-  if (c.tab === 'estado') {
-    app.querySelectorAll('#etapas [data-e]').forEach(b => b.onclick = async () => { await guarda({ etapa: b.dataset.e }); pinta(true); recargar(); });
-    app.querySelectorAll('#temps [data-x]').forEach(b => b.onclick = async () => { await guarda({ temperatura: p.temperatura === b.dataset.x ? '' : b.dataset.x }); pinta(true); });
-    document.getElementById('escribir').onclick = () => abrir({ tipo: 'nota', tel: c.tel });
-    // Si la nota no cabe completa, se cambia por un botón para leerla entera.
-    const nota = document.getElementById('nota'), hoja = app.querySelector('.vista .hoja');
-    if (nota && hoja.scrollHeight > hoja.clientHeight + 1) { nota.outerHTML = '<button class="boton dos" id="leerNota" style="height:44px;width:100%">Leer la nota completa</button>'; document.getElementById('leerNota').onclick = () => abrir({ tipo: 'lector', titulo: 'Nota de ' + nombreDe(P), texto: P.notas_equipo }); }
-    document.getElementById('prueba').onchange = async e => { await guarda({ es_prueba: e.target.checked }); recargar(); };
-  } else if (c.tab === 'datos') {
-    document.getElementById('editarContacto').onclick = () => abrir({ tipo: 'editarContacto', tel: c.tel });
-    alCambiarTamano = paginar(app.querySelector('.vista .cuerpo .cuerpo'), c._items, ([k, v]) => `<div class="fila" style="grid-template-columns:110px minmax(0,1fr)"><span class="eti" style="letter-spacing:.12em">${esc(k)}</span><span class="q"><b style="font-weight:600">${esc(v)}</b></span></div>`, { pagina: c.p, alto: 58, hueco: 7 });
-  } else if (c.tab === 'proyectos') {
-    document.getElementById('np').onclick = () => abrir({ tipo: 'nuevoProyecto', tel: c.tel });
-    alCambiarTamano = paginar(app.querySelector('.vista .cuerpo .cuerpo'), proys, filaProyecto, { pagina: c.p, vacio: '<b>Sin proyectos</b>Ábrele uno con el botón de abajo.', alPintar: l => l.querySelectorAll('[data-y]').forEach(b => b.onclick = () => abrir({ tipo: 'proyecto', id: Number(b.dataset.y) })) });
-  } else if (c.tab === 'historial') {
-    const h = (ext.contactos || []).map(x => ({ x }));
-    alCambiarTamano = paginar(app.querySelector('.vista .cuerpo .cuerpo'), h, ({ x }) => `<div class="fila"><span class="estado" style="--c:var(--cobalto);--cf:var(--azulf)">${esc(x.tipo)}</span><span class="q"><b style="font-weight:600">${esc(x.resumen || 'Sin resumen')}</b><span>${esc(x.canal)} · ${cuando(x.fecha)}</span></span><span></span></div>`, { pagina: c.p, vacio: c.ext ? '<b>Sin llamadas todavía</b>Aquí aparece cada vez que nos llame o nos escriba.' : 'Cargando…' });
-  }
+  const guarda = async datos => { const r = await api('editar_persona', Object.assign({ tel: c.tel }, datos)); if (r.ok) { Object.assign(p, datos); if (c.ext && c.ext.persona) Object.assign(c.ext.persona, datos); delete FICHAS[c.tel]; } return r; };
+  app.querySelectorAll('#etapas [data-e]').forEach(b => b.onclick = async () => { const antes = p.etapa; const r = await guarda({ etapa: b.dataset.e }); if (r.ok) { pinta(true); recargar(true); if (!PAGAN.includes(antes) && PAGAN.includes(b.dataset.e)) avisoFlotante('Ya aparece en Clientes'); } });
+  document.getElementById('nota').onclick = () => abrir({ tipo: 'nota', tel: c.tel });
+  document.getElementById('sigue').onclick = () => abrir({ tipo: 'nuevaTarea', para: yo(), cliente: nombreDe(P) });
+  document.getElementById('mas').onclick = () => abrir({ tipo: 'fichaMas', tel: c.tel, ext: c.ext });
+  document.getElementById('editar').onclick = () => abrir({ tipo: 'editarContacto', tel: c.tel });
+  let seguro = false;
+  document.getElementById('quitar').onclick = async ev => {
+    if (!seguro) { seguro = true; ev.target.textContent = '¿Seguro? Toca otra vez'; avisoFlotante(paga ? 'Regresa al CRM como Pendiente' : 'Se va a la papelera; se puede recuperar'); acomoda(); return; }
+    if (paga) { const r = await guarda({ etapa: 'pendiente' }); if (r.ok) { await recargar(true); avisoFlotante('Regresó al CRM como Pendiente'); cerrar(); } return; }
+    const r = await api('quitar_persona', { tel: c.tel });
+    if (r.ok) { await recargar(true); avisoFlotante('Está en la papelera (Equipo › Papelera)'); cerrar(); }
+  };
+  // Si no cabe todo, la nota se recorta a lo que quepa (tocándola se lee y edita completa) y luego se quita lo secundario.
+  const acomoda = () => {
+    const h = app.querySelector('.ficha1'); if (!h) return;
+    const quitar = ['apretada', '.f-quien .q span', '.f-nota .eti', '.f-bloque .eti'];
+    quitar.forEach(q => app.querySelectorAll(q).forEach(e => e.style.display = '')); h.querySelector('.f-nota').classList.remove('sin-eti'); h.classList.remove('apretada');
+    for (const q of quitar) {
+      if (h.scrollHeight <= h.clientHeight + 1) break;
+      if (q === 'apretada') { h.classList.add('apretada'); continue; }
+      app.querySelectorAll(q).forEach(e => e.style.display = 'none'); if (q === '.f-nota .eti') h.querySelector('.f-nota').classList.add('sin-eti');
+    }
+    // Una nota que no cabe nunca se ve a medias: se avisa que está completa adentro.
+    const n = app.querySelector('button.nota');
+    if (n) {
+      for (const txt of [esc(P.notas_equipo), '<b style="color:var(--tinta)">Hay una nota larga.</b> Tócala para leerla completa.', '<b style="color:var(--tinta)">Ver la nota completa</b>']) { n.innerHTML = txt; if (n.scrollHeight <= n.clientHeight + 1) break; }
+    }
+  };
+  acomoda(); alCambiarTamano = acomoda;
+}
+// Todo lo demás de la persona: sus datos, sus proyectos y cada vez que nos llamó o escribió.
+function capaFichaMas(c) {
+  const p = personaDe(c.tel); if (!p) return cerrar();
+  const ext = c.ext || {}, P = Object.assign({}, p, ext.persona || {});
+  const util = v => v !== '' && v != null && !/^otros?$/i.test(String(v).trim());
+  const datos = [['Negocio', P.negocio], ['Nombre', P.nombre], ['Giro', P.giro], ['Teléfono', P.telefono], ['Correo', P.correo], ['Servicio', P.servicio], ['Llegó por', P.origen], ['Necesita', P.necesidad], ['Volumen', P.volumen], ['Urgencia', P.urgencia], ['Decide', P.decide], ['Temperatura', P.temperatura]].filter(x => util(x[1]));
+  const items = datos.map(([k, v]) => `<div class="fila chica" style="cursor:default;grid-template-columns:100px minmax(0,1fr)"><span class="eti" style="letter-spacing:.1em">${esc(k)}</span><span class="q"><b style="font-weight:600">${esc(v)}</b></span></div>`)
+    .concat(D.proyectos.filter(x => x.tel === c.tel).map(x => filaProyecto(x)))
+    .concat((ext.contactos || []).map(x => `<div class="fila" style="cursor:default"><span class="estado" style="--c:var(--cobalto);--cf:var(--azulf)">${esc(x.tipo)}</span><span class="q"><b style="font-weight:600">${esc(x.resumen || 'Sin resumen')}</b><span>${esc(x.canal)} · ${cuando(x.fecha)}</span></span><span></span></div>`));
+  marco('Historial y datos', '', `<div class="cuerpo" style="grid-template-rows:auto minmax(0,1fr) auto"><p class="mini">${esc(nombreDe(P))}: sus datos, sus proyectos y cada vez que nos buscó.</p><div class="lista"></div>
+    <label class="mini" style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="prueba"${P.es_prueba ? ' checked' : ''}> Es una llamada de prueba (no cuenta como cliente)</label></div>`);
+  document.getElementById('prueba').onchange = async e => { const r = await api('editar_persona', { tel: c.tel, es_prueba: e.target.checked }); if (r.ok) { p.es_prueba = e.target.checked ? 1 : 0; delete FICHAS[c.tel]; recargar(true); } };
+  paginar(app.querySelector('.cuerpo'), items, x => x, { vacio: '<b>Nada todavía</b>', alPintar: l => l.querySelectorAll('[data-y]').forEach(b => b.onclick = () => abrir({ tipo: 'proyecto', id: Number(b.dataset.y) })) });
 }
 function capaEditarContacto(c) {
   const p = personaDe(c.tel); if (!p) return cerrar();
   const pan = (D.paneles || []).find(x => x.tel === c.tel);
-  marco('Contacto de ' + nombreDe(p), '', `<form class="hoja editando" id="f" style="align-self:start">
+  marco('Contacto de ' + nombreDe(p), '', `<form class="hoja editando pasos" id="f" style="align-self:start">
     ${campoFoto(p.foto || '')}
     <label class="et-campo">Negocio<input class="campo" name="negocio" value="${esc(p.negocio || '')}" maxlength="120"></label>
     <label class="et-campo">Nombre de la persona<input class="campo" name="nombre" value="${esc(p.nombre || '')}" maxlength="80"></label>
@@ -1114,13 +1176,13 @@ function capaEditarContacto(c) {
 }
 function capaNota(c) {
   const p = personaDe(c.tel); if (!p) return cerrar();
-  marco('Nota de ' + nombreDe(p), '', `<form class="hoja editando" id="f" style="align-self:start"><textarea class="campo" id="txt" rows="7" placeholder="Lo que el equipo debe saber de este cliente">${esc(p.notas_equipo || '')}</textarea><button class="boton">Guardar nota</button><div class="aviso" id="aviso"></div></form>`);
+  marco('Nota de ' + nombreDe(p), '', `<form class="hoja editando pasos" id="f" style="align-self:start"><textarea class="campo" id="txt" rows="7" placeholder="Lo que el equipo debe saber de este cliente">${esc(p.notas_equipo || '')}</textarea><button class="boton">Guardar nota</button><div class="aviso" id="aviso"></div></form>`);
   const f = document.getElementById('f');
   setTimeout(() => document.getElementById('txt').focus(), 300);
   f.onsubmit = async e => { e.preventDefault(); const v = document.getElementById('txt').value; const r = await api('editar_persona', { tel: c.tel, notas_equipo: v }); if (r.ok) { p.notas_equipo = v; cerrar(); } else document.getElementById('aviso').textContent = 'No se pudo guardar.'; };
 }
 function capaNuevoCliente(c) {
-  marco('Nuevo cliente', '', `<form class="hoja editando" id="f" style="align-self:start">
+  marco('Nuevo cliente', '', `<form class="hoja editando pasos" id="f" style="align-self:start">
     <input class="campo" name="negocio" placeholder="Negocio (ej. Grupo Beta)" maxlength="120">
     <input class="campo" name="nombre" placeholder="Nombre de la persona" maxlength="80">
     <input class="campo" name="telefono" placeholder="Teléfono (opcional)" inputmode="tel" maxlength="30">
@@ -1216,7 +1278,7 @@ function capaProyecto(c) {
   const clientes = reales().filter(x => x.etapa !== 'archivo');
   const cli = personaDe(p.tel);
   if (editar) {
-    marco(nuevo ? 'Nuevo proyecto' : 'Editar proyecto', '', `<form class="hoja editando" id="f" style="align-self:start">
+    marco(nuevo ? 'Nuevo proyecto' : 'Editar proyecto', '', `<form class="hoja editando pasos" id="f" style="align-self:start">
       <input class="campo" name="nombre" placeholder="Nombre del proyecto" value="${esc(p.nombre)}" required maxlength="100">
       <select class="campo" name="tel"><option value="">MOON (proyecto interno)</option>${clientes.map(x => `<option value="${esc(x.tel)}"${x.tel === p.tel ? ' selected' : ''}>${esc(nombreDe(x))}</option>`).join('')}</select>
       <div><div class="eti" style="margin-bottom:8px">Encargados</div><div class="quien" id="enc">${Object.keys(GENTE).map(id => `<button type="button" data-u="${id}" class="${String(p.encargados).split(',').includes(id) ? 'on' : ''}">${ava(id)}${GENTE[id].n}</button>`).join('')}</div></div>
@@ -1423,13 +1485,23 @@ async function compartir(titulo, url) {
   try { await navigator.clipboard.writeText(url); avisoFlotante('Link copiado. Pégalo en WhatsApp o en un correo para mandarlo.'); }
   catch (e) { avisoFlotante(url); }
 }
+// Clientes: solo los que ya nos pagan; "En camino", los que estamos platicando. Los fríos se quedan en el CRM.
 function capaClientes(c) {
-  const lista = panelesCliente();
-  marco('Clientes', '', `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr) auto"><div class="lista dos"></div><div class="pie"></div></div>`);
-  alCambiarTamano = paginar(app.querySelector('.cuerpo'), lista, ({ p, per }) => {
-    const E = ETAPA[per.etapa] || ETAPA.pendiente, n = docsDe(p.tel).length;
-    return `<button class="fila" data-c="${esc(p.tel)}">${icono(p, per, 44)}<span class="q"><b>${esc(nombreCorto(per))}</b><span><em style="font-style:normal;font-weight:800;color:${E.c}">${E.n}</em> · demo${n ? ` · ${n} documento${n === 1 ? '' : 's'}` : ''}</span></span><span class="flecha-f">${I.der}</span></button>`;
-  }, { pagina: c.p, alto: 64, vacio: '<b>Todavía no hay clientes con panel</b>', alPintar: l => l.querySelectorAll('[data-c]').forEach(b => b.onclick = () => abrir({ tipo: 'cliente', tel: b.dataset.c })) });
+  c.g = c.g || 'pagan';
+  const pan = tel => (D.paneles || []).find(x => x.tel === tel);
+  const r = reales(), grupos = { pagan: r.filter(p => PAGAN.includes(p.etapa)), camino: r.filter(p => p.etapa === 'en proceso') };
+  const ord = l => l.slice().sort((a, b) => (pan(b.tel) ? 1 : 0) - (pan(a.tel) ? 1 : 0) || (pan(a.tel) || {}).orden - (pan(b.tel) || {}).orden || nombreDe(a).localeCompare(nombreDe(b)));
+  marco('Clientes', 'Nuevo cliente', `<div class="cuerpo" style="grid-template-rows:auto minmax(0,1fr)"><div class="pils">
+    <button class="pil${c.g === 'pagan' ? ' on' : ''}" data-g="pagan" style="--c:var(--verde);--cf:var(--verdef)"><i>${grupos.pagan.length}</i>Clientes</button>
+    <button class="pil${c.g === 'camino' ? ' on' : ''}" data-g="camino" style="--c:var(--cobalto);--cf:var(--azulf)"><i>${grupos.camino.length}</i>En camino</button></div><div class="lista dos"></div></div>`);
+  app.querySelectorAll('[data-g]').forEach(b => b.onclick = () => { c.g = b.dataset.g; c.ps = 0; pinta(true); });
+  document.getElementById('accion').onclick = () => abrir({ tipo: 'nuevoCliente', etapa: c.g === 'pagan' ? 'cerrado' : 'en proceso' });
+  alCambiarTamano = paginar(app.querySelector('.cuerpo'), ord(grupos[c.g]), per => {
+    const p = pan(per.tel), E = ETAPA[per.etapa] || ETAPA.pendiente, n = docsDe(per.tel).length, np = D.proyectos.filter(x => x.tel === per.tel).length;
+    const sub = [`<em style="font-style:normal;font-weight:800;color:${E.c}">${E.n}</em>`, p ? 'panel' : '', np ? `${np} proyecto${np === 1 ? '' : 's'}` : '', n ? `${n} documento${n === 1 ? '' : 's'}` : ''].filter(Boolean).join(' · ');
+    const cara = p ? icono(p, per, 44) : `<span class="icono" style="--c:${E.c};width:44px;height:44px;font-size:17px">${esc(nombreDe(per).slice(0, 1).toUpperCase())}</span>`;
+    return `<button class="fila" data-c="${esc(per.tel)}">${cara}<span class="q"><b>${esc(p ? nombreCorto(per) : nombreDe(per))}</b><span>${sub}</span></span><span class="flecha-f">${I.der}</span></button>`;
+  }, { vacio: c.g === 'pagan' ? '<b>Todavía no hay clientes que paguen</b>Cuando en la ficha de alguien elijas "Cerrados", aparece aquí.' : '<b>Nadie en camino</b>Los que estamos platicando aparecen aquí.', alPintar: l => l.querySelectorAll('[data-c]').forEach(b => b.onclick = () => abrir(pan(b.dataset.c) ? { tipo: 'cliente', tel: b.dataset.c } : { tipo: 'ficha', tel: b.dataset.c })) });
 }
 function rectangulos(tel, secciones) {
   return `<div class="rects">${secciones.map(([k, n, vacio]) => {
@@ -1469,7 +1541,7 @@ function capaCliente(c) {
 function capaSubir(c) {
   const per = personaDe(c.tel); if (!per) return cerrar();
   c.sec = c.sec || 'propuesta';
-  marco('Subir a ' + nombreCorto(per), '', `<form class="hoja editando" id="f" style="align-self:start">
+  marco('Subir a ' + nombreCorto(per), '', `<form class="hoja editando pasos" id="f" style="align-self:start">
     <div><div class="eti" style="margin-bottom:8px">¿Dónde va?</div><div class="pils">${SECCIONES.map(([k, n]) => `<button type="button" class="pil solo${c.sec === k ? ' on' : ''}" data-sec="${k}">${n}</button>`).join('')}</div></div>
     <label class="campo-foto"><span class="cf-vista">${I.subir}</span><span><b id="archNombre">Elegir archivo</b><small>PDF, foto o cualquier archivo · hasta 25 MB</small></span><input type="file" id="arch" hidden></label>
     <label class="et-campo">Nombre que verá el equipo<input class="campo" name="titulo" id="titulo" maxlength="120" placeholder="Ejemplo: Contrato firmado"></label>
@@ -1715,9 +1787,9 @@ function capaEquipo(c) {
   const eq = c.eq;
   const socios = ['daniel', 'dan', 'kid'].map(id => { const ab = D.tareas.filter(x => x.para === id && x.estado !== 'hecha').length; return `<button class="socio" data-u="${id}">${ava(id)}<b>${GENTE[id].n}</b><span>${esc(usuario(id).rol || ROL[id])}</span><small>${ab} tarea${ab === 1 ? '' : 's'}</small></button>`; }).join('');
   marco('Equipo', '', `<div class="cuerpo equipo" style="grid-template-rows:auto auto auto minmax(0,1fr) auto auto">
-    <span class="eti">Socios · pueden todo</span>
+    <span class="eti">Administradores</span>
     <div class="socios">${socios}</div>
-    <div class="eq-cab"><span class="eti">Embajadores</span><span class="mini">Solo agregan en lo suyo</span></div>
+    <div class="eq-cab"><span class="eti">Embajadores</span></div>
     <div class="lista"></div>
     <button class="fila chica" id="comision"><span class="casa-ic" style="background:#1f6f43">%</span><span class="q"><b>Comisión de embajadores</b><span>${eq ? esc(eq.comision || 'Por definir') : '…'}</span></span><span class="flecha-f">${I.der}</span></button>
     <div class="botones"><button class="boton" id="agregar">Agregar embajador</button></div>
@@ -1734,7 +1806,7 @@ function capaEquipo(c) {
   // Si no cabe (celular bajito o letra grande), primero se quitan los detalles; la lista de embajadores nunca queda aplastada.
   const cu = app.querySelector('.cuerpo'), li = cu.querySelector('.lista');
   const acomoda = () => {
-    const quitar = ['.eq-cab .mini', '.socio span', '.socio small'];
+    const quitar = ['.socio span', '.socio small'];
     quitar.forEach(q => app.querySelectorAll(q).forEach(e => e.style.display = ''));
     for (const q of quitar) { if (cu.scrollHeight <= cu.clientHeight + 1 && li.clientHeight >= 70) break; app.querySelectorAll(q).forEach(e => e.style.display = 'none'); }
   };
@@ -1839,7 +1911,7 @@ function capaCuenta(c) {
 
 function capaFrase() {
   const u = usuario(yo());
-  marco('Mi frase', '', `<form class="hoja editando" id="f" style="align-self:start">
+  marco('Mi frase', '', `<form class="hoja editando pasos" id="f" style="align-self:start">
     <label class="eti" for="rol">Lo que hago en MOON</label><input class="campo" id="rol" maxlength="40" value="${esc(u.rol || '')}" placeholder="Ejemplo: Construye y diseña">
     <label class="eti" for="lema">Mi frase (sale atrás de la credencial)</label><input class="campo" id="lema" maxlength="90" value="${esc(u.lema || '')}" placeholder="Una frase que te represente">
     <button class="boton">Guardar</button><div class="aviso" id="aviso"></div></form>`);
@@ -1912,7 +1984,7 @@ const esEmb = () => D && D.rol === 'embajador';
 const CAPAS_EMB = ['demo', 'emProspectos', 'emComisiones', 'emMaterial', 'tareas', 'tarea', 'documento', 'lector', 'emCuenta'];
 function pantallaEmbajador() {
   marcoEntrada(null, `<span class="eti">Embajadores de MOON</span><h1>Entra con tu WhatsApp</h1>
-    <form id="f" style="display:grid;gap:12px;width:100%"><input class="campo" id="tel" type="tel" inputmode="tel" autocomplete="tel" placeholder="Tu WhatsApp (10 números)" required>
+    <form id="f" class="pasos" style="display:grid;gap:12px;width:100%"><input class="campo" id="tel" type="tel" inputmode="tel" autocomplete="tel" placeholder="Tu WhatsApp (10 números)" required>
     ${campoClave('clave', 'Tu contraseña', 'current-password')}
     <button class="boton">Entrar</button><div class="aviso" id="aviso"></div></form>
     <p>¿Primera vez u olvidaste tu contraseña? Pídele tu link a Dan o a Kid.</p>`);
@@ -1939,7 +2011,7 @@ async function pantallaInvita(token) {
     return;
   }
   marcoEntrada(null, `<span class="eti">Embajadores de MOON</span><h1>Hola, ${esc(r.nombre)}</h1><p>Crea tu contraseña. Mínimo 6 letras o números.</p>
-    <form id="f" style="display:grid;gap:12px;width:100%">${r.pideTel ? '<input class="campo" id="tel" type="tel" inputmode="tel" autocomplete="tel" placeholder="Tu WhatsApp (10 números)" required>' : ''}
+    <form id="f" class="pasos" style="display:grid;gap:12px;width:100%">${r.pideTel ? '<input class="campo" id="tel" type="tel" inputmode="tel" autocomplete="tel" placeholder="Tu WhatsApp (10 números)" required>' : ''}
     ${campoClave('c1', 'Contraseña nueva', 'new-password')}${campoClave('c2', 'Repítela', 'new-password')}
     <button class="boton">Entrar al tablero</button><div class="aviso" id="aviso"></div></form>`);
   document.getElementById('volver').onclick = () => transicion(arrancar);

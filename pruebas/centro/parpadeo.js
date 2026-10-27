@@ -7,7 +7,7 @@ await p.evaluate(()=>{window.__rep=0;new MutationObserver(m=>{if(m.some(x=>x.typ
 const paso=async(nom,f)=>{await p.evaluate(()=>window.__rep=0);await f();await p.waitForTimeout(1800);const n=await p.evaluate(()=>window.__rep);console.log(nom,'repintadas:',n);if(n>1)fallas.push(nom+' '+n);};
 await paso('crm',()=>p.click('[data-ir="crm"]',{position:{x:12,y:12}}));
 await paso('lista',()=>p.click('[data-g="todos"]'));await paso('ficha',()=>p.click('[data-p]'));
-await paso('tab datos',()=>p.click('[data-tab="datos"]'));
+await paso('historial',()=>p.click('#mas'));await paso('volver0',()=>p.click('#volver'));
 await paso('volver',()=>p.click('#volver'));await paso('volver2',()=>p.click('#volver'));await paso('volver3',()=>p.click('#volver'));
 await paso('clientes',()=>p.click('[data-ir="clientes"]',{position:{x:12,y:12}}));
 await paso('cliente',()=>p.click('[data-c]'));

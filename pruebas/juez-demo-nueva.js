@@ -1,3 +1,4 @@
+const TEC = require('./centro/teclado.js');
 // Juez de /prueba/nueva (Demos): todo cabe en una pantalla, sin scroll de página, en cada tamaño, claro/oscuro,
 // sola y dentro del Centro; para Dan (formulario, resultado, tablero y sus hojas) y para la puerta abierta.
 // Las listas dentro de una hoja sí se deslizan (regla de Kid). Uso: node pruebas/juez-demo-nueva.js <raiz-repo> <carpeta-fotos>
@@ -50,14 +51,19 @@ const srv = http.createServer((q, r) => {
     // Teclado: la pantalla se achica casi a la mitad; el campo que se llena se ve completo y no queda nada gris ni tapado.
     const teclado = async (sel) => {
       if (w > 800) return;
-      await p.focus(sel); await p.setViewportSize({ width: w, height: Math.round(h * 0.46) }); await p.waitForTimeout(350);
-      const r = await p.evaluate(s => { const e = document.querySelector(s), c = e.getBoundingClientRect(); const o = [];
-        if (!e.offsetParent || c.height < 10) o.push('campo escondido'); if (c.top < 0 || c.bottom > innerHeight + 1) o.push('campo fuera de la vista ' + Math.round(c.top) + '/' + Math.round(c.bottom) + '>' + innerHeight);
-        const de = document.scrollingElement; if (de.scrollHeight > innerHeight + 1) o.push('página se mueve con teclado');
-        return o; }, sel);
+      // Teclado de celular REAL: la página no cambia de tamaño, solo se ve la parte de arriba (visualViewport).
+      const alto = Math.round(h * 0.46);
+      await p.focus(sel); await TEC.abrir(p, alto); await p.waitForTimeout(150);
+      const r = await p.evaluate(([s, alto]) => { const e = document.querySelector(s), c = e.getBoundingClientRect(); const o = [];
+        if (!e.offsetParent || c.height < 10) o.push('campo escondido'); if (c.top < 0 || c.bottom > alto + 1) o.push('campo tapado por el teclado ' + Math.round(c.top) + '/' + Math.round(c.bottom) + '>' + alto);
+        if (!document.documentElement.classList.contains('tecleando')) o.push('la página no se dio cuenta del teclado');
+        const zona = e.closest('form,main') || document.body, t = new Touch({ identifier: 1, target: zona, clientX: 20, clientY: 40 });
+        const ev = new TouchEvent('touchmove', { cancelable: true, bubbles: true, touches: [t], targetTouches: [t], changedTouches: [t] }); zona.dispatchEvent(ev);
+        if (!ev.defaultPrevented) o.push('con teclado la pantalla se puede arrastrar');
+        return o; }, [sel, alto]);
       r.forEach(x => fallas.push(`${nom} teclado ${sel}: ${x}`));
       if (esquema === 'light' && w === 375) await p.screenshot({ path: `${salida}/n-${quien}-${w}${q ? '-dentro' : ''}-teclado-${sel.replace(/\W/g, '')}.png` });
-      await p.evaluate(() => document.activeElement.blur()); await p.setViewportSize({ width: w, height: h }); await p.waitForTimeout(300);
+      await p.evaluate(() => document.activeElement.blur()); await TEC.cerrar(p); await p.waitForTimeout(300);
       const vuelve = await p.evaluate(() => document.documentElement.classList.contains('tecleando'));
       if (vuelve) fallas.push(`${nom} teclado ${sel}: no regresa a la vista completa`);
     };
