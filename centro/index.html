@@ -60,7 +60,7 @@ button{cursor:pointer}
 /* ---------- Inicio ---------- */
 .hola{font-size:clamp(22px,calc(6.4 * var(--w)),34px);font-weight:700;letter-spacing:-.02em;line-height:1.1}
 .hola small{display:block;font-size:13px;font-weight:600;color:var(--suave);letter-spacing:0;margin-top:4px}
-.mosaico{min-height:0;display:grid;gap:clamp(9px,calc(1.5 * var(--u)),14px);grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:1.35fr 1fr 1fr .62fr .5fr;grid-template-areas:"tuyo tuyo" "crm proy" "equipo moon" "demo demo" "ultimo ultimo"}
+.mosaico{min-height:0;display:grid;gap:clamp(9px,calc(1.5 * var(--u)),14px);grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:1.35fr 1fr 1fr .62fr;grid-template-areas:"tuyo tuyo" "crm proy" "equipo moon" "demo demo"}
 .t{position:relative;min-height:0;border-radius:var(--r);background:var(--tarjeta);box-shadow:var(--sombra);padding:clamp(12px,calc(2 * var(--u)),18px) 16px;text-align:start;display:flex;flex-direction:column;gap:6px;overflow:hidden;transition:transform .3s var(--ease)}
 .t:active{transform:scale(.985)}
 .t .num{font-size:clamp(24px,calc(5.2 * var(--u)),40px);font-weight:800;letter-spacing:-.03em;line-height:1;margin-top:auto}
@@ -97,9 +97,6 @@ button{cursor:pointer}
 .t-fila .q b{font-size:clamp(15px,calc(2.4 * var(--u)),19px);font-weight:800;line-height:1.2}
 .bola{flex:none;width:clamp(36px,calc(5.6 * var(--u)),46px);aspect-ratio:1;border-radius:50%;background:var(--c);color:#fff;display:grid;place-items:center;font-weight:800;font-size:16px}
 .t-demo .flecha{position:static;margin-left:auto;flex:none}
-.t-ultimo{grid-area:ultimo;flex-direction:row;align-items:center;gap:12px;padding:10px 16px}
-.t-ultimo .txt{min-width:0;font-size:13px;line-height:1.3;font-weight:600;color:var(--suave)}
-.t-ultimo .txt b{color:var(--tinta)}
 .brilla{display:inline-flex;align-items:center;gap:6px;align-self:flex-start;background:#fff;color:var(--cobalto);font-weight:800;font-size:12px;border-radius:99px;padding:5px 11px 5px 6px}
 .brilla i{width:18px;height:18px;border-radius:50%;background:var(--cobalto);color:#fff;display:grid;place-items:center;font-style:normal;font-size:11px}
 .latido{animation:latido 2.4s ease-in-out infinite}
@@ -148,7 +145,7 @@ textarea.campo{height:auto;border-radius:22px;padding:14px 18px;resize:none}
 .boton.dos{background:var(--tarjeta);color:var(--tinta);box-shadow:var(--sombra-chica)}
 .boton[disabled]{opacity:.55}
 .botones{display:flex;gap:10px;flex-wrap:wrap}
-.botones .boton{flex:1 1 140px}
+.botones .boton{flex:1 1 140px;padding:0 16px}
 .tope{display:grid;grid-template-columns:minmax(0,1fr) 84px;gap:10px;align-items:center;font-size:14px;font-weight:700}
 .botones.apilados{display:grid;gap:8px}.botones.apilados .boton{height:44px}
 .boton.rojo{color:var(--rojo)}
@@ -156,6 +153,7 @@ textarea.campo{height:auto;border-radius:22px;padding:14px 18px;resize:none}
 .tour-velo{position:absolute;inset:0}
 .tour-aro{position:absolute;pointer-events:none;box-shadow:0 0 0 3px #fff,0 0 0 200vmax rgba(10,12,20,.58)}
 .tour-globo{position:absolute;background:var(--tarjeta);color:var(--tinta);border-radius:24px;padding:16px;display:grid;gap:8px;box-shadow:0 20px 40px -12px rgba(0,0,0,.55)}
+.tour-globo .botones{flex-wrap:nowrap}.tour-globo .boton{flex:1 1 0;min-width:0;height:46px}
 .tour-globo b{font-size:19px;font-weight:800;line-height:1.2}.tour-globo p{font-size:15px;font-weight:600;color:var(--suave);line-height:1.35}
 .boton.chico{height:38px;padding:0 14px;font-size:13.5px;flex:none}
 /* Equipo */
@@ -379,9 +377,10 @@ html:not(.ancho) .agenda>.fila:only-child{border-radius:20px}
 /* Ficha de una sola pantalla */
 .ficha1{display:flex;flex-direction:column;gap:clamp(10px,calc(1.8 * var(--u)),16px)}
 .f-quien{display:flex;align-items:center;gap:12px;min-width:0}.f-quien .q{min-width:0;display:grid;gap:2px}.f-quien b{font-size:clamp(18px,calc(4.8 * var(--w)),22px);font-weight:800;line-height:1.2;overflow-wrap:anywhere}.f-quien span{font-size:13px;font-weight:600;color:var(--suave)}
-.f-contacto .boton{display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}.boton.verde{background:#1f8a4c;box-shadow:0 12px 20px -10px rgba(31,138,76,.7)}
+.f-contacto{flex-wrap:nowrap}.f-contacto .boton{flex:1 1 0;min-width:0;padding:0 12px;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}.boton.verde{background:#1f8a4c;box-shadow:0 12px 20px -10px rgba(31,138,76,.7)}
 .f-bloque{display:grid;gap:8px;flex:none}
 .ficha1.apretada{gap:8px;padding:12px}.ficha1.apretada .boton{height:42px}.ficha1.apretada .f-etapas button{min-height:34px}.ficha1.apretada .f-quien .icono{width:40px!important;height:40px!important}.ficha1.apretada .f-enlaces .enlace{min-height:28px}
+.f-panel{flex:none}.f-quien .q{flex:1}.ficha1>*{flex-shrink:0}.ficha1>.f-nota{flex-shrink:1}.ficha1.apretada .f-quien b{font-size:16px}.ficha1.apretada .f-contacto .boton{height:40px}
 .f-etapas{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
 .f-etapas button{min-height:40px;border-radius:14px;font-size:13px;font-weight:800;color:var(--suave);background:var(--campo);box-shadow:var(--hundido);padding:4px;line-height:1.15}
 .f-etapas button.on{background:var(--cf);color:var(--c);box-shadow:inset 0 0 0 2px var(--c)}
@@ -389,13 +388,13 @@ html:not(.ancho) .agenda>.fila:only-child{border-radius:20px}
 .f-enlaces{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 18px}.f-enlaces .enlace{min-height:34px}.enlace.rojo{color:var(--rojo)}
 .nota{flex:1 1 0;min-height:0;overflow:hidden;border-radius:20px;background:var(--campo);box-shadow:var(--hundido);padding:12px 14px;font-weight:600;color:var(--suave);white-space:pre-line}
 /* Tamaños según el espacio que DE VERDAD se ve (ya con el tamaño de letra elegido y el teclado): clases que pone medir() */
-.ancho .mosaico{grid-template-columns:repeat(12,minmax(0,1fr));grid-template-rows:1fr 1fr minmax(64px,.32fr);grid-template-areas:"tuyo tuyo tuyo tuyo tuyo crm crm crm crm proy proy proy" "tuyo tuyo tuyo tuyo tuyo equipo equipo equipo equipo moon moon moon" "demo demo demo demo demo ultimo ultimo ultimo ultimo ultimo ultimo ultimo"}
+.ancho .mosaico{grid-template-columns:repeat(12,minmax(0,1fr));grid-template-rows:1fr 1fr minmax(64px,.32fr);grid-template-areas:"tuyo tuyo tuyo tuyo tuyo crm crm crm crm proy proy proy" "tuyo tuyo tuyo tuyo tuyo equipo equipo equipo equipo moon moon moon" "demo demo demo demo demo demo demo demo demo demo demo demo"}
 .ancho .lista.dos{grid-template-columns:repeat(2,minmax(0,1fr))}
 .mini .tabs button{font-size:12px}
 .angosto .pils{gap:5px}.angosto .pil{padding:5px 10px 5px 5px;font-size:12.5px;gap:5px}.angosto .pil i{width:18px;height:18px;font-size:10px}.angosto .pil.solo{padding:5px 11px}
 .angosto .desc{padding:8px 12px;font-size:12.5px}
 .bajo .pista{display:none}.bajo .avance svg{width:min(200px,calc(50 * var(--w)),calc(23 * var(--u)))}.bajo .avance .fase-m{font-size:13px}.bajo .hoja{padding:12px;gap:8px!important}.bajo .pil{padding:5px 11px 5px 6px}.bajo .quien button{padding:3px 12px 3px 3px}.bajo .hoja .eti{margin-bottom:5px!important}
-.bajo2 .mosaico{grid-template-rows:1.1fr 1fr 1fr .6fr .55fr}.bajo2 .t-demo .q span{display:none}.bajo2 .hola small{display:none}
+.bajo2 .mosaico{grid-template-rows:1.1fr 1fr 1fr .6fr}.bajo2 .t-demo .q span{display:none}.bajo2 .hola small{display:none}
 /* Con el teclado arriba: la entrada se compacta para que el campo quede a la vista */
 /* Con teclado se esconde la barra de arriba y lo de abajo ocupa TODO el alto (antes se quedaba en un renglón sin alto y se veía gris). */
 .teclado .app{grid-template-rows:minmax(0,1fr)}.teclado .top{display:none}.teclado .entrada .caja{gap:8px}.teclado .aviso:empty{display:none}.teclado .enlace{min-height:0}.teclado .entrada p,.teclado .entrada .eti{display:none}.teclado .entrada .ava{width:36px;height:36px;font-size:13px}.teclado .entrada h1{font-size:20px}
@@ -896,7 +895,6 @@ function pintaInicio(sil) {
   const cuenta = e => r.filter(p => (p.etapa || 'pendiente') === e).length;
   const activos = D.proyectos.filter(activo);
   const miosP = activos.filter(p => String(p.encargados).split(',').includes(yo())).length;
-  const ult = D.actividad[0];
   const hora = Number(new Date().toLocaleString('en-US', { hour: 'numeric', hour12: false, timeZone: 'America/Cancun' }));
   const saludo = hora < 12 ? 'Buenos días' : hora < 19 ? 'Buenas tardes' : 'Buenas noches';
   const barrita = ['pendiente', 'en proceso', 'cerrado', 'en órbita'].map(e => cuenta(e) ? `<i style="--n:${cuenta(e)};--c:${ETAPA[e].c}"></i>` : '').join('');
@@ -920,7 +918,6 @@ function pintaInicio(sil) {
       <div class="t t-equipo" role="button" tabindex="0" data-ir="equipo"><span class="flecha">${I.abre}</span><span class="eti">Equipo</span><div class="extra">${xEq}</div><div class="t-cifra"><span class="num">${Object.keys(GENTE).length}</span><span class="sub" data-corto="en el equipo">administradores${(D.embajadores || []).length ? ` · ${D.embajadores.length} embajador${D.embajadores.length === 1 ? '' : 'es'}` : ''}</span></div></div>
       <div class="t t-moon" role="button" tabindex="0" data-ir="casa"><span class="flecha">${I.abre}</span><span class="eti">Hecho en casa</span><div class="extra">${xMoon}</div><span class="sub" style="margin-top:auto" data-corto="Visión y Jason">Visión, Jason y presentación</span></div>
       <div class="t t-demo" role="button" tabindex="0" data-ir="demo"><span class="mic">${I.mic}</span><span class="q"><b>Crea tu recepcionista</b><span class="sub">Ármale uno a un cliente y mándale el link</span></span><span class="flecha">${I.abre}</span></div>
-      <div class="t t-ultimo">${ult ? ava(ult.quien, 1) : ''}<span class="txt">${ult ? `Lo último: <b>${esc((gente(ult.quien) || CLAUDE).n)}</b> ${esc(ult.texto)} · ${cuando(ult.fecha)}` : 'Aquí aparece lo último que pasó en MOON.'}</span></div>
     </main>
   </div>`;
   app.querySelectorAll('[data-ir]').forEach(b => { b.onclick = () => abrir({ tipo: b.dataset.ir }); b.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); b.click(); } }; });
@@ -928,7 +925,7 @@ function pintaInicio(sil) {
   atajo('[data-t]', b => abrir({ tipo: 'tarea', id: Number(b.dataset.t) }));
   atajo('[data-g]', b => abrir({ tipo: 'crmLista', g: b.dataset.g }));
   atajo('[data-y]', b => abrir({ tipo: 'proyecto', id: Number(b.dataset.y) }));
-  atajo('[data-c]', b => abrir((D.paneles || []).some(x => x.tel === b.dataset.c) ? { tipo: 'cliente', tel: b.dataset.c } : { tipo: 'ficha', tel: b.dataset.c }));
+  atajo('[data-c]', b => abrir({ tipo: 'cliente', tel: b.dataset.c }));
   atajo('[data-u]', b => abrir({ tipo: 'tareas', persona: b.dataset.u }));
   document.getElementById('salir').onclick = () => abrir({ tipo: 'cuenta' });
   llenarExtras();
@@ -1171,6 +1168,7 @@ async function capaFicha(c, sil) {
   marco('Ficha', '', `<div class="hoja ficha1">
     <div class="f-quien">${cara}<div class="q"><b>${esc(nombreDe(P))}</b><span>${esc(segunda || 'Sin teléfono todavía')}</span></div></div>
     ${tel ? `<div class="botones f-contacto"><a class="boton" href="tel:+52${tel.slice(-10)}">${I.tel} Llamar</a><a class="boton verde" href="https://wa.me/52${tel.slice(-10)}" target="_blank" rel="noopener">${I.wa} WhatsApp</a></div>` : ''}
+    ${c.desdeCliente ? '' : `<button class="boton dos f-panel" id="panel">${pan ? 'Ver su demo y documentos' : 'Ver sus documentos'}</button>`}
     <div class="f-bloque"><span class="eti">¿En qué va?</span><div class="f-etapas" id="etapas">${Object.keys(ETAPA).map(e => `<button class="${(P.etapa || 'pendiente') === e ? 'on' : ''}" data-e="${e}" style="--c:${ETAPA[e].c};--cf:${ETAPA[e].cf}">${ETAPA[e].n}</button>`).join('')}</div></div>
     ${P.proxima_cita ? `<div class="par"><span>Cita</span><b>${esc(P.proxima_cita)}</b></div>` : ''}
     <div class="f-bloque f-nota"><span class="eti">Nota del equipo</span>${P.notas_equipo ? `<button class="nota" id="nota">${esc(P.notas_equipo)}</button>` : '<button class="boton dos" id="nota" style="height:44px">Escribir una nota</button>'}</div>
@@ -1180,6 +1178,7 @@ async function capaFicha(c, sil) {
   const guarda = async datos => { const r = await api('editar_persona', Object.assign({ tel: c.tel }, datos)); if (r.ok) { Object.assign(p, datos); if (c.ext && c.ext.persona) Object.assign(c.ext.persona, datos); delete FICHAS[c.tel]; } return r; };
   app.querySelectorAll('#etapas [data-e]').forEach(b => b.onclick = async () => { const antes = p.etapa; const r = await guarda({ etapa: b.dataset.e }); if (r.ok) { pinta(true); recargar(true); const e = b.dataset.e; avisoFlotante(!PAGAN.includes(antes) && PAGAN.includes(e) ? 'Listo: ya aparece en Clientes' : PAGAN.includes(antes) && !PAGAN.includes(e) ? `Ahora está en ${ETAPA[e].n}: ya no aparece en Clientes` : `Listo: ahora está en ${ETAPA[e].n}`); } });
   document.getElementById('nota').onclick = () => abrir({ tipo: 'nota', tel: c.tel });
+  const bp = document.getElementById('panel'); if (bp) bp.onclick = () => abrir({ tipo: 'cliente', tel: c.tel });
   document.getElementById('sigue').onclick = () => abrir({ tipo: 'nuevaTarea', para: yo(), cliente: nombreDe(P) });
   document.getElementById('mas').onclick = () => abrir({ tipo: 'fichaMas', tel: c.tel, ext: c.ext });
   document.getElementById('editar').onclick = () => abrir({ tipo: 'editarContacto', tel: c.tel });
@@ -1193,11 +1192,14 @@ async function capaFicha(c, sil) {
   // Si no cabe todo, la nota se recorta a lo que quepa (tocándola se lee y edita completa) y luego se quita lo secundario.
   const acomoda = () => {
     const h = app.querySelector('.ficha1'); if (!h) return;
-    const quitar = ['apretada', '.f-quien .q span', '.f-nota .eti', '.f-bloque .eti'];
+    const quitar = ['apretada', '.f-quien .q span', '.f-nota .eti', '.f-bloque .eti', 'cortos'];
+    const largos = { mas: 'Historial y datos', editar: 'Editar contacto' };
+    Object.entries(largos).forEach(([id, t]) => { const e = document.getElementById(id); if (e) e.textContent = t; });
     quitar.forEach(q => app.querySelectorAll(q).forEach(e => e.style.display = '')); h.querySelector('.f-nota').classList.remove('sin-eti'); h.classList.remove('apretada');
     for (const q of quitar) {
       if (h.scrollHeight <= h.clientHeight + 1) break;
       if (q === 'apretada') { h.classList.add('apretada'); continue; }
+      if (q === 'cortos') { document.getElementById('mas').textContent = 'Historial'; document.getElementById('editar').textContent = 'Editar'; const qq = document.getElementById('quitar'); if (qq && !paga && qq.textContent === 'Mandar a la papelera') qq.textContent = 'A la papelera'; continue; }
       app.querySelectorAll(q).forEach(e => e.style.display = 'none'); if (q === '.f-nota .eti') h.querySelector('.f-nota').classList.add('sin-eti');
     }
     // Una nota que no cabe nunca se ve a medias: se avisa que está completa adentro.
@@ -1579,7 +1581,7 @@ function capaClientes(c) {
     const sub = [`<em style="font-style:normal;font-weight:800;color:${E.c}">${E.n}</em>`, p ? 'panel' : '', np ? `${np} proyecto${np === 1 ? '' : 's'}` : '', n ? `${n} documento${n === 1 ? '' : 's'}` : ''].filter(Boolean).join(' · ');
     const cara = p ? icono(p, per, 44) : `<span class="icono" style="--c:${E.c};width:44px;height:44px;font-size:17px">${esc(nombreDe(per).slice(0, 1).toUpperCase())}</span>`;
     return `<button class="fila" data-c="${esc(per.tel)}">${cara}<span class="q"><b>${esc(p ? nombreCorto(per) : nombreDe(per))}</b><span>${sub}</span></span><span class="flecha-f">${I.der}</span></button>`;
-  }, { vacio: c.g === 'pagan' ? '<b>Todavía no hay clientes que paguen</b>Cuando en la ficha de alguien elijas "Cerrados", aparece aquí.' : '<b>Nadie en camino</b>Los que estamos platicando aparecen aquí.', alPintar: l => l.querySelectorAll('[data-c]').forEach(b => b.onclick = () => abrir(pan(b.dataset.c) ? { tipo: 'cliente', tel: b.dataset.c } : { tipo: 'ficha', tel: b.dataset.c })) });
+  }, { vacio: c.g === 'pagan' ? '<b>Todavía no hay clientes que paguen</b>Cuando en la ficha de alguien elijas "Cerrados", aparece aquí.' : '<b>Nadie en camino</b>Los que estamos platicando aparecen aquí.', alPintar: l => l.querySelectorAll('[data-c]').forEach(b => b.onclick = () => abrir({ tipo: 'cliente', tel: b.dataset.c })) });
 }
 function rectangulos(tel, secciones) {
   return `<div class="rects">${secciones.map(([k, n, vacio]) => {
@@ -1595,25 +1597,27 @@ function activarRects(tel, secciones) {
 }
 function capaCliente(c) {
   const p = (D.paneles || []).find(x => x.tel === c.tel), per = personaDe(c.tel);
-  if (!p || !per) return cerrar();
+  if (!per) return cerrar();
   c.tab = c.tab || 'cliente';
   const proys = D.proyectos.filter(x => x.tel === c.tel);
   let cuerpo;
-  if (c.tab === 'cliente') cuerpo = `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr) auto">
+  if (c.tab === 'cliente' && !p) cuerpo = `<div class="cuerpo" style="grid-template-rows:auto minmax(0,1fr)"><p class="mini">Todavía no tiene demo. Aquí van su propuesta, contrato, material y avance.</p>${rectangulos(c.tel, SECCIONES)}</div>`;
+  else if (c.tab === 'cliente') cuerpo = `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr) auto">
       <div class="demo" style="--c:${p.color}"><div class="demo-logo">${icono(p.imagen ? Object.assign({}, p, { icono: p.imagen }) : p, per, 0)}</div>
         <div class="demo-info"><span class="eti">DEMO</span><b>${esc(nombreCorto(per))}</b><span>${esc(dominio(p.demo))}</span></div>
         <div class="demo-botones"><button class="boton demo-boton" id="demo">Abrir demo ${I.abre}</button><button class="redondo demo-enviar" id="demoEnviar" aria-label="Enviar el demo" title="Enviar el demo">${I.enviar}</button></div></div>
       ${rectangulos(c.tel, SECCIONES)}</div>`;
   else if (c.tab === 'proyectos') cuerpo = `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr) auto"><div class="lista"></div><div class="pie"></div></div>`;
-  marco(nombreCorto(per), c.tab === 'cliente' ? 'Subir archivo' : '', `<div class="cuerpo" style="grid-template-rows:auto minmax(0,1fr)"><div class="tabs"><button data-tab="cliente" class="${c.tab === 'cliente' ? 'on' : ''}">Panel</button><button data-tab="proyectos" class="${c.tab === 'proyectos' ? 'on' : ''}">Proyectos</button><button data-tab="ficha">Ficha</button></div>${cuerpo || ''}</div>`);
+  marco(p ? nombreCorto(per) : nombreDe(per), c.tab === 'cliente' ? 'Subir archivo' : '', `<div class="cuerpo" style="grid-template-rows:auto minmax(0,1fr)"><div class="tabs"><button data-tab="cliente" class="${c.tab === 'cliente' ? 'on' : ''}">Panel</button><button data-tab="proyectos" class="${c.tab === 'proyectos' ? 'on' : ''}">Proyectos</button><button data-tab="ficha">Ficha</button></div>${cuerpo || ''}</div>`);
   app.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => { if (b.dataset.tab === 'ficha') return abrir({ tipo: 'ficha', tel: c.tel, desdeCliente: true }); c.tab = b.dataset.tab; c.p = 0; pinta(true); });
   traerFicha(c.tel);
   // El logo vive en los aros, pero nunca encima del nombre ni de los botones: su tamaño sale del espacio que queda libre.
   const ajustaLogo = () => { const d = app.querySelector('.demo'), l = app.querySelector('.demo-logo'); if (!d || !l) return; l.style.removeProperty('--lg');
     const info = app.querySelector('.demo-info').getBoundingClientRect(), dr = d.getBoundingClientRect(), lr = l.getBoundingClientRect();
     if (lr.bottom > info.top - 8) { const libre = info.top - 8 - lr.top; l.style.setProperty('--lg', Math.max(0, libre) + 'px'); l.style.display = libre < 44 ? 'none' : ''; } else l.style.display = ''; };
-  if (c.tab === 'cliente') { ajustaLogo(); alCambiarTamano = ajustaLogo; }
-  if (c.tab === 'cliente') { const ac = document.getElementById('accion'); ac.innerHTML = I.subir; ac.onclick = () => abrir({ tipo: 'subir', tel: c.tel }); document.getElementById('demo').onclick = () => window.open(p.demo, '_blank', 'noopener'); document.getElementById('demoEnviar').onclick = () => compartir('Demo · ' + nombreCorto(per), p.demo); activarRects(c.tel, SECCIONES); }
+  if (c.tab === 'cliente' && p) { ajustaLogo(); alCambiarTamano = ajustaLogo; }
+  if (c.tab === 'cliente' && !p) { const ac = document.getElementById('accion'); ac.innerHTML = I.subir; ac.onclick = () => abrir({ tipo: 'subir', tel: c.tel }); activarRects(c.tel, SECCIONES); }
+  else if (c.tab === 'cliente') { const ac = document.getElementById('accion'); ac.innerHTML = I.subir; ac.onclick = () => abrir({ tipo: 'subir', tel: c.tel }); document.getElementById('demo').onclick = () => window.open(p.demo, '_blank', 'noopener'); document.getElementById('demoEnviar').onclick = () => compartir('Demo · ' + nombreCorto(per), p.demo); activarRects(c.tel, SECCIONES); }
   if (c.tab === 'proyectos') alCambiarTamano = paginar(app.querySelector('.vista .cuerpo .cuerpo'), proys, filaProyecto, { pagina: c.p, vacio: '<b>Sin proyectos</b>', alPintar: l => l.querySelectorAll('[data-y]').forEach(b => b.onclick = () => abrir({ tipo: 'proyecto', id: Number(b.dataset.y) })) });
 }
 const SECCIONES_MOON = [['presentacion', 'Presentación de MOON'], ['pagina', 'Página web de MOON'], ['bienvenida', 'Bienvenida de Jason']];
