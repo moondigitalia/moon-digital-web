@@ -8,7 +8,7 @@ const corridas = RAPIDO ? [['light', 320, 568, 1], ['light', 1280, 800, 1]] : [[
   const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' }).catch(() => chromium.launch());
   const fallas = [];
   for (const [tema, w, h, z] of corridas) {
-    const c = await b.newContext({ viewport: { width: w, height: h }, colorScheme: tema, hasTouch: w < 800, isMobile: w < 800 });
+    const c = await b.newContext({ viewport: { width: w, height: h }, colorScheme: tema, hasTouch: w < 800, isMobile: w < 800 });await c.addInitScript(()=>{try{localStorage.setItem('centro.moon.recorrido','todos')}catch(e){}});
     await c.addInitScript(z => { try { localStorage.setItem('centro.moon.letra', String(z)); } catch (e) {} }, z);
     await c.route(/^https?:\/\/(?!localhost)/, r => r.abort());
     const p = await c.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message));

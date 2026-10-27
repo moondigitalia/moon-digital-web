@@ -4,7 +4,7 @@ const { chromium } = require('playwright');
 const { PNG } = (()=>{try{return require('pngjs')}catch(e){return {}}})();
 (async()=>{const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium'});const fallas=[];
 for(const tema of ['light','dark']){
-const c=await b.newContext({viewport:{width:390,height:844},colorScheme:tema,isMobile:true,hasTouch:true});await c.route(/^https?:\/\/(?!localhost)/,r=>r.abort());
+const c=await b.newContext({viewport:{width:390,height:844},colorScheme:tema,isMobile:true,hasTouch:true});await c.addInitScript(()=>{try{localStorage.setItem('centro.moon.recorrido','todos')}catch(e){}});await c.route(/^https?:\/\/(?!localhost)/,r=>r.abort());
 const p=await c.newPage();const cdp=await c.newCDPSession(p);
 await p.goto('http://localhost:8765/');await p.click('[data-u="kid"]');await p.fill('#clave','x');await p.click('form .boton');await p.waitForSelector('.mosaico');await p.waitForTimeout(1200);
 const fondo=await p.evaluate(()=>getComputedStyle(document.body).backgroundColor.match(/\d+/g).map(Number));

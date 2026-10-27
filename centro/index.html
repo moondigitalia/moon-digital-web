@@ -152,6 +152,11 @@ textarea.campo{height:auto;border-radius:22px;padding:14px 18px;resize:none}
 .tope{display:grid;grid-template-columns:minmax(0,1fr) 84px;gap:10px;align-items:center;font-size:14px;font-weight:700}
 .botones.apilados{display:grid;gap:8px}.botones.apilados .boton{height:44px}
 .boton.rojo{color:var(--rojo)}
+#tour{position:fixed;inset:0;z-index:80}
+.tour-velo{position:absolute;inset:0}
+.tour-aro{position:absolute;pointer-events:none;box-shadow:0 0 0 3px #fff,0 0 0 200vmax rgba(10,12,20,.58)}
+.tour-globo{position:absolute;background:var(--tarjeta);color:var(--tinta);border-radius:24px;padding:16px;display:grid;gap:8px;box-shadow:0 20px 40px -12px rgba(0,0,0,.55)}
+.tour-globo b{font-size:19px;font-weight:800;line-height:1.2}.tour-globo p{font-size:15px;font-weight:600;color:var(--suave);line-height:1.35}
 .boton.chico{height:38px;padding:0 14px;font-size:13.5px;flex:none}
 /* Equipo */
 .socios{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
@@ -928,6 +933,7 @@ function pintaInicio(sil) {
   document.getElementById('salir').onclick = () => abrir({ tipo: 'cuenta' });
   llenarExtras();
   alCambiarTamano = () => pintaInicio(true);
+  setTimeout(() => recorrido(), 350);   // la primera vez en este aparato: qué es cada cosa, una a la vez
 }
 // Cada tarjeta muestra los renglones que le caben completos; los demás se resumen en "+N más" (están adentro de la tarjeta).
 function llenarExtras() {
@@ -1997,7 +2003,7 @@ function capaCuenta(c) {
     <span class="pista-cred">Tócala para darle vuelta</span>
     <div class="botones"><button class="boton" id="foto">Cambiar foto</button><button class="boton dos" id="frase">Mi frase</button></div>
     <div><div class="eti" style="margin-bottom:6px">Tamaño de letra en este dispositivo</div><div class="segmento" id="letra">${tamanosQueCaben().map(([n, v], i, todos) => `<button data-z="${v}" class="${v === z || (i === todos.length - 1 && z > v) ? 'on' : ''}" style="font-size:${Math.round(13 * v)}px">${n}</button>`).join('')}</div>${tamanosQueCaben().length < TAMANOS.length ? '<div class="mini" style="margin-top:4px">En esta pantalla no cabe más grande sin cortar cosas.</div>' : ''}</div>
-    <button class="enlace" id="cerrar" style="justify-self:center;min-height:36px">Cerrar sesión en este dispositivo</button>
+    <div class="eq-enlaces"><button class="enlace" id="verTour">Ver el recorrido otra vez</button><button class="enlace" id="cerrar">Cerrar sesión</button></div>
     <input type="file" id="archivo" accept="image/*" hidden></div>`);
   const cont = document.getElementById('creds');
   acomodarCreds(cont);
@@ -2023,6 +2029,7 @@ function capaCuenta(c) {
     transicion(() => { medir(); pinta(true); });
   });
   document.getElementById('cerrar').onclick = async () => { await api('salir'); guardarSesion(''); D = null; pila = []; transicion(pantallaQuien); };
+  document.getElementById('verTour').onclick = () => { volverA(0); setTimeout(() => recorrido(true), 500); };
 }
 
 function capaFrase() {
@@ -2179,6 +2186,7 @@ function pintaInicioEmbajador(sil) {
     for (const q of quitar) { if (!sobra()) break; app.querySelectorAll(q).forEach(e => e.style.display = 'none'); }
   };
   acomoda(); alCambiarTamano = () => pintaInicioEmbajador(true);
+  setTimeout(() => recorrido(), 350);
 }
 function filaProspecto(p) {
   const e = ETAPA[p.etapa] || ETAPA.pendiente;
@@ -2206,9 +2214,68 @@ function capaEmCuenta() {
   const z = letra();
   marco('Tu cuenta', '', `<div class="hoja" style="align-content:center;justify-items:center;text-align:center;gap:14px">${ava(yo())}<h3 style="font-size:22px;font-weight:800">${esc((D.yoDatos || {}).nombre || D.yo.nombre)}</h3><span class="eti">Embajador de MOON</span>
     <div style="width:100%"><div class="eti" style="margin-bottom:6px">Tamaño de letra en este dispositivo</div><div class="segmento" id="letra">${tamanosQueCaben().map(([n, v], i, todos) => `<button data-z="${v}" class="${v === z || (i === todos.length - 1 && z > v) ? 'on' : ''}" style="font-size:${Math.round(13 * v)}px">${n}</button>`).join('')}</div></div>
-    <p class="mini">Este dispositivo está recordado. Solo cierra sesión si es un dispositivo prestado.</p><button class="boton dos" id="cerrar">Cerrar sesión en este dispositivo</button></div>`);
+    <p class="mini">Este dispositivo está recordado. Solo cierra sesión si es un dispositivo prestado.</p><button class="boton dos" id="cerrar">Cerrar sesión en este dispositivo</button><button class="enlace" id="verTour">Ver el recorrido otra vez</button></div>`);
   app.querySelectorAll('#letra [data-z]').forEach(b => b.onclick = () => { try { localStorage.setItem(LETRA, b.dataset.z); } catch (e) {} transicion(() => { medir(); pinta(true); }); });
+  document.getElementById('verTour').onclick = () => { volverA(0); setTimeout(() => recorrido(true), 500); };
   document.getElementById('cerrar').onclick = async () => { await api('salir'); guardarSesion(''); D = null; pila = []; transicion(pantallaQuien); };
+}
+
+/* ---------- Recorrido de la primera vez: cada sección se explica en una línea, una a la vez ---------- */
+const RECORRIDO = 'centro.moon.recorrido';
+const PASOS_SOCIO = [
+  ['[data-ir="tareas"]', 'Tareas', 'Lo que te toca a ti y lo de todo el equipo. Aquí también dejas una tarea nueva.'],
+  ['[data-ir="crm"]', 'CRM', 'Todas las personas que nos han buscado, ordenadas por en qué van.'],
+  ['[data-ir="clientes"]', 'Clientes', 'Solo los que ya nos pagan, y los que estamos por cerrar ("En camino").'],
+  ['[data-ir="equipo"]', 'Equipo', 'Quién es quién, los embajadores, quién movió qué y la papelera.'],
+  ['[data-ir="casa"]', 'Hecho en casa', 'Lo nuestro: la visión, Jason, la presentación y la página de MOON.'],
+  ['[data-ir="demo"]', 'Crea tu recepcionista', 'Ármale un recepcionista a un cliente y mándale el link para que le hable.'],
+  ['#salir', 'Tu credencial', 'Tu foto, tu frase y el tamaño de la letra. Aquí puedes volver a ver este recorrido.'],
+];
+const PASOS_EMB = [
+  ['[data-ir="emComisiones"]', 'Mis comisiones', 'Los clientes que cerraste y cuánto ganas.'],
+  ['[data-ir="demo"]', 'Crea tu recepcionista', 'Ármale uno a tu prospecto y mándale el link para que le hable.'],
+  ['[data-ir="emProspectos"]', 'Mis prospectos', 'Los que probaron un recepcionista tuyo y en qué van.'],
+  ['[data-ir="tareas"]', 'Mis tareas', 'Lo que te toca hacer; aparece aquí cuando un prospecto tuyo pide algo.'],
+  ['[data-ir="emMaterial"]', 'Material de MOON', 'La presentación y la página para enseñarle a tu prospecto.'],
+  ['#salir', 'Tu cuenta', 'El tamaño de la letra, cerrar sesión y volver a ver este recorrido.'],
+];
+const recorridoVisto = () => { try { const v = localStorage.getItem(RECORRIDO) || ''; return v === 'todos' || v.split(',').includes(yo()); } catch (e) { return true; } };
+function marcarRecorrido() { try { const v = (localStorage.getItem(RECORRIDO) || '').split(',').filter(Boolean); if (!v.includes(yo())) v.push(yo()); localStorage.setItem(RECORRIDO, v.join(',')); } catch (e) {} }
+function recorrido(desdeCero) {
+  if (pila.length || document.getElementById('tour')) return;
+  if (!desdeCero && recorridoVisto()) return;
+  const pasos = (esEmb() ? PASOS_EMB : PASOS_SOCIO).filter(p => app.querySelector(p[0]));
+  if (!pasos.length) return;
+  let i = 0;
+  const t = document.createElement('div'); t.id = 'tour'; t.setAttribute('role', 'dialog'); t.setAttribute('aria-label', 'Recorrido del tablero');
+  t.innerHTML = '<div class="tour-velo"></div><div class="tour-aro"></div><div class="tour-globo"><span class="mini" id="tourPaso"></span><b id="tourTit"></b><p id="tourTxt"></p><div class="botones"><button class="boton dos" id="tourSalir">Ya entendí</button><button class="boton" id="tourSig">Siguiente</button></div></div>';
+  document.body.appendChild(t);
+  const velo = t.querySelector('.tour-velo'), aro = t.querySelector('.tour-aro'), globo = t.querySelector('.tour-globo');
+  const fin = () => { marcarRecorrido(); t.remove(); removeEventListener('resize', dibuja); };
+  function dibuja() {
+    let el = app.querySelector(pasos[i][0]); if (!el) return fin();
+    if (!parseFloat(getComputedStyle(el).borderTopLeftRadius) && el.children.length === 1) el = el.firstElementChild;   // la foto redonda dentro del botón
+    const r = el.getBoundingClientRect(), W = innerWidth, H = (window.visualViewport ? visualViewport.height : innerHeight), m = 6;
+    const x0 = Math.max(4, r.left - m), y0 = Math.max(4, r.top - m), x1 = Math.min(W - 4, r.right + m), y1 = Math.min(H - 4, r.bottom + m);
+    // El hueco tiene la misma forma que lo que marca (redondo si es redondo): nunca un rectángulo de esquinas duras.
+    const z = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--z')) || 1;
+    const rad = parseFloat(getComputedStyle(el).borderTopLeftRadius) || 0, redondo = Math.abs(r.width - r.height) < 2 && rad * z >= r.width / 2 - 1;
+    Object.assign(aro.style, { left: x0 + 'px', top: y0 + 'px', width: (x1 - x0) + 'px', height: (y1 - y0) + 'px', borderRadius: redondo ? '50%' : (rad * z + m) + 'px' });
+    document.getElementById('tourPaso').textContent = `${i + 1} de ${pasos.length}`;
+    document.getElementById('tourTit').textContent = pasos[i][1];
+    document.getElementById('tourTxt').textContent = pasos[i][2];
+    document.getElementById('tourSig').textContent = i === pasos.length - 1 ? 'Listo' : 'Siguiente';
+    // El globo va donde haya más espacio (abajo o arriba del recuadro), siempre completo dentro de la pantalla.
+    const gw = Math.min(W - 24, 380); globo.style.width = gw + 'px'; globo.style.left = Math.round((W - gw) / 2) + 'px';
+    const gh = globo.offsetHeight, abajo = H - y1, arriba = y0;
+    let top = abajo >= gh + 12 ? y1 + 10 : arriba >= gh + 12 ? y0 - gh - 10 : Math.max(8, H - gh - 8);
+    globo.style.top = Math.round(Math.max(8, Math.min(H - gh - 8, top))) + 'px';
+  }
+  t.querySelector('#tourSig').onclick = () => { if (i < pasos.length - 1) { i++; dibuja(); } else fin(); };
+  t.querySelector('#tourSalir').onclick = fin;
+  t.onclick = e => { if (e.target === t || e.target === velo) e.stopPropagation(); };   // tocar afuera no hace nada raro
+  addEventListener('resize', dibuja);
+  dibuja();
 }
 
 /* ---------- MOON ---------- */

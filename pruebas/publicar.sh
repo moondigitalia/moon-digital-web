@@ -29,7 +29,7 @@ T=$(mktemp -d)
 cd pruebas/centro
 # El servidor de prueba se prende solo si hace falta (ya no depende de acordarse).
 if [ $TABLERO = 1 ] && ! curl -s -o /dev/null localhost:8765/; then (node servidor.js > /dev/null 2>&1 &); sleep 1; fi
-[ $TABLERO = 1 ] && { (node juez.js 2>&1 | tail -1 > $T/juez) & (node juez-embajador.js 2>&1 | tail -1 > $T/embajador) & [ $RAPIDO = 0 ] && { (node parpadeo.js 2>&1 | tail -1 > $T/parpadeo) & (node fotogramas.js 2>&1 | tail -1 > $T/fotogramas) &
+[ $TABLERO = 1 ] && { (node juez.js 2>&1 | tail -1 > $T/juez) & (node juez-embajador.js 2>&1 | tail -1 > $T/embajador) & (node juez-recorrido.js 2>&1 | tail -1 > $T/recorrido) & [ $RAPIDO = 0 ] && { (node parpadeo.js 2>&1 | tail -1 > $T/parpadeo) & (node fotogramas.js 2>&1 | tail -1 > $T/fotogramas) &
   [ -n "$DOCS" ] && (node juez-docs.js "$DOCS" "$LLAVE" 2>&1 | tail -1 > $T/documentos) & }; }
 [ $WEB = 1 ] && (node ../juez-web.js 2>&1 | tail -1 > $T/web) &
 [ $EJEMPLOS = 1 ] && (cd "$RAIZ" && node pruebas/juez-ejemplos.js prueba/nueva/index.html centro/index.html index.html examen/*/index.html 2>&1 | tail -1 > $T/ejemplos) &
@@ -38,7 +38,7 @@ if [ $TABLERO = 1 ] && ! curl -s -o /dev/null localhost:8765/; then (node servid
 wait
 MAL=0
 revisa() { [ -f $T/$1 ] || return 0; r=$(cat $T/$1); echo "$1: $r"; [ "$r" = "$2" ] || MAL=1; }
-revisa juez "SIN FALLAS"; revisa embajador "SIN FALLAS"; revisa parpadeo "SIN REPINTADAS DE MAS"; revisa fotogramas "SIN PARPADEO"
+revisa juez "SIN FALLAS"; revisa embajador "SIN FALLAS"; revisa recorrido "SIN FALLAS"; revisa parpadeo "SIN REPINTADAS DE MAS"; revisa fotogramas "SIN PARPADEO"
 revisa documentos "TODOS LOS DOCUMENTOS SE VEN"; revisa web "SIN FALLAS"; revisa demos "SIN FALLAS"; revisa material "SIN FALLAS"; revisa ejemplos "SIN FALLAS"
 rm -rf $T
 [ $MAL = 0 ] || { echo "NO SE PUBLICÓ: un juez encontró algo."; exit 1; }

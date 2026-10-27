@@ -1,6 +1,6 @@
 const { chromium } = require('playwright');
 (async()=>{const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium'});
-const c=await b.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true});await c.route(/^https?:\/\/(?!localhost)/,r=>r.abort());
+const c=await b.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true});await c.addInitScript(()=>{try{localStorage.setItem('centro.moon.recorrido','todos')}catch(e){}});await c.route(/^https?:\/\/(?!localhost)/,r=>r.abort());
 const p=await c.newPage();const fallas=[];
 await p.goto('http://localhost:8765/');await p.click('[data-u="kid"]');await p.fill('#clave','x');await p.click('form .boton');await p.waitForSelector('.mosaico');await p.waitForTimeout(1500);
 await p.evaluate(()=>{window.__rep=0;new MutationObserver(m=>{if(m.some(x=>x.type==='childList'&&x.target.id==='app'))window.__rep++}).observe(document.getElementById('app'),{childList:true});});
