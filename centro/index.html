@@ -380,6 +380,10 @@ html:not(.ancho) .agenda>.fila:only-child{border-radius:20px}
 .f-contacto{flex-wrap:nowrap}.f-contacto .boton{flex:1 1 0;min-width:0;padding:0 12px;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}.boton.verde{background:#1f8a4c;box-shadow:0 12px 20px -10px rgba(31,138,76,.7)}
 .f-bloque{display:grid;gap:8px;flex:none}
 .ficha1.apretada{gap:8px;padding:12px}.ficha1.apretada .boton{height:42px}.ficha1.apretada .f-etapas button{min-height:34px}.ficha1.apretada .f-quien .icono{width:40px!important;height:40px!important}.ficha1.apretada .f-enlaces .enlace{min-height:28px}
+.p-acciones{display:flex;gap:6px;flex-wrap:nowrap;min-width:0}
+.pilita{flex:1 1 auto;justify-content:center;min-width:0;display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 10px;border-radius:99px;background:var(--tarjeta);box-shadow:var(--sombra-chica);font-size:13px;font-weight:800;color:var(--tinta);white-space:nowrap}
+.pilita svg{width:14px;height:14px;flex:none}.pilita.rojo{color:var(--rojo)}
+.f-nota1{flex:none;max-height:88px;text-align:start;font:inherit;font-weight:600;min-height:44px}
 .f-panel{flex:none}.f-quien .q{flex:1}.ficha1>*{flex-shrink:0}.ficha1>.f-nota{flex-shrink:1}.ficha1.apretada .f-quien b{font-size:16px}.ficha1.apretada .f-contacto .boton{height:40px}
 .f-etapas{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
 .f-etapas button{min-height:40px;border-radius:14px;font-size:13px;font-weight:800;color:var(--suave);background:var(--campo);box-shadow:var(--hundido);padding:4px;line-height:1.15}
@@ -487,6 +491,7 @@ const TEMP = { caliente: 'var(--rojo)', tibio: 'var(--naranja)', frio: 'var(--ci
 const I = {
   mic: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>',
   atras: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>',
+  basura: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>',
   mas: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
   abre: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M9 7h8v8"/></svg>',
   izq: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>',
@@ -826,7 +831,7 @@ async function precargar(capa) {
   if (capa.tipo === 'documento' && !capa.doc) await espera(api('documento', { id: capa.id }).then(r => { if (r.ok) capa.doc = r.doc; }));
   if (capa.tipo === 'qr') await espera(cargarQR().catch(() => null));
   if (capa.tipo === 'equipo' && !capa.eq) await espera(traerEquipo(capa));
-  if (capa.tipo === 'fichaMas' && !(capa.ext && capa.ext.ok)) await espera(traerFicha(capa.tel).then(r => { if (r && r.ok) capa.ext = r; }));
+  if (capa.tipo === 'cliente' && !capa.cargado) await espera(traerFicha(capa.tel).then(r => { if (r && r.ok) { capa.ext = r; capa.cargado = true; } }));
   if ((capa.tipo === 'bitacora' || capa.tipo === 'papelera') && !capa.lista) await espera(api(capa.tipo).then(r => { if (r.ok) { capa.lista = r.lista; capa.docs = r.docs || []; } }));
   if (capa.tipo === 'proyecto' && capa.tab === 'uso' && !capa.uso) await espera(api('uso', { id: capa.id }).then(r => { if (r.ok) capa.uso = r; }));
 }
@@ -877,7 +882,7 @@ function pinta(silencioso) {
   if (!c || c.tipo !== 'demo') veloFuera(false);
   if (!c) return esEmb() ? pintaInicioEmbajador(silencioso) : pintaInicio(silencioso);
   if (c.tipo === 'documento') setTimeout(() => ponOpcionesDoc(c), 0);
-  ({ tareas: capaTareas, tarea: capaTarea, nuevaTarea: capaNuevaTarea, crm: capaCRM, crmLista: capaCRMLista, editarContacto: capaEditarContacto, subir: capaSubir, ficha: capaFicha, fichaMas: capaFichaMas, nuevoCliente: capaNuevoCliente, proyectos: capaProyectos, proyecto: capaProyecto, nuevoProyecto: capaProyecto, equipo: capaEquipo, moon: capaMoon, lector: capaLector, clientes: capaClientes, cliente: capaCliente, seccion: capaSeccion, documento: capaDocumento, casa: capaCasa, demo: capaDemo, nota: capaNota, editarProyecto: capaProyecto, qr: capaQR, cuenta: capaCuenta, frase: capaFrase, foto: capaFoto, docOpciones: capaDocOpciones, emProspectos: capaEmProspectos, emComisiones: capaEmComisiones, emMaterial: capaEmMaterial, emCuenta: capaEmCuenta, embajador: capaEmbajador, comision: capaComision, bitacora: capaBitacora, papelera: capaPapelera })[c.tipo](c, silencioso);
+  ({ tareas: capaTareas, tarea: capaTarea, nuevaTarea: capaNuevaTarea, crm: capaCRM, crmLista: capaCRMLista, editarContacto: capaEditarContacto, subir: capaSubir, ficha: capaFicha, nuevoCliente: capaNuevoCliente, proyectos: capaProyectos, proyecto: capaProyecto, nuevoProyecto: capaProyecto, equipo: capaEquipo, moon: capaMoon, lector: capaLector, clientes: capaClientes, cliente: capaFicha, seccion: capaSeccion, documento: capaDocumento, casa: capaCasa, demo: capaDemo, nota: capaNota, editarProyecto: capaProyecto, qr: capaQR, cuenta: capaCuenta, frase: capaFrase, foto: capaFoto, docOpciones: capaDocOpciones, emProspectos: capaEmProspectos, emComisiones: capaEmComisiones, emMaterial: capaEmMaterial, emCuenta: capaEmCuenta, embajador: capaEmbajador, comision: capaComision, bitacora: capaBitacora, papelera: capaPapelera })[c.tipo](c, silencioso);
 }
 function marco(titulo, accion, cuerpo, icono) {
   app.innerHTML = `<div class="top"><button class="redondo" id="volver" aria-label="Regresar">${I.atras}</button><div class="cabeza" style="flex:1;min-width:0"><h2>${esc(titulo)}</h2>${accion ? `<button class="redondo accion" id="accion" aria-label="${esc(accion)}" title="${esc(accion)}">${icono || I.mas}</button>` : ''}</div></div><div class="vista" style="grid-template-rows:minmax(0,1fr)">${cuerpo}</div>`;
@@ -1153,77 +1158,78 @@ function filaPersona(p, conEtapa) {
   return `<button class="fila chica" data-p="${esc(p.tel)}">${cara}<span class="q"><b>${esc(nombreDe(p))}</b><span>${conEtapa ? `<em style="font-style:normal;font-weight:800;color:${E.c}">${E.n}</em>${sub ? ' · ' : ''}` : ''}${esc(sub || (conEtapa ? '' : 'Tócalo para ver su ficha'))}</span></span><span class="flecha-f">${I.der}</span></button>`;
 }
 
-// Ficha: UNA sola pantalla. Quién es, Llamar / WhatsApp, en qué va, la nota y qué sigue. Lo demás, en "Ver historial y datos".
+// Ficha de una persona o cliente (27-oct, Kid): lo primero es su demo y sus documentos; luego sus datos; luego el seguimiento.
+// Arriba, tres píldoras: Dejar tarea · Editar · Papelera. Una sola pantalla para el CRM y para Clientes.
 const PAGAN = ['cerrado', 'en órbita', 'portafolio'];
 async function capaFicha(c, sil) {
-  const p = personaDe(c.tel);
-  if (!p) return cerrar();
+  const per0 = personaDe(c.tel);
+  if (!per0) return cerrar();
   if (!c.cargado) { c.cargado = true; traerFicha(c.tel).then(r => { if (r && r.ok && pila[pila.length - 1] === c) { c.ext = r; pinta(true); } }); }
-  const P = Object.assign({}, p, (c.ext || {}).persona || {});
-  const tel = String(P.telefono || '').replace(/\D/g, '');
+  const ext = c.ext || {}, P = Object.assign({}, per0, ext.persona || {});
   const pan = (D.paneles || []).find(x => x.tel === c.tel), E = ETAPA[P.etapa || 'pendiente'] || ETAPA.pendiente;
-  const cara = pan || P.foto ? icono(Object.assign({ color: E.c }, pan || {}, P.foto ? { icono: P.foto } : {}), P, 52) : `<span class="icono" style="--c:${E.c};width:52px;height:52px;font-size:20px">${esc(nombreDe(P).slice(0, 1).toUpperCase())}</span>`;
-  const segunda = [P.negocio && P.nombre ? P.nombre : '', P.telefono].filter(Boolean).join(' · ');
-  const paga = PAGAN.includes(P.etapa);
-  marco('Ficha', '', `<div class="hoja ficha1">
-    <div class="f-quien">${cara}<div class="q"><b>${esc(nombreDe(P))}</b><span>${esc(segunda || 'Sin teléfono todavía')}</span></div></div>
-    ${tel ? `<div class="botones f-contacto"><a class="boton" href="tel:+52${tel.slice(-10)}">${I.tel} Llamar</a><a class="boton verde" href="https://wa.me/52${tel.slice(-10)}" target="_blank" rel="noopener">${I.wa} WhatsApp</a></div>` : ''}
-    ${c.desdeCliente ? '' : `<button class="boton dos f-panel" id="panel">${pan ? 'Ver su demo y documentos' : 'Ver sus documentos'}</button>`}
-    <div class="f-bloque"><span class="eti">¿En qué va?</span><div class="f-etapas" id="etapas">${Object.keys(ETAPA).map(e => `<button class="${(P.etapa || 'pendiente') === e ? 'on' : ''}" data-e="${e}" style="--c:${ETAPA[e].c};--cf:${ETAPA[e].cf}">${ETAPA[e].n}</button>`).join('')}</div></div>
-    ${P.proxima_cita ? `<div class="par"><span>Cita</span><b>${esc(P.proxima_cita)}</b></div>` : ''}
-    <div class="f-bloque f-nota"><span class="eti">Nota del equipo</span>${P.notas_equipo ? `<button class="nota" id="nota">${esc(P.notas_equipo)}</button>` : '<button class="boton dos" id="nota" style="height:44px">Escribir una nota</button>'}</div>
-    <button class="boton" id="sigue">¿Qué sigue? Dejar una tarea</button>
-    <div class="f-enlaces"><button class="enlace" id="mas">Historial y datos</button><button class="enlace" id="editar">Editar contacto</button><button class="enlace rojo" id="quitar">${paga ? 'Quitar de Clientes' : 'Mandar a la papelera'}</button></div></div>`);
+  const tel = String(P.telefono || '').replace(/\D/g, ''), paga = PAGAN.includes(P.etapa);
+  c.tab = ['docs', 'datos', 'seg'].includes(c.tab) ? c.tab : 'docs';
+  let cuerpo = '';
+  if (c.tab === 'docs') cuerpo = pan ? `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr) auto">
+      <div class="demo" style="--c:${pan.color}"><div class="demo-logo">${icono(pan.imagen ? Object.assign({}, pan, { icono: pan.imagen }) : pan, P, 0)}</div>
+        <div class="demo-info"><span class="eti">Su demo</span><b>${esc(nombreCorto(P))}</b><span>${esc(dominio(pan.demo))}</span></div>
+        <div class="demo-botones"><button class="boton demo-boton" id="demo">Abrir demo ${I.abre}</button><button class="redondo demo-enviar" id="demoEnviar" aria-label="Enviar el demo" title="Enviar el demo">${I.enviar}</button></div></div>
+      ${rectangulos(c.tel, SECCIONES)}</div>`
+    : `<div class="cuerpo" style="grid-template-rows:auto minmax(0,1fr)"><p class="mini">Todavía no tiene demo. Aquí van su propuesta, contrato, material y avance.</p>${rectangulos(c.tel, SECCIONES)}</div>`;
+  else if (c.tab === 'datos') cuerpo = `<div class="cuerpo" style="grid-template-rows:${tel ? 'auto ' : ''}minmax(0,1fr) auto">
+      ${tel ? `<div class="botones f-contacto"><a class="boton" href="tel:+52${tel.slice(-10)}">${I.tel} Llamar</a><a class="boton verde" href="https://wa.me/52${tel.slice(-10)}" target="_blank" rel="noopener">${I.wa} WhatsApp</a></div>` : ''}
+      <div class="lista"></div>
+      <label class="mini" style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="prueba"${P.es_prueba ? ' checked' : ''}> Es una llamada de prueba (no cuenta como cliente)</label></div>`;
+  else cuerpo = `<div class="cuerpo" style="grid-template-rows:auto ${P.proxima_cita ? 'auto ' : ''}auto auto minmax(0,1fr)">
+      <div class="f-bloque"><span class="eti">¿En qué va?</span><div class="f-etapas" id="etapas">${Object.keys(ETAPA).map(e => `<button class="${(P.etapa || 'pendiente') === e ? 'on' : ''}" data-e="${e}" style="--c:${ETAPA[e].c};--cf:${ETAPA[e].cf}">${ETAPA[e].n}</button>`).join('')}</div></div>
+      ${P.proxima_cita ? `<div class="par"><span>Cita</span><b>${esc(P.proxima_cita)}</b></div>` : ''}
+      ${P.notas_equipo ? `<button class="nota f-nota1" id="nota"></button>` : '<button class="boton dos" id="nota">Escribir una nota</button>'}
+      <span class="eti">Historial</span><div class="lista"></div></div>`;
+  marco(pan ? nombreCorto(P) : nombreDe(P), c.tab === 'docs' ? 'Subir archivo' : '', `<div class="cuerpo" style="grid-template-rows:auto auto minmax(0,1fr)">
+    <div class="p-acciones"><button class="pilita" id="sigue">${I.mas} Dejar tarea</button><button class="pilita" id="editar">${I.lapiz} Editar</button><button class="pilita rojo" id="quitar">${I.basura} ${paga ? 'Quitar<span class="largo"> de Clientes</span>' : 'Papelera'}</button></div>
+    <div class="tabs" role="tablist">${[['docs', 'Documentos'], ['datos', 'Datos'], ['seg', 'Seguimiento']].map(([k, n]) => `<button data-tab="${k}" class="${c.tab === k ? 'on' : ''}">${n}</button>`).join('')}</div>
+    ${cuerpo}</div>`, I.subir);
   if (sil) app.querySelector('.vista').style.animation = 'none';
-  const guarda = async datos => { const r = await api('editar_persona', Object.assign({ tel: c.tel }, datos)); if (r.ok) { Object.assign(p, datos); if (c.ext && c.ext.persona) Object.assign(c.ext.persona, datos); delete FICHAS[c.tel]; } return r; };
-  app.querySelectorAll('#etapas [data-e]').forEach(b => b.onclick = async () => { const antes = p.etapa; const r = await guarda({ etapa: b.dataset.e }); if (r.ok) { pinta(true); recargar(true); const e = b.dataset.e; avisoFlotante(!PAGAN.includes(antes) && PAGAN.includes(e) ? 'Listo: ya aparece en Clientes' : PAGAN.includes(antes) && !PAGAN.includes(e) ? `Ahora está en ${ETAPA[e].n}: ya no aparece en Clientes` : `Listo: ahora está en ${ETAPA[e].n}`); } });
-  document.getElementById('nota').onclick = () => abrir({ tipo: 'nota', tel: c.tel });
-  const bp = document.getElementById('panel'); if (bp) bp.onclick = () => abrir({ tipo: 'cliente', tel: c.tel });
+  app.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => { c.tab = b.dataset.tab; pinta(true); });   // pestañas: al instante
+  const guarda = async datos => { const r = await api('editar_persona', Object.assign({ tel: c.tel }, datos)); if (r.ok) { Object.assign(per0, datos); if (c.ext && c.ext.persona) Object.assign(c.ext.persona, datos); delete FICHAS[c.tel]; } return r; };
   document.getElementById('sigue').onclick = () => abrir({ tipo: 'nuevaTarea', para: yo(), cliente: nombreDe(P) });
-  document.getElementById('mas').onclick = () => abrir({ tipo: 'fichaMas', tel: c.tel, ext: c.ext });
   document.getElementById('editar').onclick = () => abrir({ tipo: 'editarContacto', tel: c.tel });
   let seguro = false;
   document.getElementById('quitar').onclick = async ev => {
-    if (!seguro) { seguro = true; ev.target.textContent = '¿Seguro? Toca otra vez'; avisoFlotante(paga ? 'Regresa al CRM como Pendiente' : 'Se va a la papelera; se puede recuperar'); acomoda(); return; }
+    const b = ev.currentTarget;
+    if (!seguro) { seguro = true; b.innerHTML = `${I.basura} ¿Seguro? Toca otra vez`; avisoFlotante(paga ? 'Regresa al CRM como Pendiente' : 'Se va a la papelera; se puede recuperar'); return; }
     if (paga) { const r = await guarda({ etapa: 'pendiente' }); if (r.ok) { await recargar(true); avisoFlotante('Regresó al CRM como Pendiente'); cerrar(); } return; }
     const r = await api('quitar_persona', { tel: c.tel });
     if (r.ok) { await recargar(true); avisoFlotante('Está en la papelera (Equipo › Papelera)'); cerrar(); }
   };
-  // Si no cabe todo, la nota se recorta a lo que quepa (tocándola se lee y edita completa) y luego se quita lo secundario.
-  const acomoda = () => {
-    const h = app.querySelector('.ficha1'); if (!h) return;
-    const quitar = ['apretada', '.f-quien .q span', '.f-nota .eti', '.f-bloque .eti', 'cortos'];
-    const largos = { mas: 'Historial y datos', editar: 'Editar contacto' };
-    Object.entries(largos).forEach(([id, t]) => { const e = document.getElementById(id); if (e) e.textContent = t; });
-    quitar.forEach(q => app.querySelectorAll(q).forEach(e => e.style.display = '')); h.querySelector('.f-nota').classList.remove('sin-eti'); h.classList.remove('apretada');
-    for (const q of quitar) {
-      if (h.scrollHeight <= h.clientHeight + 1) break;
-      if (q === 'apretada') { h.classList.add('apretada'); continue; }
-      if (q === 'cortos') { document.getElementById('mas').textContent = 'Historial'; document.getElementById('editar').textContent = 'Editar'; const qq = document.getElementById('quitar'); if (qq && !paga && qq.textContent === 'Mandar a la papelera') qq.textContent = 'A la papelera'; continue; }
-      app.querySelectorAll(q).forEach(e => e.style.display = 'none'); if (q === '.f-nota .eti') h.querySelector('.f-nota').classList.add('sin-eti');
+  const cu = app.querySelector('.vista .cuerpo .cuerpo');
+  if (c.tab === 'docs') {
+    const ac = document.getElementById('accion'); ac.onclick = () => abrir({ tipo: 'subir', tel: c.tel });
+    activarRects(c.tel, SECCIONES);
+    if (pan) {
+      document.getElementById('demo').onclick = () => window.open(pan.demo, '_blank', 'noopener');
+      document.getElementById('demoEnviar').onclick = () => compartir('Demo · ' + nombreCorto(P), pan.demo);
+      // El logo vive en los aros, pero nunca encima del nombre ni de los botones: su tamaño sale del espacio que queda libre.
+      const ajustaLogo = () => { const d = app.querySelector('.demo'), l = app.querySelector('.demo-logo'); if (!d || !l) return; l.style.removeProperty('--lg');
+        const info = app.querySelector('.demo-info').getBoundingClientRect(), lr = l.getBoundingClientRect();
+        if (lr.bottom > info.top - 8) { const libre = info.top - 8 - lr.top; l.style.setProperty('--lg', Math.max(0, libre) + 'px'); l.style.display = libre < 44 ? 'none' : ''; } else l.style.display = ''; };
+      ajustaLogo(); alCambiarTamano = ajustaLogo;
     }
+  } else if (c.tab === 'datos') {
+    const util = v => v !== '' && v != null && !/^otros?$/i.test(String(v).trim());
+    const datos = [['Negocio', P.negocio], ['Nombre', P.nombre], ['Teléfono', P.telefono || 'Aún no lo tenemos'], ['Correo', P.correo || 'Aún no lo tenemos'], ['Giro', P.giro], ['Servicio', P.servicio], ['Llegó por', P.origen], ['Necesita', P.necesidad], ['Volumen', P.volumen], ['Urgencia', P.urgencia], ['Decide', P.decide], ['Temperatura', P.temperatura]].filter(x => util(x[1]));
+    paginar(cu, datos, ([k, v]) => `<div class="fila chica" style="cursor:default;grid-template-columns:100px minmax(0,1fr)"><span class="eti" style="letter-spacing:.1em">${esc(k)}</span><span class="q"><b style="font-weight:600">${esc(v)}</b></span></div>`, { vacio: '<b>Sin datos todavía</b>Tócale "Editar" para agregarlos.' });
+    document.getElementById('prueba').onchange = async e => { const r = await guarda({ es_prueba: e.target.checked ? 1 : 0 }); if (r.ok) recargar(true); };
+  } else {
+    app.querySelectorAll('#etapas [data-e]').forEach(b => b.onclick = async () => { const antes = per0.etapa; const r = await guarda({ etapa: b.dataset.e }); if (r.ok) { pinta(true); recargar(true); const e = b.dataset.e; avisoFlotante(!PAGAN.includes(antes) && PAGAN.includes(e) ? 'Listo: ya aparece en Clientes' : PAGAN.includes(antes) && !PAGAN.includes(e) ? `Ahora está en ${ETAPA[e].n}: ya no aparece en Clientes` : `Listo: ahora está en ${ETAPA[e].n}`); } });
+    document.getElementById('nota').onclick = () => abrir({ tipo: 'nota', tel: c.tel });
     // Una nota que no cabe nunca se ve a medias: se avisa que está completa adentro.
     const n = app.querySelector('button.nota');
-    if (n) {
-      for (const txt of [esc(P.notas_equipo), '<b style="color:var(--tinta)">Hay una nota larga.</b> Tócala para leerla completa.', '<b style="color:var(--tinta)">Ver la nota completa</b>']) { n.innerHTML = txt; if (n.scrollHeight <= n.clientHeight + 1) break; }
-    }
-  };
-  acomoda(); alCambiarTamano = acomoda;
-}
-// Todo lo demás de la persona: sus datos, sus proyectos y cada vez que nos llamó o escribió.
-function capaFichaMas(c) {
-  const p = personaDe(c.tel); if (!p) return cerrar();
-  const ext = c.ext || {}, P = Object.assign({}, p, ext.persona || {});
-  const util = v => v !== '' && v != null && !/^otros?$/i.test(String(v).trim());
-  const datos = [['Negocio', P.negocio], ['Nombre', P.nombre], ['Giro', P.giro], ['Teléfono', P.telefono], ['Correo', P.correo], ['Servicio', P.servicio], ['Llegó por', P.origen], ['Necesita', P.necesidad], ['Volumen', P.volumen], ['Urgencia', P.urgencia], ['Decide', P.decide], ['Temperatura', P.temperatura]].filter(x => util(x[1]));
-  const items = datos.map(([k, v]) => `<div class="fila chica" style="cursor:default;grid-template-columns:100px minmax(0,1fr)"><span class="eti" style="letter-spacing:.1em">${esc(k)}</span><span class="q"><b style="font-weight:600">${esc(v)}</b></span></div>`)
-    .concat(D.proyectos.filter(x => x.tel === c.tel).map(x => filaProyecto(x)))
-    .concat((ext.contactos || []).map(x => `<div class="fila" style="cursor:default"><span class="estado" style="--c:var(--cobalto);--cf:var(--azulf)">${esc(x.tipo)}</span><span class="q"><b style="font-weight:600">${esc(x.resumen || 'Sin resumen')}</b><span>${esc(x.canal)} · ${cuando(x.fecha)}</span></span><span></span></div>`));
-  marco('Historial y datos', '', `<div class="cuerpo" style="grid-template-rows:auto minmax(0,1fr) auto"><p class="mini">${esc(nombreDe(P))}: sus datos, sus proyectos y cada vez que nos buscó.</p><div class="lista"></div>
-    <label class="mini" style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="prueba"${P.es_prueba ? ' checked' : ''}> Es una llamada de prueba (no cuenta como cliente)</label></div>`);
-  document.getElementById('prueba').onchange = async e => { const r = await api('editar_persona', { tel: c.tel, es_prueba: e.target.checked }); if (r.ok) { p.es_prueba = e.target.checked ? 1 : 0; delete FICHAS[c.tel]; recargar(true); } };
-  if (!(ext && ext.ok)) traerFicha(c.tel).then(r => { if (r && r.ok && pila[pila.length - 1] === c) { c.ext = r; pinta(true); } });
-  paginar(app.querySelector('.cuerpo'), items, x => x, { vacio: ext && ext.ok ? '<b>Nada todavía</b>' : '<b>Cargando…</b>', alPintar: l => l.querySelectorAll('[data-y]').forEach(b => b.onclick = () => abrir({ tipo: 'proyecto', id: Number(b.dataset.y) })) });
+    if (n) for (const txt of [esc(P.notas_equipo), '<b style="color:var(--tinta)">Hay una nota larga.</b> Tócala para leerla completa.', '<b style="color:var(--tinta)">Ver la nota completa</b>']) { n.innerHTML = txt; if (n.scrollHeight <= n.clientHeight + 1) break; }
+    const items = D.proyectos.filter(x => x.tel === c.tel).map(x => filaProyecto(x))
+      .concat((ext.contactos || []).map(x => `<div class="fila" style="cursor:default"><span class="estado" style="--c:var(--cobalto);--cf:var(--azulf)">${esc(x.tipo)}</span><span class="q"><b style="font-weight:600">${esc(x.resumen || 'Sin resumen')}</b><span>${esc(x.canal)} · ${cuando(x.fecha)}</span></span><span></span></div>`));
+    paginar(cu, items, x => x, { vacio: c.ext ? '<b>Nada todavía</b>Aquí aparecen sus proyectos y cada vez que nos buscó.' : '<b>Cargando…</b>', alPintar: l => l.querySelectorAll('[data-y]').forEach(b => b.onclick = () => abrir({ tipo: 'proyecto', id: Number(b.dataset.y) })) });
+  }
 }
 function capaEditarContacto(c) {
   const p = personaDe(c.tel); if (!p) return cerrar();
@@ -1594,31 +1600,6 @@ function activarRects(tel, secciones) {
   app.querySelectorAll('.rect[data-s]').forEach(b => b.onclick = () => {
     abrir({ tipo: 'seccion', tel, seccion: b.dataset.s, nombre: (secciones.find(x => x[0] === b.dataset.s) || [])[1] });
   });
-}
-function capaCliente(c) {
-  const p = (D.paneles || []).find(x => x.tel === c.tel), per = personaDe(c.tel);
-  if (!per) return cerrar();
-  c.tab = c.tab || 'cliente';
-  const proys = D.proyectos.filter(x => x.tel === c.tel);
-  let cuerpo;
-  if (c.tab === 'cliente' && !p) cuerpo = `<div class="cuerpo" style="grid-template-rows:auto minmax(0,1fr)"><p class="mini">Todavía no tiene demo. Aquí van su propuesta, contrato, material y avance.</p>${rectangulos(c.tel, SECCIONES)}</div>`;
-  else if (c.tab === 'cliente') cuerpo = `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr) auto">
-      <div class="demo" style="--c:${p.color}"><div class="demo-logo">${icono(p.imagen ? Object.assign({}, p, { icono: p.imagen }) : p, per, 0)}</div>
-        <div class="demo-info"><span class="eti">DEMO</span><b>${esc(nombreCorto(per))}</b><span>${esc(dominio(p.demo))}</span></div>
-        <div class="demo-botones"><button class="boton demo-boton" id="demo">Abrir demo ${I.abre}</button><button class="redondo demo-enviar" id="demoEnviar" aria-label="Enviar el demo" title="Enviar el demo">${I.enviar}</button></div></div>
-      ${rectangulos(c.tel, SECCIONES)}</div>`;
-  else if (c.tab === 'proyectos') cuerpo = `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr) auto"><div class="lista"></div><div class="pie"></div></div>`;
-  marco(p ? nombreCorto(per) : nombreDe(per), c.tab === 'cliente' ? 'Subir archivo' : '', `<div class="cuerpo" style="grid-template-rows:auto minmax(0,1fr)"><div class="tabs"><button data-tab="cliente" class="${c.tab === 'cliente' ? 'on' : ''}">Panel</button><button data-tab="proyectos" class="${c.tab === 'proyectos' ? 'on' : ''}">Proyectos</button><button data-tab="ficha">Ficha</button></div>${cuerpo || ''}</div>`);
-  app.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => { if (b.dataset.tab === 'ficha') return abrir({ tipo: 'ficha', tel: c.tel, desdeCliente: true }); c.tab = b.dataset.tab; c.p = 0; pinta(true); });
-  traerFicha(c.tel);
-  // El logo vive en los aros, pero nunca encima del nombre ni de los botones: su tamaño sale del espacio que queda libre.
-  const ajustaLogo = () => { const d = app.querySelector('.demo'), l = app.querySelector('.demo-logo'); if (!d || !l) return; l.style.removeProperty('--lg');
-    const info = app.querySelector('.demo-info').getBoundingClientRect(), dr = d.getBoundingClientRect(), lr = l.getBoundingClientRect();
-    if (lr.bottom > info.top - 8) { const libre = info.top - 8 - lr.top; l.style.setProperty('--lg', Math.max(0, libre) + 'px'); l.style.display = libre < 44 ? 'none' : ''; } else l.style.display = ''; };
-  if (c.tab === 'cliente' && p) { ajustaLogo(); alCambiarTamano = ajustaLogo; }
-  if (c.tab === 'cliente' && !p) { const ac = document.getElementById('accion'); ac.innerHTML = I.subir; ac.onclick = () => abrir({ tipo: 'subir', tel: c.tel }); activarRects(c.tel, SECCIONES); }
-  else if (c.tab === 'cliente') { const ac = document.getElementById('accion'); ac.innerHTML = I.subir; ac.onclick = () => abrir({ tipo: 'subir', tel: c.tel }); document.getElementById('demo').onclick = () => window.open(p.demo, '_blank', 'noopener'); document.getElementById('demoEnviar').onclick = () => compartir('Demo · ' + nombreCorto(per), p.demo); activarRects(c.tel, SECCIONES); }
-  if (c.tab === 'proyectos') alCambiarTamano = paginar(app.querySelector('.vista .cuerpo .cuerpo'), proys, filaProyecto, { pagina: c.p, vacio: '<b>Sin proyectos</b>', alPintar: l => l.querySelectorAll('[data-y]').forEach(b => b.onclick = () => abrir({ tipo: 'proyecto', id: Number(b.dataset.y) })) });
 }
 const SECCIONES_MOON = [['presentacion', 'Presentación de MOON'], ['pagina', 'Página web de MOON'], ['bienvenida', 'Bienvenida de Jason']];
 function capaSubir(c) {
