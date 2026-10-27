@@ -65,6 +65,9 @@ button{cursor:pointer}
 .t:active{transform:scale(.985)}
 .t .num{font-size:clamp(24px,calc(5.2 * var(--u)),40px);font-weight:800;letter-spacing:-.03em;line-height:1;margin-top:auto}
 .t .sub{font-size:13px;line-height:1.25;color:var(--suave);font-weight:600}
+.t .t-cifra{margin-top:auto;display:flex;align-items:baseline;gap:4px 8px;flex-wrap:wrap;min-width:0}.t .t-cifra .num{margin-top:0}
+.mini .largo{display:none}
+.aviso-fila{font-style:normal;font-weight:800}
 .t>.eti{padding-right:38px;line-height:1.15;font-size:clamp(16px,calc(2.6 * var(--u)),24px);font-weight:800;letter-spacing:-.01em;text-transform:none;color:var(--tinta)}
 .t-tuyo>.eti{color:#fff}
 .t .flecha{position:absolute;top:12px;right:12px;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:var(--fondo);box-shadow:var(--hundido)}
@@ -146,7 +149,7 @@ textarea.campo{height:auto;border-radius:22px;padding:14px 18px;resize:none}
 .boton[disabled]{opacity:.55}
 .botones{display:flex;gap:10px;flex-wrap:wrap}
 .botones .boton{flex:1 1 140px}
-.dos-campos{display:grid;grid-template-columns:minmax(0,1fr) 84px;gap:10px}.teclado .pasos .dos-campos:not(:focus-within){display:none}.teclado .pasos .dos-campos+.mini{display:none}
+.tope{display:grid;grid-template-columns:minmax(0,1fr) 84px;gap:10px;align-items:center;font-size:14px;font-weight:700}
 .botones.apilados{display:grid;gap:8px}.botones.apilados .boton{height:44px}
 .boton.chico{height:38px;padding:0 14px;font-size:13.5px;flex:none}
 /* Equipo */
@@ -171,6 +174,9 @@ textarea.campo{height:auto;border-radius:22px;padding:14px 18px;resize:none}
 .fecha-dice{font-weight:800;color:var(--cobalto);font-size:16px}
 #sug{flex:1;min-height:0}
 .sig-campo{display:none}.teclado form.pasos.no-ultimo .sig-campo{display:block;width:100%}.teclado form.pasos.no-ultimo>.botones{display:none}.teclado form.pasos.no-ultimo>.boton:not(.sig-campo){display:none}.teclado form.pasos .botones.apilados{display:none}
+.ocupado .boton,.ocupado button{cursor:progress}
+.redondo[disabled]{opacity:.35;pointer-events:none}
+.lista.hay-mas{-webkit-mask-image:linear-gradient(#000 calc(100% - 46px),transparent);mask-image:linear-gradient(#000 calc(100% - 46px),transparent)}
 .teclado .pasos-cab{display:none}.teclado form.pasos>:not(:focus-within):not(.botones):not(.boton):not(.aviso):not(.pasos-cuerpo){display:none}.teclado .pasos .grupo:not(:focus-within){display:none}.teclado .pasos .grupo .grupo{display:grid}.teclado .pasos .fecha-dice{display:none}
 .fases{display:grid;gap:clamp(4px,calc(1 * var(--u)),10px);justify-self:center;width:min(100%,320px)}
 .fases button{display:flex;align-items:center;gap:12px;font-size:15px;font-weight:700;color:var(--tenue);text-align:start}
@@ -329,6 +335,8 @@ html:not(.ancho) .agenda>.fila:only-child{border-radius:20px}
 .cf-vista img{width:100%;height:100%;object-fit:contain;background:#fff}.cf-vista svg{width:22px;height:22px}
 .campo-foto b{display:block;font-size:14.5px;font-weight:800;overflow-wrap:anywhere}.campo-foto small{display:block;font-size:12px;font-weight:600;color:var(--suave)}
 .et-campo{display:grid;gap:5px;font-size:12px;font-weight:800;color:var(--suave);letter-spacing:.04em}
+/* Celulares bajitos: los formularios se compactan (nunca se salen de la pantalla) */
+.bajo2 form.pasos.hoja{gap:8px;padding:12px}.bajo2 .et-campo{gap:3px}.bajo2 form.pasos .campo{min-height:42px;height:42px}.bajo2 form.pasos textarea.campo{height:auto}.bajo2 .campo-foto{padding:6px 10px}form .aviso:empty{display:none}.bajo2 form.pasos .quien button .ava{width:26px;height:26px}.bajo2 form.pasos .quien button{padding-top:3px;padding-bottom:3px}
 .doc-ic{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:var(--azulf);color:var(--cobalto);flex:none}.doc-ic svg{width:18px;height:18px}
 .casa-filas{display:grid;gap:8px}
 .casa-ic{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(150deg,#22306a,#141a3c);color:#fff;flex:none}.casa-ic svg{width:18px;height:18px}
@@ -381,7 +389,7 @@ html:not(.ancho) .agenda>.fila:only-child{border-radius:20px}
 .angosto .pils{gap:5px}.angosto .pil{padding:5px 10px 5px 5px;font-size:12.5px;gap:5px}.angosto .pil i{width:18px;height:18px;font-size:10px}.angosto .pil.solo{padding:5px 11px}
 .angosto .desc{padding:8px 12px;font-size:12.5px}
 .bajo .pista{display:none}.bajo .avance svg{width:min(200px,calc(50 * var(--w)),calc(23 * var(--u)))}.bajo .avance .fase-m{font-size:13px}.bajo .hoja{padding:12px;gap:8px!important}.bajo .pil{padding:5px 11px 5px 6px}.bajo .quien button{padding:3px 12px 3px 3px}.bajo .hoja .eti{margin-bottom:5px!important}
-.bajo2 .mosaico{grid-template-rows:1.1fr 1fr 1fr .6fr .55fr}.bajo2 .t-demo .q span{display:none}.bajo2 .t .sub{display:none}.bajo2 .hola small{display:none}
+.bajo2 .mosaico{grid-template-rows:1.1fr 1fr 1fr .6fr .55fr}.bajo2 .t-demo .q span{display:none}.bajo2 .hola small{display:none}
 /* Con el teclado arriba: la entrada se compacta para que el campo quede a la vista */
 /* Con teclado se esconde la barra de arriba y lo de abajo ocupa TODO el alto (antes se quedaba en un renglón sin alto y se veía gris). */
 .teclado .app{grid-template-rows:minmax(0,1fr)}.teclado .top{display:none}.teclado .entrada .caja{gap:8px}.teclado .aviso:empty{display:none}.teclado .enlace{min-height:0}.teclado .entrada p,.teclado .entrada .eti{display:none}.teclado .entrada .ava{width:36px;height:36px;font-size:13px}.teclado .entrada h1{font-size:20px}
@@ -484,7 +492,7 @@ const I = {
   ojoNo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18M10.6 5.1A10.7 10.7 0 0 1 12 5c6.5 0 10 7 10 7a17 17 0 0 1-3.2 4.2M6.6 6.6C3.7 8.4 2 12 2 12s3.5 7 10 7c1.9 0 3.6-.6 5-1.5"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>',
   subir: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4M7 9l5-5 5 5"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>',
   lapiz: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13 7l4 4"/></svg>',
-  enviar: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 8l5-5 5 5"/><path d="M5 13v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/></svg>',
+  enviar: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 3 10 14"/><path d="M21 3l-6.5 18-4.5-7-7-4.5z"/></svg>',
   palomita: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
   liga: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>',
   qr: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="6" height="6" rx="1"/><rect x="14.5" y="3.5" width="6" height="6" rx="1"/><rect x="3.5" y="14.5" width="6" height="6" rx="1"/><path d="M14.5 14.5h2v2h-2zM18.5 18.5h2v2h-2zM18.5 14.5h2M14.5 18.5v2"/></svg>',
@@ -505,7 +513,35 @@ const firmaSesion = () => { const v = sesionGuardada(); let h = 0; for (let i = 
 function leerCopia() { try { const c = JSON.parse(localStorage.getItem(COPIA) || 'null'); return c && c.s === firmaSesion() && c.d ? c : null; } catch (e) { return null; } }
 function guardarCopia(d, f) { try { const c = leerCopia() || {}; localStorage.setItem(COPIA, JSON.stringify({ s: firmaSesion(), d: d || c.d, f: f || c.f })); } catch (e) {} }
 
+// Mientras se guarda algo, ningún otro toque cuenta: un doble toque nunca guarda dos veces ni regresa dos pantallas.
+const LECTURAS = new Set(['inicio', 'ficha', 'documento', 'archivo_parte', 'fotos', 'equipo', 'bitacora', 'papelera', 'uso', 'quienes', 'invitacion', 'tarea_vista', 'subir_parte', 'salir']);
+let ocupado = false, sueltaReloj = null;
+function soltar() { ocupado = false; pendientes = 0; clearTimeout(sueltaReloj); document.documentElement.classList.remove('ocupado'); }
+function bloquear() { ocupado = true; clearTimeout(sueltaReloj); sueltaReloj = setTimeout(soltar, 8000); document.documentElement.classList.add('ocupado'); }
+// Solo se frenan los toques que guardan o cambian de pantalla (botones grandes, regresar, filas); los interruptores (fases, etapas) siguen libres.
+const bloqueaToque = e => { if (ocupado && e.target.closest && (e.type === 'submit' || e.target.closest('.boton,#volver,.redondo,.enlace,.fila,.t,[data-ir]'))) { e.preventDefault(); e.stopImmediatePropagation(); } };
+// Solo bloquea un guardado que salió de tocar un botón de guardar o de regresar (no los interruptores que guardan solos).
+let toqueGuardar = 0;
+const marcaToque = e => { if (!ocupado && e.target.closest && (e.type === 'submit' || e.target.closest('.boton,#volver,.redondo,.enlace'))) toqueGuardar = performance.now(); };
+document.addEventListener('click', bloqueaToque, true);
+document.addEventListener('submit', bloqueaToque, true);
+document.addEventListener('click', marcaToque, true);
+document.addEventListener('submit', marcaToque, true);
+let pendientes = 0;
 async function api(accion, datos) {
+  const escribe = !LECTURAS.has(accion);
+  if (escribe && performance.now() - toqueGuardar < 400) bloquear();
+  if (ocupado) { pendientes++; clearTimeout(sueltaReloj); }   // lo que se pide justo después de guardar es parte del mismo toque
+  const contado = ocupado;
+  const j = await api0(accion, datos);
+  if (contado) pendientes = Math.max(0, pendientes - 1);
+  // Si falló, se suelta luego luego (para reintentar). Si salió bien, se suelta al dibujar la pantalla siguiente,
+  // o en un instante si el toque ya no hace nada más (por ejemplo, "Mandar su link").
+  if (contado && escribe && !j.ok && !pendientes) soltar();
+  else if (ocupado && !pendientes) { clearTimeout(sueltaReloj); sueltaReloj = setTimeout(soltar, 80); }
+  return j;
+}
+async function api0(accion, datos) {
   const r = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-sesion': sesionGuardada() }, body: JSON.stringify(Object.assign({ accion }, datos || {})) })
     .catch(() => null);
   if (!r) return { ok: false, error: 'red' };
@@ -560,8 +596,10 @@ function paginar(cont, items, pinta, opciones) {
     if (items.length) o.alPintar && o.alPintar(lista);
     if (capa && capa[clave]) lista.scrollTop = capa[clave];
   }
-  lista.onscroll = () => { if (capa) capa[clave] = lista.scrollTop; };
-  dibuja();
+  // Si la lista tiene más abajo, el borde de abajo se desvanece: así se nota que hay más (nunca un renglón escondido sin aviso).
+  const hayMas = () => lista.classList.toggle('hay-mas', lista.scrollTop + lista.clientHeight < lista.scrollHeight - 2);
+  lista.onscroll = () => { if (capa) capa[clave] = lista.scrollTop; hayMas(); };
+  dibuja(); hayMas(); requestAnimationFrame(hayMas);
   return () => {};   // ya no hay que repartir en páginas al cambiar el tamaño
 }
 let alCambiarTamano = null;
@@ -783,6 +821,7 @@ async function precargar(capa) {
   if (capa.tipo === 'documento' && !capa.doc) await espera(api('documento', { id: capa.id }).then(r => { if (r.ok) capa.doc = r.doc; }));
   if (capa.tipo === 'qr') await espera(cargarQR().catch(() => null));
   if (capa.tipo === 'equipo' && !capa.eq) await espera(traerEquipo(capa));
+  if (capa.tipo === 'fichaMas' && !(capa.ext && capa.ext.ok)) await espera(traerFicha(capa.tel).then(r => { if (r && r.ok) capa.ext = r; }));
   if ((capa.tipo === 'bitacora' || capa.tipo === 'papelera') && !capa.lista) await espera(api(capa.tipo).then(r => { if (r.ok) capa.lista = r.lista; }));
   if (capa.tipo === 'proyecto' && capa.tab === 'uso' && !capa.uso) await espera(api('uso', { id: capa.id }).then(r => { if (r.ok) capa.uso = r; }));
 }
@@ -802,17 +841,23 @@ async function abrir(capa) {
 function reemplazar(capa) { pila[pila.length - 1] = capa; transicion(() => pinta()); }
 // Si un documento abierto (página de otro sitio) guardó pasos en el historial, "atrás" solo movería ese documento:
 // por eso, si la capa no se cerró sola en un momento, se cierra aquí. El botón Regresar siempre regresa.
+let cerrandoAdrede = false;
 function cerrar() {
   const capa = pila[pila.length - 1];
+  cerrandoAdrede = true; setTimeout(() => { cerrandoAdrede = false; }, 600);
   if (history.state && history.state.capa) { history.back(); setTimeout(() => { if (capa && pila[pila.length - 1] === capa) { pila.pop(); transicion(() => pinta()); } }, 400); }
   else { pila.pop(); transicion(() => pinta()); }
 }
 // El historial dice en qué capa vamos: se regresa a ese nivel (si ya estábamos ahí, no pasa nada; nunca se cierran dos de golpe).
-addEventListener('popstate', () => { const nivel = (history.state && history.state.capa) || 0; if (pila.length > nivel) { pila.length = nivel; transicion(() => pinta()); } });
+addEventListener('popstate', () => {
+  const arriba = pila[pila.length - 1];
+  const adrede = cerrandoAdrede; cerrandoAdrede = false;
+  if (!adrede && arriba && arriba.tipo === 'nuevaTarea' && arriba.paso > 1 && (history.state && history.state.capa || 0) < pila.length) { try { history.pushState({ capa: pila.length }, ''); } catch (e) {} if (arriba.guardar) arriba.guardar(); arriba.paso--; pinta(true); return; } const nivel = (history.state && history.state.capa) || 0; if (pila.length > nivel) { pila.length = nivel; transicion(() => pinta()); } });
 function pinta(silencioso) {
   // Una sola pantalla a la vez: la anterior se borra, nada queda escondido detrás.
   // Si solo se actualizan datos (llegó la ficha, la foto o la recarga de cada minuto), se cambia sin animar nada.
   alCambiarTamano = null;
+  soltar();
   registrarEmbajadores();
   // Un embajador solo puede estar en sus pantallas: si algo lo manda a otra, regresa a su inicio.
   if (esEmb() && pila.some(x => !CAPAS_EMB.includes(x.tipo))) pila = [];
@@ -855,12 +900,12 @@ function pintaInicio(sil) {
       <div class="t t-tuyo" role="button" tabindex="0" data-ir="tareas"><span class="flecha">${I.abre}</span><span class="eti">Tareas</span>
         ${nuevas ? `<span class="brilla latido"><i>${nuevas}</i>nueva${nuevas === 1 ? '' : 's'} para ti</span>` : ''}
         <div class="extra">${xTareas}</div>
-        <span class="num">${mias.length}</span><span class="sub">${vencen ? `${vencen} atrasada${vencen === 1 ? '' : 's'} · ` : ''}tareas abiertas</span></div>
-      <div class="t t-crm" role="button" tabindex="0" data-ir="crm"><span class="flecha">${I.abre}</span><span class="eti">CRM de MOON</span><div class="extra">${xCrm}</div><span class="num">${cuenta('pendiente') + cuenta('en proceso')}</span><span class="sub">clientes por cerrar</span><span class="barrita">${barrita}</span></div>
-      <div class="t t-proy" role="button" tabindex="0" data-ir="clientes"><span class="flecha">${I.abre}</span><span class="eti">Clientes</span><div class="extra">${xProy}</div><span class="num">${clientes.length}</span><span class="sub">nos pagan${enCamino ? ` · ${enCamino} en camino` : ''}</span></div>
-      <div class="t t-equipo" role="button" tabindex="0" data-ir="equipo"><span class="flecha">${I.abre}</span><span class="eti">Equipo</span><div class="extra">${xEq}</div><span class="num">${Object.keys(GENTE).length}</span><span class="sub">integrantes</span></div>
-      <div class="t t-moon" role="button" tabindex="0" data-ir="casa"><span class="flecha">${I.abre}</span><span class="eti">Hecho en casa</span><div class="extra">${xMoon}</div><span class="sub" style="margin-top:auto">Visión, Jason y presentación</span></div>
-      <div class="t t-demo" role="button" tabindex="0" data-ir="demo"><span class="mic">${I.mic}</span><span class="q"><b>Para tus clientes</b><span class="sub">Demo, calculadora y presentación</span></span><span class="flecha">${I.abre}</span></div>
+        <div class="t-cifra"><span class="num">${mias.length}</span><span class="sub" data-corto="${esc(nuevas ? `abiertas · <b style='color:#fff'>${nuevas} nueva${nuevas === 1 ? '' : 's'}</b>` : 'abiertas')}">${vencen ? `${vencen} atrasada${vencen === 1 ? '' : 's'} · ` : ''}abiertas</span></div></div>
+      <div class="t t-crm" role="button" tabindex="0" data-ir="crm"><span class="flecha">${I.abre}</span><span class="eti">CRM<span class="largo"> de MOON</span></span><div class="extra">${xCrm}</div><div class="t-cifra"><span class="num">${cuenta('pendiente') + cuenta('en proceso')}</span><span class="sub">por cerrar</span></div><span class="barrita">${barrita}</span></div>
+      <div class="t t-proy" role="button" tabindex="0" data-ir="clientes"><span class="flecha">${I.abre}</span><span class="eti">Clientes</span><div class="extra">${xProy}</div><div class="t-cifra"><span class="num">${clientes.length}</span><span class="sub" data-corto="nos pagan">nos pagan${enCamino ? ` · ${enCamino} en camino` : ''}</span></div></div>
+      <div class="t t-equipo" role="button" tabindex="0" data-ir="equipo"><span class="flecha">${I.abre}</span><span class="eti">Equipo</span><div class="extra">${xEq}</div><div class="t-cifra"><span class="num">${Object.keys(GENTE).length}</span><span class="sub" data-corto="en el equipo">administradores${(D.embajadores || []).length ? ` · ${D.embajadores.length} embajador${D.embajadores.length === 1 ? '' : 'es'}` : ''}</span></div></div>
+      <div class="t t-moon" role="button" tabindex="0" data-ir="casa"><span class="flecha">${I.abre}</span><span class="eti">Hecho en casa</span><div class="extra">${xMoon}</div><span class="sub" style="margin-top:auto" data-corto="Visión y Jason">Visión, Jason y presentación</span></div>
+      <div class="t t-demo" role="button" tabindex="0" data-ir="demo"><span class="mic">${I.mic}</span><span class="q"><b>Crea tu recepcionista</b><span class="sub">Ármale uno a un cliente y mándale el link</span></span><span class="flecha">${I.abre}</span></div>
       <div class="t t-ultimo">${ult ? ava(ult.quien, 1) : ''}<span class="txt">${ult ? `Lo último: <b>${esc((gente(ult.quien) || CLAUDE).n)}</b> ${esc(ult.texto)} · ${cuando(ult.fecha)}` : 'Aquí aparece lo último que pasó en MOON.'}</span></div>
     </main>
   </div>`;
@@ -891,8 +936,10 @@ function llenarExtras() {
     if (!x.children.length) x.style.display = 'none';   // vacía no ocupa lugar
   });
   app.querySelectorAll('.mosaico .t').forEach(t => {
-    for (const sel of ['.extra', '.barrita', '.sub', '.brilla']) {
+    // Si no cabe: primero se van los renglones extra, luego el texto se dice más corto; quitarlo es lo último.
+    for (const sel of ['.extra', '.barrita', 'corto', '.brilla', '.sub']) {
       if (t.scrollHeight <= t.clientHeight + 1) break;
+      if (sel === 'corto') { t.querySelectorAll('[data-corto]').forEach(e => { e.innerHTML = e.dataset.corto; }); continue; }
       const e = t.querySelector(sel); if (e) e.style.display = 'none';
     }
   });
@@ -903,9 +950,14 @@ const DIAS = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', '
 const MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
 function fechaBonita(f) { if (!f) return ''; const [a, m, d] = f.split('-').map(Number); const x = new Date(a, m - 1, d); return `${DIAS[x.getDay()]} ${d} de ${MESES[m - 1]}`; }
 const hoyISO = (mas = 0) => { const [a, m, d] = fechaCancun(Date.now()).split('-').map(Number); const x = new Date(a, m - 1, d + mas); return `${x.getFullYear()}-${String(x.getMonth() + 1).padStart(2, '0')}-${String(x.getDate()).padStart(2, '0')}`; };
-function finDeSemana() { const [a, m, d] = hoyISO().split('-').map(Number); const dia = new Date(a, m - 1, d).getDay(); return hoyISO(dia <= 5 ? 5 - dia : 7 - dia); }   // el viernes (o el domingo si ya es fin de semana)
+const diaHoy = () => { const [a, m, d] = hoyISO().split('-').map(Number); return new Date(a, m - 1, d).getDay(); };
+// "Esta semana" = este viernes. Si ya es viernes o fin de semana, la opción dice "La próxima semana" (el viernes que viene): nunca dos botones con el mismo día.
+const tardeEnSemana = () => [5, 6, 0].includes(diaHoy());
+function finDeSemana() { const dia = diaHoy(); return hoyISO(dia >= 1 && dia <= 4 ? 5 - dia : dia === 5 ? 7 : dia === 6 ? 6 : 5); }
 const sinAcento = x => String(x || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-const deQuien = x => x.cliente || (proyectoDe(x.proyecto) || {}).nombre || 'General';
+const deQuien = x => x.cliente || (proyectoDe(x.proyecto) || {}).nombre || 'Sin cliente';
+// Quién dejó una tarea: una persona, o "el tablero" cuando se creó sola (por ejemplo, cuando un prospecto pidió su recepcionista).
+const quienDejo = id => gente(id) ? gente(id).n : 'El tablero (automática)';
 function capaTareas(c) {
   const de = c.persona && c.persona !== yo() ? c.persona : '';
   c.grupo = c.grupo || (de ? 'abiertas' : 'mias');
@@ -924,7 +976,7 @@ function capaTareas(c) {
   alCambiarTamano = paginar(app.querySelector('.cuerpo'), items, x => filaTarea(x, g[0] === 'todos'), { vacio, alPintar: l => l.querySelectorAll('[data-t]').forEach(b => b.onclick = () => abrir({ tipo: 'tarea', id: Number(b.dataset.t) })) });
 }
 function filaTarea(x, dePara) {
-  const st = x.estado === 'hecha' ? ['Hecha', 'var(--verde)', 'var(--verdef)'] : x.estado === 'nueva' ? ['Nueva', '#fff', 'var(--cobalto)'] : atrasada(x) ? ['Atrasada', 'var(--rojo)', 'var(--rojof)'] : ['Vista', 'var(--suave)', 'var(--campo)'];
+  const st = x.estado === 'hecha' ? ['Hecha', 'var(--verde)', 'var(--verdef)'] : x.estado === 'nueva' ? ['Nueva', '#fff', 'var(--cobalto)'] : atrasada(x) ? ['Atrasada', 'var(--rojo)', 'var(--rojof)'] : ['La vio', 'var(--suave)', 'var(--campo)'];
   const quien = dePara ? `Para ${(gente(x.para) || { n: x.para }).n} · ` : '';
   return `<button class="fila${x.estado === 'nueva' ? ' nueva' : ''}" data-t="${x.id}">${ava(dePara ? x.para : x.de, 1)}<span class="q"><b>${esc(x.titulo)}</b><span>${esc(quien + deQuien(x))} · ${x.vence ? 'para el ' + fechaBonita(x.vence) : cuando(x.creado)}</span></span><span class="estado" style="--c:${st[1]};--cf:${st[2]}">${st[0]}</span></button>`;
 }
@@ -933,18 +985,18 @@ async function capaTarea(c) {
   if (!x) return cerrar();
   if (x.para === yo() && x.estado === 'nueva') { x.estado = 'vista'; x.visto = new Date().toISOString(); api('tarea_vista', { id: x.id }); }
   const par = (n, v) => v ? `<div class="par"><span>${n}</span><b>${esc(v)}</b></div>` : '';
-  marco('Tarea', '', `<div class="hoja" style="grid-template-rows:auto auto minmax(0,1fr) auto">
+  marco(x.para === yo() ? 'Tu tarea' : `Tarea de ${(gente(x.para) || { n: x.para }).n}`, '', `<div class="hoja" style="grid-template-rows:auto auto minmax(0,1fr) auto">
     <div class="eti">${esc(deQuien(x))}</div>
     <h3 style="font-size:clamp(19px,calc(5 * var(--w)),24px);font-weight:800;line-height:1.2;overflow-wrap:anywhere">${esc(x.titulo)}</h3>
     <div id="caja" style="min-height:0;overflow:hidden;display:grid;align-content:start;gap:10px">
       ${x.detalle ? `<p id="detalle" style="color:var(--suave);font-weight:600;white-space:pre-line">${esc(x.detalle)}</p>` : ''}
       ${par('Ya quedó cuando', x.listo)}${par('Necesita', x.necesita)}
       <div class="par"><span>Para</span><b>${esc(gente(x.para) ? gente(x.para).n : x.para)}</b></div>
-      <div class="par"><span>La dejó</span><b>${esc(gente(x.de) ? gente(x.de).n : 'Claude')} · ${cuando(x.creado)}</b></div>
+      <div class="par"><span>La dejó</span><b>${esc(quienDejo(x.de))} · ${cuando(x.creado)}</b></div>
       ${x.vence ? `<div class="par"><span>Para el</span><b>${esc(fechaBonita(x.vence))}</b></div>` : ''}
       <div class="par"><span>La vio</span><b>${x.visto ? cuando(x.visto) : 'Todavía no'}</b></div>
     </div>
-    <div class="botones">${x.enlace ? `<a class="boton dos" href="${esc(x.enlace)}" target="_blank" rel="noopener">Abrir el link</a>` : ''}${x.para !== yo() && esEmb() ? '' : x.estado === 'hecha' ? '<button class="boton dos" id="hecho">Volver a abrir</button>' : '<button class="boton" id="hecho">Ya lo hice</button>'}</div></div>`);
+    <div class="botones">${x.enlace ? `<a class="boton dos" href="${esc(x.enlace)}" target="_blank" rel="noopener">Abrir el link</a>` : ''}${x.para !== yo() && esEmb() ? '' : x.estado === 'hecha' ? '<button class="boton dos" id="hecho">Volver a abrir</button>' : `<button class="boton" id="hecho">${x.para === yo() ? 'Ya lo hice' : `Ya la hizo ${esc((gente(x.para) || { n: x.para }).n)}`}</button>`}</div></div>`);
   // Si lo escrito no cabe completo, se esconde y aparece un botón para leerlo entero (nunca se corta).
   const caja = document.getElementById('caja');
   if (caja.scrollHeight > caja.clientHeight + 1) {
@@ -955,13 +1007,14 @@ async function capaTarea(c) {
   }
   const h = document.getElementById('hecho');
   if (h) h.onclick = async () => {
-    const r = await api('tarea_hecha', { id: x.id, hecha: x.estado !== 'hecha' });
-    if (r.ok) { await recargar(); cerrar(); }
+    const hecha = x.estado !== 'hecha';
+    const r = await api('tarea_hecha', { id: x.id, hecha });
+    if (r.ok) { await recargar(); avisoFlotante(hecha ? 'Listo: tarea hecha' : 'La tarea volvió a quedar abierta'); cerrar(); }
   };
 }
 // Nueva tarea: una pregunta a la vez (nunca un formulario largo que el teclado tape).
 function capaNuevaTarea(c) {
-  const t = c.t = c.t || { titulo: '', para: c.para || yo(), cliente: c.cliente || (proyectoDe(c.proyecto) || {}).nombre || '', vence: '', listo: '', necesita: '', enlace: '' };
+  const t = c.t = c.t || { titulo: '', para: c.para || yo(), cliente: c.cliente || (() => { const pr = proyectoDe(c.proyecto), per = pr && personaDe(pr.tel); return per ? nombreDe(per) : pr ? 'MOON' : ''; })(), vence: '', listo: '', necesita: '', enlace: '' };
   c.paso = c.paso || 1;
   const N = 7, paso = c.paso;
   const gentes = ['daniel', 'dan', 'kid'].concat((D.embajadores || []).map(e => e.id));
@@ -970,7 +1023,7 @@ function capaNuevaTarea(c) {
   if (paso === 1) cuerpo = grupo('q1', '¿Qué hay que hacer?', `<textarea class="campo" id="q1" rows="2" maxlength="160" placeholder="Ejemplo: Mandarle la propuesta a Clínica Sonrisa">${esc(t.titulo)}</textarea>`);
   if (paso === 2) cuerpo = `<div class="grupo"><span class="preg">¿Para quién?</span><div class="quien grande" id="para">${gentes.map(id => `<button type="button" data-u="${id}" class="${id === t.para ? 'on' : ''}">${ava(id)}<span>${esc(gente(id).n)}</span></button>`).join('')}</div></div>`;
   if (paso === 3) cuerpo = grupo('q3', '¿De qué cliente?', `<input class="campo" id="q3" autocomplete="off" maxlength="120" value="${esc(t.cliente)}" placeholder="Escribe el nombre o déjalo vacío">`) + `<div class="lista" id="sug"></div>`;
-  if (paso === 4) cuerpo = `<div class="grupo"><span class="preg">¿Para cuándo?</span><div class="segmento fechas" id="cuando">${[['hoy', 'Hoy', hoyISO()], ['manana', 'Mañana', hoyISO(1)], ['semana', 'Esta semana', finDeSemana()], ['sin', 'Sin fecha', '']].map(([k, n, v]) => `<button type="button" data-v="${v}" class="${t.vence === v && (v || t.sinFecha) ? 'on' : ''}">${n}</button>`).join('')}</div>
+  if (paso === 4) cuerpo = `<div class="grupo"><span class="preg">¿Para cuándo?</span><div class="segmento fechas" id="cuando">${[['hoy', 'Hoy', hoyISO()], ['manana', 'Mañana', hoyISO(1)], ['semana', tardeEnSemana() ? 'La próxima semana' : 'Esta semana', finDeSemana()], ['sin', 'Sin fecha', '']].map(([k, n, v]) => `<button type="button" data-v="${v}" class="${t.vence === v && (v || t.sinFecha) ? 'on' : ''}">${n}</button>`).join('')}</div>
     <label class="grupo" for="q4"><span class="mini">O elige el día:</span><input class="campo" id="q4" type="date" min="${hoyISO()}" value="${esc(t.vence)}"></label>
     <p class="fecha-dice" id="dice">${t.vence ? 'Para el ' + fechaBonita(t.vence) : t.sinFecha ? 'Sin fecha' : 'Elige una opción'}</p></div>`;
   if (paso === 5) cuerpo = grupo('q5', '¿Cómo sabemos que ya quedó?', `<textarea class="campo" id="q5" rows="2" maxlength="600" enterkeyhint="next" placeholder="Ejemplo: El cliente ya contestó que le llegó">${esc(t.listo)}</textarea>`) + '<p class="mini">Si no aplica, déjalo vacío y toca Siguiente.</p>';
@@ -990,8 +1043,10 @@ function capaNuevaTarea(c) {
     if (paso === 7) t.enlace = v('q7').trim();
   };
   // Al cambiar de pregunta, el campo nuevo queda listo para escribir (el teclado no se cierra ni la pantalla brinca).
+  c.guardar = guarda;
   const ir = n => { guarda(); c.paso = n; pinta(true); const e = app.querySelector('.pasos-cuerpo .campo:not([type=date])'); if (e) e.focus(); };
   document.getElementById('atras').onclick = () => paso === 1 ? cerrar() : ir(paso - 1);
+  document.getElementById('volver').onclick = () => paso === 1 ? cerrar() : ir(paso - 1);   // la flecha de arriba también regresa UNA pregunta, nunca borra lo escrito
   ['q1', 'q5', 'q6'].forEach(id => { const x = document.getElementById(id); if (x) { x.enterKeyHint = 'next'; x.onkeydown = e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); f.requestSubmit(); } }; } });
   if (paso === 2) app.querySelectorAll('#para button').forEach(b => b.onclick = () => { t.para = b.dataset.u; ir(3); });
   if (paso === 3) {
@@ -1105,10 +1160,10 @@ async function capaFicha(c, sil) {
     ${P.proxima_cita ? `<div class="par"><span>Cita</span><b>${esc(P.proxima_cita)}</b></div>` : ''}
     <div class="f-bloque f-nota"><span class="eti">Nota del equipo</span>${P.notas_equipo ? `<button class="nota" id="nota">${esc(P.notas_equipo)}</button>` : '<button class="boton dos" id="nota" style="height:44px">Escribir una nota</button>'}</div>
     <button class="boton" id="sigue">¿Qué sigue? Dejar una tarea</button>
-    <div class="f-enlaces"><button class="enlace" id="mas">Historial y datos</button><button class="enlace" id="editar">Editar contacto</button><button class="enlace rojo" id="quitar">${paga ? 'Quitar de Clientes' : 'Quitar'}</button></div></div>`);
+    <div class="f-enlaces"><button class="enlace" id="mas">Historial y datos</button><button class="enlace" id="editar">Editar contacto</button><button class="enlace rojo" id="quitar">${paga ? 'Quitar de Clientes' : 'Mandar a la papelera'}</button></div></div>`);
   if (sil) app.querySelector('.vista').style.animation = 'none';
   const guarda = async datos => { const r = await api('editar_persona', Object.assign({ tel: c.tel }, datos)); if (r.ok) { Object.assign(p, datos); if (c.ext && c.ext.persona) Object.assign(c.ext.persona, datos); delete FICHAS[c.tel]; } return r; };
-  app.querySelectorAll('#etapas [data-e]').forEach(b => b.onclick = async () => { const antes = p.etapa; const r = await guarda({ etapa: b.dataset.e }); if (r.ok) { pinta(true); recargar(true); if (!PAGAN.includes(antes) && PAGAN.includes(b.dataset.e)) avisoFlotante('Ya aparece en Clientes'); } });
+  app.querySelectorAll('#etapas [data-e]').forEach(b => b.onclick = async () => { const antes = p.etapa; const r = await guarda({ etapa: b.dataset.e }); if (r.ok) { pinta(true); recargar(true); const e = b.dataset.e; avisoFlotante(!PAGAN.includes(antes) && PAGAN.includes(e) ? 'Listo: ya aparece en Clientes' : PAGAN.includes(antes) && !PAGAN.includes(e) ? `Ahora está en ${ETAPA[e].n}: ya no aparece en Clientes` : `Listo: ahora está en ${ETAPA[e].n}`); } });
   document.getElementById('nota').onclick = () => abrir({ tipo: 'nota', tel: c.tel });
   document.getElementById('sigue').onclick = () => abrir({ tipo: 'nuevaTarea', para: yo(), cliente: nombreDe(P) });
   document.getElementById('mas').onclick = () => abrir({ tipo: 'fichaMas', tel: c.tel, ext: c.ext });
@@ -1150,12 +1205,13 @@ function capaFichaMas(c) {
   marco('Historial y datos', '', `<div class="cuerpo" style="grid-template-rows:auto minmax(0,1fr) auto"><p class="mini">${esc(nombreDe(P))}: sus datos, sus proyectos y cada vez que nos buscó.</p><div class="lista"></div>
     <label class="mini" style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="prueba"${P.es_prueba ? ' checked' : ''}> Es una llamada de prueba (no cuenta como cliente)</label></div>`);
   document.getElementById('prueba').onchange = async e => { const r = await api('editar_persona', { tel: c.tel, es_prueba: e.target.checked }); if (r.ok) { p.es_prueba = e.target.checked ? 1 : 0; delete FICHAS[c.tel]; recargar(true); } };
-  paginar(app.querySelector('.cuerpo'), items, x => x, { vacio: '<b>Nada todavía</b>', alPintar: l => l.querySelectorAll('[data-y]').forEach(b => b.onclick = () => abrir({ tipo: 'proyecto', id: Number(b.dataset.y) })) });
+  if (!(ext && ext.ok)) traerFicha(c.tel).then(r => { if (r && r.ok && pila[pila.length - 1] === c) { c.ext = r; pinta(true); } });
+  paginar(app.querySelector('.cuerpo'), items, x => x, { vacio: ext && ext.ok ? '<b>Nada todavía</b>' : '<b>Cargando…</b>', alPintar: l => l.querySelectorAll('[data-y]').forEach(b => b.onclick = () => abrir({ tipo: 'proyecto', id: Number(b.dataset.y) })) });
 }
 function capaEditarContacto(c) {
   const p = personaDe(c.tel); if (!p) return cerrar();
   const pan = (D.paneles || []).find(x => x.tel === c.tel);
-  marco('Contacto de ' + nombreDe(p), '', `<form class="hoja editando pasos" id="f" style="align-self:start">
+  marco('Contacto de ' + nombreDe(p), '', `<form class="hoja editando pasos" id="f" novalidate style="align-self:start">
     ${campoFoto(p.foto || '')}
     <label class="et-campo">Negocio<input class="campo" name="negocio" value="${esc(p.negocio || '')}" maxlength="120"></label>
     <label class="et-campo">Nombre de la persona<input class="campo" name="nombre" value="${esc(p.nombre || '')}" maxlength="80"></label>
@@ -1171,34 +1227,35 @@ function capaEditarContacto(c) {
     if (foto !== undefined) datos.foto = foto;
     const r = await api('editar_persona', Object.assign({ tel: c.tel }, datos));
     if (!r.ok) { document.getElementById('aviso').textContent = r.error === 'foto' ? 'Esa foto no se pudo guardar. Prueba con otra.' : 'No se pudo guardar.'; return; }
-    Object.assign(p, datos); delete FICHAS[c.tel]; await recargar(); cerrar();
+    Object.assign(p, datos); delete FICHAS[c.tel]; await recargar(); avisoFlotante('Contacto guardado'); cerrar();
   };
 }
 function capaNota(c) {
   const p = personaDe(c.tel); if (!p) return cerrar();
-  marco('Nota de ' + nombreDe(p), '', `<form class="hoja editando pasos" id="f" style="align-self:start"><textarea class="campo" id="txt" rows="7" placeholder="Lo que el equipo debe saber de este cliente">${esc(p.notas_equipo || '')}</textarea><button class="boton">Guardar nota</button><div class="aviso" id="aviso"></div></form>`);
+  marco('Nota de ' + nombreDe(p), '', `<form class="hoja editando pasos" id="f" novalidate style="align-self:start"><textarea class="campo" id="txt" rows="7" placeholder="Lo que el equipo debe saber de este cliente">${esc(p.notas_equipo || '')}</textarea><button class="boton">Guardar nota</button><div class="aviso" id="aviso"></div></form>`);
   const f = document.getElementById('f');
   setTimeout(() => document.getElementById('txt').focus(), 300);
-  f.onsubmit = async e => { e.preventDefault(); const v = document.getElementById('txt').value; const r = await api('editar_persona', { tel: c.tel, notas_equipo: v }); if (r.ok) { p.notas_equipo = v; cerrar(); } else document.getElementById('aviso').textContent = 'No se pudo guardar.'; };
+  f.onsubmit = async e => { e.preventDefault(); const v = document.getElementById('txt').value; const r = await api('editar_persona', { tel: c.tel, notas_equipo: v }); if (r.ok) { p.notas_equipo = v; delete FICHAS[c.tel]; avisoFlotante('Nota guardada'); cerrar(); } else document.getElementById('aviso').textContent = 'No se pudo guardar.'; };
 }
 function capaNuevoCliente(c) {
-  marco('Nuevo cliente', '', `<form class="hoja editando pasos" id="f" style="align-self:start">
-    <input class="campo" name="negocio" placeholder="Negocio (ej. Grupo Beta)" maxlength="120">
-    <input class="campo" name="nombre" placeholder="Nombre de la persona" maxlength="80">
-    <input class="campo" name="telefono" placeholder="Teléfono (opcional)" inputmode="tel" maxlength="30">
-    <input class="campo" name="correo" placeholder="Correo (opcional)" inputmode="email" maxlength="120">
+  // La etapa ya la dice de dónde vienes (Clientes, En camino o el CRM): no se pregunta otra vez.
+  const etapa = c.etapa || 'pendiente';
+  const destino = etapa === 'cerrado' ? 'Clientes' : etapa === 'en proceso' ? 'En camino' : 'el CRM como Pendiente';
+  marco(etapa === 'cerrado' ? 'Nuevo cliente' : 'Nueva persona', '', `<form class="hoja editando pasos" id="f" novalidate style="align-self:start">
     ${campoFoto('')}
-    <div class="pils" style="align-content:start">${Object.keys(ETAPA).filter(e => e !== 'archivo').map(e => `<button type="button" class="pil${(c.etapa || 'pendiente') === e ? ' on' : ''}" data-e="${e}" style="--c:${ETAPA[e].c};--cf:${ETAPA[e].cf}"><i>${ETAPA[e].ic}</i>${ETAPA[e].n}</button>`).join('')}</div>
-    <button class="boton">Agregar al CRM</button><div class="aviso" id="aviso"></div></form>`);
-  let etapa = c.etapa || 'pendiente';
-  app.querySelectorAll('[data-e]').forEach(b => b.onclick = () => { etapa = b.dataset.e; app.querySelectorAll('[data-e]').forEach(x => x.classList.toggle('on', x === b)); });
+    <label class="et-campo">Negocio<input class="campo" name="negocio" placeholder="Ejemplo: Grupo Beta" maxlength="120"></label>
+    <label class="et-campo">Nombre de la persona<input class="campo" name="nombre" placeholder="Ejemplo: Laura Méndez" maxlength="80"></label>
+    <label class="et-campo">Teléfono (si lo tienes)<input class="campo" name="telefono" inputmode="tel" maxlength="30"></label>
+    <label class="et-campo">Correo (si lo tienes)<input class="campo" name="correo" inputmode="email" maxlength="120"></label>
+    <p class="mini">Queda en ${destino}.</p>
+    <button class="boton">Agregar</button><div class="aviso" id="aviso"></div></form>`);
   let foto = ''; activarFoto(d => { foto = d; });
   const f = document.getElementById('f');
   f.onsubmit = async e => {
     e.preventDefault(); const fd = new FormData(f);
     if (!fd.get('negocio') && !fd.get('nombre')) { document.getElementById('aviso').textContent = 'Escribe al menos el negocio o el nombre.'; return; }
     const r = await api('nuevo_cliente', { negocio: fd.get('negocio'), nombre: fd.get('nombre'), telefono: fd.get('telefono'), correo: fd.get('correo'), foto, etapa, encargados: 'daniel,dan,kid' });
-    if (r.ok) { await recargar(); reemplazar({ tipo: 'ficha', tel: r.tel }); } else document.getElementById('aviso').textContent = 'No se pudo guardar.';
+    if (r.ok) { await recargar(); avisoFlotante('Agregado a ' + (etapa === 'cerrado' ? 'Clientes' : etapa === 'en proceso' ? 'En camino' : 'el CRM')); reemplazar({ tipo: 'ficha', tel: r.tel }); } else document.getElementById('aviso').textContent = 'No se pudo guardar. Intenta de nuevo.';
   };
 }
 
@@ -1278,17 +1335,18 @@ function capaProyecto(c) {
   const clientes = reales().filter(x => x.etapa !== 'archivo');
   const cli = personaDe(p.tel);
   if (editar) {
-    marco(nuevo ? 'Nuevo proyecto' : 'Editar proyecto', '', `<form class="hoja editando pasos" id="f" style="align-self:start">
-      <input class="campo" name="nombre" placeholder="Nombre del proyecto" value="${esc(p.nombre)}" required maxlength="100">
-      <select class="campo" name="tel"><option value="">MOON (proyecto interno)</option>${clientes.map(x => `<option value="${esc(x.tel)}"${x.tel === p.tel ? ' selected' : ''}>${esc(nombreDe(x))}</option>`).join('')}</select>
+    marco(nuevo ? 'Nuevo proyecto' : 'Editar proyecto', '', `<form class="hoja editando pasos" id="f" novalidate style="align-self:start">
+      <label class="et-campo">Nombre del proyecto<input class="campo" name="nombre" placeholder="Ejemplo: Recepcionista de la clínica" value="${esc(p.nombre)}" maxlength="100"></label>
+      <label class="et-campo">¿De qué cliente?<select class="campo" name="tel"><option value="">MOON (proyecto interno)</option>${clientes.map(x => `<option value="${esc(x.tel)}"${x.tel === p.tel ? ' selected' : ''}>${esc(nombreDe(x))}</option>`).join('')}</select></label>
       <div><div class="eti" style="margin-bottom:8px">Encargados</div><div class="quien" id="enc">${Object.keys(GENTE).map(id => `<button type="button" data-u="${id}" class="${String(p.encargados).split(',').includes(id) ? 'on' : ''}">${ava(id)}${GENTE[id].n}</button>`).join('')}</div></div>
-      <textarea class="campo" name="nota" rows="3" placeholder="En una o dos frases: de qué trata">${esc(p.nota)}</textarea>
-      <input class="campo" name="enlace" type="url" inputmode="url" placeholder="Enlace para abrirlo (https://…)" value="${esc(p.enlace || '')}" maxlength="400">
+      <label class="et-campo">¿De qué trata? (una o dos frases)<textarea class="campo" name="nota" rows="2">${esc(p.nota)}</textarea></label>
+      <label class="et-campo">Link para abrirlo (si tiene)<input class="campo" name="enlace" type="text" inputmode="url" autocapitalize="off" placeholder="https://…" value="${esc(p.enlace || '')}" maxlength="400"></label>
       <button class="boton">${nuevo ? 'Abrir proyecto' : 'Guardar'}</button><div class="aviso" id="aviso"></div></form>`);
     app.querySelectorAll('#enc button').forEach(b => b.onclick = () => b.classList.toggle('on'));
     const f = document.getElementById('f');
     f.onsubmit = async e => {
       e.preventDefault(); const fd = new FormData(f);
+      if (!String(fd.get('nombre') || '').trim()) { document.getElementById('aviso').textContent = 'Escribe el nombre del proyecto.'; return; }
       let enl = String(fd.get('enlace') || '').trim(); if (enl && !/^https?:\/\//i.test(enl)) enl = 'https://' + enl; enl = enl.replace(/^http:\/\//i, 'https://');
       const datos = { nombre: fd.get('nombre'), tel: fd.get('tel'), nota: fd.get('nota'), enlace: enl, encargados: [...app.querySelectorAll('#enc button.on')].map(b => b.dataset.u).join(',') };
       if (!nuevo) datos.id = p.id;
@@ -1431,7 +1489,7 @@ function pintaUso(c, p) {
   cont.querySelector('#barras').innerHTML = `<div class="barras-in">${dias.map(([d, n], i) => `<i title="${d}: ${n}" style="--h:${Math.max(4, Math.round(n / max * 100))}%${i === 27 ? ';--c:var(--cobalto)' : n ? '' : ';--c:var(--niebla)'}"></i>`).join('')}</div><div class="barras-pie"><span>hace 4 semanas</span><span>hoy</span></div>`;
   const vacio = U.conectado
     ? '<b>Todavía nadie lo ha usado</b>En cuanto alguien lo use, aparece aquí al momento.'
-    : '<b>Este proyecto todavía no avisa cuando alguien lo usa</b>Pídele a Claude: "conecta el uso de este proyecto". Es una sola vez.';
+    : '<b>Este proyecto todavía no avisa cuando alguien lo usa</b>Cuando Kid lo conecte (se hace una sola vez), aquí verás cada vez que alguien lo use.';
   alCambiarTamano = paginar(cont, U.ultimos || [], x => {
     const per = personaDe(x.quien);
     const quien = per ? nombreDe(per) : x.quien && /^\d{10}$/.test(x.quien) ? x.quien : 'Alguien';
@@ -1461,9 +1519,14 @@ function icono(p, per, tam) {
 }
 // Se puede mandar fuera lo del cliente y lo público de MOON; lo interno del equipo, no (la misma regla vive en el servidor).
 const sePuedeEnviar = d => d && d.formato === 'link' && /^https:\/\//.test(d.url || '') && !(d.tel === 'moon' && ['bienvenida', 'jason'].includes(d.seccion));
+// Pie de hojas: "Anterior · 2 de 5 · Siguiente". En la primera y en la última hoja la flecha se apaga (nunca da la vuelta sin avisar).
+function pieHojas(pie, i, n, irA) {
+  pie.innerHTML = n > 1 ? `<button class="redondo" data-pag="-1" aria-label="Anterior"${i <= 0 ? ' disabled' : ''}>${I.izq}</button><span class="pag">${i + 1} de ${n}</span><button class="redondo" data-pag="1" aria-label="Siguiente"${i >= n - 1 ? ' disabled' : ''}>${I.der}</button>` : '';
+  pie.querySelectorAll('[data-pag]').forEach(b => b.onclick = () => { const k = i + Number(b.dataset.pag); if (k >= 0 && k < n) irA(k); });
+}
 function abrirDoc(d) {
   if (d.formato === 'link' && !/^https?:\/\//.test(d.url || '')) { location.href = d.url; return; }   // tel: (llamar a Jason)
-  if (d.formato === 'centro') {   // algo que vive dentro del Centro (ej. las llamadas de Jason)
+  if (d.formato === 'centro') {   // algo que vive dentro del Centro; por ejemplo, las llamadas de Jason
     const [, clave, tab] = String(d.url).split(':');
     const pr = D.proyectos.find(x => x.nombre && clave === 'jason' && /jason/i.test(x.nombre));
     if (pr) abrir({ tipo: 'proyecto', id: pr.id, tab: tab || 'fase' });
@@ -1541,7 +1604,7 @@ function capaCliente(c) {
 function capaSubir(c) {
   const per = personaDe(c.tel); if (!per) return cerrar();
   c.sec = c.sec || 'propuesta';
-  marco('Subir a ' + nombreCorto(per), '', `<form class="hoja editando pasos" id="f" style="align-self:start">
+  marco('Subir a ' + nombreCorto(per), '', `<form class="hoja editando pasos" id="f" novalidate style="align-self:start">
     <div><div class="eti" style="margin-bottom:8px">¿Dónde va?</div><div class="pils">${SECCIONES.map(([k, n]) => `<button type="button" class="pil solo${c.sec === k ? ' on' : ''}" data-sec="${k}">${n}</button>`).join('')}</div></div>
     <label class="campo-foto"><span class="cf-vista">${I.subir}</span><span><b id="archNombre">Elegir archivo</b><small>PDF, foto o cualquier archivo · hasta 25 MB</small></span><input type="file" id="arch" hidden></label>
     <label class="et-campo">Nombre que verá el equipo<input class="campo" name="titulo" id="titulo" maxlength="120" placeholder="Ejemplo: Contrato firmado"></label>
@@ -1552,7 +1615,7 @@ function capaSubir(c) {
   document.getElementById('f').onsubmit = async e => {
     e.preventDefault(); const f = inp.files && inp.files[0];
     if (!f) { aviso.textContent = 'Primero elige el archivo.'; return; }
-    if (f.size > 25e6) { aviso.textContent = 'Ese archivo pesa más de 25 MB. Mándalo más ligero (ej. el PDF comprimido).'; return; }
+    if (f.size > 25e6) { aviso.textContent = 'Ese archivo pesa más de 25 MB. Mándalo más ligero; por ejemplo, el PDF comprimido.'; return; }
     const btn = document.getElementById('subirBtn'); btn.disabled = true; aviso.textContent = 'Preparando…';
     const ini = await api('subir_inicio', { tel: c.tel, seccion: c.sec, titulo: tit.value, nombre: f.name, mime: f.type, tamano: f.size });
     if (!ini.ok) { aviso.textContent = 'No se pudo empezar. Revisa tu internet y vuelve a intentar.'; btn.disabled = false; return; }
@@ -1604,8 +1667,7 @@ function capaDocumento(c) {
       onmessage = e => {
         if (e.source !== fr.contentWindow || !e.data || typeof e.data.total !== 'number') return;
         c.lamina = e.data.lamina; const n = e.data.total;
-        pie.innerHTML = n > 1 ? `<button class="redondo" data-pag="-1" aria-label="Anterior">${I.izq}</button><span class="pag">${c.lamina + 1} de ${n}</span><button class="redondo" data-pag="1" aria-label="Siguiente">${I.der}</button>` : '';
-        pie.querySelectorAll('[data-pag]').forEach(b => b.onclick = () => ir((c.lamina + Number(b.dataset.pag) + n) % n));
+        pieHojas(pie, c.lamina, n, ir);
       };
       fr.onload = () => ir(c.lamina);
     }
@@ -1651,10 +1713,9 @@ function capaDocumento(c) {
         if (actual.length) paginas.push(actual);
         c.p = Math.min(c.p || 0, paginas.length - 1);
         hoja.innerHTML = paginas[c.p].join('');
-        pie.innerHTML = paginas.length > 1 ? `<button class="redondo" data-pag="-1" aria-label="Anterior">${I.izq}</button><span class="pag">${c.p + 1} de ${paginas.length}</span><button class="redondo" data-pag="1" aria-label="Siguiente">${I.der}</button>` : '';
-        pie.querySelectorAll('[data-pag]').forEach(b => b.onclick = () => { c.p = (c.p + Number(b.dataset.pag) + paginas.length) % paginas.length; dibuja(); });
+        pieHojas(pie, c.p, paginas.length, k => { c.p = k; dibuja(); });
         let x0 = null; hoja.ontouchstart = e => { x0 = e.touches[0].clientX; };
-        hoja.ontouchend = e => { if (x0 == null || paginas.length < 2) return; const dx = e.changedTouches[0].clientX - x0; x0 = null; if (Math.abs(dx) > 50) { c.p = (c.p + (dx < 0 ? 1 : -1) + paginas.length) % paginas.length; dibuja(); } };
+        hoja.ontouchend = e => { if (x0 == null || paginas.length < 2) return; const dx = e.changedTouches[0].clientX - x0; x0 = null; if (Math.abs(dx) > 50) { const k = c.p + (dx < 0 ? 1 : -1); if (k >= 0 && k < paginas.length) { c.p = k; dibuja(); } } };
       }
       dibuja(); alCambiarTamano = dibuja;
     }, () => { hoja.innerHTML = '<p>No se pudo mostrar el documento. Revisa tu internet.</p>'; });
@@ -1683,10 +1744,12 @@ function capaCasa() {
   // Si no cabe todo (celulares bajitos, barras del navegador, letra grande), se quita primero lo que es adorno
   // y luego lo secundario — nunca se enciman botones sobre texto.
   const acomoda = () => {
-    const quitar = ['.j-orbe', '.j-num', '.j-cab div>span:last-child', '.casa .vision p', '.casa-filas .q span'];
-    quitar.forEach(q => app.querySelectorAll(q).forEach(e => e.style.display = ''));
-    const sobra = () => ['.j-centro', '.jason', '.casa-filas', '.vision'].some(q => { const e = app.querySelector(q); return e && e.scrollHeight > e.clientHeight + 1; }) || app.scrollHeight > app.clientHeight + 1;
-    for (const q of quitar) { if (!sobra()) break; app.querySelectorAll(q).forEach(e => e.style.display = 'none'); }
+    const quitar = ['.j-orbe', '.casa-filas .q span', '.j-cab div>span:last-child', '.j-num', '.casa .vision'];
+    const cu = app.querySelector('.cuerpo.casa');
+    quitar.forEach(q => app.querySelectorAll(q).forEach(e => e.style.display = '')); cu.style.gridTemplateRows = 'auto minmax(0,1fr) auto';
+    const sobra = () => ['.j-centro', '.jason', '.casa-filas', '.vision'].some(q => { const e = app.querySelector(q); return e && e.offsetHeight && e.scrollHeight > e.clientHeight + 1; }) || app.scrollHeight > app.clientHeight + 1;
+    // Si ni así cabe, la visión se quita completa (nunca una barra vacía) y las filas se recorren sin dejar hueco.
+    for (const q of quitar) { if (!sobra()) break; app.querySelectorAll(q).forEach(e => e.style.display = 'none'); if (q === '.casa .vision') cu.style.gridTemplateRows = 'minmax(0,1fr) auto'; }
   };
   acomoda(); alCambiarTamano = acomoda;
   app.querySelectorAll('[data-k]').forEach(b => b.onclick = () => {
@@ -1698,7 +1761,7 @@ function capaCasa() {
 
 /* ---------- Armar demo: la página de demos vive aquí adentro (mismo Centro, misma sesión) ---------- */
 function capaDemo() {
-  marco('Para tus clientes', '', `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr)"><div class="hoja visor" style="background:transparent;box-shadow:none;border-radius:0;overflow:visible"><iframe class="doc-html" src="/prueba/nueva?dentro=1" title="Para tus clientes" allow="clipboard-write; microphone"></iframe></div></div>`);
+  marco('Crea tu recepcionista', '', `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr)"><div class="hoja visor" style="background:transparent;box-shadow:none;border-radius:0;overflow:visible"><iframe class="doc-html" src="/prueba/nueva?dentro=1" title="Crea tu recepcionista" allow="clipboard-write; microphone"></iframe></div></div>`);
   const fr = app.querySelector('.doc-html');
   // Cuando la página de adentro abre una hoja, oscurece solo su recuadro; aquí se oscurece todo lo demás, igual y al mismo tiempo,
   // para que se vea UNA sola sombra en toda la pantalla (nunca un rectángulo más oscuro). Tocar afuera cierra la hoja.
@@ -1734,8 +1797,7 @@ function capaLector(c) {
     }
     c.p = Math.min(c.p || 0, paginas.length - 1);
     txt.textContent = paginas[c.p];
-    pie.innerHTML = paginas.length > 1 ? `<button class="redondo" data-pag="-1" aria-label="Anterior">${I.izq}</button><span class="pag">${c.p + 1} de ${paginas.length}</span><button class="redondo" data-pag="1" aria-label="Siguiente">${I.der}</button>` : '';
-    pie.querySelectorAll('[data-pag]').forEach(b => b.onclick = () => { c.p = (c.p + Number(b.dataset.pag) + paginas.length) % paginas.length; dibuja(); });
+    pieHojas(pie, c.p, paginas.length, k => { c.p = k; dibuja(); });
   }
   dibuja(); alCambiarTamano = dibuja;
 }
@@ -1797,7 +1859,7 @@ function capaEquipo(c) {
   app.querySelectorAll('.socio').forEach(b => b.onclick = () => abrir({ tipo: 'tareas', persona: b.dataset.u }));
   const lista = eq ? eq.embajadores : [];
   lista.forEach(e => { if (!EMB[e.id]) EMB[e.id] = { n: e.nombre, c: e.color || '#e8892f', i: e.nombre.split(/\s+/).slice(0, 2).map(x => x[0]).join('').toUpperCase() }; });
-  paginar(app.querySelector('.cuerpo'), lista, e => `<button class="fila" data-e="${esc(e.id)}">${ava(e.id)}<span class="q"><b>${esc(e.nombre)}</b><span>${e.demos} recepcionista${e.demos === 1 ? '' : 's'} armado${e.demos === 1 ? '' : 's'} · ${e.cierres} cierre${e.cierres === 1 ? '' : 's'}</span></span>${!e.activo ? '<span class="estado" style="--c:var(--rojo);--cf:var(--rojof)">Sin acceso</span>' : !e.con_clave ? '<span class="estado" style="--c:var(--naranja);--cf:var(--naranjaf)">No ha entrado</span>' : ''}</button>`,
+  paginar(app.querySelector('.cuerpo'), lista, e => `<button class="fila" data-e="${esc(e.id)}">${ava(e.id)}<span class="q"><b>${esc(e.nombre)}</b><span>${!e.activo ? '<em class="aviso-fila" style="color:var(--rojo)">Sin acceso</em> · ' : !e.con_clave ? '<em class="aviso-fila" style="color:var(--naranja)">Todavía no entra</em> · ' : ''}${e.demos} recepcionista${e.demos === 1 ? '' : 's'} · ${e.cierres} cierre${e.cierres === 1 ? '' : 's'}</span></span><span class="flecha-f">${I.der}</span></button>`,
     { vacio: eq ? '<b>Todavía no hay embajadores</b>Toca "Agregar embajador".' : '<b>Cargando…</b>', alPintar: l => l.querySelectorAll('[data-e]').forEach(b => b.onclick = () => abrir({ tipo: 'embajador', id: b.dataset.e, eq })) });
   document.getElementById('agregar').onclick = () => abrir({ tipo: 'embajador', eq });
   document.getElementById('comision').onclick = () => eq && abrir({ tipo: 'comision', valor: eq.comision || '' });
@@ -1819,9 +1881,8 @@ function capaEmbajador(c) {
   marco(nuevo ? 'Agregar embajador' : e.nombre, '', `<form class="hoja editando pasos" id="f" novalidate style="align-self:start">
     ${nuevo ? '' : `<p class="mini">${e.demos} recepcionista${e.demos === 1 ? '' : 's'} armado${e.demos === 1 ? '' : 's'} · ${e.cierres} cierre${e.cierres === 1 ? '' : 's'}${e.con_clave ? '' : ' · todavía no entra'}</p>`}
     <label class="grupo" for="nom"><span class="eti">Nombre</span><input class="campo" id="nom" maxlength="60" autocomplete="off" value="${esc(e.nombre || '')}" placeholder="Ejemplo: Joe Madrid"></label>
-    <div class="dos-campos"><label class="grupo" for="tel"><span class="eti">WhatsApp</span><input class="campo" id="tel" type="tel" inputmode="tel" value="${esc(e.tel || '')}" placeholder="10 números"></label>
-    <label class="grupo" for="tope"><span class="eti">Al día</span><input class="campo" id="tope" type="number" inputmode="numeric" min="0" max="100" value="${esc(e.tope_demos ?? 10)}" aria-label="Recepcionistas que puede armar al día"></label></div>
-    <p class="mini">"Al día": cuántos recepcionistas puede armar cada día.</p>
+    <label class="grupo" for="tel"><span class="eti">WhatsApp</span><input class="campo" id="tel" type="tel" inputmode="tel" value="${esc(e.tel || '')}" placeholder="10 números"></label>
+    <label class="tope" for="tope"><span>Recepcionistas que puede armar por día</span><input class="campo" id="tope" type="number" inputmode="numeric" min="0" max="100" value="${esc(e.tope_demos ?? 10)}"></label>
     <div class="botones"><button class="boton">${nuevo ? 'Agregar' : 'Guardar'}</button></div>
     ${nuevo ? '' : `<div class="botones apilados"><button type="button" class="boton dos" id="link"${e.activo ? '' : ' disabled'}>Mandar su link de entrada</button><button type="button" class="boton dos" id="acceso">${e.activo ? 'Quitar acceso' : 'Regresar acceso'}</button></div>`}
     <div class="aviso" id="aviso"></div></form>`);
@@ -1832,7 +1893,8 @@ function capaEmbajador(c) {
     if (!v('nom').trim()) { av.textContent = errores.nombre; return; }
     const r = await api('embajador_guardar', { id: c.id || '', nombre: v('nom'), tel: v('tel'), tope: v('tope') });
     if (!r.ok) { av.textContent = errores[r.error] || 'No se pudo guardar. Intenta de nuevo.'; return; }
-    await Promise.all([recargar(true), traerEquipo(c)]);
+    const eqc = pila.find(x => x.tipo === 'equipo');
+    await Promise.all([recargar(true), traerEquipo(eqc || c)]); if (eqc) c.eq = eqc.eq;
     if (nuevo) { reemplazar({ tipo: 'embajador', id: r.id, eq: c.eq }); avisoFlotante('Listo. Ahora mándale su link de entrada.'); }
     else { avisoFlotante('Guardado'); cerrar(); }
   };
@@ -1847,18 +1909,19 @@ function capaEmbajador(c) {
   document.getElementById('acceso').onclick = async ev => {
     if (e.activo && !seguro) { seguro = true; ev.target.textContent = 'Toca otra vez para quitarlo'; return; }
     const r = await api('embajador_guardar', { id: e.id, activo: !e.activo });
-    if (r.ok) { await Promise.all([recargar(true), traerEquipo(c)]); cerrar(); avisoFlotante(e.activo ? `${e.nombre} ya no puede entrar` : `${e.nombre} puede entrar otra vez`); }
+    const eqc = pila.find(x => x.tipo === 'equipo');
+    if (r.ok) { await Promise.all([recargar(true), traerEquipo(eqc || c)]); cerrar(); avisoFlotante(e.activo ? `${e.nombre} ya no puede entrar` : `${e.nombre} puede entrar otra vez`); }
   };
 }
 function capaComision(c) {
-  marco('Comisión de embajadores', '', `<form class="hoja editando pasos" id="f" style="align-self:start">
+  marco('Comisión de embajadores', '', `<form class="hoja editando pasos" id="f" novalidate style="align-self:start">
     <label class="grupo" for="val"><span class="preg">¿Cuánto ganan los embajadores?</span><textarea class="campo" id="val" rows="3" maxlength="200" placeholder="Ejemplo: 10% del primer pago de cada cliente que cierren">${esc(c.valor)}</textarea></label>
     <p class="mini">Lo ven todos los embajadores en "Mis comisiones". Si lo dejas vacío dice "Por definir".</p>
     <div class="botones"><button class="boton">Guardar</button></div><div class="aviso" id="aviso"></div></form>`);
   document.getElementById('f').onsubmit = async ev => {
     ev.preventDefault();
     const r = await api('comision_guardar', { valor: document.getElementById('val').value.trim() });
-    if (r.ok) { const eqc = pila.find(x => x.tipo === 'equipo'); if (eqc) eqc.eq = null; cerrar(); } else document.getElementById('aviso').textContent = 'No se pudo guardar. Intenta de nuevo.';
+    if (r.ok) { const eqc = pila.find(x => x.tipo === 'equipo'); if (eqc) await traerEquipo(eqc); avisoFlotante('Comisión guardada'); cerrar(); } else document.getElementById('aviso').textContent = 'No se pudo guardar. Intenta de nuevo.';
   };
 }
 function capaBitacora(c) {
@@ -1911,7 +1974,7 @@ function capaCuenta(c) {
 
 function capaFrase() {
   const u = usuario(yo());
-  marco('Mi frase', '', `<form class="hoja editando pasos" id="f" style="align-self:start">
+  marco('Mi frase', '', `<form class="hoja editando pasos" id="f" novalidate style="align-self:start">
     <label class="eti" for="rol">Lo que hago en MOON</label><input class="campo" id="rol" maxlength="40" value="${esc(u.rol || '')}" placeholder="Ejemplo: Construye y diseña">
     <label class="eti" for="lema">Mi frase (sale atrás de la credencial)</label><input class="campo" id="lema" maxlength="90" value="${esc(u.lema || '')}" placeholder="Una frase que te represente">
     <button class="boton">Guardar</button><div class="aviso" id="aviso"></div></form>`);
@@ -1919,7 +1982,7 @@ function capaFrase() {
     e.preventDefault();
     const datos = { rol: document.getElementById('rol').value, lema: document.getElementById('lema').value };
     const r = await api('mi_perfil', datos);
-    if (r.ok) { Object.assign(u, datos); cerrar(); } else document.getElementById('aviso').textContent = 'No se pudo guardar. Intenta de nuevo.';
+    if (r.ok) { Object.assign(u, datos); avisoFlotante('Guardado'); cerrar(); } else document.getElementById('aviso').textContent = 'No se pudo guardar. Intenta de nuevo.';
   };
 }
 

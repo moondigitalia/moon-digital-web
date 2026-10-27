@@ -209,13 +209,13 @@ module.exports = async (req, res) => {
       if (tel10) await alCRM(tel10, t(d.whatsapp, 30) || tel10, nombre, x.negocio, x.giro, `${texto} (demo de ${x.asistente})`, 'demo:' + codigo, emb ? emb.id : '');
       if (opcion !== 'no') {
         const quien = nombre ? `${nombre} (${x.negocio})` : x.negocio;
-        await sql('INSERT INTO tareas (proyecto, titulo, detalle, para, de, estado, vence, creado) VALUES (?,?,?,?,?,?,?,?)',
+        await sql('INSERT INTO tareas (proyecto, titulo, detalle, para, de, estado, vence, creado, cliente) VALUES (?,?,?,?,?,?,?,?,?)',
           [0, t(`${quien}: ${opcion === 'quiero' ? 'quiere su asistente' : 'quiere una llamada'}`, 160),
-           t(`${texto}.\nWhatsApp: ${tel10}\nNegocio: ${x.negocio} (${x.giro})${emb ? `\nLo trajo: ${emb.nombre} (embajador)` : ''}\nSu demo: ${link(codigo)}`, 2000), 'dan', 'claude', 'nueva', '', ahora()]);
+           t(`${texto}.\nWhatsApp: ${tel10}\nNegocio: ${x.negocio} (${x.giro})${emb ? `\nLo trajo: ${emb.nombre} (embajador)` : ''}\nSu demo: ${link(codigo)}`, 2000), 'dan', 'claude', 'nueva', '', ahora(), t(x.negocio, 120)]);
         // Si lo trajo un embajador, él también recibe la tarea para darle seguimiento.
-        if (emb) await sql('INSERT INTO tareas (proyecto, titulo, detalle, para, de, estado, vence, creado) VALUES (?,?,?,?,?,?,?,?)',
+        if (emb) await sql('INSERT INTO tareas (proyecto, titulo, detalle, para, de, estado, vence, creado, cliente) VALUES (?,?,?,?,?,?,?,?,?)',
           [0, t(`${quien}: ${opcion === 'quiero' ? 'quiere su asistente' : 'quiere una llamada'}`, 160),
-           t(`${texto}.\nWhatsApp: ${tel10}\nNegocio: ${x.negocio}\nDan también lo ve.`, 2000), emb.id, 'claude', 'nueva', '', ahora()]);
+           t(`${texto}.\nWhatsApp: ${tel10}\nNegocio: ${x.negocio}\nDan también lo ve.`, 2000), emb.id, 'claude', 'nueva', '', ahora(), t(x.negocio, 120)]);
       }
       await sql('INSERT INTO actividad (fecha, quien, texto) VALUES (?,?,?)', [ahora(), 'claude', t(`${x.negocio} probó su demo: ${texto.toLowerCase()}`, 200)]).catch(() => {});
       res.status(200).json({ ok: true });

@@ -31,7 +31,7 @@ const corridas = RAPIDO ? [['light', 320, 568, 1], ['light', 1280, 800, 1]] : [[
     await p.goto('http://localhost:8765/');
     await p.waitForSelector('#soyEmb'); await p.click('#soyEmb'); await revisa('entrada');
     await teclado(p, w, h, 'entrada', fallas);
-    await p.fill('#tel', '998 123 4567'); await p.fill('#clave', 'mala'); await p.click('form .boton'); await p.waitForTimeout(300);
+    await p.fill('#tel', '998 123 4567'); await p.fill('#clave', 'mala'); await p.click('form .boton'); await p.waitForTimeout(900);
     if (!/no coinciden/.test(await p.textContent('#aviso'))) fallas.push(`${w} contraseña mala sin aviso claro`);
     await p.fill('#clave', '123456'); await p.click('form .boton');
     await p.waitForSelector('.mosaico.emb', { timeout: 5000 }).catch(() => fallas.push(`${w} no entró el embajador`));
@@ -52,7 +52,7 @@ const corridas = RAPIDO ? [['light', 320, 568, 1], ['light', 1280, 800, 1]] : [[
     await p.goto('http://localhost:8765/tablero?invita=' + 'T'.repeat(30)); await p.waitForSelector('#c1'); await revisa('invita');
     if (p.url().includes('invita')) fallas.push(`${w} el link de invitación se queda en la barra`);
     await teclado(p, w, h, 'invita', fallas);
-    await p.fill('#tel', '9981234567'); await p.fill('#c1', 'abcdef'); await p.fill('#c2', 'abcdeg'); await p.click('form .boton'); await p.waitForTimeout(200);
+    await p.fill('#tel', '9981234567'); await p.fill('#c1', 'abcdef'); await p.fill('#c2', 'abcdeg'); await p.click('form .boton'); await p.waitForTimeout(600);
     if (!/no son iguales/.test(await p.textContent('#aviso'))) fallas.push(`${w} contraseñas distintas sin aviso`);
     await p.fill('#c2', 'abcdef'); await p.click('form .boton');
     await p.waitForSelector('.mosaico.emb', { timeout: 5000 }).catch(() => fallas.push(`${w} el link no lo dejó adentro`));
