@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Tablero de Eventos · demo de MOON Digital</title>
+<meta name="description" content="Demo: cada evento con su responsable, su proceso y cómo va, en un solo tablero.">
+<meta property="og:title" content="Tablero de Eventos">
+<meta property="og:description" content="Cada evento con su responsable, su proceso y cómo va, en un solo tablero. Demo de MOON Digital.">
+<meta property="og:url" content="https://moondigitalia.com/eventos/">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --fondo:#f3efe9;--tarjeta:#f8f5f0;--campo:#ece7e0;--tinta:#1d1d22;--suave:#5d5d66;--tenue:#8b8a92;
+  --cobalto:#0b4fd6;--verde:#1f8a4c;--verdef:#e3f3ea;--amarillo:#b7791f;--amarillof:#fbf0dc;--rojo:#cf4a40;--rojof:#fbe7e5;--gris:#8b8a92;--grisf:#ecebe8;
+  --sombra:0 10px 24px -14px rgba(90,75,55,.45);--sombra2:0 6px 14px -8px rgba(90,75,55,.4);--r:26px;
+}
+@media (prefers-color-scheme:dark){:root{--fondo:#16171b;--tarjeta:#1f2025;--campo:#2a2b31;--tinta:#efedea;--suave:#b3b1b8;--tenue:#85848c;--cobalto:#3a78ff;--verde:#4cc283;--verdef:#163024;--amarillo:#e6b04f;--amarillof:#3a2e17;--rojo:#ef7b72;--rojof:#3a1f1d;--grisf:#2a2b31;--sombra:0 10px 24px -14px rgba(0,0,0,.8);--sombra2:0 6px 14px -8px rgba(0,0,0,.7)}}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{position:fixed;inset:0;overflow:hidden;overscroll-behavior:none;background:var(--fondo);color:var(--tinta);font-family:Manrope,system-ui,-apple-system,sans-serif;font-size:15px;line-height:1.35;-webkit-font-smoothing:antialiased;touch-action:manipulation;-webkit-text-size-adjust:100%}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+input,select{font:inherit;font-size:16px;color:inherit}
+#app{position:fixed;inset:0;max-width:760px;margin:0 auto;padding:max(14px,env(safe-area-inset-top)) 16px max(14px,env(safe-area-inset-bottom));display:grid;grid-template-rows:auto minmax(0,1fr);gap:12px}
+.top{display:flex;align-items:center;gap:12px;min-height:44px}
+.top h2{font-size:20px;font-weight:800;flex:1;min-width:0;line-height:1.2}
+.marca{font-size:12px;font-weight:800;letter-spacing:.2em;flex:1}.marca i{font-style:normal;color:var(--cobalto)}
+.redondo{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--tarjeta);box-shadow:var(--sombra2);flex:none}
+.redondo svg{width:18px;height:18px}
+.vista{min-height:0;display:grid;gap:12px;grid-template-rows:auto minmax(0,1fr);animation:entra .18s ease-out}
+@keyframes entra{from{opacity:.4}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){.vista{animation:none}}
+.eti{font-size:11px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--suave)}
+.mini{font-size:13px;font-weight:600;color:var(--suave)}
+.hola{font-size:clamp(22px,6.4vw,30px);font-weight:800;letter-spacing:-.02em;line-height:1.1}
+.hola small{display:block;font-size:13px;font-weight:600;color:var(--suave);letter-spacing:0;margin-top:4px}
+.ava{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:800;font-size:14px;flex:none;background:var(--c)}
+.ava.chico{width:28px;height:28px;font-size:11px}
+/* Inicio */
+.mosaico{min-height:0;display:grid;gap:10px;grid-template-columns:1fr 1fr;grid-template-rows:minmax(0,1.6fr) minmax(0,1fr) auto;grid-template-areas:"ev ev" "sem eq" "pro pro"}
+.t{min-height:0;border-radius:var(--r);background:var(--tarjeta);box-shadow:var(--sombra);padding:14px 16px;display:flex;flex-direction:column;gap:6px;overflow:hidden;text-align:start}
+.t:active{transform:scale(.985)}
+.t b.titulo{font-size:18px;font-weight:800}
+.t .num{font-size:34px;font-weight:800;letter-spacing:-.03em;line-height:1;margin-top:auto}
+.t-ev{grid-area:ev;background:var(--cobalto);color:#fff}.t-ev .mini{color:rgba(255,255,255,.85)}
+.t-sem{grid-area:sem}.t-eq{grid-area:eq}
+.t-pro{grid-area:pro;flex-direction:row;align-items:center;gap:12px;padding:12px 16px}
+.semaforos{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto}
+.sem{display:inline-flex;align-items:center;gap:6px;border-radius:99px;padding:5px 10px 5px 6px;background:rgba(255,255,255,.16);font-size:13px;font-weight:800}
+.sem i{width:18px;height:18px;border-radius:50%;background:var(--c);box-shadow:0 0 0 2px rgba(255,255,255,.7)}
+.circulo{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:var(--cobalto);color:#fff;flex:none}.circulo svg{width:20px;height:20px}
+/* Listas */
+.lista{min-height:0;overflow-y:auto;overscroll-behavior:contain;display:flex;flex-direction:column;gap:9px;padding:2px 2px 8px;-webkit-overflow-scrolling:touch}
+.lista>*{flex:none}
+.fila{border-radius:22px;background:var(--tarjeta);box-shadow:var(--sombra2);padding:11px 14px;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;text-align:start;width:100%}
+.fila b{display:block;font-size:15px;font-weight:800;line-height:1.25}
+.fila span.q span{display:block;font-size:12.5px;font-weight:600;color:var(--suave);margin-top:2px}
+.luz{width:14px;height:14px;border-radius:50%;background:var(--c);flex:none}
+.estado{font-size:11.5px;font-weight:800;border-radius:99px;padding:4px 10px;background:var(--cf);color:var(--c);white-space:nowrap}
+.pils{display:flex;gap:7px;flex-wrap:wrap}
+.pil{display:inline-flex;align-items:center;gap:6px;border-radius:99px;padding:7px 12px;font-size:13px;font-weight:800;background:var(--tarjeta);box-shadow:var(--sombra2);color:var(--suave)}
+.pil.on{background:var(--cobalto);color:#fff}
+.pil i{font-style:normal;min-width:20px;height:20px;border-radius:99px;display:grid;place-items:center;font-size:11px;background:rgba(127,127,127,.18);padding:0 5px}
+/* Evento */
+.ev-cab{border-radius:var(--r);background:var(--tarjeta);box-shadow:var(--sombra);padding:14px 16px;display:grid;gap:10px}
+.ev-cab .linea{display:flex;align-items:center;gap:10px}
+.ev-cab b{font-size:19px;font-weight:800;line-height:1.2}
+.etapas{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px}
+.etapa{display:grid;gap:4px;justify-items:center;text-align:center;font-size:10.5px;font-weight:800;color:var(--suave);padding:2px 0}
+.etapa .barra{width:100%;height:8px;border-radius:99px;background:var(--campo);overflow:hidden}
+.etapa .barra i{display:block;height:100%;background:var(--verde);width:var(--p)}
+.etapa.on{color:var(--cobalto)}.etapa.on .barra{box-shadow:0 0 0 2px var(--cobalto)}
+.paso{border-radius:20px;background:var(--tarjeta);box-shadow:var(--sombra2);padding:10px 14px;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;text-align:start;width:100%}
+.check{width:28px;height:28px;border-radius:50%;box-shadow:inset 0 0 0 2px var(--tenue);display:grid;place-items:center;flex:none}
+.check svg{width:15px;height:15px;opacity:0}
+.paso.hecho .check{background:var(--verde);box-shadow:none;color:#fff}.paso.hecho .check svg{opacity:1}
+.paso.hecho b{color:var(--suave);text-decoration:line-through}
+.paso b{font-size:14.5px;font-weight:700;line-height:1.3}
+.paso small{display:block;font-size:12px;font-weight:600;color:var(--suave);margin-top:2px}
+/* Formularios */
+.hoja{border-radius:var(--r);background:var(--tarjeta);box-shadow:var(--sombra);padding:16px;display:flex;flex-direction:column;gap:14px;align-self:start}
+.preg{font-size:21px;font-weight:800;line-height:1.2}
+.campo{width:100%;height:48px;border-radius:99px;border:0;background:var(--campo);padding:0 18px;outline:none}
+.botones{display:flex;gap:10px}
+.boton{flex:1;min-width:0;height:50px;border-radius:99px;font-weight:800;font-size:15px;background:var(--cobalto);color:#fff;padding:0 10px;white-space:nowrap}
+.boton.dos{background:var(--tarjeta);color:var(--tinta);box-shadow:var(--sombra2)}
+.quien{display:flex;flex-wrap:wrap;gap:8px}
+.quien button{display:flex;align-items:center;gap:8px;border-radius:99px;padding:5px 14px 5px 5px;background:var(--tarjeta);box-shadow:var(--sombra2);font-weight:800}
+.quien button.on{box-shadow:inset 0 0 0 2px var(--cobalto);background:var(--campo)}
+.aviso{font-size:13px;font-weight:700;color:var(--rojo)}.aviso:empty{display:none}
+.toast{pointer-events:none;position:fixed;left:50%;bottom:max(18px,env(safe-area-inset-bottom));transform:translateX(-50%);background:#1d1d22;color:#fff;font-weight:700;font-size:14px;padding:12px 18px;border-radius:99px;z-index:9;max-width:calc(100% - 32px);text-align:center;transition:opacity .3s}
+.nota-demo{font-size:12px;font-weight:600;color:var(--tenue);text-align:center}
+.nota-demo button{color:var(--cobalto);font-weight:800}
+@media (max-height:620px){.t-pro .mini,.t-sem .mini,.t-eq .mini{display:none}.hola small{display:none}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+'use strict';
+/* Demo: todo vive en este aparato (no se guarda en ningún servidor). Los nombres, eventos y el proceso son de ejemplo. */
+const I = {
+  atras: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>',
+  check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  mas: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+  proceso: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="6" r="2"/><circle cx="5" cy="18" r="2"/><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="5" cy="12" r="2"/></svg>',
+};
+const GENTE = {
+  jefa: { n: 'Encargada del área', c: '#2b2b30', i: 'EA', corto: 'Encargada' },
+  andrea: { n: 'Andrea', c: '#0b4fd6', i: 'A' },
+  luis: { n: 'Luis', c: '#1f8a4c', i: 'L' },
+  mariana: { n: 'Mariana', c: '#c0392b', i: 'M' },
+  jorge: { n: 'Jorge', c: '#8e44ad', i: 'J' },
+};
+const EJECUTIVOS = ['andrea', 'luis', 'mariana', 'jorge'];
+// El proceso (de ejemplo): cada paso dice cuántos días antes del evento debe quedar (negativo = después).
+const CORTO = ['Planear', 'Contratar', 'Organizar', 'El día', 'Cierre'];   // nombre corto de cada etapa para la barrita
+const PROCESO = [
+  ['Planeación', [['Definir objetivo y presupuesto', 120], ['Elegir sede y fecha', 100], ['Aprobación de la dirección', 90]]],
+  ['Proveedores', [['Cotizar con 3 proveedores', 75], ['Contratos firmados', 60], ['Anticipos pagados', 45]]],
+  ['Logística', [['Invitaciones enviadas', 30], ['Lista de asistentes confirmada', 14], ['Transporte y hospedaje listos', 10], ['Visita final a la sede', 3]]],
+  ['Día del evento', [['Montaje revisado', 0], ['Registro de asistentes', 0], ['Fotos y evidencias', 0]]],
+  ['Cierre', [['Encuesta de satisfacción', -3], ['Pagos finales a proveedores', -10], ['Reporte y aprendizajes', -15]]],
+];
+const LLAVE = 'moon.demo.eventos.v1';
+const hoy = () => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; };
+const dia = (f, mas) => { const d = new Date(f + 'T00:00:00'); d.setDate(d.getDate() + mas); return d; };
+const MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+const DIAS = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+const bonita = d => `${DIAS[d.getDay()]} ${d.getDate()} de ${MESES[d.getMonth()]}`;
+const corta = d => `${d.getDate()} de ${MESES[d.getMonth()]}${d.getFullYear() !== hoy().getFullYear() ? ' ' + d.getFullYear() : ''}`;
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const iso = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+const enDias = n => iso(dia(iso(hoy()), n));
+
+// Eventos de ejemplo. Lo que ya debió pasar queda hecho, menos unos pocos (para que se vea cómo avisa el tablero).
+function ejemplo() {
+  const evs = [
+    ['Carrera anual', 'Ciudad de México', 'andrea', enDias(-10)],
+    ['Evento Tuxtla', 'Tuxtla Gutiérrez', 'andrea', enDias(18)],
+    ['Convención de agentes', 'Monterrey', 'andrea', enDias(130)],
+    ['Torneo de golf', 'Guadalajara', 'luis', enDias(31)],
+    ['Cena de fin de año', 'Ciudad de México', 'luis', enDias(45)],
+    ['Feria de seguridad vial', 'Puebla', 'mariana', enDias(75)],
+    ['Expo agentes', 'Querétaro', 'mariana', enDias(160)],
+    ['Rally', 'Cancún', 'jorge', enDias(25)],
+    ['Congreso regional', 'León', 'jorge', enDias(110)],
+  ];
+  const pendientes = { 'Evento Tuxtla': ['Invitaciones enviadas'], 'Rally': ['Invitaciones enviadas', 'Anticipos pagados'], 'Carrera anual': ['Reporte y aprendizajes'] };
+  return evs.map(([nombre, ciudad, resp, fecha], k) => ({ id: k + 1, nombre, ciudad, resp, fecha, pasos: armarPasos(fecha, (paso, vence) => vence < hoy() && !(pendientes[nombre] || []).includes(paso)) }));
+}
+function armarPasos(fecha, hecho) {
+  const l = [];
+  PROCESO.forEach(([etapa, pasos], e) => pasos.forEach(([n, antes]) => { const vence = dia(fecha, -antes); l.push({ e, n, antes, hecho: !!(hecho && hecho(n, vence)) }); }));
+  return l;
+}
+let S;
+try { S = JSON.parse(localStorage.getItem(LLAVE) || 'null'); } catch (e) { S = null; }
+if (!S || !S.eventos) S = { yo: 'jefa', eventos: ejemplo() };
+const guardar = () => { try { localStorage.setItem(LLAVE, JSON.stringify(S)); } catch (e) {} };
+
+const vence = (ev, p) => dia(ev.fecha, -p.antes);
+const atrasado = (ev, p) => !p.hecho && vence(ev, p) < hoy();
+const pronto = (ev, p) => !p.hecho && !atrasado(ev, p) && vence(ev, p) <= dia(iso(hoy()), 7);
+function luz(ev) {
+  if (ev.pasos.every(p => p.hecho)) return ['Terminado', 'var(--gris)', 'var(--grisf)'];
+  if (ev.pasos.some(p => atrasado(ev, p))) return ['Atrasado', 'var(--rojo)', 'var(--rojof)'];
+  if (ev.pasos.some(p => pronto(ev, p))) return ['Vence pronto', 'var(--amarillo)', 'var(--amarillof)'];
+  return ['Al día', 'var(--verde)', 'var(--verdef)'];
+}
+const etapaActual = ev => { const i = ev.pasos.findIndex(p => !p.hecho); return i < 0 ? PROCESO.length - 1 : ev.pasos[i].e; };
+const ava = (id, chico) => { const g = GENTE[id]; return `<span class="ava${chico ? ' chico' : ''}" style="--c:${g.c}">${g.i}</span>`; };
+const misEventos = () => S.yo === 'jefa' ? S.eventos : S.eventos.filter(e => e.resp === S.yo);
+
+const app = document.getElementById('app');
+let pila = [];
+function abrir(c) { pila.push(c); try { history.pushState({ n: pila.length }, ''); } catch (e) {} pinta(); }
+function cerrar() { if (history.state && history.state.n) history.back(); else { pila.pop(); pinta(); } }
+addEventListener('popstate', () => { const n = (history.state && history.state.n) || 0; if (pila.length > n) { pila.length = n; pinta(); } });
+let reloj;
+function aviso(t) { let a = document.querySelector('.toast'); if (!a) { a = document.createElement('div'); a.className = 'toast'; document.body.appendChild(a); } a.textContent = t; a.style.opacity = 1; clearTimeout(reloj); reloj = setTimeout(() => { a.style.opacity = 0; }, 2400); }
+function marco(titulo, cuerpo, accion) {
+  app.innerHTML = `<div class="top"><button class="redondo" id="volver" aria-label="Regresar">${I.atras}</button><h2>${esc(titulo)}</h2>${accion ? `<button class="redondo" id="accion" aria-label="${esc(accion)}" style="background:var(--cobalto);color:#fff">${I.mas}</button>` : ''}</div><div class="vista">${cuerpo}</div>`;
+  document.getElementById('volver').onclick = cerrar;
+}
+function pinta() {
+  const c = pila[pila.length - 1];
+  if (!c) return inicio();
+  ({ eventos: capaEventos, evento: capaEvento, semana: capaSemana, equipo: capaEquipo, proceso: capaProceso, nuevo: capaNuevo, quien: capaQuien, de: capaDe })[c.tipo](c);
+}
+
+/* ---------- Inicio ---------- */
+function inicio() {
+  const evs = misEventos(), luces = evs.map(luz);
+  const cuenta = n => luces.filter(l => l[0] === n).length;
+  const semana = evs.flatMap(ev => ev.pasos.filter(p => atrasado(ev, p) || pronto(ev, p)).map(p => ({ ev, p })));
+  const g = GENTE[S.yo];
+  app.innerHTML = `<div class="top"><span class="marca">EVENTOS <i>/</i> TABLERO</span><button id="quien" aria-label="Cambiar de persona">${ava(S.yo)}</button></div>
+  <div class="vista" style="grid-template-rows:auto minmax(0,1fr) auto">
+    <h1 class="hola">Hola, ${esc(g.corto || g.n)}<small>${S.yo === 'jefa' ? 'Así van todos los eventos del área' : 'Así van tus eventos'}</small></h1>
+    <main class="mosaico">
+      <button class="t t-ev" data-ir="eventos"><b class="titulo">${S.yo === 'jefa' ? 'Eventos del año' : 'Mis eventos'}</b><span class="mini">Toca para ver cada uno y en qué etapa va</span>
+        <span class="num">${evs.length}</span>
+        <div class="semaforos">${[['Atrasado', 'var(--rojo)', 'atrasado', 'atrasados'], ['Vence pronto', 'var(--amarillo)', 'por vencer', 'por vencer'], ['Al día', 'var(--verde)', 'al día', 'al día']].map(([n, col, uno, varios]) => `<span class="sem"><i style="--c:${col}"></i>${cuenta(n)} ${cuenta(n) === 1 ? uno : varios}</span>`).join('')}</div></button>
+      <button class="t t-sem" data-ir="semana"><b class="titulo">Esta semana</b><span class="mini">Pasos atrasados y los que vencen en 7 días</span><span class="num" style="color:${semana.some(x => atrasado(x.ev, x.p)) ? 'var(--rojo)' : 'inherit'}">${semana.length}</span></button>
+      <button class="t t-eq" data-ir="equipo"><b class="titulo">Equipo</b><span class="mini">Quién lleva cada evento</span><span class="num">${EJECUTIVOS.length}</span></button>
+      <button class="t t-pro" data-ir="proceso"><span class="circulo">${I.proceso}</span><span><b class="titulo" style="display:block">Nuestro proceso</b><span class="mini">${PROCESO.length} etapas que todo evento sigue</span></span></button>
+    </main>
+    <p class="nota-demo">Demo con datos de ejemplo · <button id="reiniciar">Volver a empezar</button></p>
+  </div>`;
+  app.querySelectorAll('[data-ir]').forEach(b => b.onclick = () => abrir({ tipo: b.dataset.ir }));
+  document.getElementById('quien').onclick = () => abrir({ tipo: 'quien' });
+  document.getElementById('reiniciar').onclick = () => { S = { yo: S.yo, eventos: ejemplo() }; guardar(); inicio(); aviso('Listo: la demo volvió a empezar'); };
+}
+function capaQuien() {
+  marco('¿Quién eres?', `<p class="mini">En la versión real cada quien entra con su propia contraseña. Aquí puedes ver cómo lo ve cada uno.</p>
+    <div class="lista">${['jefa'].concat(EJECUTIVOS).map(id => `<button class="fila" data-u="${id}">${ava(id)}<span class="q"><b>${esc(GENTE[id].n)}</b><span>${id === 'jefa' ? 'Ve todos los eventos del área' : S.eventos.filter(e => e.resp === id).length + ' eventos a su cargo'}</span></span><span>${S.yo === id ? '<span class="estado" style="--c:var(--cobalto);--cf:var(--campo)">Tú</span>' : ''}</span></button>`).join('')}</div>`);
+  app.querySelectorAll('[data-u]').forEach(b => b.onclick = () => { S.yo = b.dataset.u; guardar(); cerrar(); });
+}
+
+/* ---------- Eventos ---------- */
+function filaEvento(ev) {
+  const [n, col, cf] = luz(ev), e = etapaActual(ev), hechos = ev.pasos.filter(p => p.hecho).length;
+  return `<button class="fila" data-ev="${ev.id}"><span class="luz" style="--c:${col}"></span><span class="q"><b>${esc(ev.nombre)} · ${esc(ev.ciudad)}</b><span>${esc(GENTE[ev.resp].n)} · ${corta(dia(ev.fecha, 0))} · ${n === 'Terminado' ? 'terminado' : PROCESO[e][0]} (${hechos} de ${ev.pasos.length})</span></span><span class="estado" style="--c:${col};--cf:${cf}">${n}</span></button>`;
+}
+function capaEventos(c) {
+  c.f = c.f || 'todos';
+  const evs = misEventos().slice().sort((a, b) => a.fecha.localeCompare(b.fecha));
+  const grupos = [['todos', 'Todos'], ['Atrasado', 'Atrasados'], ['Vence pronto', 'Vencen pronto'], ['Al día', 'Al día'], ['Terminado', 'Terminados']];
+  const lista = c.f === 'todos' ? evs : evs.filter(ev => luz(ev)[0] === c.f);
+  marco(S.yo === 'jefa' ? 'Eventos del año' : 'Mis eventos', `<div class="pils">${grupos.map(([k, n]) => `<button class="pil${c.f === k ? ' on' : ''}" data-f="${k}"><i>${k === 'todos' ? evs.length : evs.filter(ev => luz(ev)[0] === k).length}</i>${n}</button>`).join('')}</div>
+    <div class="lista">${lista.map(filaEvento).join('') || '<p class="mini" style="text-align:center;padding:30px 0">Ningún evento aquí.</p>'}</div>`, 'Nuevo evento');
+  app.querySelectorAll('[data-f]').forEach(b => b.onclick = () => { c.f = b.dataset.f; pinta(); });
+  app.querySelectorAll('[data-ev]').forEach(b => b.onclick = () => abrir({ tipo: 'evento', id: Number(b.dataset.ev) }));
+  document.getElementById('accion').onclick = () => abrir({ tipo: 'nuevo' });
+}
+function capaEvento(c) {
+  const ev = S.eventos.find(e => e.id === c.id); if (!ev) return cerrar();
+  if (c.e == null) c.e = etapaActual(ev);
+  const [n, col, cf] = luz(ev), faltan = Math.round((dia(ev.fecha, 0) - hoy()) / 864e5);
+  const pasos = ev.pasos.filter(p => p.e === c.e);
+  marco(ev.nombre, `<div style="display:grid;gap:10px">
+    <div class="ev-cab"><div class="linea">${ava(ev.resp)}<span style="flex:1;min-width:0"><b>${esc(ev.nombre)}</b><span class="mini" style="display:block">${esc(ev.ciudad)} · ${bonita(dia(ev.fecha, 0))} · ${faltan > 0 ? `faltan ${faltan} días` : faltan === 0 ? 'es hoy' : `fue hace ${-faltan} días`}</span></span><span class="estado" style="--c:${col};--cf:${cf}">${n}</span></div>
+      <div class="etapas">${PROCESO.map(([nom], i) => { const ps = ev.pasos.filter(p => p.e === i), h = ps.filter(p => p.hecho).length; return `<button class="etapa${i === c.e ? ' on' : ''}" data-e="${i}"><span class="barra"><i style="--p:${Math.round(h / ps.length * 100)}%"></i></span>${CORTO[i]}</button>`; }).join('')}</div></div>
+    <span class="eti">${PROCESO[c.e][0]} · ${pasos.filter(p => p.hecho).length} de ${pasos.length} listos</span></div>
+    <div class="lista">${pasos.map(p => { const v = vence(ev, p), at = atrasado(ev, p), pr = pronto(ev, p); return `<button class="paso${p.hecho ? ' hecho' : ''}" data-p="${esc(p.n)}"><span class="check">${I.check}</span><span><b>${esc(p.n)}</b><small>${p.antes > 0 ? `${p.antes} días antes` : p.antes === 0 ? 'El día del evento' : `${-p.antes} días después`} · ${bonita(v)}</small></span>${at ? '<span class="estado" style="--c:var(--rojo);--cf:var(--rojof)">Atrasado</span>' : pr ? '<span class="estado" style="--c:var(--amarillo);--cf:var(--amarillof)">Esta semana</span>' : '<span></span>'}</button>`; }).join('')}</div>`);
+  app.querySelector('.vista').style.gridTemplateRows = 'auto minmax(0,1fr)';
+  app.querySelectorAll('[data-e]').forEach(b => b.onclick = () => { c.e = Number(b.dataset.e); pinta(); });
+  app.querySelectorAll('[data-p]').forEach(b => b.onclick = () => {
+    const p = pasos.find(x => x.n === b.dataset.p); p.hecho = !p.hecho; guardar();
+    const etapaLista = pasos.every(x => x.hecho);
+    if (p.hecho && etapaLista && c.e < PROCESO.length - 1) { aviso(`¡${PROCESO[c.e][0]} completa! Sigue: ${PROCESO[c.e + 1][0]}`); c.e++; }
+    else if (p.hecho) aviso('Listo: paso hecho');
+    pinta();
+  });
+}
+function capaSemana() {
+  const items = misEventos().flatMap(ev => ev.pasos.filter(p => atrasado(ev, p) || pronto(ev, p)).map(p => ({ ev, p }))).sort((a, b) => vence(a.ev, a.p) - vence(b.ev, b.p));
+  marco('Esta semana', `<p class="mini">Primero lo atrasado; luego lo que vence en los próximos 7 días.</p>
+    <div class="lista">${items.map(({ ev, p }) => { const at = atrasado(ev, p); return `<button class="fila" data-ev="${ev.id}" data-e="${p.e}">${ava(ev.resp, 1)}<span class="q"><b>${esc(p.n)}</b><span>${esc(ev.nombre)} · ${esc(ev.ciudad)} · ${bonita(vence(ev, p))}</span></span><span class="estado" style="--c:${at ? 'var(--rojo)' : 'var(--amarillo)'};--cf:${at ? 'var(--rojof)' : 'var(--amarillof)'}">${at ? 'Atrasado' : 'Esta semana'}</span></button>`; }).join('') || '<p class="mini" style="text-align:center;padding:30px 0">Todo al día. Nada vence esta semana.</p>'}</div>`);
+  app.querySelectorAll('[data-ev]').forEach(b => b.onclick = () => abrir({ tipo: 'evento', id: Number(b.dataset.ev), e: Number(b.dataset.e) }));
+}
+function capaEquipo() {
+  marco('Equipo', `<p class="mini">Cada quien es responsable de sus eventos, y todos ven cómo van los demás para apoyarse.</p>
+    <div class="lista">${EJECUTIVOS.map(id => { const evs = S.eventos.filter(e => e.resp === id), at = evs.filter(e => luz(e)[0] === 'Atrasado').length; return `<button class="fila" data-u="${id}">${ava(id)}<span class="q"><b>${esc(GENTE[id].n)}</b><span>${evs.length} eventos · ${evs.map(e => e.ciudad).join(', ')}</span></span>${at ? `<span class="estado" style="--c:var(--rojo);--cf:var(--rojof)">${at} atrasado${at === 1 ? '' : 's'}</span>` : '<span class="estado" style="--c:var(--verde);--cf:var(--verdef)">Al día</span>'}</button>`; }).join('')}</div>`);
+  app.querySelectorAll('[data-u]').forEach(b => b.onclick = () => abrir({ tipo: 'de', id: b.dataset.u }));
+}
+// Los eventos de alguien del equipo (sin cambiar quién eres).
+function capaDe(c) {
+  const evs = S.eventos.filter(e => e.resp === c.id).sort((a, b) => a.fecha.localeCompare(b.fecha));
+  marco(`Eventos de ${GENTE[c.id].n}`, `<p class="mini">${evs.length} eventos a su cargo.</p><div class="lista">${evs.map(filaEvento).join('')}</div>`);
+  app.querySelectorAll('[data-ev]').forEach(b => b.onclick = () => abrir({ tipo: 'evento', id: Number(b.dataset.ev) }));
+}
+function capaProceso() {
+  marco('Nuestro proceso', `<p class="mini">Se escribe una sola vez. Cada evento nuevo lo trae completo, con las fechas ya calculadas desde el día del evento.</p>
+    <div class="lista">${PROCESO.map(([n, pasos], i) => `<div class="ev-cab" style="gap:8px"><span class="eti">Etapa ${i + 1} · ${n}</span>${pasos.map(([p, d]) => `<div style="display:flex;justify-content:space-between;gap:10px;font-weight:700;font-size:14px"><span>${esc(p)}</span><span class="mini" style="white-space:nowrap">${d > 0 ? `${d} días antes` : d === 0 ? 'El día' : `${-d} días después`}</span></div>`).join('')}</div>`).join('')}</div>`);
+}
+/* ---------- Nuevo evento: una pregunta a la vez; el proceso se pone solo ---------- */
+function capaNuevo(c) {
+  c.paso = c.paso || 1; const t = c.t = c.t || { nombre: '', ciudad: '', resp: S.yo === 'jefa' ? '' : S.yo, fecha: '' };
+  const N = 4, P = c.paso;
+  const cuerpo = P === 1 ? `<span class="preg">¿Cómo se llama el evento?</span><input class="campo" id="v" maxlength="60" value="${esc(t.nombre)}" placeholder="Ejemplo: Torneo de boliche" enterkeyhint="next">`
+    : P === 2 ? `<span class="preg">¿En qué ciudad?</span><input class="campo" id="v" maxlength="40" value="${esc(t.ciudad)}" placeholder="Ejemplo: Oaxaca" enterkeyhint="next">`
+    : P === 3 ? `<span class="preg">¿Quién es responsable?</span><div class="quien">${EJECUTIVOS.map(id => `<button type="button" data-u="${id}" class="${t.resp === id ? 'on' : ''}">${ava(id, 1)}${esc(GENTE[id].n)}</button>`).join('')}</div>`
+    : `<span class="preg">¿Qué día es el evento?</span><input class="campo" id="v" type="date" min="${iso(hoy())}" value="${esc(t.fecha)}"><p class="mini" id="dice">${t.fecha ? 'Para el ' + bonita(dia(t.fecha, 0)) : 'Con esta fecha se calculan solos todos los pasos del proceso.'}</p>`;
+  marco('Nuevo evento', `<span class="mini">Paso ${P} de ${N}</span><form class="hoja" id="f" novalidate>${cuerpo}<div class="botones"><button type="button" class="boton dos" id="atras">${P === 1 ? 'Cancelar' : 'Atrás'}</button><button class="boton">${P === N ? 'Crear evento' : 'Siguiente'}</button></div><div class="aviso" id="aviso"></div></form>`);
+  const v = document.getElementById('v'), av = document.getElementById('aviso');
+  if (v && v.type !== 'date') setTimeout(() => v.focus(), 50);
+  if (v && v.type === 'date') v.onchange = () => { document.getElementById('dice').textContent = v.value ? 'Para el ' + bonita(dia(v.value, 0)) : ''; };
+  app.querySelectorAll('[data-u]').forEach(b => b.onclick = () => { t.resp = b.dataset.u; c.paso = 4; pinta(); });
+  document.getElementById('atras').onclick = () => { if (P === 1) cerrar(); else { c.paso--; pinta(); } };
+  document.addEventListener('mousedown', e => { if (document.activeElement === v && e.target.closest('button')) e.preventDefault(); }, { once: true });
+  document.getElementById('f').onsubmit = e => {
+    e.preventDefault(); av.textContent = '';
+    if (P === 1) { t.nombre = v.value.trim(); if (!t.nombre) return (av.textContent = 'Escribe el nombre del evento.'); }
+    if (P === 2) { t.ciudad = v.value.trim(); if (!t.ciudad) return (av.textContent = 'Escribe la ciudad.'); }
+    if (P === 3 && !t.resp) return (av.textContent = 'Elige quién es responsable.');
+    if (P === 4) {
+      t.fecha = v.value; if (!t.fecha) return (av.textContent = 'Elige el día del evento.');
+      const id = Math.max(0, ...S.eventos.map(x => x.id)) + 1;
+      S.eventos.push({ id, nombre: t.nombre, ciudad: t.ciudad, resp: t.resp, fecha: t.fecha, pasos: armarPasos(t.fecha) }); guardar();
+      pila.pop(); pila.push({ tipo: 'evento', id }); pinta();
+      return aviso(`Listo: ya trae sus ${PROCESO.reduce((n, x) => n + x[1].length, 0)} pasos con fecha`);
+    }
+    c.paso++; pinta();
+  };
+}
+// La pantalla nunca se arrastra: solo se mueve una lista que de verdad tenga más abajo.
+document.addEventListener('touchmove', e => {
+  if (e.touches.length !== 1) return e.preventDefault();
+  for (let x = e.target; x && x !== document.body; x = x.parentElement) if (x.classList && x.classList.contains('lista') && x.scrollHeight > x.clientHeight + 1) return;
+  e.preventDefault();
+}, { passive: false });
+addEventListener('scroll', () => { if (scrollY) scrollTo(0, 0); });
+pinta();
+</script>
+</body>
+</html>
