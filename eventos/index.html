@@ -46,9 +46,14 @@ input,select{font:inherit;font-size:16px;color:inherit}
 .t:active{transform:scale(.985)}
 .t b.titulo{font-size:18px;font-weight:800}
 .t .num{font-size:34px;font-weight:800;letter-spacing:-.03em;line-height:1;margin-top:auto}
-.t-ev{grid-area:ev;background:var(--cobalto);color:#fff;position:relative}
-.logo-ev{position:absolute;top:12px;right:12px;background:#fff;border-radius:14px;padding:6px 9px;display:grid;place-items:center;box-shadow:0 6px 14px -8px rgba(0,0,0,.35)}.logo-ev img{height:clamp(26px,7vw,38px);width:auto;display:block}
-.t-ev.con-logo .titulo,.t-ev.con-logo>.mini{padding-right:clamp(108px,30vw,150px)}.t-ev .mini{color:rgba(255,255,255,.85)}
+.t-ev{grid-area:ev;background:linear-gradient(150deg,#2f8fae,#21677f);color:#fff;position:relative}
+.t-ev.con-logo{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto;gap:8px}
+.logo-ev{min-height:0;height:100%;display:grid;place-items:center;border-radius:20px;background:radial-gradient(closest-side,rgba(255,255,255,.16),transparent 75%)}
+.brillo{position:relative;width:min(86%,400px);aspect-ratio:900/276;-webkit-mask:var(--logo) center/contain no-repeat;mask:var(--logo) center/contain no-repeat;background:rgba(255,255,255,.96);filter:drop-shadow(0 6px 18px rgba(0,0,0,.18))}
+.brillo::after{content:"";position:absolute;inset:0;background:linear-gradient(105deg,transparent 35%,rgba(42,127,155,.0) 40%,rgba(160,235,255,.95) 50%,rgba(42,127,155,0) 60%,transparent 65%);background-size:260% 100%;background-position:120% 0;animation:brillo 4.2s cubic-bezier(.45,0,.2,1) infinite}
+@keyframes brillo{0%,35%{background-position:120% 0}75%,100%{background-position:-20% 0}}
+@media (prefers-reduced-motion:reduce){.brillo::after{animation:none;background:none}}
+.ev-pie{display:flex;align-items:center;gap:6px 14px;flex-wrap:wrap}.ev-pie .num{margin-top:0}.ev-pie .semaforos{margin-top:0}
 .t-sem{grid-area:sem}.t-eq{grid-area:eq}
 .t-pro{grid-area:pro;flex-direction:row;align-items:center;gap:12px;padding:12px 16px}
 .semaforos{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto}
@@ -98,7 +103,7 @@ input,select{font:inherit;font-size:16px;color:inherit}
 .nota-demo{font-size:12px;font-weight:600;color:var(--tenue);text-align:center}
 @media (prefers-color-scheme:dark){.logo-q{background:#fff;border-radius:8px;padding:3px 6px;height:32px}}
 .nota-demo button{color:var(--cobalto);font-weight:800}
-@media (max-height:620px){.t-pro .mini,.t-sem .mini,.t-eq .mini,.t-ev .mini{display:none}.hola small{display:none}}
+@media (max-height:620px){.t-pro .mini,.t-sem .mini,.t-eq .mini,.t-ev .mini{display:none}.hola small{display:none}.mosaico{grid-template-rows:minmax(0,1.75fr) minmax(0,1fr) auto}.sem{font-size:12px;padding:3px 8px 3px 4px}.sem i{width:14px;height:14px}.t .num{font-size:30px}}
 </style>
 </head>
 <body>
@@ -215,19 +220,27 @@ function inicio() {
   <div class="vista" style="grid-template-rows:auto minmax(0,1fr) auto">
     <h1 class="hola">Hola, ${esc(g.corto || g.n)}<small>${S.yo === 'jefa' ? 'Así van todos los eventos del área' : 'Así van tus eventos'}</small></h1>
     <main class="mosaico">
-      <button class="t t-ev${FOTOS.logo ? ' con-logo' : ''}" data-ir="eventos">${FOTOS.logo ? `<span class="logo-ev"><img src="${FOTOS.logo}" alt="Quálitas"></span>` : ''}<b class="titulo">${S.yo === 'jefa' ? 'Eventos del año' : 'Mis eventos'}</b><span class="mini">Toca para ver cada uno y en qué etapa va</span>
-        <span class="num">${evs.length}</span>
-        <div class="semaforos">${[['Atrasado', 'var(--rojo)', 'atrasado', 'atrasados'], ['Vence pronto', 'var(--amarillo)', 'por vencer', 'por vencer'], ['Al día', 'var(--verde)', 'al día', 'al día']].map(([n, col, uno, varios]) => `<span class="sem"><i style="--c:${col}"></i>${cuenta(n)} ${cuenta(n) === 1 ? uno : varios}</span>`).join('')}</div></button>
+      <button class="t t-ev${FOTOS.silueta ? ' con-logo' : ''}" data-ir="eventos"><b class="titulo">${S.yo === 'jefa' ? 'Eventos del año' : 'Mis eventos'}</b>${FOTOS.silueta ? '' : '<span class="mini">Toca para ver cada uno y en qué etapa va</span>'}
+        ${FOTOS.silueta ? `<span class="logo-ev"><span class="brillo" role="img" aria-label="Quálitas" style="--logo:url(${FOTOS.silueta})"></span></span>` : ''}
+        <div class="ev-pie"><span class="num">${evs.length}</span>
+        <div class="semaforos">${[['Atrasado', 'var(--rojo)', 'atrasado', 'atrasados'], ['Vence pronto', 'var(--amarillo)', 'por vencer', 'por vencer'], ['Al día', 'var(--verde)', 'al día', 'al día']].map(([n, col, uno, varios]) => `<span class="sem"><i style="--c:${col}"></i>${cuenta(n)} ${cuenta(n) === 1 ? uno : varios}</span>`).join('')}</div></div></button>
       <button class="t t-sem" data-ir="semana"><b class="titulo">Esta semana</b><span class="mini">Pasos atrasados y los que vencen en 7 días</span><span class="num" style="color:${semana.some(x => atrasado(x.ev, x.p)) ? 'var(--rojo)' : 'inherit'}">${semana.length}</span></button>
       <button class="t t-eq" data-ir="equipo"><b class="titulo">Equipo</b><span class="mini">Quién lleva cada evento</span><span class="num">${EJECUTIVOS.length}</span></button>
       <button class="t t-pro" data-ir="proceso"><span class="circulo">${I.proceso}</span><span><b class="titulo" style="display:block">Nuestro proceso</b><span class="mini">${PROCESO.length} etapas que todo evento sigue</span></span></button>
     </main>
     <p class="nota-demo">Propuesta de MOON Digital · eventos de ejemplo · <button id="reiniciar">Volver a empezar</button></p>
   </div>`;
+  ajustaLogo();
   app.querySelectorAll('[data-ir]').forEach(b => b.onclick = () => abrir({ tipo: b.dataset.ir }));
   document.getElementById('quien').onclick = () => abrir({ tipo: 'quien' });
   document.getElementById('reiniciar').onclick = () => { S = { yo: S.yo, eventos: ejemplo() }; guardar(); inicio(); aviso('Listo: la demo volvió a empezar'); };
 }
+// El logo toma el espacio que le deja el recuadro: lo más grande posible sin encimarse con el título ni con los números.
+function ajustaLogo() {
+  const caja = app.querySelector('.logo-ev'), l = app.querySelector('.brillo'); if (!caja || !l) return;
+  l.style.width = Math.max(60, Math.floor(Math.min(caja.clientWidth * 0.86, 400, (caja.clientHeight - 8) * 900 / 276))) + 'px';
+}
+addEventListener('resize', () => { if (!pila.length) ajustaLogo(); });
 function capaQuien() {
   marco('¿Quién eres?', `<p class="mini">En la versión real cada quien entra con su propia contraseña. Aquí puedes ver cómo lo ve cada uno.</p>
     <div class="lista">${['jefa'].concat(EJECUTIVOS).map(id => `<button class="fila" data-u="${id}">${ava(id)}<span class="q"><b>${esc(GENTE[id].n)}</b><span>${id === 'jefa' ? 'Encargada · ve todos los eventos del área' : S.eventos.filter(e => e.resp === id).length + ' eventos a su cargo'}</span></span><span>${S.yo === id ? '<span class="estado" style="--c:var(--cobalto);--cf:var(--campo)">Tú</span>' : ''}</span></button>`).join('')}</div>`);
