@@ -8,6 +8,9 @@
     },
     "api/leer-negocio.js": {
       "maxDuration": 60
+    },
+    "api/demo-eventos.js": {
+      "includeFiles": "{api/_docs/**}"
     }
   },
   "rewrites": [

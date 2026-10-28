@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Tablero de Eventos · demo de MOON Digital</title>
+<title>Eventos Especiales · Quálitas</title>
 <meta name="description" content="Demo: cada evento con su responsable, su proceso y cómo va, en un solo tablero.">
-<meta property="og:title" content="Tablero de Eventos">
-<meta property="og:description" content="Cada evento con su responsable, su proceso y cómo va, en un solo tablero. Demo de MOON Digital.">
+<meta property="og:title" content="Tablero de Eventos Especiales · Quálitas">
+<meta property="og:description" content="Cada evento con su responsable, su proceso y cómo va, en un solo tablero. Propuesta de MOON Digital.">
 <meta property="og:url" content="https://moondigitalia.com/eventos/">
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,10 +14,10 @@
 <style>
 :root{
   --fondo:#f3efe9;--tarjeta:#f8f5f0;--campo:#ece7e0;--tinta:#1d1d22;--suave:#5d5d66;--tenue:#8b8a92;
-  --cobalto:#0b4fd6;--verde:#1f8a4c;--verdef:#e3f3ea;--amarillo:#b7791f;--amarillof:#fbf0dc;--rojo:#cf4a40;--rojof:#fbe7e5;--gris:#8b8a92;--grisf:#ecebe8;
+  --cobalto:#2a7f9b;--morado:#8e1b7a;--verde:#1f8a4c;--verdef:#e3f3ea;--amarillo:#b7791f;--amarillof:#fbf0dc;--rojo:#cf4a40;--rojof:#fbe7e5;--gris:#8b8a92;--grisf:#ecebe8;
   --sombra:0 10px 24px -14px rgba(90,75,55,.45);--sombra2:0 6px 14px -8px rgba(90,75,55,.4);--r:26px;
 }
-@media (prefers-color-scheme:dark){:root{--fondo:#16171b;--tarjeta:#1f2025;--campo:#2a2b31;--tinta:#efedea;--suave:#b3b1b8;--tenue:#85848c;--cobalto:#3a78ff;--verde:#4cc283;--verdef:#163024;--amarillo:#e6b04f;--amarillof:#3a2e17;--rojo:#ef7b72;--rojof:#3a1f1d;--grisf:#2a2b31;--sombra:0 10px 24px -14px rgba(0,0,0,.8);--sombra2:0 6px 14px -8px rgba(0,0,0,.7)}}
+@media (prefers-color-scheme:dark){:root{--fondo:#16171b;--tarjeta:#1f2025;--campo:#2a2b31;--tinta:#efedea;--suave:#b3b1b8;--tenue:#85848c;--cobalto:#4fb3cf;--morado:#d36bc2;--verde:#4cc283;--verdef:#163024;--amarillo:#e6b04f;--amarillof:#3a2e17;--rojo:#ef7b72;--rojof:#3a1f1d;--grisf:#2a2b31;--sombra:0 10px 24px -14px rgba(0,0,0,.8);--sombra2:0 6px 14px -8px rgba(0,0,0,.7)}}
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{position:fixed;inset:0;overflow:hidden;overscroll-behavior:none;background:var(--fondo);color:var(--tinta);font-family:Manrope,system-ui,-apple-system,sans-serif;font-size:15px;line-height:1.35;-webkit-font-smoothing:antialiased;touch-action:manipulation;-webkit-text-size-adjust:100%}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
@@ -35,7 +35,10 @@ input,select{font:inherit;font-size:16px;color:inherit}
 .mini{font-size:13px;font-weight:600;color:var(--suave)}
 .hola{font-size:clamp(22px,6.4vw,30px);font-weight:800;letter-spacing:-.02em;line-height:1.1}
 .hola small{display:block;font-size:13px;font-weight:600;color:var(--suave);letter-spacing:0;margin-top:4px}
-.ava{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:800;font-size:14px;flex:none;background:var(--c)}
+.ava{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:800;font-size:14px;flex:none;background:var(--c) center/cover no-repeat}
+.ava.foto{color:transparent}
+.logo-q{height:30px;width:auto;display:block}
+.marca-q{display:flex;align-items:center;gap:10px;flex:1;min-width:0}.marca-q span{font-size:11px;font-weight:800;letter-spacing:.16em;color:var(--suave);text-transform:uppercase}
 .ava.chico{width:28px;height:28px;font-size:11px}
 /* Inicio */
 .mosaico{min-height:0;display:grid;gap:10px;grid-template-columns:1fr 1fr;grid-template-rows:minmax(0,1.6fr) minmax(0,1fr) auto;grid-template-areas:"ev ev" "sem eq" "pro pro"}
@@ -91,8 +94,9 @@ input,select{font:inherit;font-size:16px;color:inherit}
 .aviso{font-size:13px;font-weight:700;color:var(--rojo)}.aviso:empty{display:none}
 .toast{pointer-events:none;position:fixed;left:50%;bottom:max(18px,env(safe-area-inset-bottom));transform:translateX(-50%);background:#1d1d22;color:#fff;font-weight:700;font-size:14px;padding:12px 18px;border-radius:99px;z-index:9;max-width:calc(100% - 32px);text-align:center;transition:opacity .3s}
 .nota-demo{font-size:12px;font-weight:600;color:var(--tenue);text-align:center}
+@media (prefers-color-scheme:dark){.logo-q{background:#fff;border-radius:8px;padding:3px 6px;height:32px}}
 .nota-demo button{color:var(--cobalto);font-weight:800}
-@media (max-height:620px){.t-pro .mini,.t-sem .mini,.t-eq .mini{display:none}.hola small{display:none}}
+@media (max-height:620px){.t-pro .mini,.t-sem .mini,.t-eq .mini,.t-ev .mini{display:none}.hola small{display:none}}
 </style>
 </head>
 <body>
@@ -106,14 +110,19 @@ const I = {
   mas: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
   proceso: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="6" r="2"/><circle cx="5" cy="18" r="2"/><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="5" cy="12" r="2"/></svg>',
 };
+// El equipo de Eventos Especiales. Las fotos llegan aparte (nunca van en el código público de la página).
 const GENTE = {
-  jefa: { n: 'Encargada del área', c: '#2b2b30', i: 'EA', corto: 'Encargada' },
-  andrea: { n: 'Andrea', c: '#0b4fd6', i: 'A' },
-  luis: { n: 'Luis', c: '#1f8a4c', i: 'L' },
-  mariana: { n: 'Mariana', c: '#c0392b', i: 'M' },
-  jorge: { n: 'Jorge', c: '#8e44ad', i: 'J' },
+  jefa: { n: 'Lizbeth García', c: '#8e1b7a', i: 'LG', corto: 'Lizbeth', papel: 'Encargada de Eventos Especiales' },
+  e1: { n: 'Ejecutivo 1', c: '#2a7f9b', i: '1' },
+  e2: { n: 'Ejecutivo 2', c: '#1f8a4c', i: '2' },
+  e3: { n: 'Ejecutivo 3', c: '#b7791f', i: '3' },
+  e4: { n: 'Ejecutivo 4', c: '#5b4bc4', i: '4' },
+  e5: { n: 'Ejecutivo 5', c: '#c0392b', i: '5' },
 };
-const EJECUTIVOS = ['andrea', 'luis', 'mariana', 'jorge'];
+const EJECUTIVOS = ['e1', 'e2', 'e3', 'e4', 'e5'];
+let FOTOS = {};
+try { FOTOS = JSON.parse(localStorage.getItem('moon.demo.eventos.fotos') || '{}'); } catch (e) {}
+fetch('/api/demo-eventos').then(r => r.json()).then(r => { if (r && r.ok) { const nuevo = JSON.stringify(r.fotos) !== JSON.stringify(FOTOS); FOTOS = r.fotos; try { localStorage.setItem('moon.demo.eventos.fotos', JSON.stringify(FOTOS)); } catch (e) {} if (nuevo) pinta(); } }).catch(() => {});
 // El proceso (de ejemplo): cada paso dice cuántos días antes del evento debe quedar (negativo = después).
 const CORTO = ['Planear', 'Contratar', 'Organizar', 'El día', 'Cierre'];   // nombre corto de cada etapa para la barrita
 const PROCESO = [
@@ -123,7 +132,7 @@ const PROCESO = [
   ['Día del evento', [['Montaje revisado', 0], ['Registro de asistentes', 0], ['Fotos y evidencias', 0]]],
   ['Cierre', [['Encuesta de satisfacción', -3], ['Pagos finales a proveedores', -10], ['Reporte y aprendizajes', -15]]],
 ];
-const LLAVE = 'moon.demo.eventos.v1';
+const LLAVE = 'moon.demo.eventos.v2';
 const hoy = () => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; };
 const dia = (f, mas) => { const d = new Date(f + 'T00:00:00'); d.setDate(d.getDate() + mas); return d; };
 const MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
@@ -137,15 +146,18 @@ const enDias = n => iso(dia(iso(hoy()), n));
 // Eventos de ejemplo. Lo que ya debió pasar queda hecho, menos unos pocos (para que se vea cómo avisa el tablero).
 function ejemplo() {
   const evs = [
-    ['Carrera anual', 'Ciudad de México', 'andrea', enDias(-10)],
-    ['Evento Tuxtla', 'Tuxtla Gutiérrez', 'andrea', enDias(18)],
-    ['Convención de agentes', 'Monterrey', 'andrea', enDias(130)],
-    ['Torneo de golf', 'Guadalajara', 'luis', enDias(31)],
-    ['Cena de fin de año', 'Ciudad de México', 'luis', enDias(45)],
-    ['Feria de seguridad vial', 'Puebla', 'mariana', enDias(75)],
-    ['Expo agentes', 'Querétaro', 'mariana', enDias(160)],
-    ['Rally', 'Cancún', 'jorge', enDias(25)],
-    ['Congreso regional', 'León', 'jorge', enDias(110)],
+    ['Carrera anual', 'Ciudad de México', 'e1', '2026-10-18'],
+    ['Evento Tuxtla', 'Tuxtla Gutiérrez', 'e1', '2026-11-15'],
+    ['Evento Mérida', 'Mérida', 'e1', '2026-02-20'],
+    ['Evento Ciudad de México', 'Ciudad de México', 'e1', '2026-10-02'],
+    ['Torneo de golf', 'Guadalajara', 'e2', enDias(31)],
+    ['Cena de fin de año', 'Ciudad de México', 'e2', enDias(45)],
+    ['Feria de seguridad vial', 'Puebla', 'e3', enDias(75)],
+    ['Convención de agentes', 'Monterrey', 'e3', enDias(130)],
+    ['Rally', 'Cancún', 'e4', enDias(25)],
+    ['Congreso regional', 'León', 'e4', enDias(110)],
+    ['Expo agentes', 'Querétaro', 'e5', enDias(160)],
+    ['Encuentro de ajustadores', 'Veracruz', 'e5', enDias(55)],
   ];
   const pendientes = { 'Evento Tuxtla': ['Invitaciones enviadas'], 'Rally': ['Invitaciones enviadas', 'Anticipos pagados'], 'Carrera anual': ['Reporte y aprendizajes'] };
   return evs.map(([nombre, ciudad, resp, fecha], k) => ({ id: k + 1, nombre, ciudad, resp, fecha, pasos: armarPasos(fecha, (paso, vence) => vence < hoy() && !(pendientes[nombre] || []).includes(paso)) }));
@@ -170,7 +182,7 @@ function luz(ev) {
   return ['Al día', 'var(--verde)', 'var(--verdef)'];
 }
 const etapaActual = ev => { const i = ev.pasos.findIndex(p => !p.hecho); return i < 0 ? PROCESO.length - 1 : ev.pasos[i].e; };
-const ava = (id, chico) => { const g = GENTE[id]; return `<span class="ava${chico ? ' chico' : ''}" style="--c:${g.c}">${g.i}</span>`; };
+const ava = (id, chico) => { const g = GENTE[id], f = FOTOS[id]; return `<span class="ava${chico ? ' chico' : ''}${f ? ' foto' : ''}" style="--c:${g.c}${f ? `;background-image:url(${f})` : ''}" role="img" aria-label="${esc(g.n)}">${g.i}</span>`; };
 const misEventos = () => S.yo === 'jefa' ? S.eventos : S.eventos.filter(e => e.resp === S.yo);
 
 const app = document.getElementById('app');
@@ -196,7 +208,7 @@ function inicio() {
   const cuenta = n => luces.filter(l => l[0] === n).length;
   const semana = evs.flatMap(ev => ev.pasos.filter(p => atrasado(ev, p) || pronto(ev, p)).map(p => ({ ev, p })));
   const g = GENTE[S.yo];
-  app.innerHTML = `<div class="top"><span class="marca">EVENTOS <i>/</i> TABLERO</span><button id="quien" aria-label="Cambiar de persona">${ava(S.yo)}</button></div>
+  app.innerHTML = `<div class="top"><span class="marca-q"><img class="logo-q" src="${FOTOS.logo || ''}" alt="Quálitas"${FOTOS.logo ? '' : ' hidden'}><span>Eventos Especiales</span></span><button id="quien" aria-label="Cambiar de persona">${ava(S.yo)}</button></div>
   <div class="vista" style="grid-template-rows:auto minmax(0,1fr) auto">
     <h1 class="hola">Hola, ${esc(g.corto || g.n)}<small>${S.yo === 'jefa' ? 'Así van todos los eventos del área' : 'Así van tus eventos'}</small></h1>
     <main class="mosaico">
@@ -207,7 +219,7 @@ function inicio() {
       <button class="t t-eq" data-ir="equipo"><b class="titulo">Equipo</b><span class="mini">Quién lleva cada evento</span><span class="num">${EJECUTIVOS.length}</span></button>
       <button class="t t-pro" data-ir="proceso"><span class="circulo">${I.proceso}</span><span><b class="titulo" style="display:block">Nuestro proceso</b><span class="mini">${PROCESO.length} etapas que todo evento sigue</span></span></button>
     </main>
-    <p class="nota-demo">Demo con datos de ejemplo · <button id="reiniciar">Volver a empezar</button></p>
+    <p class="nota-demo">Propuesta de MOON Digital · eventos de ejemplo · <button id="reiniciar">Volver a empezar</button></p>
   </div>`;
   app.querySelectorAll('[data-ir]').forEach(b => b.onclick = () => abrir({ tipo: b.dataset.ir }));
   document.getElementById('quien').onclick = () => abrir({ tipo: 'quien' });
@@ -215,7 +227,7 @@ function inicio() {
 }
 function capaQuien() {
   marco('¿Quién eres?', `<p class="mini">En la versión real cada quien entra con su propia contraseña. Aquí puedes ver cómo lo ve cada uno.</p>
-    <div class="lista">${['jefa'].concat(EJECUTIVOS).map(id => `<button class="fila" data-u="${id}">${ava(id)}<span class="q"><b>${esc(GENTE[id].n)}</b><span>${id === 'jefa' ? 'Ve todos los eventos del área' : S.eventos.filter(e => e.resp === id).length + ' eventos a su cargo'}</span></span><span>${S.yo === id ? '<span class="estado" style="--c:var(--cobalto);--cf:var(--campo)">Tú</span>' : ''}</span></button>`).join('')}</div>`);
+    <div class="lista">${['jefa'].concat(EJECUTIVOS).map(id => `<button class="fila" data-u="${id}">${ava(id)}<span class="q"><b>${esc(GENTE[id].n)}</b><span>${id === 'jefa' ? 'Encargada · ve todos los eventos del área' : S.eventos.filter(e => e.resp === id).length + ' eventos a su cargo'}</span></span><span>${S.yo === id ? '<span class="estado" style="--c:var(--cobalto);--cf:var(--campo)">Tú</span>' : ''}</span></button>`).join('')}</div>`);
   app.querySelectorAll('[data-u]').forEach(b => b.onclick = () => { S.yo = b.dataset.u; guardar(); cerrar(); });
 }
 
