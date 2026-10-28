@@ -5,6 +5,6 @@ module.exports = (req, res) => {
   const d = leerCifrado('qualitas-eventos');
   if (!d) { res.status(404).json({ ok: false }); return; }
   const fotos = {}; for (const k in d) fotos[k] = `data:${d[k][0]};base64,${d[k][1]}`;
-  res.setHeader('Cache-Control', 'public, max-age=3600');
+  res.setHeader('Cache-Control', 'no-store');   // nunca una versión vieja guardada (por eso un día no salió el logo)
   res.status(200).json({ ok: true, fotos });
 };

@@ -10,6 +10,7 @@
 <meta property="og:url" content="https://moondigitalia.com/eventos/">
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preload" href="/eventos/logo-silueta.png" as="image">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -130,7 +131,7 @@ const EJECUTIVOS = ['e1', 'e2', 'e3', 'e4'];
 const FOTO_DE = { jefa: 'e3', e1: 'e1', e2: 'e2', e3: 'e4', e4: 'e5' };
 let FOTOS = {};
 try { FOTOS = JSON.parse(localStorage.getItem('moon.demo.eventos.fotos') || '{}'); } catch (e) {}
-fetch('/api/demo-eventos').then(r => r.json()).then(r => { if (r && r.ok) { const nuevo = JSON.stringify(r.fotos) !== JSON.stringify(FOTOS); FOTOS = r.fotos; try { localStorage.setItem('moon.demo.eventos.fotos', JSON.stringify(FOTOS)); } catch (e) {} if (nuevo) pinta(); } }).catch(() => {});
+fetch('/api/demo-eventos?v=3', { cache: 'no-store' }).then(r => r.json()).then(r => { if (r && r.ok) { const nuevo = JSON.stringify(r.fotos) !== JSON.stringify(FOTOS); FOTOS = r.fotos; try { localStorage.setItem('moon.demo.eventos.fotos', JSON.stringify(FOTOS)); } catch (e) {} if (nuevo) pinta(); } }).catch(() => {});
 // El proceso (de ejemplo): cada paso dice cuántos días antes del evento debe quedar (negativo = después).
 const CORTO = ['Planear', 'Contratar', 'Organizar', 'El día', 'Cierre'];   // nombre corto de cada etapa para la barrita
 const PROCESO = [
@@ -220,8 +221,8 @@ function inicio() {
   <div class="vista" style="grid-template-rows:auto minmax(0,1fr) auto">
     <h1 class="hola">Hola, ${esc(g.corto || g.n)}<small>${S.yo === 'jefa' ? 'Así van todos los eventos del área' : 'Así van tus eventos'}</small></h1>
     <main class="mosaico">
-      <button class="t t-ev${FOTOS.silueta ? ' con-logo' : ''}" data-ir="eventos"><b class="titulo">${S.yo === 'jefa' ? 'Eventos del año' : 'Mis eventos'}</b>${FOTOS.silueta ? '' : '<span class="mini">Toca para ver cada uno y en qué etapa va</span>'}
-        ${FOTOS.silueta ? `<span class="logo-ev"><span class="brillo" role="img" aria-label="Quálitas" style="--logo:url(${FOTOS.silueta})"></span></span>` : ''}
+      <button class="t t-ev con-logo" data-ir="eventos"><b class="titulo">${S.yo === 'jefa' ? 'Eventos del año' : 'Mis eventos'}</b>
+        <span class="logo-ev"><span class="brillo" role="img" aria-label="Quálitas" style="--logo:url(/eventos/logo-silueta.png)"></span></span>
         <div class="ev-pie"><span class="num">${evs.length}</span>
         <div class="semaforos">${[['Atrasado', 'var(--rojo)', 'atrasado', 'atrasados'], ['Vence pronto', 'var(--amarillo)', 'por vencer', 'por vencer'], ['Al día', 'var(--verde)', 'al día', 'al día']].map(([n, col, uno, varios]) => `<span class="sem"><i style="--c:${col}"></i>${cuenta(n)} ${cuenta(n) === 1 ? uno : varios}</span>`).join('')}</div></div></button>
       <button class="t t-sem" data-ir="semana"><b class="titulo">Esta semana</b><span class="mini">Pasos atrasados y los que vencen en 7 días</span><span class="num" style="color:${semana.some(x => atrasado(x.ev, x.p)) ? 'var(--rojo)' : 'inherit'}">${semana.length}</span></button>
