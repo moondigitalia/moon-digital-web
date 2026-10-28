@@ -113,13 +113,14 @@ const I = {
 // El equipo de Eventos Especiales. Las fotos llegan aparte (nunca van en el código público de la página).
 const GENTE = {
   jefa: { n: 'Lizbeth García', c: '#8e1b7a', i: 'LG', corto: 'Lizbeth', papel: 'Encargada de Eventos Especiales' },
-  e1: { n: 'Ejecutivo 1', c: '#2a7f9b', i: '1' },
-  e2: { n: 'Ejecutivo 2', c: '#1f8a4c', i: '2' },
-  e3: { n: 'Ejecutivo 3', c: '#b7791f', i: '3' },
-  e4: { n: 'Ejecutivo 4', c: '#5b4bc4', i: '4' },
-  e5: { n: 'Ejecutivo 5', c: '#c0392b', i: '5' },
+  e1: { n: 'Andrés Arciniega', c: '#2a7f9b', i: 'AA' },
+  e2: { n: 'Karina Moreno', c: '#1f8a4c', i: 'KM' },
+  e3: { n: 'Rodrigo Medina', c: '#b7791f', i: 'RM' },
+  e4: { n: 'Valeria Mondragon', c: '#5b4bc4', i: 'VM' },
 };
-const EJECUTIVOS = ['e1', 'e2', 'e3', 'e4', 'e5'];
+const EJECUTIVOS = ['e1', 'e2', 'e3', 'e4'];
+// Qué foto es de quién (se llena cuando se confirme; mientras, cada quien sale con sus iniciales).
+const FOTO_DE = {};
 let FOTOS = {};
 try { FOTOS = JSON.parse(localStorage.getItem('moon.demo.eventos.fotos') || '{}'); } catch (e) {}
 fetch('/api/demo-eventos').then(r => r.json()).then(r => { if (r && r.ok) { const nuevo = JSON.stringify(r.fotos) !== JSON.stringify(FOTOS); FOTOS = r.fotos; try { localStorage.setItem('moon.demo.eventos.fotos', JSON.stringify(FOTOS)); } catch (e) {} if (nuevo) pinta(); } }).catch(() => {});
@@ -132,7 +133,7 @@ const PROCESO = [
   ['Día del evento', [['Montaje revisado', 0], ['Registro de asistentes', 0], ['Fotos y evidencias', 0]]],
   ['Cierre', [['Encuesta de satisfacción', -3], ['Pagos finales a proveedores', -10], ['Reporte y aprendizajes', -15]]],
 ];
-const LLAVE = 'moon.demo.eventos.v2';
+const LLAVE = 'moon.demo.eventos.v3';
 const hoy = () => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; };
 const dia = (f, mas) => { const d = new Date(f + 'T00:00:00'); d.setDate(d.getDate() + mas); return d; };
 const MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
@@ -156,8 +157,8 @@ function ejemplo() {
     ['Convención de agentes', 'Monterrey', 'e3', enDias(130)],
     ['Rally', 'Cancún', 'e4', enDias(25)],
     ['Congreso regional', 'León', 'e4', enDias(110)],
-    ['Expo agentes', 'Querétaro', 'e5', enDias(160)],
-    ['Encuentro de ajustadores', 'Veracruz', 'e5', enDias(55)],
+    ['Expo agentes', 'Querétaro', 'e4', enDias(160)],
+    ['Encuentro de ajustadores', 'Veracruz', 'e3', enDias(55)],
   ];
   const pendientes = { 'Evento Tuxtla': ['Invitaciones enviadas'], 'Rally': ['Invitaciones enviadas', 'Anticipos pagados'], 'Carrera anual': ['Reporte y aprendizajes'] };
   return evs.map(([nombre, ciudad, resp, fecha], k) => ({ id: k + 1, nombre, ciudad, resp, fecha, pasos: armarPasos(fecha, (paso, vence) => vence < hoy() && !(pendientes[nombre] || []).includes(paso)) }));
@@ -182,7 +183,7 @@ function luz(ev) {
   return ['Al día', 'var(--verde)', 'var(--verdef)'];
 }
 const etapaActual = ev => { const i = ev.pasos.findIndex(p => !p.hecho); return i < 0 ? PROCESO.length - 1 : ev.pasos[i].e; };
-const ava = (id, chico) => { const g = GENTE[id], f = FOTOS[id]; return `<span class="ava${chico ? ' chico' : ''}${f ? ' foto' : ''}" style="--c:${g.c}${f ? `;background-image:url(${f})` : ''}" role="img" aria-label="${esc(g.n)}">${g.i}</span>`; };
+const ava = (id, chico) => { const g = GENTE[id], f = FOTOS[FOTO_DE[id]]; return `<span class="ava${chico ? ' chico' : ''}${f ? ' foto' : ''}" style="--c:${g.c}${f ? `;background-image:url(${f})` : ''}" role="img" aria-label="${esc(g.n)}">${g.i}</span>`; };
 const misEventos = () => S.yo === 'jefa' ? S.eventos : S.eventos.filter(e => e.resp === S.yo);
 
 const app = document.getElementById('app');
