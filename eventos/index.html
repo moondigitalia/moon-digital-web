@@ -46,7 +46,9 @@ input,select{font:inherit;font-size:16px;color:inherit}
 .t:active{transform:scale(.985)}
 .t b.titulo{font-size:18px;font-weight:800}
 .t .num{font-size:34px;font-weight:800;letter-spacing:-.03em;line-height:1;margin-top:auto}
-.t-ev{grid-area:ev;background:var(--cobalto);color:#fff}.t-ev .mini{color:rgba(255,255,255,.85)}
+.t-ev{grid-area:ev;background:var(--cobalto);color:#fff;position:relative}
+.logo-ev{position:absolute;top:12px;right:12px;background:#fff;border-radius:14px;padding:6px 9px;display:grid;place-items:center;box-shadow:0 6px 14px -8px rgba(0,0,0,.35)}.logo-ev img{height:clamp(26px,7vw,38px);width:auto;display:block}
+.t-ev.con-logo .titulo,.t-ev.con-logo>.mini{padding-right:clamp(108px,30vw,150px)}.t-ev .mini{color:rgba(255,255,255,.85)}
 .t-sem{grid-area:sem}.t-eq{grid-area:eq}
 .t-pro{grid-area:pro;flex-direction:row;align-items:center;gap:12px;padding:12px 16px}
 .semaforos{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto}
@@ -209,11 +211,11 @@ function inicio() {
   const cuenta = n => luces.filter(l => l[0] === n).length;
   const semana = evs.flatMap(ev => ev.pasos.filter(p => atrasado(ev, p) || pronto(ev, p)).map(p => ({ ev, p })));
   const g = GENTE[S.yo];
-  app.innerHTML = `<div class="top"><span class="marca-q"><img class="logo-q" src="${FOTOS.logo || ''}" alt="Quálitas"${FOTOS.logo ? '' : ' hidden'}><span>Eventos Especiales</span></span><button id="quien" aria-label="Cambiar de persona">${ava(S.yo)}</button></div>
+  app.innerHTML = `<div class="top"><span class="marca-q"><span>Eventos Especiales</span></span><button id="quien" aria-label="Cambiar de persona">${ava(S.yo)}</button></div>
   <div class="vista" style="grid-template-rows:auto minmax(0,1fr) auto">
     <h1 class="hola">Hola, ${esc(g.corto || g.n)}<small>${S.yo === 'jefa' ? 'Así van todos los eventos del área' : 'Así van tus eventos'}</small></h1>
     <main class="mosaico">
-      <button class="t t-ev" data-ir="eventos"><b class="titulo">${S.yo === 'jefa' ? 'Eventos del año' : 'Mis eventos'}</b><span class="mini">Toca para ver cada uno y en qué etapa va</span>
+      <button class="t t-ev${FOTOS.logo ? ' con-logo' : ''}" data-ir="eventos">${FOTOS.logo ? `<span class="logo-ev"><img src="${FOTOS.logo}" alt="Quálitas"></span>` : ''}<b class="titulo">${S.yo === 'jefa' ? 'Eventos del año' : 'Mis eventos'}</b><span class="mini">Toca para ver cada uno y en qué etapa va</span>
         <span class="num">${evs.length}</span>
         <div class="semaforos">${[['Atrasado', 'var(--rojo)', 'atrasado', 'atrasados'], ['Vence pronto', 'var(--amarillo)', 'por vencer', 'por vencer'], ['Al día', 'var(--verde)', 'al día', 'al día']].map(([n, col, uno, varios]) => `<span class="sem"><i style="--c:${col}"></i>${cuenta(n)} ${cuenta(n) === 1 ? uno : varios}</span>`).join('')}</div></button>
       <button class="t t-sem" data-ir="semana"><b class="titulo">Esta semana</b><span class="mini">Pasos atrasados y los que vencen en 7 días</span><span class="num" style="color:${semana.some(x => atrasado(x.ev, x.p)) ? 'var(--rojo)' : 'inherit'}">${semana.length}</span></button>
