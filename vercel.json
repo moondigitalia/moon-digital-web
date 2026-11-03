@@ -19,6 +19,26 @@
       "destination": "https://jason.moondigitalia.workers.dev/api/privacidad"
     },
     {
+      "source": "/mijason",
+      "destination": "https://jason.moondigitalia.workers.dev/api/mijason"
+    },
+    {
+      "source": "/mijason/:ruta*",
+      "destination": "https://jason.moondigitalia.workers.dev/api/mijason/:ruta*"
+    },
+    {
+      "source": "/excel",
+      "destination": "https://jason.moondigitalia.workers.dev/api/excel"
+    },
+    {
+      "source": "/comprobante",
+      "destination": "https://jason.moondigitalia.workers.dev/api/comprobante"
+    },
+    {
+      "source": "/cotizacion/:ruta*",
+      "destination": "https://jason.moondigitalia.workers.dev/api/cotizacion/:ruta*"
+    },
+    {
       "source": "/tablero",
       "destination": "/centro/index.html"
     },
