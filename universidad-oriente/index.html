@@ -373,9 +373,13 @@ em.c{font-family:var(--c);font-style:italic;font-weight:600;letter-spacing:-.01e
   // flechas, Av Pág y el control remoto del proyector: una lámina a la vez
   document.addEventListener('keydown',function(e){
     if(e.altKey||e.ctrlKey||e.metaKey)return;
-    var k=actual(),n=null;
-    if(['ArrowDown','ArrowRight','PageDown',' '].indexOf(e.key)>-1)n=Math.min(ls.length-1,k+1);
-    if(['ArrowUp','ArrowLeft','PageUp'].indexOf(e.key)>-1)n=Math.max(0,k-1);
+    var k=actual(),n=null,r=ls[k].getBoundingClientRect(),h=window.innerHeight;
+    var adelante=['ArrowDown','ArrowRight','PageDown',' '].indexOf(e.key)>-1, atras=['ArrowUp','ArrowLeft','PageUp'].indexOf(e.key)>-1;
+    // si la lámina no cabe completa en la pantalla, primero se termina de ver y luego se pasa a la siguiente
+    if(adelante&&r.bottom>h+4){e.preventDefault();window.scrollBy({top:Math.min(h*0.85,r.bottom-h),behavior:'smooth'});return;}
+    if(atras&&r.top<-4){e.preventDefault();window.scrollBy({top:Math.max(-h*0.85,r.top),behavior:'smooth'});return;}
+    if(adelante)n=Math.min(ls.length-1,k+1);
+    if(atras)n=Math.max(0,k-1);
     if(e.key==='Home')n=0; if(e.key==='End')n=ls.length-1;
     if(n!==null){e.preventDefault();ls[n].scrollIntoView({behavior:'smooth',block:'start'});}
   });
