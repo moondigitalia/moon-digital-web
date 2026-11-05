@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#00205C">
+<title>Demo · Universidad de Oriente · MOON Digital</title>
+<link rel="stylesheet" href="/fuentes/material/letras.css">
+<style>
+/* Demo guiado (mismo formato que el de Vero / Alex Lavín) para la Universidad de Oriente, plantel Veracruz.
+   Regla de esta historia: el resumen de las 7:00 solo cuenta lo que se vio pasar antes. Nada sale de la nada.
+   Letra: DM Sans 600/700/800 (son los pesos que existen en /fuentes; 500 no existe y se veía delgada). Nada de gris claro. */
+:root{--navy:#00205C;--deep:#0B2E73;--hondo:#001538;--claro:#8FB4FF;--blue:#1D4FB8;--ok:#13744B;--okbg:#DDF3E8;--warn:#B3401F;--warnbg:#FCE6DD;
+--ink:#0E1B33;--ink2:#1F2A3F;--paper:#FFFFFF;--soft:#EEF2F9;--line:#D5DDEA;--chat:#ECE5DA;--out:#D3F0DD;
+--ease:cubic-bezier(.22,.8,.24,1);--spring:cubic-bezier(.34,1.45,.5,1)}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--hondo);overflow:hidden;-webkit-text-size-adjust:100%}
+body{font-family:"DM Sans",system-ui,-apple-system,"Segoe UI",sans-serif;font-weight:600;color:var(--ink);-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+button{font-family:inherit;-webkit-appearance:none;appearance:none}
+button:focus-visible{outline:4px solid var(--claro);outline-offset:6px}
+#stage{position:absolute;left:50%;top:50%;transform-origin:0 0;background:radial-gradient(120% 80% at 50% 0%,#123C8C 0%,#0B2E73 50%,#00205C 100%);border-radius:64px;overflow:hidden}
+#stage::before{content:"";position:absolute;width:900px;height:900px;border-radius:50%;right:-420px;top:-380px;border:2px solid rgba(255,255,255,.10)}
+/* vertical (celular) 960x1440 · horizontal (computadora y proyector) 1600x960 */
+#stage.v{width:960px;height:1440px}
+#stage.h{width:1600px;height:960px}
+
+.top{position:absolute;left:56px;right:56px;top:40px;height:70px;display:flex;align-items:center;justify-content:space-between;z-index:3}
+.top .uo{height:52px}
+.top .tag{font-size:24px;font-weight:800;color:#fff;border:2px solid rgba(255,255,255,.55);border-radius:999px;padding:8px 22px;white-space:nowrap}
+.dots{position:absolute;left:56px;right:56px;top:128px;display:flex;gap:12px;z-index:3}
+.dots i{flex:1;height:9px;border-radius:9px;background:rgba(255,255,255,.22);overflow:hidden;position:relative}
+.dots i::after{content:"";position:absolute;inset:0;background:#fff;transform:scaleX(0);transform-origin:0 50%;transition:transform .7s var(--ease)}
+.dots i.on::after{transform:scaleX(1)}
+.cap{position:absolute;left:56px;right:56px;top:154px;z-index:3}
+.cap .in{transition:opacity .5s var(--ease),transform .5s var(--ease)}
+.cap .out{opacity:0;transform:translateY(14px)}
+.cap .kicker{font-size:25px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--claro)}
+.cap h1{font-family:"Fraunces",Georgia,serif;font-style:italic;font-weight:600;font-size:60px;line-height:1.05;color:#fff;margin-top:4px}
+
+.chat{position:absolute;background:var(--chat);border-radius:44px;overflow:hidden;z-index:2;transition:box-shadow .6s var(--ease)}
+.chat-head{position:absolute;left:0;right:0;top:0;height:92px;background:var(--navy);display:flex;align-items:center;gap:16px;padding:0 26px;z-index:2}
+.chat-head .av{width:58px;height:58px;border-radius:50%;background:#fff;display:grid;place-items:center;flex:none;overflow:hidden}
+.chat-head .av img{width:40px}
+.chat-head b{display:block;color:#fff;font-size:27px;font-weight:800;line-height:1.1}
+.chat-head span{display:block;color:#fff;font-size:22px;font-weight:600;line-height:1.25}
+.chat-head .wa{margin-left:auto;font-size:21px;color:#fff;display:flex;align-items:center;gap:8px;font-weight:700}
+.chat-head .wa i{width:14px;height:14px;border-radius:50%;background:#5BE38A;display:block}
+.feed{position:absolute;left:0;right:0;top:92px;bottom:0;-webkit-mask-image:linear-gradient(transparent 0,#000 46px);mask-image:linear-gradient(transparent 0,#000 46px);padding:18px 24px 20px;display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden}
+.feed-inner{display:flex;flex-direction:column;gap:12px}
+.b{max-width:88%;padding:12px 22px 10px;border-radius:28px;font-size:29px;line-height:1.3;font-weight:600;position:relative;animation:pop .5s var(--spring) both;color:#101828}
+.b.in{align-self:flex-start;background:#fff;border-bottom-left-radius:10px}
+.b.out{align-self:flex-end;background:var(--out);border-bottom-right-radius:10px}
+.b small{display:block;text-align:right;font-size:21px;color:#33415A;margin-top:2px;font-weight:700}
+.b b{font-weight:800}
+.b .who{display:block;font-size:21px;font-weight:800;color:var(--blue);margin-bottom:2px}
+.b.react{margin-bottom:20px}
+.reac{position:absolute;left:-14px;bottom:-20px;width:44px;height:44px;border-radius:50%;background:#fff;display:grid;place-items:center;box-shadow:0 0 0 3px var(--chat);animation:pop .5s var(--spring) both}
+.reac svg{width:30px;height:30px}
+@keyframes pop{from{opacity:0;transform:translateY(24px) scale(.94)}to{opacity:1;transform:none}}
+.typing{display:flex;gap:10px;padding:20px 26px}
+.typing i{width:14px;height:14px;border-radius:50%;background:#55657F;animation:dot 1s infinite ease-in-out}
+.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+@keyframes dot{0%,80%,100%{transform:translateY(0);opacity:.5}40%{transform:translateY(-10px);opacity:1}}
+.pic{display:flex;align-items:center;gap:18px}
+.thumb{width:110px;height:96px;border-radius:18px;flex:none;position:relative;overflow:hidden;background:linear-gradient(180deg,#C9D6E8 0 55%,#9FB3CC 55% 100%)}
+.thumb::before{content:"";position:absolute;left:18px;bottom:14px;width:74px;height:20px;border-radius:50%;background:#5C8FD6;opacity:.85}
+.thumb::after{content:"";position:absolute;left:44px;top:10px;width:8px;height:44px;border-radius:8px;background:#5C8FD6}
+.pic .pt{font-size:26px;line-height:1.25}
+.pic .pt span{display:block;font-size:22px;color:#33415A}
+.link{display:flex;align-items:center;gap:16px;margin-top:10px;background:var(--soft);border-radius:22px;padding:12px 18px 12px 12px;transition:transform .3s var(--spring),box-shadow .4s}
+.link .lk{width:62px;height:62px;border-radius:50%;background:var(--navy);display:grid;place-items:center;flex:none}
+.link b{display:block;font-size:25px;line-height:1.15}
+.link span{display:block;font-size:22px;color:#33415A}
+.link.tap{transform:scale(.95);box-shadow:0 0 0 8px rgba(29,79,184,.25)}
+.ic{display:inline-block;width:1.05em;height:1.05em;vertical-align:-.16em}
+
+.flow{position:absolute;z-index:2;border-radius:6px;background:rgba(255,255,255,.2);overflow:hidden}
+.flow i{position:absolute;border-radius:6px;background:#fff}
+#stage.v .flow{left:50%;top:826px;width:6px;height:26px;margin-left:-3px}
+#stage.v .flow i{left:0;right:0;height:14px;top:-14px}
+#stage.v .flow.go i{animation:dropv .7s var(--ease)}
+@keyframes dropv{to{top:26px}}
+#stage.h .flow{top:520px;left:708px;width:26px;height:6px}
+#stage.h .flow i{top:0;bottom:0;width:14px;left:-14px}
+#stage.h .flow.go i{animation:droph .7s var(--ease)}
+@keyframes droph{to{left:26px}}
+
+.panel{position:absolute;background:var(--paper);border-radius:44px;overflow:hidden;z-index:2;transition:box-shadow .6s var(--ease)}
+.p-head{position:absolute;left:0;right:0;top:0;height:86px;display:flex;align-items:center;gap:16px;padding:0 30px;border-bottom:2px solid var(--line)}
+.p-head .lock{width:50px;height:50px;border-radius:50%;background:var(--navy);display:grid;place-items:center;flex:none}
+.p-head b{font-size:28px;font-weight:800}
+.p-head .where{margin-left:auto;font-size:23px;font-weight:800;color:var(--blue)}
+.p-body{position:absolute;left:0;right:0;top:86px;bottom:0}
+.view{position:absolute;inset:22px 30px;transition:opacity .55s var(--ease),transform .55s var(--ease)}
+.view.hide{opacity:0;transform:translateY(20px)}
+.glow{box-shadow:0 0 0 6px #fff!important}
+
+/* posiciones */
+#stage.v .chat{left:56px;right:56px;top:262px;height:560px}
+#stage.v .panel{left:56px;right:56px;top:856px;height:432px}
+#stage.h .chat{left:56px;width:640px;top:262px;height:560px}
+#stage.h .panel{left:746px;right:56px;top:262px;height:560px}
+
+#stage.v .cap h1{font-size:54px}
+#stage.v .cc i{width:140px;height:140px;font-size:46px}
+#stage.v .circles{padding-top:0}
+.hint{position:absolute;left:50%;top:52%;transform:translate(-50%,-50%);text-align:center;width:80%;opacity:0;transition:opacity .6s var(--ease)}
+.hint.on{opacity:1}
+.hint b{display:block;font-size:34px;font-weight:800;color:var(--navy)}
+.hint span{display:block;font-size:27px;color:var(--ink2);margin-top:6px;line-height:1.3}
+
+.empty{display:flex;flex-direction:column;align-items:center;text-align:center;gap:22px;padding-top:4px}
+.empty p{font-size:28px;line-height:1.3;max-width:720px}
+.empty p span{display:block;font-size:24px;color:var(--ink2);margin-top:6px}
+.trio{display:flex;gap:36px;justify-content:center}
+.trio div{width:160px;text-align:center}
+.trio i{display:grid;place-items:center;width:104px;height:104px;margin:0 auto 10px;border-radius:50%;border:3px dashed #9FB0C8;font-style:normal}
+.trio span{font-size:24px;font-weight:800;color:var(--ink2)}
+
+.sec{font-size:23px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--blue);margin-bottom:12px}
+.rows{display:flex;flex-direction:column;gap:12px}
+.row{display:grid;grid-template-columns:66px 1fr auto;align-items:center;gap:16px;background:var(--soft);border-radius:999px;padding:8px 22px 8px 8px;transition:background 1.4s var(--ease),box-shadow 1.4s var(--ease)}
+.row .d{width:58px;height:58px;border-radius:50%;background:#fff;display:grid;place-items:center;font-size:28px}
+.row .c{min-width:0}
+.row .c b{display:block;font-size:27px;font-weight:800;line-height:1.15}
+.row .c span{display:block;font-size:23px;color:var(--ink2);line-height:1.25}
+.row.new{animation:rowin .8s var(--spring) both;background:#FFF4D1;box-shadow:0 0 0 3px #E0B23A}
+.row.settled{background:var(--soft);box-shadow:none}
+@keyframes rowin{from{opacity:0;transform:translateY(-30px) scale(.96)}to{opacity:1;transform:none}}
+.st{font-size:22px;font-weight:800;border-radius:999px;padding:8px 16px;white-space:nowrap;transition:background .5s,color .5s}
+.st.wait{background:var(--warnbg);color:var(--warn)}
+.st.ok{background:var(--okbg);color:var(--ok)}
+.st.pulse{animation:pulse 1.2s var(--ease) 2}
+@keyframes pulse{50%{transform:scale(1.08)}}
+
+.circles{display:flex;justify-content:space-around;align-items:flex-start;padding-top:6px}
+.cc{width:220px;text-align:center;opacity:0;transform:scale(.7);transition:opacity .6s var(--ease),transform .8s var(--spring)}
+.cc.on{opacity:1;transform:none}
+.cc i{display:grid;place-items:center;width:180px;height:180px;margin:0 auto 12px;border-radius:50%;font-style:normal;font-weight:800;font-size:56px;line-height:1}
+.cc i small{display:block;font-size:22px;font-weight:700;margin-top:6px}
+.cc.a i{background:var(--okbg);color:var(--ok)}
+.cc.b i{background:var(--soft);color:var(--navy)}
+.cc span{font-size:23px;color:var(--ink2);line-height:1.25;display:block}
+
+.resumen{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.rs{background:var(--soft);border-radius:28px;padding:14px 18px;display:flex;gap:14px;align-items:center;opacity:0;transform:translateY(16px);transition:opacity .5s var(--ease),transform .6s var(--spring)}
+.rs.on{opacity:1;transform:none}
+.rs .e{font-size:34px;flex:none}
+.rs b{display:block;font-size:26px;font-weight:800;line-height:1.15}
+.rs span{display:block;font-size:22px;color:var(--ink2);line-height:1.25}
+.calma{margin-top:14px;background:var(--okbg);color:var(--ok);border-radius:999px;padding:12px 22px;font-size:23px;font-weight:800;text-align:center;opacity:0;transition:opacity .6s var(--ease)}
+.calma.on{opacity:1}
+
+.bars{display:flex;flex-direction:column;gap:14px;margin-top:6px}
+.bar{display:grid;grid-template-columns:200px 1fr 70px;gap:16px;align-items:center}
+.bar b{font-size:26px;font-weight:800}
+.bar .t{height:30px;border-radius:30px;background:var(--soft);overflow:hidden}
+.bar .t i{display:block;height:100%;border-radius:30px;background:#8FB4FF;width:0;transition:width 1s var(--ease)}
+.bar.first .t i{background:var(--blue)}
+.bar em{font-style:normal;font-size:26px;font-weight:800;text-align:right}
+.fuente{margin-top:16px;font-size:22px;color:var(--ink2);line-height:1.35}
+
+.steps{display:flex;justify-content:space-between;align-items:flex-start;padding:4px 4px 0}
+.sp{width:31%;text-align:center;opacity:0;transform:scale(.7);transition:opacity .6s var(--ease),transform .8s var(--spring)}
+.sp.on{opacity:1;transform:none}
+.sp i{display:grid;place-items:center;width:150px;height:150px;margin:0 auto 14px;border-radius:50%;font-style:normal;font-size:60px;font-weight:800}
+.sp.now i{background:var(--navy);color:#fff;box-shadow:0 0 0 8px #D5E1F7}
+.sp.later i{border:3px dashed #8FA2C0;color:var(--navy)}
+.sp strong{display:block;font-size:27px;font-weight:800}
+.sp span{display:block;font-size:23px;color:var(--ink2);line-height:1.3;margin-top:4px}
+
+.ctl{position:absolute;left:56px;right:56px;height:104px;display:flex;align-items:center;justify-content:space-between;z-index:4}
+#stage.v .ctl{bottom:40px}
+#stage.h .ctl{bottom:26px}
+.round{width:88px;height:88px;border-radius:50%;border:3px solid rgba(255,255,255,.6);background:transparent;display:grid;place-items:center;cursor:pointer;transition:transform .3s var(--spring),opacity .3s}
+.round:active{transform:scale(.9)}
+.round:disabled{opacity:.3;cursor:default}
+.round.muted .wavep{opacity:0}
+.next{height:100px;min-width:380px;padding:0 48px 0 56px;border-radius:999px;border:0;background:#fff;color:var(--navy);font-size:36px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:18px;cursor:pointer;transition:transform .35s var(--spring),background .4s}
+.next:active{transform:scale(.95)}
+.next.wait{background:#C9D8F5}
+.next.ready{animation:breathe 2.4s var(--ease) infinite}
+@keyframes breathe{0%,100%{box-shadow:0 0 0 0 rgba(255,255,255,.5)}50%{box-shadow:0 0 0 22px rgba(255,255,255,0)}}
+
+.cover{position:absolute;inset:0;z-index:10;background:var(--navy);display:flex;flex-direction:column;justify-content:center;padding:0 90px;transition:opacity .8s var(--ease),transform .8s var(--ease)}
+.cover.gone{opacity:0;transform:scale(1.04);pointer-events:none}
+.cover .ring{position:absolute;right:-260px;top:-160px;width:620px;height:620px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#1B4BA8,#0B2E73)}
+.cover .ring2{position:absolute;right:-360px;top:-260px;width:820px;height:820px;border-radius:50%;border:2px solid rgba(255,255,255,.14)}
+.cover .logos{display:flex;align-items:center;gap:34px;position:relative;margin-bottom:46px}
+.cover .logos img.uo{height:78px}
+.cover .logos img.moon{height:66px}
+.cover .logos .sep{width:2px;height:60px;background:rgba(255,255,255,.4)}
+.cover p.k{font-size:26px;letter-spacing:4px;text-transform:uppercase;color:var(--claro);font-weight:800;position:relative}
+.cover h2{font-family:"Fraunces",Georgia,serif;font-style:italic;font-size:104px;line-height:1;font-weight:600;color:#fff;margin:20px 0 6px;position:relative}
+.cover p.s{font-size:34px;line-height:1.4;color:#fff;margin:30px 0 56px;max-width:860px;position:relative}
+.cover .next{align-self:flex-start}
+.cover small{display:block;margin-top:26px;font-size:24px;color:#fff;position:relative}
+</style>
+</head>
+<body>
+<main id="stage" class="v" aria-live="polite">
+  <div class="top">
+    <img class="uo" src="img/uo-blanco.png" alt="Universidad de Oriente">
+    <div class="tag">Demo · datos de ejemplo</div>
+  </div>
+  <div class="dots" id="dots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <div class="cap"><div class="in" id="cap"><div class="kicker" id="kicker"></div><h1 id="title"></h1></div></div>
+
+  <section class="chat" aria-label="WhatsApp del asistente">
+    <div class="chat-head">
+      <div class="av"><img src="img/uo-icono.png" alt=""></div>
+      <div><b>Asistente UO Veracruz</b><span id="con">en línea</span></div>
+      <div class="wa"><i></i>WhatsApp</div>
+    </div>
+    <div class="hint" id="hint"><b>El WhatsApp de su plantel</b><span>Aquí escriben el personal, las familias y los aspirantes.</span></div>
+    <div class="feed"><div class="feed-inner" id="feed"></div></div>
+  </section>
+  <div class="flow" id="flow" aria-hidden="true"><i></i></div>
+  <section class="panel" aria-label="Panel de Rectoría">
+    <div class="p-head">
+      <div class="lock" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="3" fill="#fff"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" fill="none" stroke="#fff" stroke-width="2.4"/></svg></div>
+      <b>Panel de Rectoría</b>
+      <span class="where" id="where"></span>
+    </div>
+    <div class="p-body" id="pbody"></div>
+  </section>
+
+  <div class="ctl">
+    <button class="round" id="back" aria-label="Escena anterior"><svg width="36" height="36" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <button class="next" id="next"><span id="nextTxt">Siguiente</span><svg width="34" height="34" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <button class="round" id="voice" aria-label="Voz encendida" aria-pressed="true"><svg width="38" height="38" viewBox="0 0 24 24"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="#fff"/><path class="wavep" d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg></button>
+  </div>
+
+  <div class="cover" id="cover">
+    <div class="ring2" aria-hidden="true"></div><div class="ring" aria-hidden="true"></div>
+    <div class="logos"><img class="uo" src="img/uo-blanco.png" alt="Universidad de Oriente"><span class="sep" aria-hidden="true"></span><img class="moon" src="img/moon-blanco.png" alt="MOON Digital"></div>
+    <p class="k">Plantel Veracruz · de MOON Digital</p>
+    <h2>Un día en su plantel</h2>
+    <p class="s">Preparamos este demo para que vean cómo se sentiría un día normal con un asistente que ordena la información por ustedes.</p>
+    <button class="next ready" id="start"><span>Empezar</span><svg width="34" height="34" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <small>Dura unos 3 minutos y tiene voz. Se puede silenciar con la bocina.</small>
+  </div>
+</main>
+
+<script>
+(function(){
+"use strict";
+var $=function(id){return document.getElementById(id)};
+var stage=$("stage"),feed=$("feed"),pbody=$("pbody");
+function fit(){
+  var vv=window.visualViewport,vw=vv?vv.width:innerWidth,vh=vv?vv.height:innerHeight;
+  var hz=vw/vh>1.05; stage.className=hz?"h":"v";
+  var W=hz?1600:960,H=hz?960:1440,pad=Math.min(vw,vh)<600?8:24;
+  var s=Math.min((vw-pad*2)/W,(vh-pad*2)/H);
+  stage.style.transform="translate("+(-W*s/2)+"px,"+(-H*s/2)+"px) scale("+s+")";
+}
+fit();addEventListener("resize",fit);if(window.visualViewport)visualViewport.addEventListener("resize",fit);
+
+var IC={
+ check:'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="#13744B"/><path d="M6.8 12.4l3.4 3.4 7-7" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+ lock:'<svg width="30" height="30" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="3" fill="#fff"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" fill="none" stroke="#fff" stroke-width="2.4"/></svg>',
+ sum:'<svg width="44" height="44" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14M5 12h14M5 17h9" stroke="#55657F" stroke-width="2.4" stroke-linecap="round"/></svg>',
+ rep:'<svg width="44" height="44" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3" fill="none" stroke="#55657F" stroke-width="2.2"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3" stroke="#55657F" stroke-width="2.2" stroke-linecap="round"/></svg>',
+ cap:'<svg width="44" height="44" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 9l10-5 10 5-10 5z" fill="none" stroke="#55657F" stroke-width="2"/><path d="M6 11v5c3 2 9 2 12 0v-5" fill="none" stroke="#55657F" stroke-width="2"/></svg>'
+};
+var run={id:0,fast:false,pending:[]};
+function sleep(ms){var my=run.id;return new Promise(function(res,rej){if(run.fast){res();return}var it={};var t=setTimeout(done,ms);it.t=t;it.res=function(){clearTimeout(t);done()};function done(){var i=run.pending.indexOf(it);if(i>-1)run.pending.splice(i,1);if(my!==run.id)rej("x");else res()}run.pending.push(it)})}
+function hurry(){run.fast=true;hush();run.pending.slice().forEach(function(p){p.res()})}
+var voiceOn=true,voice=null,synth=window.speechSynthesis,sayId=0,voiceDone=Promise.resolve();
+function pick(){if(!synth)return;var vs=synth.getVoices(),pref=["es-MX","es-US","es-419","es-ES","es"];for(var p=0;p<pref.length&&!voice;p++)for(var i=0;i<vs.length;i++)if((vs[i].lang||"").replace("_","-").indexOf(pref[p])===0){voice=vs[i];break}}
+if(synth){pick();if(synth.onvoiceschanged!==undefined)synth.onvoiceschanged=pick}
+function say(text){
+  if(!synth){voiceDone=Promise.resolve();return}
+  try{synth.cancel()}catch(e){}
+  if(!voiceOn||!text){voiceDone=Promise.resolve();return}
+  var parts=text.match(/[^.!?:]+[.!?:]?/g)||[text],left=parts.length,my=++sayId;
+  voiceDone=new Promise(function(res){var safety=setTimeout(res,text.length*72+1500);parts.forEach(function(t){try{var u=new SpeechSynthesisUtterance(t.trim());if(voice)u.voice=voice;u.lang=voice?voice.lang:"es-MX";u.rate=1;u.onend=u.onerror=function(){if(--left<=0||my!==sayId){clearTimeout(safety);res()}};synth.speak(u)}catch(e){clearTimeout(safety);res()}})});
+}
+function hush(){sayId++;try{synth&&synth.cancel()}catch(e){}voiceDone=Promise.resolve()}
+$("voice").addEventListener("click",function(){voiceOn=!voiceOn;this.classList.toggle("muted",!voiceOn);this.setAttribute("aria-pressed",voiceOn?"true":"false");this.setAttribute("aria-label",voiceOn?"Voz encendida":"Voz apagada");if(!voiceOn)hush();else say(scenes[cur].say)});
+
+function el(t,c,h){var e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e}
+function msg(side,html,h,who){var b=el("div","b "+side,(who?'<span class="who">'+who+'</span>':'')+html+"<small>"+h+"</small>");feed.appendChild(b);return b}
+async function typing(ms){var t=el("div","b in",'<div class="typing"><i></i><i></i><i></i></div>');t.style.padding="0";feed.appendChild(t);try{await sleep(ms)}finally{t.remove()}}
+function react(b){b.classList.add("react");b.appendChild(el("span","reac",IC.check))}
+function linkCard(t){return '<div class="link"><div class="lk">'+IC.lock+'</div><div><b>'+t+'</b><span>Panel de Rectoría · se abre al tocar</span></div></div>'}
+async function tapLink(b){var l=b.querySelector(".link");if(!l)return;l.classList.add("tap");await sleep(420);l.classList.remove("tap")}
+function pulseFlow(){var f=$("flow");f.classList.remove("go");void f.offsetWidth;f.classList.add("go")}
+function where(t){$("where").textContent=t}
+function con(t){$("con").textContent=t}
+function view(html){pbody.querySelectorAll(".view").forEach(function(o){o.classList.add("hide","leaving");setTimeout(function(){o.remove()},600)});var v=el("div","view hide",html);pbody.appendChild(v);requestAnimationFrame(function(){requestAnimationFrame(function(){if(!v.classList.contains("leaving"))v.classList.remove("hide")})});return v}
+function row(icon,t,d,st,cls){return '<div class="row"><div class="d">'+icon+'</div><div class="c"><b>'+t+'</b><span>'+d+'</span></div><span class="st '+cls+'">'+st+'</span></div>'}
+function addRow(v,html){var rows=v.querySelector(".rows");var r=el("div",null,html).firstChild;r.classList.add("new");rows.insertBefore(r,rows.firstChild);while(rows.children.length>3)rows.removeChild(rows.lastChild);setTimeout(function(){r.classList.add("settled")},2600);return r}
+function setSt(r,txt,cls){var s=r.querySelector(".st");s.textContent=txt;s.className="st "+cls+" pulse"}
+
+var R_ASP=row("🎓","Aspirante · Nutrición","Mañana 10:00 con Admisiones","Agendado","ok");
+
+var scenes=[
+ {k:"Antes de empezar",t:"Así se lee esta pantalla",con:"en línea",
+  say:"Hola. Somos MOON Digital. Preparamos este demo para que vean cómo se sentiría un día en su plantel. A un lado está el WhatsApp del asistente: ahí le escriben el personal, las familias y los aspirantes. Al otro lado está el panel de Rectoría: ahí se acomoda solo todo lo que le cuentan. El asistente solo sabe lo que le cuentan. No adivina nada. Vamos a ver un día normal, con datos de ejemplo.",
+  go:async function(){
+   where("Aún vacío");
+   view('<div class="empty"><p>Aquí se acomoda solo lo que le cuentan al asistente.<span>Lo ve solo quien ustedes decidan.</span></p><div class="trio"><div><i>'+IC.rep+'</i><span>Reportes</span></div><div><i>'+IC.cap+'</i><span>Interesados</span></div><div><i>'+IC.sum+'</i><span>Resumen</span></div></div></div>');
+   await sleep(8000);
+   document.querySelector(".chat").classList.add("glow");$("hint").classList.add("on");
+   await sleep(7000);
+   document.querySelector(".chat").classList.remove("glow");document.querySelector(".panel").classList.add("glow");
+   await sleep(6500);
+   document.querySelector(".panel").classList.remove("glow");$("hint").classList.remove("on");
+   await sleep(600);await typing(1000);
+   msg("in","Buenos días. Soy el asistente del plantel. Cuéntenme <b>reportes, permisos o dudas</b>, y yo lo acomodo.","8:00");
+   await sleep(800);
+ }},
+ {k:"9:15 · Recursos Humanos",t:"Un maestro pide permiso",con:"con: Prof. Luis Ramírez",
+  say:"Nueve quince. Un maestro pide permiso por WhatsApp, como le escribiría a cualquier persona. El asistente le avisa a su coordinadora. Ella lo aprueba con un toque, y el maestro recibe su confirmación. En el panel queda registrado.",
+  go:async function(){
+   where("Personal");
+   var v=view('<div class="sec">Permisos de hoy</div><div class="rows"></div>');
+   await sleep(1200);
+   msg("out","Buen día. El viernes 14 necesito permiso para una cita médica.","9:15","Prof. Luis Ramírez");
+   await sleep(900);await typing(1300);
+   msg("in","Con gusto, profesor. Ya le avisé a su coordinadora; en cuanto lo apruebe le confirmo.","9:15");
+   await sleep(700);pulseFlow();await sleep(400);
+   var r=addRow(v,row("🗓️","Permiso · Prof. Luis Ramírez","Viernes 14 · cita médica","Esperando","wait"));
+   await sleep(2600);
+   setSt(r,"Aprobado","ok");
+   await sleep(600);await typing(1100);
+   msg("in","Su coordinadora aprobó su permiso del viernes 14. "+IC.check,"9:31");
+   await sleep(1300);
+ }},
+ {k:"11:40 · Operaciones",t:"El conserje reporta una fuga",con:"con: Don Pepe, conserje",
+  say:"Once cuarenta. El conserje ve una fuga en los baños del edificio B. Le toma foto y la manda. El asistente abre el reporte y le avisa a Mantenimiento. Cuando Mantenimiento confirma que quedó arreglado, el reporte se cierra solo.",
+  go:async function(){
+   where("Reportes");
+   var v=view('<div class="sec">Reportes de mantenimiento</div><div class="rows"></div>');
+   await sleep(1200);
+   msg("out",'<div class="pic"><div class="thumb" aria-hidden="true"></div><div class="pt">Fuga en los baños del edificio B<span>Foto</span></div></div>',"11:40","Don Pepe, conserje");
+   await sleep(900);await typing(1300);
+   msg("in","Gracias, Don Pepe. Abrí el <b>reporte 27</b> y ya le avisé a Mantenimiento.","11:40");
+   await sleep(700);pulseFlow();await sleep(400);
+   var r=addRow(v,row("🔧","Fuga · baños del edificio B","Reportó: conserje Don Pepe","Abierto","wait"));
+   await sleep(2800);
+   setSt(r,"Arreglado","ok");
+   await sleep(500);await typing(1000);
+   msg("in","Mantenimiento confirmó que el <b>reporte 27</b> quedó arreglado. "+IC.check,"13:10");
+   await sleep(1300);
+ }},
+ {k:"13:00 · Administrativo",t:"Recordatorio de colegiatura",con:"con: familia García",
+  say:"Una de la tarde. A las familias con vencimiento esa semana les llega un recordatorio amable. Si ya pagaron, no pasa nada. En el panel se ve a cuántas familias les llegó y cuántas ya respondieron.",
+  go:async function(){
+   where("Colegiaturas");
+   var v=view('<div class="sec">Recordatorios de hoy</div><div class="circles"><div class="cc b"><i><div>42<small>enviados</small></div></i><span>Familias con vencimiento esta semana</span></div><div class="cc a"><i><div id="resp">0<small>respondieron</small></div></i><span>Contestaron el mensaje</span></div></div>');
+   await sleep(1000);
+   await typing(1100);
+   msg("in","Buenas tardes, familia García. Les recordamos con gusto que la colegiatura de noviembre vence el <b>viernes 14</b>. Si ya la pagaron, por favor ignoren este mensaje. ¡Gracias!","13:00");
+   await sleep(700);pulseFlow();
+   var cc=v.querySelectorAll(".cc");for(var i=0;i<cc.length;i++){await sleep(300);cc[i].classList.add("on")}
+   await sleep(1500);
+   var si=msg("out","Gracias, mañana la pagamos.","13:22","Familia García");
+   await sleep(600);react(si);
+   for(var n=1;n<=9;n++){await sleep(140);$("resp").innerHTML=n+"<small>respondieron</small>"}
+   await sleep(1200);
+ }},
+ {k:"22:45 · Admisiones",t:"Un aspirante escribe de noche",con:"con: aspirante",
+  say:"Diez cuarenta y cinco de la noche. Un aspirante pregunta por la licenciatura en Nutrición. El asistente le responde al momento y le ofrece hablar con un asesor. Queda agendado para el día siguiente, a las diez. En el panel aparece como interesado, con lo que preguntó.",
+  go:async function(){
+   where("Interesados");
+   var v=view('<div class="sec">Interesados nuevos</div><div class="rows"></div>');
+   await sleep(1200);
+   msg("out","Hola, ¿tienen la carrera de Nutrición?","22:45","Aspirante");
+   await sleep(900);await typing(1300);
+   msg("in","¡Hola! Sí, en el plantel Veracruz tenemos la Licenciatura en Nutrición. ¿Le gustaría que un asesor le llame para darle todos los detalles?","22:45");
+   await sleep(1200);
+   msg("out","Sí, mañana en la mañana.","22:46","Aspirante");
+   await sleep(800);await typing(1100);
+   msg("in","Listo: queda agendado <b>mañana a las 10:00</b> con Admisiones. ¡Gracias por escribirnos!","22:46");
+   await sleep(600);pulseFlow();await sleep(400);
+   addRow(v,R_ASP);
+   await sleep(1500);
+ }},
+ {k:"7:00 · Al día siguiente",t:"Rectoría recibe su resumen",con:"con: Rectoría",
+  say:"Siete de la mañana del día siguiente. A Rectoría le llega su resumen. Fíjense: solo trae lo que vimos pasar ayer. El permiso aprobado, la fuga arreglada, los recordatorios de colegiatura y el aspirante de Nutrición. Nada sale de la nada.",
+  go:async function(){
+   where("Resumen de ayer");
+   var v=view('<div class="resumen"><div class="rs"><span class="e">✅</span><div><b>1 permiso</b><span>Aprobado por su coordinadora</span></div></div><div class="rs"><span class="e">🔧</span><div><b>1 reporte</b><span>Fuga del edificio B, arreglada</span></div></div><div class="rs"><span class="e">📩</span><div><b>42 recordatorios</b><span>9 familias ya respondieron</span></div></div><div class="rs"><span class="e">🎓</span><div><b>1 aspirante</b><span>Nutrición, hoy a las 10:00</span></div></div></div><div class="calma" id="calma">Hoy no hay nada urgente que necesite su atención</div>');
+   await sleep(900);await typing(1300);
+   var b=msg("in","<b>Buenos días.</b> Ayer en el plantel: 1 permiso aprobado, 1 reporte arreglado, 42 recordatorios de colegiatura y 1 aspirante de Nutrición agendado hoy a las 10:00. Hoy no hay nada urgente."+linkCard("Resumen de ayer"),"7:00");
+   await sleep(1400);await tapLink(b);pulseFlow();
+   var rs=v.querySelectorAll(".rs");for(var i=0;i<rs.length;i++){await sleep(350);rs[i].classList.add("on")}
+   await sleep(500);$("calma").classList.add("on");
+   await sleep(1500);
+ }},
+ {k:"Una pregunta de Rectoría",t:"¿Qué carrera interesa más?",con:"con: Rectoría",
+  say:"Rectoría quiere saber qué carrera tiene más interesados este mes. Lo pregunta por WhatsApp y la respuesta llega en segundos. Sale de los interesados que el asistente fue registrando: los que escribieron por WhatsApp, por la página y en las ferias.",
+  go:async function(){
+   where("Interesados del mes");
+   var data=[["Enfermería",38],["Gastronomía",27],["Nutrición",19],["Otras carreras",22]],h="";
+   data.forEach(function(d,i){h+='<div class="bar'+(i===0?' first':'')+'"><b>'+d[0]+'</b><div class="t"><i data-w="'+Math.round(d[1]/38*100)+'" style="transition-delay:'+(i*.12)+'s"></i></div><em>'+d[1]+'</em></div>'});
+   var v=view('<div class="sec">Interesados de noviembre</div><div class="bars">'+h+'</div><p class="fuente">Cuenta los interesados que el asistente registró por WhatsApp, la página web y las ferias.</p>');
+   await sleep(1000);
+   msg("out","¿Qué carrera lleva más interesados este mes?","7:10","Rectoría");
+   await sleep(800);await typing(1500);
+   var b=msg("in","<b>Enfermería</b>, con 38 interesados este mes. Le siguen Gastronomía con 27 y Nutrición con 19."+linkCard("Interesados del mes"),"7:10");
+   await sleep(1400);await tapLink(b);pulseFlow();await sleep(300);
+   v.querySelectorAll(".t i").forEach(function(t){t.style.width=t.getAttribute("data-w")+"%"});
+   await sleep(1800);
+ }},
+ {k:"Cómo empezamos",t:"Primero, juntos en Veracruz",con:"en línea",
+  say:"Ustedes conocen su plantel mejor que nadie. Por eso empezamos platicando qué área les gustaría aliviar primero. Arrancamos solo en Veracruz, con esa área, probada junto con su equipo. Y cuando ustedes vean que funciona, crecemos juntos: más áreas y, después, los demás planteles. Gracias por su tiempo.",
+  go:async function(){
+   where("Paso a paso");
+   var v=view('<div class="steps"><div class="sp now"><i>1</i><strong>Platicamos</strong><span>Qué área les gustaría aliviar primero</span></div><div class="sp later"><i>2</i><strong>Veracruz</strong><span>Arrancamos con esa área, junto con su equipo</span></div><div class="sp later"><i>3</i><strong>Crecemos</strong><span>Más áreas y, después, los demás planteles</span></div></div>');
+   await sleep(500);await typing(1200);
+   msg("in","Ustedes conocen su plantel mejor que nadie. Empezamos por el área que ustedes elijan, y crecemos cuando vean que funciona.","—");
+   var sp=v.querySelectorAll(".sp");for(var i=0;i<sp.length;i++){await sleep(420);sp[i].classList.add("on")}
+   await sleep(900);
+ }}
+];
+var cur=0,playing=false,next=$("next"),back=$("back"),nextTxt=$("nextTxt");
+function setDots(n){var d=$("dots").children;for(var i=0;i<d.length;i++)d[i].classList.toggle("on",i<=n)}
+function setCap(s){var c=$("cap");c.classList.add("out");setTimeout(function(){$("kicker").textContent=s.k;$("title").textContent=s.t;c.classList.remove("out")},280)}
+function setBtn(){next.classList.toggle("wait",playing);next.classList.toggle("ready",!playing);nextTxt.textContent=playing?"Adelantar":(cur===scenes.length-1?"Ver de nuevo":"Siguiente");back.disabled=cur===0}
+async function goTo(n){
+  run.id++;run.fast=false;run.pending.forEach(function(p){clearTimeout(p.t)});run.pending=[];
+  cur=n;playing=true;feed.innerHTML="";$("hint").classList.remove("on");
+  document.querySelectorAll(".glow").forEach(function(g){g.classList.remove("glow")});
+  con(scenes[n].con);setDots(n);setCap(scenes[n]);setBtn();say(scenes[n].say);
+  var my=run.id;
+  try{await scenes[n].go()}catch(e){if(e!=="x")console.error(e)}
+  if(my!==run.id)return;
+  if(!run.fast)await voiceDone;
+  if(my===run.id){playing=false;run.fast=false;setBtn()}
+}
+next.addEventListener("click",function(){if(playing){hurry();return}goTo(cur===scenes.length-1?0:cur+1)});
+back.addEventListener("click",function(){if(cur>0)goTo(cur-1)});
+$("start").addEventListener("click",function(){$("cover").classList.add("gone");goTo(0)});
+document.addEventListener("keydown",function(e){
+  if($("cover").classList.contains("gone")){
+    if(["ArrowRight","ArrowDown","PageDown"," "].indexOf(e.key)>-1){e.preventDefault();next.click()}
+    if(["ArrowLeft","ArrowUp","PageUp"].indexOf(e.key)>-1){e.preventDefault();back.click()}
+    if(e.key==="Escape"&&window.parent!==window){window.parent.postMessage("cerrar-demo","*")}
+  }else if(["Enter"," ","ArrowRight","PageDown"].indexOf(e.key)>-1){e.preventDefault();$("start").click()}
+});
+setBtn();
+window.__demo={scenes:scenes,cur:function(){return cur},playing:function(){return playing},goTo:goTo,hurry:hurry};
+})();
+</script>
+</body>
+</html>
