@@ -309,28 +309,11 @@ var scenes=[
    await sleep(6500);
    document.querySelector(".panel").classList.remove("glow");$("hint").classList.remove("on");
    await sleep(600);await typing(1000);
-   msg("in","Buenos días. Soy el asistente del plantel. Cuéntenme <b>reportes, permisos o dudas</b>, y yo lo acomodo.","8:00");
+   msg("in","Buenos días. Soy el asistente del plantel. Cuéntenme <b>reportes, solicitudes o dudas</b>, y yo lo acomodo.","8:00");
    await sleep(800);
  }},
- {k:"9:15 · Recursos Humanos",t:"Un maestro pide permiso",con:"con: Prof. Luis Ramírez",
-  say:"Nueve quince. Un maestro pide permiso por WhatsApp, como le escribiría a cualquier persona. El asistente le avisa a su coordinadora. Ella lo aprueba con un toque, y el maestro recibe su confirmación. En el panel queda registrado.",
-  go:async function(){
-   where("Personal");
-   var v=view('<div class="sec">Permisos de hoy</div><div class="rows"></div>');
-   await sleep(1200);
-   msg("out","Buen día. El viernes 14 necesito permiso para una cita médica.","9:15","Prof. Luis Ramírez");
-   await sleep(900);await typing(1300);
-   msg("in","Con gusto, profesor. Ya le avisé a su coordinadora; en cuanto lo apruebe le confirmo.","9:15");
-   await sleep(700);pulseFlow();await sleep(400);
-   var r=addRow(v,row("🗓️","Permiso · Prof. Luis Ramírez","Viernes 14 · cita médica","Esperando","wait"));
-   await sleep(2600);
-   setSt(r,"Aprobado","ok");
-   await sleep(600);await typing(1100);
-   msg("in","Su coordinadora aprobó su permiso del viernes 14. "+IC.check,"9:31");
-   await sleep(1300);
- }},
  {k:"11:40 · Operaciones",t:"El conserje reporta una fuga",con:"con: Don Pepe, conserje",
-  say:"Once cuarenta. El conserje ve una fuga en los baños del edificio B. Le toma foto y la manda. El asistente abre el reporte y le avisa a Mantenimiento. Cuando Mantenimiento confirma que quedó arreglado, el reporte se cierra solo.",
+  say:"Once cuarenta. El conserje ve una fuga en los baños del edificio B. En vez de buscar a quién avisar, manda una foto a un solo número. El asistente abre el reporte y le avisa a Mantenimiento. Cuando Mantenimiento confirma que quedó arreglado, el reporte se cierra solo, sin que nadie tenga que andar preguntando.",
   go:async function(){
    where("Reportes");
    var v=view('<div class="sec">Reportes de mantenimiento</div><div class="rows"></div>');
@@ -347,7 +330,7 @@ var scenes=[
    await sleep(1300);
  }},
  {k:"13:00 · Administrativo",t:"Recordatorio de colegiatura",con:"con: familia García",
-  say:"Una de la tarde. A las familias con vencimiento esa semana les llega un recordatorio amable. Si ya pagaron, no pasa nada. En el panel se ve a cuántas familias les llegó y cuántas ya respondieron.",
+  say:"Una de la tarde. Con la lista de pagos que la escuela ya tiene, a las familias con vencimiento esa semana les llega un recordatorio amable, sin que nadie lo mande a mano. Si ya pagaron, no pasa nada. En el panel se ve a cuántas familias les llegó y cuántas ya respondieron.",
   go:async function(){
    where("Colegiaturas");
    var v=view('<div class="sec">Recordatorios de hoy</div><div class="circles"><div class="cc b"><i><div>42<small>enviados</small></div></i><span>Familias con vencimiento esta semana</span></div><div class="cc a"><i><div id="resp">0<small>respondieron</small></div></i><span>Contestaron el mensaje</span></div></div>');
@@ -361,6 +344,19 @@ var scenes=[
    await sleep(600);react(si);
    for(var n=1;n<=9;n++){await sleep(140);$("resp").innerHTML=n+"<small>respondieron</small>"}
    await sleep(1200);
+ }},
+ {k:"20:30 · Académico",t:"Una mamá pide una constancia",con:"con: Sra. López, mamá",
+  say:"Ocho y media de la noche. Una mamá necesita una constancia de estudios para su hija. Hoy tendría que llamar o ir a la oficina en horario. Aquí la pide por WhatsApp, cuando puede. Control Escolar la recibe ya ordenada a la mañana siguiente, y a la mamá le avisan cuando está lista.",
+  go:async function(){
+   where("Control Escolar");
+   var v=view('<div class="sec">Solicitudes para mañana</div><div class="rows"></div>');
+   await sleep(1200);
+   msg("out","Buenas noches. Necesito una constancia de estudios de mi hija, Ana López, de 2.º de Enfermería.","20:30","Sra. López, mamá");
+   await sleep(900);await typing(1400);
+   msg("in","Con gusto, señora López. Ya quedó registrada su solicitud. Control Escolar la prepara mañana y le aviso por aquí cuando esté lista para recoger.","20:30");
+   await sleep(700);pulseFlow();await sleep(400);
+   addRow(v,row("📄","Constancia de estudios","Ana López · 2.º de Enfermería","Para mañana","wait"));
+   await sleep(1600);
  }},
  {k:"22:45 · Admisiones",t:"Un aspirante escribe de noche",con:"con: aspirante",
   say:"Diez cuarenta y cinco de la noche. Un aspirante pregunta por la licenciatura en Nutrición. El asistente le responde al momento y le ofrece hablar con un asesor. Queda agendado para el día siguiente, a las diez. En el panel aparece como interesado, con lo que preguntó.",
@@ -380,12 +376,12 @@ var scenes=[
    await sleep(1500);
  }},
  {k:"7:00 · Al día siguiente",t:"Rectoría recibe su resumen",con:"con: Rectoría",
-  say:"Siete de la mañana del día siguiente. A Rectoría le llega su resumen. Fíjense: solo trae lo que vimos pasar ayer. El permiso aprobado, la fuga arreglada, los recordatorios de colegiatura y el aspirante de Nutrición. Nada sale de la nada.",
+  say:"Siete de la mañana del día siguiente. A Rectoría le llega su resumen. Fíjense: solo trae lo que vimos pasar ayer. La fuga arreglada, los recordatorios de colegiatura, la constancia que pidió la mamá y el aspirante de Nutrición. Nada sale de la nada.",
   go:async function(){
    where("Resumen de ayer");
-   var v=view('<div class="resumen"><div class="rs"><span class="e">✅</span><div><b>1 permiso</b><span>Aprobado por su coordinadora</span></div></div><div class="rs"><span class="e">🔧</span><div><b>1 reporte</b><span>Fuga del edificio B, arreglada</span></div></div><div class="rs"><span class="e">📩</span><div><b>42 recordatorios</b><span>9 familias ya respondieron</span></div></div><div class="rs"><span class="e">🎓</span><div><b>1 aspirante</b><span>Nutrición, hoy a las 10:00</span></div></div></div><div class="calma" id="calma">Hoy no hay nada urgente que necesite su atención</div>');
+   var v=view('<div class="resumen"><div class="rs"><span class="e">🔧</span><div><b>1 reporte</b><span>Fuga del edificio B, arreglada</span></div></div><div class="rs"><span class="e">📩</span><div><b>42 recordatorios</b><span>9 familias ya respondieron</span></div></div><div class="rs"><span class="e">📄</span><div><b>1 constancia</b><span>En la lista de Control Escolar para hoy</span></div></div><div class="rs"><span class="e">🎓</span><div><b>1 aspirante</b><span>Nutrición, hoy a las 10:00</span></div></div></div><div class="calma" id="calma">Hoy no hay nada urgente que necesite su atención</div>');
    await sleep(900);await typing(1300);
-   var b=msg("in","<b>Buenos días.</b> Ayer en el plantel: 1 permiso aprobado, 1 reporte arreglado, 42 recordatorios de colegiatura y 1 aspirante de Nutrición agendado hoy a las 10:00. Hoy no hay nada urgente."+linkCard("Resumen de ayer"),"7:00");
+   var b=msg("in","<b>Buenos días.</b> Ayer en el plantel: 1 reporte arreglado, 42 recordatorios de colegiatura, 1 constancia para Control Escolar y 1 aspirante de Nutrición agendado hoy a las 10:00. Hoy no hay nada urgente."+linkCard("Resumen de ayer"),"7:00");
    await sleep(1400);await tapLink(b);pulseFlow();
    var rs=v.querySelectorAll(".rs");for(var i=0;i<rs.length;i++){await sleep(350);rs[i].classList.add("on")}
    await sleep(500);$("calma").classList.add("on");
