@@ -1502,7 +1502,7 @@ function pintaUso(c, p) {
     return;
   }
   const U = c.uso, k = U.cifras || {};
-  cont.querySelector('#cifras').innerHTML = [['Hoy', k.hoy], ['7 días', k.semana], ['30 días', k.mes], ['Personas', k.personas]]
+  cont.querySelector('#cifras').innerHTML = [['Clientes hoy', k.hoy], ['Clientes 7 días', k.semana], ['Clientes 30 días', k.mes], ['Pruebas del equipo', k.pruebas]]
     .map(([n, v]) => `<div class="cifra"><b>${v || 0}</b><span>${n}</span></div>`).join('');
   // Una barrita por día de las últimas 4 semanas (hora de Cancún); la de hoy va en cobalto.
   const mapa = Object.fromEntries((U.porDia || []).map(x => [x.d, x.n]));
@@ -1516,7 +1516,7 @@ function pintaUso(c, p) {
   alCambiarTamano = paginar(cont, U.ultimos || [], x => {
     const per = personaDe(x.quien);
     const quien = per ? nombreDe(per) : x.quien && /^\d{10}$/.test(x.quien) ? x.quien : 'Alguien';
-    return `<button class="fila" data-u="${x.id}"><span class="estado" style="--c:var(--cobalto);--cf:var(--azulf)">${esc(CANAL[x.canal] || x.canal || 'Uso')}</span><span class="q"><b style="font-weight:700">${esc(quien)}</b><span>${esc(x.resumen || 'Sin resumen')} · ${cuando(x.fecha)}</span></span><span></span></button>`;
+    return `<button class="fila" data-u="${x.id}"><span class="estado" style="${x.prueba ? '--c:var(--tinta-suave,#5b6478);--cf:var(--niebla)' : '--c:var(--cobalto);--cf:var(--azulf)'}">${x.prueba ? 'Prueba' : esc(CANAL[x.canal] || x.canal || 'Uso')}</span><span class="q"><b style="font-weight:700">${esc(quien)}</b><span>${esc(x.resumen || 'Sin resumen')} · ${cuando(x.fecha)}</span></span><span></span></button>`;
   }, { pagina: c.p, vacio, alPintar: l => l.querySelectorAll('[data-u]').forEach(b => b.onclick = () => {
     const x = U.ultimos.find(y => y.id == b.dataset.u); if (!x) return;
     let det = ''; try { const o = JSON.parse(x.datos || '{}'); det = Object.entries(o).filter(([, v]) => v !== '' && v != null).map(([k2, v]) => `${k2[0].toUpperCase() + k2.slice(1)}: ${v}`).join('\n'); } catch (e) { det = x.datos || ''; }

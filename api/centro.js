@@ -374,14 +374,16 @@ async function conSocio(d, yo) {
     const dia = n => new Date(Date.now() - n * 864e5).toISOString();
     // Cancún vive en UTC-5 todo el año (sin horario de verano): el día empieza a las 05:00 UTC.
     const inicioHoy = new Date(Math.floor((Date.now() - 5 * 36e5) / 864e5) * 864e5 + 5 * 36e5).toISOString();
-    const [cifras, porDia, ultimos, conectado] = await Promise.all([
+    const [cifras, porDia, ultimos, conectado, pruebas] = await Promise.all([
       sql(`SELECT SUM(fecha >= ?) hoy, SUM(fecha >= ?) semana, SUM(fecha >= ?) mes, COUNT(DISTINCT CASE WHEN fecha >= ? THEN quien END) personas, COUNT(*) total FROM uso WHERE ${real}`, [inicioHoy, dia(7), dia(30), dia(30), id]),
       sql(`SELECT substr(datetime(fecha, '-5 hours'), 1, 10) d, COUNT(*) n FROM uso WHERE ${real} AND fecha >= ? GROUP BY d`, [id, dia(28)]),
-      sql(`SELECT id, fecha, quien, canal, resumen, datos FROM uso WHERE ${real} ORDER BY fecha DESC LIMIT 300`, [id]),
+      // La lista enseña TODO (también las pruebas del equipo, marcadas), para que nunca parezca que no se ha usado.
+      sql(`SELECT id, fecha, quien, canal, resumen, datos, (quien IN (SELECT tel FROM personas WHERE es_prueba = 1)) prueba FROM uso WHERE proyecto = ? ORDER BY fecha DESC LIMIT 300`, [id]),
       sql('SELECT clave, llave_uso FROM proyectos WHERE id = ?', [id]),
+      sql('SELECT COUNT(*) n FROM uso WHERE proyecto = ? AND quien IN (SELECT tel FROM personas WHERE es_prueba = 1)', [id]),
     ]);
     const c = conectado[0] || {};
-    return { ok: true, cifras: cifras[0] || {}, porDia, ultimos, conectado: !!(c.clave || c.llave_uso) };
+    return { ok: true, cifras: Object.assign({}, cifras[0] || {}, { pruebas: (pruebas[0] || {}).n || 0 }), porDia, ultimos, conectado: !!(c.clave || c.llave_uso) };
   }
 
   // Solo Claude (clave interna) genera la llave de un proyecto, para conectarlo. Se muestra una sola vez.
