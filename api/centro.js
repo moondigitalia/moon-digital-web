@@ -136,7 +136,7 @@ async function entrada(d, req) {
 
 // ---------- Con sesión ----------
 async function inicio(yo) {
-  const [usuarios, personas, proyectos, tareas, actividad, usoMes, paneles, documentos, embajadores, llamadas] = await Promise.all([
+  const [usuarios, personas, proyectos, tareas, actividad, usoMes, paneles, documentos, embajadores, llamadas, citas] = await Promise.all([
     sql("SELECT id, nombre, color, rol, lema, creado FROM usuarios WHERE tipo = 'socio'"),
     sql('SELECT tel, telefono, correo, foto, nombre, negocio, giro, temperatura, etapa, servicio, origen, necesidad, proxima_cita, encargados, notas_equipo, ultimo_contacto, contactos, es_prueba FROM personas WHERE COALESCE(borrado, \'\') = \'\' ORDER BY ultimo_contacto DESC LIMIT 1000'),
     sql("SELECT id, tel, nombre, fase, enlace, encargados, nota, creado, actualizado, (clave != '' OR llave_uso != '') AS conectado FROM proyectos ORDER BY actualizado DESC"),
@@ -148,10 +148,12 @@ async function inicio(yo) {
     sql("SELECT id, nombre, color FROM usuarios WHERE tipo = 'embajador' AND activo = 1 ORDER BY creado"),
     // Las llamadas de Jason en la primera pantalla: todas (también las del equipo, marcadas como prueba).
     sql("SELECT id, proyecto, fecha, quien, canal, resumen, datos, (quien IN (SELECT tel FROM personas WHERE es_prueba = 1)) prueba FROM uso WHERE canal = 'llamada' ORDER BY fecha DESC LIMIT 60"),
+    // Las citas con el asesor que Jason agenda y a las que les da seguimiento (las de los últimos 30 días y las que vienen).
+    sql("SELECT id, tel, nombre, negocio, necesidad, inicio, tipo, canal, estado, resultado, resultado_fecha, avisos, prueba FROM citas WHERE estado NOT IN ('reemplazada') AND inicio >= ? ORDER BY inicio LIMIT 300", [new Date(Date.now() - 30 * 864e5 - 5 * 36e5).toISOString().slice(0, 16)]).catch(() => []),
   ]);
   const usos = Object.fromEntries(usoMes.map(x => [x.proyecto, x.n]));
   proyectos.forEach(p => { p.uso_mes = usos[p.id] || 0; });
-  return { ok: true, yo, rol: 'socio', usuarios, embajadores, personas, proyectos, tareas, actividad, paneles, documentos, llamadas, listas: { etapas: ETAPAS, temperaturas: TEMPERATURAS, servicios: SERVICIOS, origenes: ORIGENES, fases: FASES } };
+  return { ok: true, yo, rol: 'socio', usuarios, embajadores, personas, proyectos, tareas, actividad, paneles, documentos, llamadas, citas, listas: { etapas: ETAPAS, temperaturas: TEMPERATURAS, servicios: SERVICIOS, origenes: ORIGENES, fases: FASES } };
 }
 
 const listaUsuarios = v => (Array.isArray(v) ? v : String(v || '').split(',')).map(x => String(x).trim()).filter(x => USUARIOS.includes(x)).join(',');
@@ -367,6 +369,20 @@ async function conSocio(d, yo) {
     } else if (enviable(doc)) doc.compartir = doc.url;
     delete doc.enlace;
     return { ok: true, doc };
+  }
+
+  // Cómo le fue al asesor en una cita: Jason le da el seguimiento que toca (lib/citas.js en Jason). También cancelarla.
+  if (d.accion === 'cita_resultado') {
+    const RES = ['interes', 'pensar', 'no_contesto', 'no_interes'];
+    if (!RES.includes(d.resultado)) return { ok: false, error: 'resultado' };
+    const r = await sql("UPDATE citas SET resultado = ?, resultado_fecha = ?, actualizado = ? WHERE id = ? AND estado NOT IN ('cancelada', 'reemplazada') RETURNING nombre, negocio", [d.resultado, ahora(), ahora(), t(d.id, 80)]);
+    if (!r.length) return { ok: false, error: 'cita' };
+    await anotar(yo.id, `marcó la cita de ${r[0].negocio || r[0].nombre || 'un prospecto'}: ${{ interes: 'le interesó', pensar: 'lo va a pensar', no_contesto: 'no contestó', no_interes: 'no le interesa' }[d.resultado]}`);
+    return { ok: true };
+  }
+  if (d.accion === 'cita_cancelar') {
+    const r = await sql("UPDATE citas SET estado = 'cancelada', actualizado = ? WHERE id = ? AND resultado = '' RETURNING id", [ahora(), t(d.id, 80)]);
+    return { ok: !!r.length };
   }
 
   if (d.accion === 'uso') {

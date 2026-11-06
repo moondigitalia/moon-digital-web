@@ -75,7 +75,7 @@ button{cursor:pointer}
 .t-tuyo{grid-area:tuyo;background:var(--cobalto);color:#fff;box-shadow:0 18px 30px -14px rgba(11,79,214,.65),inset 0 1px 0 rgba(255,255,255,.25)}
 .t-tuyo .eti,.t-tuyo .sub{color:rgba(255,255,255,.82)}
 .t-tuyo .flecha{background:rgba(255,255,255,.16);box-shadow:none}
-.xi.cita{height:auto;align-items:start;padding-top:7px;padding-bottom:7px}.xi.cita .q{display:flex;flex-direction:column;gap:2px;white-space:normal;min-width:0}.xi.cita .q b{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.xi.cita .q small{white-space:normal;line-height:1.3}
+.xi.cita{height:auto;align-items:start;padding-top:7px;padding-bottom:7px}.xi.cita .q{display:flex;flex-direction:column;gap:2px;white-space:normal;min-width:0}.xi.cita .q b{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.xi.cita .q small{white-space:normal;line-height:1.3;margin:0;padding:0;text-align:start;align-self:start}
 .t-crm{grid-area:crm}.t-proy{grid-area:proy}.t-equipo{grid-area:equipo}.t-moon{grid-area:moon}
 /* Armar demo: la herramienta de venta de Dan, una franja con el micrófono a la vista. */
 .t-demo{grid-area:demo;flex-direction:row;align-items:center;gap:14px;padding:10px 16px}
@@ -883,7 +883,7 @@ function pinta(silencioso) {
   if (!c || c.tipo !== 'demo') veloFuera(false);
   if (!c) return esEmb() ? pintaInicioEmbajador(silencioso) : pintaInicio(silencioso);
   if (c.tipo === 'documento') setTimeout(() => ponOpcionesDoc(c), 0);
-  ({ tareas: capaTareas, tarea: capaTarea, nuevaTarea: capaNuevaTarea, crm: capaCRM, crmLista: capaCRMLista, editarContacto: capaEditarContacto, subir: capaSubir, ficha: capaFicha, nuevoCliente: capaNuevoCliente, proyectos: capaProyectos, proyecto: capaProyecto, nuevoProyecto: capaProyecto, equipo: capaEquipo, moon: capaMoon, lector: capaLector, clientes: capaClientes, cliente: capaFicha, seccion: capaSeccion, documento: capaDocumento, casa: capaCasa, demo: capaDemo, nota: capaNota, editarProyecto: capaProyecto, qr: capaQR, cuenta: capaCuenta, frase: capaFrase, foto: capaFoto, docOpciones: capaDocOpciones, emProspectos: capaEmProspectos, emComisiones: capaEmComisiones, emMaterial: capaEmMaterial, emCuenta: capaEmCuenta, embajador: capaEmbajador, comision: capaComision, bitacora: capaBitacora, papelera: capaPapelera, llamadas: capaLlamadas, citas: capaCitas })[c.tipo](c, silencioso);
+  ({ tareas: capaTareas, tarea: capaTarea, nuevaTarea: capaNuevaTarea, crm: capaCRM, crmLista: capaCRMLista, editarContacto: capaEditarContacto, subir: capaSubir, ficha: capaFicha, nuevoCliente: capaNuevoCliente, proyectos: capaProyectos, proyecto: capaProyecto, nuevoProyecto: capaProyecto, equipo: capaEquipo, moon: capaMoon, lector: capaLector, clientes: capaClientes, cliente: capaFicha, seccion: capaSeccion, documento: capaDocumento, casa: capaCasa, demo: capaDemo, nota: capaNota, editarProyecto: capaProyecto, qr: capaQR, cuenta: capaCuenta, frase: capaFrase, foto: capaFoto, docOpciones: capaDocOpciones, emProspectos: capaEmProspectos, emComisiones: capaEmComisiones, emMaterial: capaEmMaterial, emCuenta: capaEmCuenta, embajador: capaEmbajador, comision: capaComision, bitacora: capaBitacora, papelera: capaPapelera, llamadas: capaLlamadas, citas: capaCitas, cita: capaCita })[c.tipo](c, silencioso);
 }
 function marco(titulo, accion, cuerpo, icono) {
   app.innerHTML = `<div class="top"><button class="redondo" id="volver" aria-label="Regresar">${I.atras}</button><div class="cabeza" style="flex:1;min-width:0"><h2>${esc(titulo)}</h2>${accion ? `<button class="redondo accion" id="accion" aria-label="${esc(accion)}" title="${esc(accion)}">${icono || I.mas}</button>` : ''}</div></div><div class="vista" style="grid-template-rows:minmax(0,1fr)">${cuerpo}</div>`;
@@ -913,8 +913,9 @@ function pintaInicio(sil) {
   const llSemana = lls.filter(x => Date.parse(x.fecha) >= semana).length, llClientes = lls.filter(x => !x.prueba && Date.parse(x.fecha) >= semana).length;
   const quienLlamo = x => { const per = personaDe(x.quien); return per ? nombreDe(per) : x.quien || 'Alguien'; };
   const xLlam = lls.slice(0, 8).map(x => `<button class="xi" data-l="${x.id}"><span class="q">${esc(quienLlamo(x))}</span><small>${x.prueba ? 'prueba · ' : ''}${esc(cuando(x.fecha))}</small></button>`).join('');
-  const citas = r.concat((D.personas || []).filter(p => p.es_prueba)).filter(p => p.proxima_cita);
-  const xCitas = citas.map(p => `<button class="xi cita" data-p="${esc(p.tel)}"><span class="q"><b>${esc(nombreDe(p))}</b><small>${esc(p.proxima_cita)}</small></span></button>`).join('');
+  const { proximas, porCalificar } = citasEnOrden();
+  const xCitas = porCalificar.map(c => `<button class="xi cita" data-ct="${esc(c.id)}"><span class="q"><b>${esc(citaQuien(c))}</b><small>¿Cómo te fue? · ${esc(citaCuando(c.inicio))}</small></span></button>`)
+    .concat(proximas.map(c => `<button class="xi cita" data-ct="${esc(c.id)}"><span class="q"><b>${esc(citaQuien(c))}</b><small>${esc(citaCuando(c.inicio))} · ${esc(CITA_ESTADO[c.estado] || '')}</small></span></button>`)).join('');
   const xMoon = `<p class="xtxt">Ser una empresa de inteligencia artificial muy fuerte, muy dinámica y muy intuitiva.</p>` + ['Jason', 'Página de MOON', 'Presentación de MOON'].map(n => `<span class="xi">${n}</span>`).join('');
   app.innerHTML = `
   <div class="top"><div class="marca"><span class="logo" role="img" aria-label="MOON Digital"></span><i>/</i>TABLERO</div><div class="esp"></div><button id="salir" aria-label="Mi cuenta">${ava(yo())}</button></div>
@@ -926,7 +927,7 @@ function pintaInicio(sil) {
         <div class="t-cifra"><span class="num">${llSemana}</span><span class="sub" data-corto="en 7 días">en 7 días · ${llClientes} de cliente${llClientes === 1 ? '' : 's'}</span></div></div>
       <div class="t t-crm" role="button" tabindex="0" data-ir="crm"><span class="flecha">${I.abre}</span><span class="eti">CRM<span class="largo"> de MOON</span></span><div class="extra">${xCrm}</div><div class="t-cifra"><span class="num">${cuenta('pendiente') + cuenta('en proceso')}</span><span class="sub">por cerrar</span></div><span class="barrita">${barrita}</span></div>
       <div class="t t-proy" role="button" tabindex="0" data-ir="clientes"><span class="flecha">${I.abre}</span><span class="eti">Clientes</span><div class="extra">${xProy}</div><div class="t-cifra"><span class="num">${clientes.length}</span><span class="sub" data-corto="nos pagan">nos pagan${enCamino ? ` · ${enCamino} en camino` : ''}</span></div></div>
-      <div class="t t-equipo" role="button" tabindex="0" data-ir="citas"><span class="flecha">${I.abre}</span><span class="eti">Citas</span><div class="extra">${xCitas}</div><div class="t-cifra"><span class="num">${citas.length}</span><span class="sub" data-corto="apartadas">apartadas con el asesor</span></div></div>
+      <div class="t t-equipo" role="button" tabindex="0" data-ir="citas"><span class="flecha">${I.abre}</span><span class="eti">Citas</span><div class="extra">${xCitas}</div><div class="t-cifra"><span class="num">${proximas.length}</span><span class="sub" data-corto="próximas">próximas${porCalificar.length ? ` · ${porCalificar.length} por calificar` : ''}</span></div></div>
       <div class="t t-moon" role="button" tabindex="0" data-ir="casa"><span class="flecha">${I.abre}</span><span class="eti">Hecho en casa</span><div class="extra">${xMoon}</div><span class="sub" style="margin-top:auto" data-corto="Visión y Jason">Visión, Jason y presentación</span></div>
       <div class="t t-demo" role="button" tabindex="0" data-ir="demo"><span class="mic">${I.mic}</span><span class="q"><b>Crea tu recepcionista</b><span class="sub">Ármale uno a un cliente y mándale el link</span></span><span class="flecha">${I.abre}</span></div>
     </main>
@@ -938,7 +939,7 @@ function pintaInicio(sil) {
   atajo('[data-y]', b => abrir({ tipo: 'proyecto', id: Number(b.dataset.y) }));
   atajo('[data-c]', b => abrir({ tipo: 'cliente', tel: b.dataset.c }));
   atajo('[data-l]', b => verLlamada((D.llamadas || []).find(x => x.id == b.dataset.l)));
-  atajo('[data-p]', b => abrir({ tipo: 'ficha', tel: b.dataset.p }));
+  atajo('[data-ct]', b => abrir({ tipo: 'cita', id: b.dataset.ct }));
   document.getElementById('salir').onclick = () => abrir({ tipo: 'cuenta' });
   llenarExtras();
   alCambiarTamano = () => pintaInicio(true);
@@ -987,12 +988,61 @@ function capaLlamadas(c) {
   app.querySelectorAll('[data-f]').forEach(b => b.onclick = () => { c.f = b.dataset.f; pinta(true); });
   app.querySelectorAll('.lista [data-l]').forEach(b => b.onclick = () => verLlamada(todas.find(x => x.id == b.dataset.l)));
 }
-function capaCitas() {
-  const citas = (D.personas || []).filter(p => p.proxima_cita && !p.borrado);
+// Las citas de Jason con el asesor (tabla citas): las próximas, las que esperan «¿cómo te fue?» y las ya calificadas.
+const CITA_ESTADO = { agendada: 'sin confirmar', confirmada: 'confirmó', pide_cambio: 'pidió cambio', cancelada: 'cancelada' };
+const CITA_RES = { interes: ['Le interesó', 'var(--verde,#1f8a4c)'], pensar: ['Lo va a pensar', 'var(--naranja,#d9822b)'], no_contesto: ['No contestó', 'var(--morado)'], no_interes: ['No le interesa', 'var(--rojo)'] };
+const ahoraCancun = () => new Date(Date.now() - 5 * 36e5).toISOString().slice(0, 16);
+function citasEnOrden() {
+  const t = ahoraCancun(), cs = (D.citas || []).filter(c => c.estado !== 'cancelada');
+  return { proximas: cs.filter(c => c.inicio >= t), porCalificar: cs.filter(c => c.inicio < t && !c.resultado).reverse(), pasadas: cs.filter(c => c.inicio < t && c.resultado).reverse() };
+}
+function citaQuien(c) { const n = (c.nombre || '').split(' ')[0] || personaDe(c.tel) && nombreDe(personaDe(c.tel)) || c.tel; return `${n}${c.negocio ? ` (${c.negocio})` : ''}${c.prueba ? ' · prueba' : ''}`; }
+function citaCuando(inicio) {
+  const [f, hm] = inicio.split('T'), [a, m, d] = f.split('-').map(Number), [hh, mm] = hm.split(':').map(Number);
+  const dia = DIAS[new Date(Date.UTC(a, m - 1, d, 12)).getUTCDay()];
+  const hoy = ahoraCancun().slice(0, 10), man = new Date(Date.parse(hoy + 'T12:00:00Z') + 864e5).toISOString().slice(0, 10);
+  const cuando = f === hoy ? 'hoy' : f === man ? 'mañana' : `${dia} ${d}`;
+  return `${cuando}, ${hh % 12 || 12}:${String(mm).padStart(2, '0')} ${hh < 12 ? 'a. m.' : 'p. m.'}`;
+}
+function filaCita(c) {
+  const R = c.resultado && CITA_RES[c.resultado];
+  const chip = R ? R[0] : c.inicio < ahoraCancun() ? '¿Cómo te fue?' : CITA_ESTADO[c.estado] || 'agendada';
+  const color = R ? R[1] : c.inicio < ahoraCancun() ? 'var(--cobalto)' : c.estado === 'confirmada' ? 'var(--verde,#1f8a4c)' : c.estado === 'pide_cambio' ? 'var(--naranja,#d9822b)' : 'var(--suave)';
+  return `<button class="fila" data-ct="${esc(c.id)}"><span class="estado" style="--c:${color};--cf:var(--campo)">${esc(chip)}</span><span class="q"><b style="font-weight:700">${esc(citaQuien(c))}</b><span>${esc(citaCuando(c.inicio))} · ${esc(c.tipo)}${c.canal === 'whatsapp' ? ' · por WhatsApp' : ''}</span></span><span class="flecha-f">${I.der}</span></button>`;
+}
+function capaCitas(c) {
+  const g = citasEnOrden();
+  c.f = c.f || (g.porCalificar.length ? 'calificar' : 'proximas');
+  const items = c.f === 'calificar' ? g.porCalificar : c.f === 'pasadas' ? g.pasadas : g.proximas;
   marco('Citas', '', `<div class="cuerpo" style="grid-template-rows:auto minmax(0,1fr)">
-    <div class="desc" style="--c:var(--cobalto);--cf:var(--azulf)">Las que Jason apartó con el asesor. Toca una para ver la ficha.</div>
-    <div class="lista agenda desliza">${citas.length ? citas.map(p => filaPersona(p, true)).join('') : '<div class="vacio"><div><b>No hay citas apartadas</b>Cuando Jason agende una, aparece aquí.</div></div>'}</div></div>`);
-  app.querySelectorAll('[data-p]').forEach(b => { b.onpointerdown = () => traerFicha(b.dataset.p); b.onclick = () => abrir({ tipo: 'ficha', tel: b.dataset.p }); });
+    <div class="tabs">${[['proximas', 'Próximas', g.proximas], ['calificar', '¿Cómo te fue?', g.porCalificar], ['pasadas', 'Pasadas', g.pasadas]].map(([k, t, l]) => `<button data-f="${k}" class="${c.f === k ? 'on' : ''}">${t} (${l.length})</button>`).join('')}</div>
+    <div class="lista agenda desliza">${items.length ? items.map(filaCita).join('') : `<div class="vacio"><div><b>${c.f === 'calificar' ? 'Nada por calificar' : c.f === 'pasadas' ? 'Todavía no hay citas calificadas' : 'No hay citas próximas'}</b>Las citas que Jason agenda por llamada o por WhatsApp aparecen aquí solas.</div></div>`}</div></div>`);
+  app.querySelectorAll('[data-f]').forEach(b => b.onclick = () => { c.f = b.dataset.f; pinta(true); });
+  app.querySelectorAll('.lista [data-ct]').forEach(b => b.onclick = () => abrir({ tipo: 'cita', id: b.dataset.ct }));
+}
+const AVISO_NOMBRE = { dan_nueva: 'Aviso de cita nueva al asesor', confirmacion: 'Confirmación al cliente', dia: 'Recordatorio un día antes', hora: 'Recordatorio una hora antes', dan_hora: 'Aviso al asesor una hora antes', dan_como: '«¿Cómo te fue?» al asesor', res: 'Mensaje después de la cita', seg1: 'Seguimiento a los 3 días', seg2: 'Seguimiento a los 7 días' };
+function capaCita(c) {
+  const x = (D.citas || []).find(y => y.id === c.id);
+  if (!x) { marco('Cita', '', '<div class="cuerpo"><div class="vacio"><div><b>Esta cita ya no está</b>Pudo haberse cambiado de horario.</div></div></div>'); return; }
+  let av = {}; try { av = JSON.parse(x.avisos || '{}'); } catch (e) {}
+  const pasada = x.inicio < ahoraCancun();
+  const enviados = Object.keys(AVISO_NOMBRE).filter(k => av[k] && /^\d{4}-/.test(av[k])).map(k => `<li>${AVISO_NOMBRE[k]} · ${esc(cuando(av[k]))}</li>`).join('');
+  const per = personaDe(x.tel);
+  marco(citaQuien(x), '', `<div class="cuerpo" style="grid-template-rows:auto auto minmax(0,1fr) auto">
+    <div class="desc" style="--c:var(--cobalto);--cf:var(--azulf)"><b>${esc(citaCuando(x.inicio))} (hora de Cancún)</b> · ${esc(x.tipo)}${x.canal === 'whatsapp' ? ' · agendó por WhatsApp' : ' · agendó por llamada'} · ${esc(CITA_ESTADO[x.estado] || x.estado)}<br>${esc('+52 ' + x.tel.slice(0, 3) + ' ' + x.tel.slice(3, 6) + ' ' + x.tel.slice(6))}${x.necesidad ? ` · ${esc(x.necesidad)}` : ''}</div>
+    <div><div class="eti" style="margin-bottom:6px">${x.resultado ? 'Cómo te fue (lo puedes cambiar)' : pasada ? '¿Cómo te fue?' : 'Cuando termine la cita, ¿cómo te fue?'}</div>
+      <div class="f-etapas" id="res" style="grid-template-columns:repeat(2,minmax(0,1fr))">${Object.entries(CITA_RES).map(([k, [n, col]]) => `<button data-r="${k}" class="${x.resultado === k ? 'on' : ''}" style="--c:${col};--cf:var(--campo)">${n}</button>`).join('')}</div></div>
+    <div style="font-size:14px;overflow:auto;min-height:0;padding:2px 4px">${enviados ? `<div class="eti" style="margin:4px 0">Lo que Jason ya mandó</div><ul style="margin:0;padding-left:18px;display:grid;gap:4px">${enviados}</ul>` : '<div class="mini">Jason todavía no ha mandado mensajes de esta cita.</div>'}</div>
+    <div class="botones">${per ? '<button class="boton dos" id="ficha">Ver su ficha</button>' : ''}${!pasada && !x.resultado ? '<button class="boton dos" id="cancelar">Cancelar cita</button>' : ''}</div></div>`);
+  app.querySelectorAll('#res [data-r]').forEach(b => b.onclick = async () => {
+    const r = await api('cita_resultado', { id: x.id, resultado: b.dataset.r });
+    if (!r.ok) { avisoFlotante('No se pudo guardar. Intenta de nuevo.'); return; }
+    x.resultado = b.dataset.r; x.resultado_fecha = new Date().toISOString();
+    avisoFlotante({ interes: 'Listo: Jason le da las gracias y pasa a En proceso', pensar: 'Listo: Jason le escribe a los 3 y a los 7 días', no_contesto: 'Listo: Jason le ofrece otro horario', no_interes: 'Listo: Jason le agradece y pasa a Descartado' }[x.resultado]);
+    pinta(true);
+  });
+  const fi = document.getElementById('ficha'); if (fi) fi.onclick = () => abrir({ tipo: 'ficha', tel: x.tel });
+  const ca = document.getElementById('cancelar'); if (ca) ca.onclick = async () => { const r = await api('cita_cancelar', { id: x.id }); if (r.ok) { x.estado = 'cancelada'; avisoFlotante('Cita cancelada: Jason ya no le manda recordatorios'); cerrar(); } else avisoFlotante('No se pudo cancelar.'); };
 }
 
 /* ---------- Tareas ---------- */
