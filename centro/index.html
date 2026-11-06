@@ -469,7 +469,7 @@ const ETAPA = {
   'portafolio': { n: 'Portafolio', c: 'var(--suave)',   cf: 'var(--campo)',   ic: '★', d: 'Ya se lo entregamos y no lleva mantenimiento. Es el registro de lo que hemos hecho.' },
   'archivo':    { n: 'Descartado', c: 'var(--rojo)',    cf: 'var(--rojof)',   ic: '×', d: 'Ya no les damos seguimiento. No cuentan en ninguna cifra; se guardan aquí por si un día regresan.' },
 };
-const GRUPO_TODOS = { n: 'Todos', c: 'var(--tinta)', cf: 'var(--campo)', ic: '●', d: 'Todas las personas y negocios que tenemos, también los de prueba. Los descartados viven en su propia lista.' };
+const GRUPO_TODOS = { n: 'Todos', c: 'var(--tinta)', cf: 'var(--campo)', ic: '●', d: 'Absolutamente todos: también los de prueba y los descartados, cada uno marcado.' };
 const GRUPO_PRUEBAS = { n: 'Pruebas', c: 'var(--suave)', cf: 'var(--campo)', ic: '⚙', d: 'Llamadas de prueba de nosotros mismos. No cuentan como clientes.' };
 const ROL = { daniel: 'Ideas y dirección', dan: 'Ventas y llamadas', kid: 'Construye y diseña' };
 const FASE_TXT = {
@@ -1172,7 +1172,7 @@ function capaCRMLista(c) {
   const base = reales(), pruebas = D.personas.filter(p => p.es_prueba);
   c.g = c.g || 'todos';
   const q = (c.busca || '').toLowerCase();
-  let items = c.g === 'pruebas' ? pruebas : c.g === 'todos' ? base.filter(p => p.etapa !== 'archivo').concat(pruebas) : base.filter(p => (p.etapa || 'pendiente') === c.g);   // "Todos" es TODOS: también los de prueba, marcados
+  let items = c.g === 'pruebas' ? pruebas : c.g === 'todos' ? base.concat(pruebas) : base.filter(p => (p.etapa || 'pendiente') === c.g);   // "Todos" es TODOS: también los de prueba, marcados
   if (q) items = base.concat(pruebas).filter(p => [p.nombre, p.negocio, p.telefono, p.correo, p.giro, p.necesidad, p.notas_equipo].join(' ').toLowerCase().includes(q));
   const G = grupoDe(c.g), titulo = q ? `Resultados de “${c.busca}”` : `${G.n} (${items.length})`;
   marco(titulo, q ? '' : 'Nuevo cliente', `<div class="cuerpo" style="grid-template-rows:auto auto minmax(0,1fr)">
