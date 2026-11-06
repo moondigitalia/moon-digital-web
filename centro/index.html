@@ -75,6 +75,7 @@ button{cursor:pointer}
 .t-tuyo{grid-area:tuyo;background:var(--cobalto);color:#fff;box-shadow:0 18px 30px -14px rgba(11,79,214,.65),inset 0 1px 0 rgba(255,255,255,.25)}
 .t-tuyo .eti,.t-tuyo .sub{color:rgba(255,255,255,.82)}
 .t-tuyo .flecha{background:rgba(255,255,255,.16);box-shadow:none}
+.xi.cita{height:auto;align-items:start;padding-top:7px;padding-bottom:7px}.xi.cita .q{display:flex;flex-direction:column;gap:2px;white-space:normal;min-width:0}.xi.cita .q b{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.xi.cita .q small{white-space:normal;line-height:1.3}
 .t-crm{grid-area:crm}.t-proy{grid-area:proy}.t-equipo{grid-area:equipo}.t-moon{grid-area:moon}
 /* Armar demo: la herramienta de venta de Dan, una franja con el micrófono a la vista. */
 .t-demo{grid-area:demo;flex-direction:row;align-items:center;gap:14px;padding:10px 16px}
@@ -913,7 +914,7 @@ function pintaInicio(sil) {
   const quienLlamo = x => { const per = personaDe(x.quien); return per ? nombreDe(per) : x.quien || 'Alguien'; };
   const xLlam = lls.slice(0, 8).map(x => `<button class="xi" data-l="${x.id}"><span class="q">${esc(quienLlamo(x))}</span><small>${x.prueba ? 'prueba · ' : ''}${esc(cuando(x.fecha))}</small></button>`).join('');
   const citas = r.concat((D.personas || []).filter(p => p.es_prueba)).filter(p => p.proxima_cita);
-  const xCitas = citas.map(p => `<button class="xi" data-p="${esc(p.tel)}"><span class="q">${esc(nombreDe(p))}</span><small>${esc(p.proxima_cita)}</small></button>`).join('');
+  const xCitas = citas.map(p => `<button class="xi cita" data-p="${esc(p.tel)}"><span class="q"><b>${esc(nombreDe(p))}</b><small>${esc(p.proxima_cita)}</small></span></button>`).join('');
   const xMoon = `<p class="xtxt">Ser una empresa de inteligencia artificial muy fuerte, muy dinámica y muy intuitiva.</p>` + ['Jason', 'Página de MOON', 'Presentación de MOON'].map(n => `<span class="xi">${n}</span>`).join('');
   app.innerHTML = `
   <div class="top"><div class="marca"><span class="logo" role="img" aria-label="MOON Digital"></span><i>/</i>TABLERO</div><div class="esp"></div><button id="salir" aria-label="Mi cuenta">${ava(yo())}</button></div>
@@ -1171,21 +1172,27 @@ function capaCRMLista(c) {
   const base = reales(), pruebas = D.personas.filter(p => p.es_prueba);
   c.g = c.g || 'todos';
   const q = (c.busca || '').toLowerCase();
-  let items = c.g === 'pruebas' ? pruebas : c.g === 'todos' ? base : base.filter(p => (p.etapa || 'pendiente') === c.g);
+  let items = c.g === 'pruebas' ? pruebas : c.g === 'todos' ? base.concat(pruebas) : base.filter(p => (p.etapa || 'pendiente') === c.g);   // "Todos" es TODOS: también los de prueba, marcados
   if (q) items = base.concat(pruebas).filter(p => [p.nombre, p.negocio, p.telefono, p.correo, p.giro, p.necesidad, p.notas_equipo].join(' ').toLowerCase().includes(q));
   const G = grupoDe(c.g), titulo = q ? `Resultados de “${c.busca}”` : `${G.n} (${items.length})`;
-  marco(titulo, q ? '' : 'Nuevo cliente', `<div class="cuerpo" style="grid-template-rows:auto minmax(0,1fr)">
+  marco(titulo, q ? '' : 'Nuevo cliente', `<div class="cuerpo" style="grid-template-rows:auto auto minmax(0,1fr)">
+    <label class="buscador">${I.lupa}<input id="buscaL" placeholder="Buscar en esta lista: nombre, negocio o teléfono" enterkeyhint="search"></label>
     ${q ? `<div class="desc" style="--c:var(--tinta);--cf:var(--campo)">${items.length} encontrado${items.length === 1 ? '' : 's'}</div>` : `<div class="desc" style="--c:${G.c};--cf:${G.cf}">${esc(G.d)}</div>`}
     <div class="lista agenda desliza">${items.length ? items.map(p => filaPersona(p, c.g === 'todos' || c.g === 'pruebas' || !!q)).join('') : `<div class="vacio"><div><b>${q ? 'Sin resultados' : 'Aún no hay nadie aquí'}</b>${q ? 'Prueba con otra palabra.' : ''}</div></div>`}</div></div>`);
   if (!q) document.getElementById('accion').onclick = () => abrir({ tipo: 'nuevoCliente', etapa: Object.keys(ETAPA).includes(c.g) ? c.g : 'pendiente' });
   app.querySelectorAll('[data-p]').forEach(b => { b.onpointerdown = () => traerFicha(b.dataset.p); b.onclick = () => abrir({ tipo: 'ficha', tel: b.dataset.p }); });
   const l = app.querySelector('.desliza'); if (c.scroll) l.scrollTop = c.scroll; l.onscroll = () => { c.scroll = l.scrollTop; };
+  // Buscar dentro de la lista mientras escribes (sin salir de la pantalla).
+  const bl = document.getElementById('buscaL');
+  if (bl) bl.oninput = () => { const t = bl.value.trim().toLowerCase(); let n = 0;
+    l.querySelectorAll('[data-p]').forEach(b => { const per = items.find(x => x.tel === b.dataset.p); const ok = !t || [per && per.nombre, per && per.negocio, per && per.telefono, per && per.tel, per && per.giro, per && per.notas_equipo, b.textContent].join(' ').toLowerCase().includes(t); b.style.display = ok ? '' : 'none'; if (ok) n++; });
+    let v = l.querySelector('.sin-res'); if (!n && t) { if (!v) { v = document.createElement('div'); v.className = 'vacio sin-res'; v.innerHTML = '<div><b>Sin resultados</b>Prueba con otra palabra.</div>'; l.appendChild(v); } } else if (v) v.remove(); };
 }
 function filaPersona(p, conEtapa) {
   const n = D.proyectos.filter(x => x.tel === p.tel).length;
   const E = ETAPA[p.etapa || 'pendiente'] || ETAPA.pendiente;
   const pan = (D.paneles || []).find(x => x.tel === p.tel);
-  const sub = [p.proxima_cita ? `Cita: ${p.proxima_cita}` : '', quienDe(p), n ? `${n} proyecto${n === 1 ? '' : 's'}` : ''].filter(Boolean).join(' · ');
+  const sub = [p.es_prueba ? 'Prueba' : '', p.proxima_cita ? `Cita: ${p.proxima_cita}` : '', quienDe(p), n ? `${n} proyecto${n === 1 ? '' : 's'}` : ''].filter(Boolean).join(' · ');
   const cara = pan || p.foto ? icono(Object.assign({ color: E.c }, pan || {}, p.foto ? { icono: p.foto } : {}), p, 36) : `<span class="icono" style="--c:${E.c};width:36px;height:36px;font-size:15px">${esc(nombreDe(p).slice(0, 1).toUpperCase())}</span>`;
   return `<button class="fila chica" data-p="${esc(p.tel)}">${cara}<span class="q"><b>${esc(nombreDe(p))}</b><span>${conEtapa ? `<em style="font-style:normal;font-weight:800;color:${E.c}">${E.n}</em>${sub ? ' · ' : ''}` : ''}${esc(sub || (conEtapa ? '' : 'Tócalo para ver su ficha'))}</span></span><span class="flecha-f">${I.der}</span></button>`;
 }
@@ -1797,7 +1804,7 @@ const CASA_IC = {
   presentacion: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="3"/><path d="M12 16v4M8 20h8"/></svg>',
   pagina: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.2 3 14.8 0 18M12 3c-3 3.2-3 14.8 0 18"/></svg>',
   proyectos: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>' };
-const CASA = [['presentacion', 'Presentación de MOON Digital', 'Quiénes somos y qué hacemos'], ['pagina', 'Página web de MOON', 'moondigitalia.com'], ['proyectos', 'Proyectos internos', 'Lo que construimos para nosotros']];
+const CASA = [['presentacion', 'Presentación de MOON Digital', 'Quiénes somos y qué hacemos'], ['pagina', 'Página web de MOON', 'moondigitalia.com'], ];
 function capaCasa() {
   const jd = docsDe('moon', 'jason'), num = jd.find(d => d.id === 'jason-numero');
   const JAS = [['llamadas', 'Llamadas', jd.find(d => d.id === 'jason-llamadas') || { formato: 'centro', url: 'proyecto:jason:uso' }], ['bienvenida', 'Bienvenida', docsDe('moon', 'bienvenida')[0]]];
