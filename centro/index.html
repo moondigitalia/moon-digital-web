@@ -467,9 +467,9 @@ const ETAPA = {
   'cerrado':    { n: 'Cerrados',   c: 'var(--verde)',   cf: 'var(--verdef)',  ic: '✓', d: 'Ya firmaron y pagaron. Estamos construyendo lo suyo.' },
   'en órbita':  { n: 'En órbita',  c: 'var(--morado)',  cf: 'var(--moradof)', ic: '◎', d: 'Ya se lo entregamos y nos pagan mantenimiento cada mes. Hay que cuidarlos de cerca.' },
   'portafolio': { n: 'Portafolio', c: 'var(--suave)',   cf: 'var(--campo)',   ic: '★', d: 'Ya se lo entregamos y no lleva mantenimiento. Es el registro de lo que hemos hecho.' },
-  'archivo':    { n: 'Archivo',    c: 'var(--rojo)',    cf: 'var(--rojof)',   ic: '×', d: 'Dijeron que no, por ahora. Se guardan por si regresan.' },
+  'archivo':    { n: 'Descartado', c: 'var(--rojo)',    cf: 'var(--rojof)',   ic: '×', d: 'Ya no les damos seguimiento. No cuentan en ninguna cifra; se guardan aquí por si un día regresan.' },
 };
-const GRUPO_TODOS = { n: 'Todos', c: 'var(--tinta)', cf: 'var(--campo)', ic: '●', d: 'Todas las personas y negocios que tenemos, estén en la etapa que estén.' };
+const GRUPO_TODOS = { n: 'Todos', c: 'var(--tinta)', cf: 'var(--campo)', ic: '●', d: 'Todas las personas y negocios que tenemos, también los de prueba. Los descartados viven en su propia lista.' };
 const GRUPO_PRUEBAS = { n: 'Pruebas', c: 'var(--suave)', cf: 'var(--campo)', ic: '⚙', d: 'Llamadas de prueba de nosotros mismos. No cuentan como clientes.' };
 const ROL = { daniel: 'Ideas y dirección', dan: 'Ventas y llamadas', kid: 'Construye y diseña' };
 const FASE_TXT = {
@@ -1133,7 +1133,7 @@ function grupoDe(k) { return k === 'todos' ? GRUPO_TODOS : k === 'pruebas' ? GRU
 function capaCRM(c) {
   // Cada etapa es una tarjeta con cuántos hay y quiénes son; al picarla se abre la lista completa (ahí sí se desliza).
   const base = reales(), pruebas = D.personas.filter(p => p.es_prueba);
-  const grupos = ['todos'].concat(Object.keys(ETAPA).filter(e => e !== 'archivo' || base.some(p => p.etapa === e))).concat(pruebas.length ? ['pruebas'] : []);
+  const grupos = ['todos'].concat(Object.keys(ETAPA)).concat(pruebas.length ? ['pruebas'] : []);
   const de = k => k === 'todos' ? base : k === 'pruebas' ? pruebas : base.filter(p => (p.etapa || 'pendiente') === k);
   marco('CRM de MOON', 'Nuevo cliente', `<div class="cuerpo" style="grid-template-rows:auto minmax(0,1fr)">
     <label class="buscador">${I.lupa}<input id="busca" placeholder="Buscar cliente, teléfono o nota" enterkeyhint="search"></label>
@@ -1172,7 +1172,7 @@ function capaCRMLista(c) {
   const base = reales(), pruebas = D.personas.filter(p => p.es_prueba);
   c.g = c.g || 'todos';
   const q = (c.busca || '').toLowerCase();
-  let items = c.g === 'pruebas' ? pruebas : c.g === 'todos' ? base.concat(pruebas) : base.filter(p => (p.etapa || 'pendiente') === c.g);   // "Todos" es TODOS: también los de prueba, marcados
+  let items = c.g === 'pruebas' ? pruebas : c.g === 'todos' ? base.filter(p => p.etapa !== 'archivo').concat(pruebas) : base.filter(p => (p.etapa || 'pendiente') === c.g);   // "Todos" es TODOS: también los de prueba, marcados
   if (q) items = base.concat(pruebas).filter(p => [p.nombre, p.negocio, p.telefono, p.correo, p.giro, p.necesidad, p.notas_equipo].join(' ').toLowerCase().includes(q));
   const G = grupoDe(c.g), titulo = q ? `Resultados de “${c.busca}”` : `${G.n} (${items.length})`;
   marco(titulo, q ? '' : 'Nuevo cliente', `<div class="cuerpo" style="grid-template-rows:auto auto minmax(0,1fr)">
