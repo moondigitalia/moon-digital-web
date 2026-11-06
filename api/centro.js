@@ -136,7 +136,7 @@ async function entrada(d, req) {
 
 // ---------- Con sesión ----------
 async function inicio(yo) {
-  const [usuarios, personas, proyectos, tareas, actividad, usoMes, paneles, documentos, embajadores] = await Promise.all([
+  const [usuarios, personas, proyectos, tareas, actividad, usoMes, paneles, documentos, embajadores, llamadas] = await Promise.all([
     sql("SELECT id, nombre, color, rol, lema, creado FROM usuarios WHERE tipo = 'socio'"),
     sql('SELECT tel, telefono, correo, foto, nombre, negocio, giro, temperatura, etapa, servicio, origen, necesidad, proxima_cita, encargados, notas_equipo, ultimo_contacto, contactos, es_prueba FROM personas WHERE COALESCE(borrado, \'\') = \'\' ORDER BY ultimo_contacto DESC LIMIT 1000'),
     sql("SELECT id, tel, nombre, fase, enlace, encargados, nota, creado, actualizado, (clave != '' OR llave_uso != '') AS conectado FROM proyectos ORDER BY actualizado DESC"),
@@ -146,10 +146,12 @@ async function inicio(yo) {
     sql('SELECT tel, orden, demo, color, imagen, icono FROM paneles ORDER BY orden'),
     sql("SELECT id, tel, seccion, orden, titulo, frase, url, formato FROM documentos WHERE seccion != 'oculto' AND COALESCE(borrado, '') = '' AND NOT (formato = 'archivo' AND fuente NOT LIKE '%\"listo\":1%') ORDER BY tel, seccion, orden"),
     sql("SELECT id, nombre, color FROM usuarios WHERE tipo = 'embajador' AND activo = 1 ORDER BY creado"),
+    // Las llamadas de Jason en la primera pantalla: todas (también las del equipo, marcadas como prueba).
+    sql("SELECT id, proyecto, fecha, quien, canal, resumen, datos, (quien IN (SELECT tel FROM personas WHERE es_prueba = 1)) prueba FROM uso WHERE canal = 'llamada' ORDER BY fecha DESC LIMIT 60"),
   ]);
   const usos = Object.fromEntries(usoMes.map(x => [x.proyecto, x.n]));
   proyectos.forEach(p => { p.uso_mes = usos[p.id] || 0; });
-  return { ok: true, yo, rol: 'socio', usuarios, embajadores, personas, proyectos, tareas, actividad, paneles, documentos, listas: { etapas: ETAPAS, temperaturas: TEMPERATURAS, servicios: SERVICIOS, origenes: ORIGENES, fases: FASES } };
+  return { ok: true, yo, rol: 'socio', usuarios, embajadores, personas, proyectos, tareas, actividad, paneles, documentos, llamadas, listas: { etapas: ETAPAS, temperaturas: TEMPERATURAS, servicios: SERVICIOS, origenes: ORIGENES, fases: FASES } };
 }
 
 const listaUsuarios = v => (Array.isArray(v) ? v : String(v || '').split(',')).map(x => String(x).trim()).filter(x => USUARIOS.includes(x)).join(',');

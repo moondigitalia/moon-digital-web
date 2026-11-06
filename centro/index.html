@@ -882,7 +882,7 @@ function pinta(silencioso) {
   if (!c || c.tipo !== 'demo') veloFuera(false);
   if (!c) return esEmb() ? pintaInicioEmbajador(silencioso) : pintaInicio(silencioso);
   if (c.tipo === 'documento') setTimeout(() => ponOpcionesDoc(c), 0);
-  ({ tareas: capaTareas, tarea: capaTarea, nuevaTarea: capaNuevaTarea, crm: capaCRM, crmLista: capaCRMLista, editarContacto: capaEditarContacto, subir: capaSubir, ficha: capaFicha, nuevoCliente: capaNuevoCliente, proyectos: capaProyectos, proyecto: capaProyecto, nuevoProyecto: capaProyecto, equipo: capaEquipo, moon: capaMoon, lector: capaLector, clientes: capaClientes, cliente: capaFicha, seccion: capaSeccion, documento: capaDocumento, casa: capaCasa, demo: capaDemo, nota: capaNota, editarProyecto: capaProyecto, qr: capaQR, cuenta: capaCuenta, frase: capaFrase, foto: capaFoto, docOpciones: capaDocOpciones, emProspectos: capaEmProspectos, emComisiones: capaEmComisiones, emMaterial: capaEmMaterial, emCuenta: capaEmCuenta, embajador: capaEmbajador, comision: capaComision, bitacora: capaBitacora, papelera: capaPapelera })[c.tipo](c, silencioso);
+  ({ tareas: capaTareas, tarea: capaTarea, nuevaTarea: capaNuevaTarea, crm: capaCRM, crmLista: capaCRMLista, editarContacto: capaEditarContacto, subir: capaSubir, ficha: capaFicha, nuevoCliente: capaNuevoCliente, proyectos: capaProyectos, proyecto: capaProyecto, nuevoProyecto: capaProyecto, equipo: capaEquipo, moon: capaMoon, lector: capaLector, clientes: capaClientes, cliente: capaFicha, seccion: capaSeccion, documento: capaDocumento, casa: capaCasa, demo: capaDemo, nota: capaNota, editarProyecto: capaProyecto, qr: capaQR, cuenta: capaCuenta, frase: capaFrase, foto: capaFoto, docOpciones: capaDocOpciones, emProspectos: capaEmProspectos, emComisiones: capaEmComisiones, emMaterial: capaEmMaterial, emCuenta: capaEmCuenta, embajador: capaEmbajador, comision: capaComision, bitacora: capaBitacora, papelera: capaPapelera, llamadas: capaLlamadas, citas: capaCitas })[c.tipo](c, silencioso);
 }
 function marco(titulo, accion, cuerpo, icono) {
   app.innerHTML = `<div class="top"><button class="redondo" id="volver" aria-label="Regresar">${I.atras}</button><div class="cabeza" style="flex:1;min-width:0"><h2>${esc(titulo)}</h2>${accion ? `<button class="redondo accion" id="accion" aria-label="${esc(accion)}" title="${esc(accion)}">${icono || I.mas}</button>` : ''}</div></div><div class="vista" style="grid-template-rows:minmax(0,1fr)">${cuerpo}</div>`;
@@ -907,20 +907,25 @@ function pintaInicio(sil) {
   const xCrm = Object.keys(ETAPA).filter(e => e !== 'archivo' && cuenta(e)).map(e => `<button class="xi" data-g="${e}"><span class="punto" style="--c:${ETAPA[e].c}"></span><span class="q">${ETAPA[e].n}</span><small>${cuenta(e)}</small></button>`).join('');
   const clientes = r.filter(p => PAGAN.includes(p.etapa)), enCamino = cuenta('en proceso');
   const xProy = clientes.map(per => { const pn = (D.paneles || []).find(x => x.tel === per.tel); return `<button class="xi" data-c="${esc(per.tel)}"><span class="punto" style="--c:${pn ? pn.color : ETAPA[per.etapa].c}"></span><span class="q">${esc(pn ? nombreCorto(per) : nombreDe(per))}</span><small>${esc(ETAPA[per.etapa].n)}</small></button>`; }).join('');
-  const xEq = ['daniel', 'dan', 'kid'].map(id => { const ab = D.tareas.filter(x => x.para === id && x.estado !== 'hecha'); const nv = ab.filter(x => x.estado === 'nueva').length; return `<button class="xi" data-u="${id}">${ava(id, 1)}<span class="q">${GENTE[id].n}</span><small>${nv ? nv + ' sin ver' : ab.length + ' abiertas'}</small></button>`; }).join('');
+  // Llamadas de Jason (todas; las del equipo dicen "prueba") y citas apartadas con el asesor.
+  const lls = D.llamadas || [], semana = Date.now() - 7 * 864e5;
+  const llSemana = lls.filter(x => Date.parse(x.fecha) >= semana).length, llClientes = lls.filter(x => !x.prueba && Date.parse(x.fecha) >= semana).length;
+  const quienLlamo = x => { const per = personaDe(x.quien); return per ? nombreDe(per) : x.quien || 'Alguien'; };
+  const xLlam = lls.slice(0, 8).map(x => `<button class="xi" data-l="${x.id}"><span class="q">${esc(quienLlamo(x))}</span><small>${x.prueba ? 'prueba · ' : ''}${esc(cuando(x.fecha))}</small></button>`).join('');
+  const citas = r.concat((D.personas || []).filter(p => p.es_prueba)).filter(p => p.proxima_cita);
+  const xCitas = citas.map(p => `<button class="xi" data-p="${esc(p.tel)}"><span class="q">${esc(nombreDe(p))}</span><small>${esc(p.proxima_cita)}</small></button>`).join('');
   const xMoon = `<p class="xtxt">Ser una empresa de inteligencia artificial muy fuerte, muy dinámica y muy intuitiva.</p>` + ['Jason', 'Página de MOON', 'Presentación de MOON'].map(n => `<span class="xi">${n}</span>`).join('');
   app.innerHTML = `
   <div class="top"><div class="marca"><span class="logo" role="img" aria-label="MOON Digital"></span><i>/</i>TABLERO</div><div class="esp"></div><button id="salir" aria-label="Mi cuenta">${ava(yo())}</button></div>
   <div class="vista"${sil ? ' style="animation:none"' : ''}>
-    <h1 class="hola">${saludo}, ${esc(GENTE[yo()] ? GENTE[yo()].n : D.yo.nombre)}<small>${mias.length ? `Tienes ${mias.length} tarea${mias.length === 1 ? '' : 's'} abierta${mias.length === 1 ? '' : 's'}` : 'No tienes tareas pendientes'}</small></h1>
+    <h1 class="hola">${saludo}, ${esc(GENTE[yo()] ? GENTE[yo()].n : D.yo.nombre)}<small>${llSemana ? `${llSemana} llamada${llSemana === 1 ? '' : 's'} esta semana` : 'Sin llamadas esta semana'}</small></h1>
     <main class="mosaico">
-      <div class="t t-tuyo" role="button" tabindex="0" data-ir="tareas"><span class="flecha">${I.abre}</span><span class="eti">Tareas</span>
-        ${nuevas ? `<span class="brilla latido"><i>${nuevas}</i>nueva${nuevas === 1 ? '' : 's'} para ti</span>` : ''}
-        <div class="extra">${xTareas}</div>
-        <div class="t-cifra"><span class="num">${mias.length}</span><span class="sub" data-corto="${esc(nuevas ? `abiertas · <b style='color:#fff'>${nuevas} nueva${nuevas === 1 ? '' : 's'}</b>` : 'abiertas')}">${vencen ? `${vencen} atrasada${vencen === 1 ? '' : 's'} · ` : ''}abiertas</span></div></div>
+      <div class="t t-tuyo" role="button" tabindex="0" data-ir="llamadas"><span class="flecha">${I.abre}</span><span class="eti">Llamadas</span>
+        <div class="extra">${xLlam}</div>
+        <div class="t-cifra"><span class="num">${llSemana}</span><span class="sub" data-corto="en 7 días">en 7 días · ${llClientes} de cliente${llClientes === 1 ? '' : 's'}</span></div></div>
       <div class="t t-crm" role="button" tabindex="0" data-ir="crm"><span class="flecha">${I.abre}</span><span class="eti">CRM<span class="largo"> de MOON</span></span><div class="extra">${xCrm}</div><div class="t-cifra"><span class="num">${cuenta('pendiente') + cuenta('en proceso')}</span><span class="sub">por cerrar</span></div><span class="barrita">${barrita}</span></div>
       <div class="t t-proy" role="button" tabindex="0" data-ir="clientes"><span class="flecha">${I.abre}</span><span class="eti">Clientes</span><div class="extra">${xProy}</div><div class="t-cifra"><span class="num">${clientes.length}</span><span class="sub" data-corto="nos pagan">nos pagan${enCamino ? ` · ${enCamino} en camino` : ''}</span></div></div>
-      <div class="t t-equipo" role="button" tabindex="0" data-ir="equipo"><span class="flecha">${I.abre}</span><span class="eti">Equipo</span><div class="extra">${xEq}</div><div class="t-cifra"><span class="num">${Object.keys(GENTE).length}</span><span class="sub" data-corto="en el equipo">administradores${(D.embajadores || []).length ? ` · ${D.embajadores.length} embajador${D.embajadores.length === 1 ? '' : 'es'}` : ''}</span></div></div>
+      <div class="t t-equipo" role="button" tabindex="0" data-ir="citas"><span class="flecha">${I.abre}</span><span class="eti">Citas</span><div class="extra">${xCitas}</div><div class="t-cifra"><span class="num">${citas.length}</span><span class="sub" data-corto="apartadas">apartadas con el asesor</span></div></div>
       <div class="t t-moon" role="button" tabindex="0" data-ir="casa"><span class="flecha">${I.abre}</span><span class="eti">Hecho en casa</span><div class="extra">${xMoon}</div><span class="sub" style="margin-top:auto" data-corto="Visión y Jason">Visión, Jason y presentación</span></div>
       <div class="t t-demo" role="button" tabindex="0" data-ir="demo"><span class="mic">${I.mic}</span><span class="q"><b>Crea tu recepcionista</b><span class="sub">Ármale uno a un cliente y mándale el link</span></span><span class="flecha">${I.abre}</span></div>
     </main>
@@ -931,7 +936,8 @@ function pintaInicio(sil) {
   atajo('[data-g]', b => abrir({ tipo: 'crmLista', g: b.dataset.g }));
   atajo('[data-y]', b => abrir({ tipo: 'proyecto', id: Number(b.dataset.y) }));
   atajo('[data-c]', b => abrir({ tipo: 'cliente', tel: b.dataset.c }));
-  atajo('[data-u]', b => abrir({ tipo: 'tareas', persona: b.dataset.u }));
+  atajo('[data-l]', b => verLlamada((D.llamadas || []).find(x => x.id == b.dataset.l)));
+  atajo('[data-p]', b => abrir({ tipo: 'ficha', tel: b.dataset.p }));
   document.getElementById('salir').onclick = () => abrir({ tipo: 'cuenta' });
   llenarExtras();
   alCambiarTamano = () => pintaInicio(true);
@@ -960,6 +966,32 @@ function llenarExtras() {
       const e = t.querySelector(sel); if (e) e.style.display = 'none';
     }
   });
+}
+
+/* ---------- Llamadas y citas: lo de Jason, a un toque desde la primera pantalla ---------- */
+function verLlamada(x) {
+  if (!x) return;
+  let det = ''; try { const o = JSON.parse(x.datos || '{}'); det = Object.entries(o).filter(([, v]) => v !== '' && v != null).map(([k2, v]) => `${k2[0].toUpperCase() + k2.slice(1)}: ${v}`).join('\n'); } catch (e) { det = x.datos || ''; }
+  const per = personaDe(x.quien);
+  abrir({ tipo: 'lector', titulo: `${per ? nombreDe(per) : x.quien || 'Llamada'} · ${cuando(x.fecha)}`, texto: [x.prueba ? 'Llamada de prueba del equipo.' : '', x.resumen, det].filter(Boolean).join('\n\n') || 'Sin detalle.' });
+}
+function capaLlamadas(c) {
+  c.f = c.f || 'todas';
+  const todas = D.llamadas || [];
+  const items = c.f === 'clientes' ? todas.filter(x => !x.prueba) : c.f === 'pruebas' ? todas.filter(x => x.prueba) : todas;
+  const n = f => (f === 'clientes' ? todas.filter(x => !x.prueba) : f === 'pruebas' ? todas.filter(x => x.prueba) : todas).length;
+  marco('Llamadas', '', `<div class="cuerpo" style="grid-template-rows:auto minmax(0,1fr)">
+    <div class="tabs">${[['todas', 'Todas'], ['clientes', 'Clientes'], ['pruebas', 'Pruebas']].map(([k, t]) => `<button data-f="${k}" class="${c.f === k ? 'on' : ''}">${t} (${n(k)})</button>`).join('')}</div>
+    <div class="lista agenda desliza">${items.length ? items.map(x => { const per = personaDe(x.quien); return `<button class="fila" data-l="${x.id}"><span class="estado" style="${x.prueba ? '--c:var(--suave);--cf:var(--niebla)' : '--c:var(--cobalto);--cf:var(--azulf)'}">${x.prueba ? 'Prueba' : 'Cliente'}</span><span class="q"><b style="font-weight:700">${esc(per ? nombreDe(per) : x.quien || 'Alguien')}</b><span>${esc(x.resumen || 'Sin resumen')} · ${cuando(x.fecha)}</span></span><span></span></button>`; }).join('') : `<div class="vacio"><div><b>${c.f === 'clientes' ? 'Todavía no llama ningún cliente' : 'Sin llamadas'}</b>En cuanto alguien llame a Jason, aparece aquí al momento.</div></div>`}</div></div>`);
+  app.querySelectorAll('[data-f]').forEach(b => b.onclick = () => { c.f = b.dataset.f; pinta(true); });
+  app.querySelectorAll('.lista [data-l]').forEach(b => b.onclick = () => verLlamada(todas.find(x => x.id == b.dataset.l)));
+}
+function capaCitas() {
+  const citas = (D.personas || []).filter(p => p.proxima_cita && !p.borrado);
+  marco('Citas', '', `<div class="cuerpo" style="grid-template-rows:auto minmax(0,1fr)">
+    <div class="desc" style="--c:var(--cobalto);--cf:var(--azulf)">Las que Jason apartó con el asesor. Toca una para ver la ficha.</div>
+    <div class="lista agenda desliza">${citas.length ? citas.map(p => filaPersona(p, true)).join('') : '<div class="vacio"><div><b>No hay citas apartadas</b>Cuando Jason agende una, aparece aquí.</div></div>'}</div></div>`);
+  app.querySelectorAll('[data-p]').forEach(b => { b.onpointerdown = () => traerFicha(b.dataset.p); b.onclick = () => abrir({ tipo: 'ficha', tel: b.dataset.p }); });
 }
 
 /* ---------- Tareas ---------- */
@@ -1398,7 +1430,7 @@ function capaProyecto(c) {
       ${p.enlace ? `<div class="par"><span>Enlace</span><b>${esc(p.enlace.replace(/^https:\/\//, ''))}</b></div>` : ''}
       <div class="par"><span>Abierto</span><b>${cuando(p.creado)}</b></div>
       <button class="boton dos" id="editar">Editar datos</button></div>`;
-  marco(p.nombre, '', `<div class="cuerpo" style="grid-template-rows:auto minmax(0,1fr)"><div class="tabs"><button data-tab="fase" class="${c.tab === 'fase' ? 'on' : ''}">Fase</button><button data-tab="tareas" class="${c.tab === 'tareas' ? 'on' : ''}">Tareas (${abiertas})</button><button data-tab="uso" class="${c.tab === 'uso' ? 'on' : ''}">Uso (${p.uso_mes || 0})</button><button data-tab="datos" class="${c.tab === 'datos' ? 'on' : ''}">Datos</button></div>${cuerpo}</div>`);
+  marco(p.nombre, '', `<div class="cuerpo" style="grid-template-rows:auto minmax(0,1fr)"><div class="tabs"><button data-tab="fase" class="${c.tab === 'fase' ? 'on' : ''}">Fase</button><button data-tab="uso" class="${c.tab === 'uso' ? 'on' : ''}">Uso (${p.uso_mes || 0})</button><button data-tab="datos" class="${c.tab === 'datos' ? 'on' : ''}">Datos</button></div>${cuerpo}</div>`);
   app.querySelectorAll('[data-tab]').forEach(b => b.onclick = async () => { c.tab = b.dataset.tab; c.p = 0; await precargar(c); pinta(true); });   // pestañas: al instante, como pasar de hoja
   if (c.tab === 'fase') {
     // Varias fases a la vez: cada toque prende o apaga una, al momento; se guarda un instante después (si tocas varias seguidas, se guarda una vez).
@@ -1854,8 +1886,8 @@ function credencial(id) {
       <span class="foto">${FOTOS[id] ? `<img src="${FOTOS[id]}" alt="">` : g.i}</span>
       <div class="info">
         <div class="estampas"><span class="estampa nom">${esc(g.n)}</span><span class="estampa moon">MOON</span>${u.rol ? `<span class="estampa rolx">${esc(u.rol)}</span>` : ''}</div>
-        <div class="campos"><span class="campo-c azul"><small>Sin ver</small><b>${nv}</b></span><span class="campo-c"><small>Abiertas</small><b>${ab.length}</b></span>
-          ${at ? `<span class="campo-c rojo"><small>Atrasadas</small><b>${at}</b></span>` : `<span class="campo-c"><small>Hechas</small><b>${he}</b></span>`}<span class="campo-c"><small>Proyectos</small><b>${proys.length}</b></span></div>
+        <div class="campos"><span class="campo-c azul"><small>Llamadas (7 días)</small><b>${(D.llamadas || []).filter(x => Date.parse(x.fecha) >= Date.now() - 7 * 864e5).length}</b></span><span class="campo-c"><small>Citas</small><b>${(D.personas || []).filter(p => p.proxima_cita).length}</b></span>
+          <span class="campo-c"><small>En el CRM</small><b>${reales().length}</b></span><span class="campo-c"><small>Proyectos</small><b>${proys.length}</b></span></div>
       </div>
       <div class="franja"><span class="logo" role="img" aria-label="MOON Digital"></span><span>#00${k}${id === yo() ? ' · tú' : ''}</span></div>
     </div>
@@ -1894,7 +1926,7 @@ function capaEquipo(c) {
     <button class="fila chica" id="comision"><span class="casa-ic" style="background:#1f6f43">%</span><span class="q"><b>Comisión de embajadores</b><span>${eq ? esc(eq.comision || 'Por definir') : '…'}</span></span><span class="flecha-f">${I.der}</span></button>
     <div class="botones"><button class="boton" id="agregar">Agregar embajador</button></div>
     <div class="eq-enlaces"><button class="enlace" id="bitacora">Quién movió qué</button><button class="enlace" id="papelera">Papelera</button></div></div>`);
-  app.querySelectorAll('.socio').forEach(b => b.onclick = () => abrir({ tipo: 'tareas', persona: b.dataset.u }));
+
   const lista = eq ? eq.embajadores : [];
   lista.forEach(e => { if (!EMB[e.id]) EMB[e.id] = { n: e.nombre, c: e.color || '#e8892f', i: e.nombre.split(/\s+/).slice(0, 2).map(x => x[0]).join('').toUpperCase() }; });
   paginar(app.querySelector('.cuerpo'), lista, e => `<button class="fila" data-e="${esc(e.id)}">${ava(e.id)}<span class="q"><b>${esc(e.nombre)}</b><span>${!e.activo ? '<em class="aviso-fila" style="color:var(--rojo)">Sin acceso</em> · ' : !e.con_clave ? '<em class="aviso-fila" style="color:var(--naranja)">Todavía no entra</em> · ' : ''}${e.demos} recepcionista${e.demos === 1 ? '' : 's'} · ${e.cierres} cierre${e.cierres === 1 ? '' : 's'}</span></span><span class="flecha-f">${I.der}</span></button>`,
@@ -1983,11 +2015,12 @@ function capaPapelera(c) {
 /* ---------- Tu credencial: la abre tu foto de arriba ---------- */
 function capaCuenta(c) {
   const z = letra();
-  marco('Tu credencial', '', `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr) auto auto auto auto">
+  marco('Tu credencial', '', `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr) auto auto auto auto auto">
     <div class="creds" id="creds">${credencial(yo())}</div>
     <span class="pista-cred">Tócala para darle vuelta</span>
     <div class="botones"><button class="boton" id="foto">Cambiar foto</button><button class="boton dos" id="frase">Mi frase</button></div>
     <div><div class="eti" style="margin-bottom:6px">Tamaño de letra en este dispositivo</div><div class="segmento" id="letra">${tamanosQueCaben().map(([n, v], i, todos) => `<button data-z="${v}" class="${v === z || (i === todos.length - 1 && z > v) ? 'on' : ''}" style="font-size:${Math.round(13 * v)}px">${n}</button>`).join('')}</div>${tamanosQueCaben().length < TAMANOS.length ? '<div class="mini" style="margin-top:4px">En esta pantalla no cabe más grande sin cortar cosas.</div>' : ''}</div>
+    <button class="boton dos" id="irEquipo">Equipo, embajadores y papelera</button>
     <div class="eq-enlaces"><button class="enlace" id="verTour">Ver el recorrido otra vez</button><button class="enlace" id="cerrar">Cerrar sesión</button></div>
     <input type="file" id="archivo" accept="image/*" hidden></div>`);
   const cont = document.getElementById('creds');
@@ -2015,6 +2048,7 @@ function capaCuenta(c) {
   });
   document.getElementById('cerrar').onclick = async () => { await api('salir'); guardarSesion(''); D = null; pila = []; transicion(pantallaQuien); };
   document.getElementById('verTour').onclick = () => { volverA(0); setTimeout(() => recorrido(true), 500); };
+  const eq = document.getElementById('irEquipo'); if (eq) eq.onclick = () => abrir({ tipo: 'equipo' });
 }
 
 function capaFrase() {
@@ -2208,13 +2242,13 @@ function capaEmCuenta() {
 /* ---------- Recorrido de la primera vez: cada sección se explica en una línea, una a la vez ---------- */
 const RECORRIDO = 'centro.moon.recorrido';
 const PASOS_SOCIO = [
-  ['[data-ir="tareas"]', 'Tareas', 'Lo que te toca a ti y lo de todo el equipo. Aquí también dejas una tarea nueva.'],
+  ['[data-ir="llamadas"]', 'Llamadas', 'Cada llamada que contestó Jason: de clientes y de prueba. Toca una para ver de qué se habló.'],
   ['[data-ir="crm"]', 'CRM', 'Todas las personas que nos han buscado, ordenadas por en qué van.'],
   ['[data-ir="clientes"]', 'Clientes', 'Solo los que ya nos pagan, y los que estamos por cerrar ("En camino").'],
-  ['[data-ir="equipo"]', 'Equipo', 'Quién es quién, los embajadores, quién movió qué y la papelera.'],
+  ['[data-ir="citas"]', 'Citas', 'Las citas que Jason apartó con el asesor.'],
   ['[data-ir="casa"]', 'Hecho en casa', 'Lo nuestro: la visión, Jason, la presentación y la página de MOON.'],
   ['[data-ir="demo"]', 'Crea tu recepcionista', 'Ármale un recepcionista a un cliente y mándale el link para que le hable.'],
-  ['#salir', 'Tu credencial', 'Tu foto, tu frase y el tamaño de la letra. Aquí puedes volver a ver este recorrido.'],
+  ['#salir', 'Tu credencial', 'Tu foto, tu frase, el tamaño de la letra y el Equipo (embajadores y papelera).'],
 ];
 const PASOS_EMB = [
   ['[data-ir="emComisiones"]', 'Mis comisiones', 'Los clientes que cerraste y cuánto ganas.'],
