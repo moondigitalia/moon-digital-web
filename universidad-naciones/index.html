@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#00205C">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Universidad de las Naciones · MOON Digital">
-<meta property="og:description" content="Ideas para trabajar juntos: lo que ya construimos y cómo podría verse un día en su plantel.">
+<meta property="og:description" content="Ideas para trabajar juntos: conozcan a Uni y cómo podría verse un día en su plantel.">
 <meta property="og:url" content="https://moondigitalia.com/universidad-naciones/">
 <meta property="og:image" content="https://moondigitalia.com/universidad-naciones/img/compartir.png">
 <link rel="icon" href="/img/logo.webp">
@@ -61,6 +61,19 @@ em.c{font-family:var(--c);font-style:italic;font-weight:600;letter-spacing:-.01e
 .cover .by b{color:#fff}
 .hint{position:absolute;left:50%;bottom:clamp(14px,3vh,34px);transform:translateX(-50%);font-size:clamp(16px,.95vw,17px);color:#FFFFFF;letter-spacing:.06em;z-index:2;white-space:nowrap}
 
+/* 2 · conozcan a Uni */
+.uni2{background:var(--bg)}
+.uni-g{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,.75fr);gap:clamp(24px,4vw,90px);align-items:center}
+.uni-tx{min-width:0}
+.btn-uni{display:inline-flex;align-items:center;gap:14px;margin-top:clamp(18px,3.4vh,40px);background:var(--navy);color:#fff;text-decoration:none;border-radius:999px;padding:clamp(8px,1.2vh,12px) clamp(24px,2vw,34px) clamp(8px,1.2vh,12px) clamp(8px,1.2vh,12px);font-size:clamp(19px,1.4vw,26px);font-weight:800;white-space:nowrap;transition:transform .35s cubic-bezier(.34,1.45,.5,1),background .3s ease}
+.btn-uni:hover{background:var(--navy2);transform:scale(1.03)}
+.btn-uni .mic{width:clamp(44px,3.4vw,58px);height:clamp(44px,3.4vw,58px);border-radius:50%;background:#fff;color:var(--navy);display:grid;place-items:center;flex:none}
+.uni-base{margin-top:clamp(18px,3vh,34px);font-size:clamp(16px,1vw,19px);color:var(--gray);line-height:1.5;max-width:52ch}
+.uni-base a{color:var(--blue);font-weight:800;white-space:nowrap}
+.uni-fig{position:relative;display:grid;place-items:center;min-width:0;container-type:inline-size}
+.uni-disco{position:absolute;width:min(100cqi,62vh,calc(min(74vh,720px,135cqi) * .84));aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 35% 35%,#2E4FA6 0%,#0B2E73 60%,#00205C 100%)}
+.uni-fig img{position:relative;height:min(74vh,720px,135cqi);width:auto;max-width:100%;object-fit:contain}
+@media (max-width:900px){.uni-g{grid-template-columns:minmax(0,1fr)}.uni-fig{order:-1}.uni-fig img{height:min(46vh,420px)}.uni-disco{width:min(80cqi,40vh)}}
 /* 2 · lo que ya hicimos */
 .made{background:var(--bg)}
 .obras{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,1fr) minmax(0,1fr);gap:clamp(16px,2vw,34px);margin-top:clamp(22px,3.4vh,44px);align-items:start}
@@ -129,6 +142,7 @@ em.c{font-family:var(--c);font-style:italic;font-weight:600;letter-spacing:-.01e
 .wtop{background:var(--navy);color:#fff;padding:22px 22px 16px;display:flex;align-items:center;gap:12px}
 .wtop .av{width:46px;height:46px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;flex:0 0 46px}
 .wtop .av img{width:30px}
+.wtop .av img.cara{width:100%;height:100%;object-fit:cover}
 .wtop b{font-size:17px;display:block}
 .wtop span{font-size:13px;color:#FFFFFF}
 .wbody{padding:18px 14px 26px}
@@ -233,7 +247,7 @@ em.c{font-family:var(--c);font-style:italic;font-weight:600;letter-spacing:-.01e
 
 <nav class="dots oscuro" id="dots" aria-label="Láminas">
   <a href="#l1" aria-label="Portada"></a>
-  <a href="#l2" aria-label="Lo que ya hicimos"></a>
+  <a href="#l2" aria-label="Conozcan a Uni"></a>
   <a href="#l3" aria-label="Ecosistema"></a>
   <a href="#l4" aria-label="Un día en el plantel"></a>
   <a href="#l5" aria-label="Siguiente paso"></a>
@@ -256,40 +270,17 @@ em.c{font-family:var(--c);font-style:italic;font-weight:600;letter-spacing:-.01e
   <div class="hint">Deslice hacia abajo o use las flechas del teclado</div>
 </section>
 
-<!-- 2 · LO QUE YA HICIMOS -->
-<section class="s made" id="l2">
-  <div class="in">
-    <div class="eyebrow">Lo que ya hicimos</div>
-    <h2>Universidad Tercer Milenio · <em class="c">Boca del Río</em></h2>
-    <p class="lead">Una página nueva con un asesor virtual que atiende a cualquier hora, y dos herramientas para ferias y para su comunidad. Cada interesado llega directo a su equipo de admisiones.</p>
-    <div class="obras">
-      <div class="pila">
-        <a class="obra h" href="https://u3m-demo.vercel.app/" target="_blank" rel="noopener">
-          <div class="marco web"><img src="img/home_clean.webp" alt="Página web de Universidad Tercer Milenio"></div>
-          <div class="tx"><h3>Página web nueva</h3>
-          <p>Carreras, becas y requisitos, claros y en un solo lugar.</p>
-          <span class="abrir">Abrir y probar <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></span></div>
-        </a>
-        <a class="obra h" href="https://u3m-demo.vercel.app/#asesor" target="_blank" rel="noopener">
-          <div class="marco web"><img src="img/asesor.webp" alt="Mileni, asesor virtual" style="object-position:62% 40%"></div>
-          <div class="tx"><h3>Mileni, asesor virtual</h3>
-          <p>Responde por texto y voz, y pasa al interesado con un asesor por WhatsApp.</p>
-          <span class="abrir">Abrir y probar <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></span></div>
-        </a>
-      </div>
-      <a class="obra" href="https://u3m-demo.vercel.app/radar" target="_blank" rel="noopener">
-        <div class="marco tel"><img src="img/radar_mob.webp" alt="Radar de Carrera en el celular"></div>
-        <h3>Radar de Carrera</h3>
-        <p>7 preguntas en ferias y redes; el resultado llega al instante.</p>
-        <span class="abrir">Abrir y probar <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></span>
-      </a>
-      <a class="obra" href="https://u3m-demo.vercel.app/referidos" target="_blank" rel="noopener">
-        <div class="marco tel"><img src="img/ref_mob.webp" alt="Recomienda y gana en el celular"></div>
-        <h3>Recomienda y gana</h3>
-        <p>Su comunidad recomienda amigos y cada uno llega a un asesor.</p>
-        <span class="abrir">Abrir y probar <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></span>
-      </a>
+<!-- 2 · CONOZCAN A UNI -->
+<section class="s uni2" id="l2">
+  <div class="in uni-g">
+    <div class="uni-tx">
+      <div class="eyebrow">Para ustedes</div>
+      <h2>Conozcan a <em class="c">Uni,</em> el lobo de la Universidad de las Naciones</h2>
+      <p class="lead">Atiende a aspirantes y a sus papás a cualquier hora, por voz o por escrito, con la información de su universidad. Cuando alguien se interesa, se lo pasa a su equipo de admisiones.</p>
+      <a class="btn-uni" href="https://moondigitalia.com/universidad-naciones/asistente/" target="_blank" rel="noopener"><span class="mic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></span>Háblale a Uni</a>
+      <p class="uni-base">Hecho sobre la misma base que ya atiende a aspirantes en la Universidad Tercer Milenio. <a href="https://u3m-demo.vercel.app/" target="_blank" rel="noopener">Ver ese trabajo</a></p>
     </div>
+    <div class="uni-fig"><span class="uni-disco" aria-hidden="true"></span><img src="img/uni-cuerpo.webp" alt="Uni, el lobo de la Universidad de las Naciones" width="305" height="688"></div>
   </div>
 </section>
 
@@ -355,7 +346,7 @@ em.c{font-family:var(--c);font-style:italic;font-weight:600;letter-spacing:-.01e
     </div>
     <div>
       <div class="cel"><div class="scr">
-        <div class="wtop"><div class="av"><img src="img/un-logo.png" alt=""></div><div><b>Asistente virtual</b><span>Universidad de las Naciones</span></div></div>
+        <div class="wtop"><div class="av"><img class="cara" src="img/uni-cara.webp" alt=""></div><div><b>Uni</b><span>Universidad de las Naciones</span></div></div>
         <div class="wbody">
           <div class="bub">
             <b>Buenos días.</b> Esto pasó ayer en el plantel:

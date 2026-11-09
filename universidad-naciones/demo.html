@@ -42,6 +42,7 @@ button:focus-visible{outline:4px solid var(--claro);outline-offset:6px}
 .chat-head{position:absolute;left:0;right:0;top:0;height:92px;background:var(--navy);display:flex;align-items:center;gap:16px;padding:0 26px;z-index:2}
 .chat-head .av{width:58px;height:58px;border-radius:50%;background:#fff;display:grid;place-items:center;flex:none;overflow:hidden}
 .chat-head .av img{width:40px}
+.chat-head .av img.cara{width:100%;height:100%;object-fit:cover}
 .chat-head b{display:block;color:#fff;font-size:27px;font-weight:800;line-height:1.1}
 .chat-head span{display:block;color:#fff;font-size:22px;font-weight:600;line-height:1.25}
 .chat-head .wa{margin-left:auto;font-size:21px;color:#fff;display:flex;align-items:center;gap:8px;font-weight:700}
@@ -214,8 +215,8 @@ button:focus-visible{outline:4px solid var(--claro);outline-offset:6px}
 
   <section class="chat" aria-label="WhatsApp del asistente">
     <div class="chat-head">
-      <div class="av"><img src="img/un-logo.png" alt=""></div>
-      <div><b>Asistente virtual · UN</b><span id="con">en línea</span></div>
+      <div class="av"><img class="cara" src="img/uni-cara.webp" alt=""></div>
+      <div><b>Uni · UN</b><span id="con">en línea</span></div>
       <div class="wa"><i></i>WhatsApp</div>
     </div>
     <div class="hint" id="hint"><b>El WhatsApp de su plantel</b><span>Aquí escriben el personal, las familias y los aspirantes.</span></div>
@@ -303,7 +304,7 @@ var R_ASP=row("🎓","Aspirante nuevo","Mañana 10:00 con Admisiones","Agendado"
 
 var scenes=[
  {k:"Antes de empezar",t:"Así se lee esta pantalla",con:"en línea",
-  say:"Hola. Somos MOON Digital. Preparamos este demo para que vean cómo se sentiría un día en su plantel. A un lado está el WhatsApp del asistente: ahí le escriben el personal, las familias y los aspirantes. Al otro lado está el panel de Rectoría: ahí se acomoda solo todo lo que le cuentan. El asistente solo sabe lo que le cuentan. No adivina nada. Vamos a ver un día normal, con datos de ejemplo.",
+  say:"Hola. Somos MOON Digital. Preparamos este demo para que vean cómo se sentiría un día en su plantel. A un lado está el WhatsApp de Yuni, el asistente: ahí le escriben el personal, las familias y los aspirantes. Al otro lado está el panel de Rectoría: ahí se acomoda solo todo lo que le cuentan. El asistente solo sabe lo que le cuentan. No adivina nada. Vamos a ver un día normal, con datos de ejemplo.",
   go:async function(){
    where("Aún vacío");
    view('<div class="empty"><p>Aquí se acomoda solo lo que le cuentan al asistente.<span>Lo ve solo quien ustedes decidan.</span></p><div class="trio"><div><i>'+IC.rep+'</i><span>Reportes</span></div><div><i>'+IC.cap+'</i><span>Interesados</span></div><div><i>'+IC.sum+'</i><span>Resumen</span></div></div></div>');
@@ -314,7 +315,7 @@ var scenes=[
    await sleep(6500);
    document.querySelector(".panel").classList.remove("glow");$("hint").classList.remove("on");
    await sleep(600);await typing(1000);
-   msg("in","Buenos días. Soy el asistente del plantel. Cuéntenme <b>reportes, solicitudes o dudas</b>, y yo lo acomodo.","8:00");
+   msg("in","Buenos días. Soy Uni, el asistente del plantel. Cuéntenme <b>reportes, solicitudes o dudas</b>, y yo lo acomodo.","8:00");
    await sleep(800);
  }},
  {k:"11:40 · Operaciones",t:"El conserje reporta una fuga",con:"con: Don Pepe, conserje",
