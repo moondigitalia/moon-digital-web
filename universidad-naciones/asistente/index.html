@@ -217,7 +217,7 @@ async function connect() {
       agentId: AGENT_ID, connectionType: 'websocket', textOnly: true,
       dynamicVariables: { modo: 'texto', nombre: userName || 'sin nombre' },
       overrides: Object.assign({ conversation: { textOnly: true } },
-        userName ? { agent: { firstMessage: '¡Qué onda de nuevo, ' + userName + '! ¿En qué te ayudo hoy?' } } : {}),
+        userName ? { agent: { firstMessage: 'Hey, ' + userName + ', ¿cómo estás? Qué gusto verte de nuevo. ¿En qué te ayudo hoy?' } } : {}),
       clientTools,
       onConnect: () => setEstado('● En línea'),
       onDisconnect: () => { const had = !!typingEl; typing(false); conv = null; connecting = null; gotFirst = false; setEstado('● En línea'); if (had) add('sys', fallback()); },
@@ -272,8 +272,8 @@ async function startVoice() {
       dynamicVariables: { modo: 'voz', nombre: userName || 'sin nombre' },
       clientTools,
       overrides: { agent: { firstMessage: userName
-        ? '¡Qué onda, ' + userName + '! Aquí Yuni. ¿En qué te ayudo?'
-        : '¡Qué onda! Soy Yuni, el lobo de la Universidad de las Naciones. ¿Cómo te llamas?' } },
+        ? 'Hey, ' + userName + ', ¿cómo estás? Soy Yuni. ¿En qué te ayudo?'
+        : 'Hey, ¿cómo estás? Soy Yuni, el lobo de la Universidad de las Naciones. ¿Cómo te llamas?' } },
       onConnect: () => {
         if (my !== voiceSeq) return;
         vState('listening', 'Te escucho…');
