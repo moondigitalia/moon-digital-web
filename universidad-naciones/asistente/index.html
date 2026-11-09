@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#1F3A8A">
+<meta property="og:title" content="Asistente virtual · Universidad de las Naciones">
+<meta property="og:description" content="Pregúntale sobre licenciaturas, becas y requisitos. Demo de MOON Digital.">
+<meta property="og:image" content="https://moondigitalia.com/universidad-naciones/img/compartir.png">
+<title>Asistente virtual · Universidad de las Naciones</title>
+<link rel="icon" href="../img/un-logo.png">
+<link rel="stylesheet" href="/fuentes/material/letras.css">
+<style>
+/* Demo del asistente de la Universidad de las Naciones (mismo motor que Mileni de Tercer Milenio, agente propio).
+   Agente: "Asistente UN · Universidad de las Naciones (demo)" en ElevenLabs, solo texto.
+   El registro de interesados NO se envía a ningún sistema: solo muestra cómo le llegaría a Admisiones.
+   El avatar se cambia en una sola línea (AVATAR, abajo) cuando llegue el logo del asistente. */
+:root{--azul:#24408E;--azul2:#1F3A8A;--hondo:#132660;--claro:#DCE5F7;--ink:#101828;--ink2:#26324A;--line:#D5DDEA;--soft:#EEF2F9;--ok:#13744B;--okbg:#DDF3E8}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:"DM Sans",system-ui,-apple-system,"Segoe UI",sans-serif;font-weight:600;color:var(--ink);background:var(--hondo);-webkit-font-smoothing:antialiased}
+.wrap{min-height:100%;height:100dvh;display:grid;grid-template-columns:minmax(0,1fr) minmax(380px,560px);gap:0}
+/* lado de la marca (computadora) */
+.marca{position:relative;overflow:hidden;background:radial-gradient(120% 90% at 20% 10%,#2E4FA6 0%,#24408E 45%,#132660 100%);color:#fff;display:flex;flex-direction:column;justify-content:center;padding:clamp(32px,6vw,96px)}
+.marca::before{content:"";position:absolute;width:780px;height:780px;border-radius:50%;right:-320px;top:-260px;border:2px solid rgba(255,255,255,.12)}
+.marca::after{content:"";position:absolute;width:420px;height:420px;border-radius:50%;left:-200px;bottom:-160px;border:2px solid rgba(255,255,255,.10)}
+.marca .logo{width:clamp(120px,12vw,190px);aspect-ratio:1;border-radius:50%;position:relative}
+.marca h1{font-size:clamp(36px,4vw,66px);font-weight:800;line-height:1.05;letter-spacing:-.02em;margin-top:28px;position:relative;max-width:12em}
+.marca h1 em{font-family:"Fraunces",Georgia,serif;font-style:italic;font-weight:600}
+.marca p{font-size:clamp(18px,1.4vw,24px);line-height:1.5;margin-top:18px;max-width:30em;position:relative}
+.marca .lema{margin-top:28px;font-size:clamp(15px,1vw,18px);letter-spacing:.24em;text-transform:uppercase;font-weight:800;color:var(--claro);position:relative}
+.marca .demo{position:absolute;left:clamp(32px,6vw,96px);bottom:28px;font-size:15px;color:#fff;opacity:.9;display:flex;align-items:center;gap:12px}
+.marca .demo img{height:26px}
+/* chat */
+.chat{display:flex;flex-direction:column;background:#F4F6FB;min-height:0;height:100dvh}
+.ch{display:flex;align-items:center;gap:14px;padding:16px 20px;background:var(--azul2);color:#fff;flex:none}
+.ch .av{width:52px;height:52px;border-radius:50%;flex:none;background:#fff;object-fit:cover}
+.ch b{display:block;font-size:19px;font-weight:800;line-height:1.15}
+.ch span{display:block;font-size:15px;color:#BFF0D0;font-weight:700}
+.msgs{flex:1;overflow-y:auto;padding:22px 18px 12px;display:flex;flex-direction:column;gap:12px;overscroll-behavior:contain}
+.msg{max-width:86%;padding:13px 17px;border-radius:22px;font-size:18px;line-height:1.5;white-space:pre-wrap;word-wrap:break-word;animation:pop .45s cubic-bezier(.34,1.45,.5,1) both}
+.msg.ai{align-self:flex-start;background:#fff;border-bottom-left-radius:8px;color:#101828;box-shadow:0 0 0 1px var(--line)}
+.msg.me{align-self:flex-end;background:var(--azul);color:#fff;border-bottom-right-radius:8px}
+.msg.sys{align-self:center;background:#FFF4D1;color:#5A4200;font-size:16px;text-align:center}
+.msg a{color:inherit;text-decoration:underline;text-underline-offset:3px}
+.msg.lead{align-self:stretch;max-width:none;background:#fff;border-radius:24px;box-shadow:0 0 0 2px #9FB3DE;white-space:normal;padding:16px 18px}
+.lead-h{display:flex;justify-content:space-between;gap:10px;align-items:center;font-size:17px}
+.lead-h b{color:var(--azul2)}
+.lead-lvl{font-size:14px;font-weight:800;border-radius:999px;padding:4px 12px;background:var(--okbg);color:var(--ok);white-space:nowrap}
+.lead dl{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin:12px 0;font-size:16px}
+.lead dt{color:var(--ink2);font-weight:700}
+.lead dd{font-weight:800}
+.lead-f{font-size:14px;color:var(--ink2);border-top:1px solid var(--line);padding-top:10px}
+@keyframes pop{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
+.typing{align-self:flex-start;background:#fff;border-radius:22px;padding:16px 20px;display:flex;gap:7px;box-shadow:0 0 0 1px var(--line)}
+.typing i{width:10px;height:10px;border-radius:50%;background:#5B6B8A;animation:dot 1s infinite ease-in-out}
+.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+@keyframes dot{0%,80%,100%{transform:translateY(0);opacity:.5}40%{transform:translateY(-6px);opacity:1}}
+.quick{display:flex;gap:10px;padding:0 18px 12px;flex-wrap:wrap;flex:none}
+.quick button{font-family:inherit;font-size:16px;font-weight:700;color:var(--azul2);background:#fff;border:2px solid #B9C7E6;border-radius:999px;padding:10px 16px;cursor:pointer;transition:background .25s,transform .25s}
+.quick button:hover{background:var(--soft)}
+.quick button:active{transform:scale(.96)}
+form{display:flex;gap:10px;padding:12px 16px calc(14px + env(safe-area-inset-bottom));background:#fff;border-top:1px solid var(--line);flex:none}
+input{flex:1;min-width:0;font-family:inherit;font-size:18px;font-weight:600;color:var(--ink);border:2px solid #C9D4EA;border-radius:999px;padding:14px 20px;outline:none;background:#fff}
+input:focus{border-color:var(--azul)}
+form button{width:56px;height:56px;border-radius:50%;border:0;background:var(--azul);color:#fff;display:grid;place-items:center;cursor:pointer;flex:none;transition:transform .25s}
+form button:active{transform:scale(.92)}
+.nota{font-size:13px;color:var(--ink2);text-align:center;padding:0 16px 10px;background:#fff}
+@media (max-width:900px){
+  .wrap{grid-template-columns:1fr}
+  .marca{display:none}
+  .msg{font-size:17px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="marca" aria-label="Universidad de las Naciones">
+    <img class="logo" src="../img/un-logo.png" alt="Universidad de las Naciones">
+    <h1>Pregúntale a tu <em>asistente</em> de la Universidad de las Naciones</h1>
+    <p>Licenciaturas, becas, requisitos e inscripciones, a cualquier hora. Cuando quieras, te conecta con un asesor de admisiones.</p>
+    <div class="lema">La universidad del talento</div>
+    <div class="demo"><img src="../img/moon-blanco.png" alt="MOON Digital"> Demo preparado por MOON Digital</div>
+  </section>
+
+  <section class="chat" aria-label="Chat con el asistente">
+    <div class="ch">
+      <img class="av" id="av" src="../img/un-logo.png" alt="">
+      <div><b>Asistente virtual · Universidad de las Naciones</b><span id="estado">● En línea</span></div>
+    </div>
+    <div class="msgs" id="msgs" aria-live="polite"></div>
+    <div class="quick" id="quick">
+      <button type="button" data-q="¿Qué licenciaturas tienen?">¿Qué licenciaturas tienen?</button>
+      <button type="button" data-q="¿Tienen becas?">¿Tienen becas?</button>
+      <button type="button" data-q="¿Qué necesito para inscribirme?">¿Qué necesito para inscribirme?</button>
+    </div>
+    <form id="f" autocomplete="off">
+      <label for="in" style="position:absolute;left:-9999px">Escribe tu pregunta</label>
+      <input id="in" placeholder="Escribe tu pregunta…" maxlength="500">
+      <button type="submit" aria-label="Enviar"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+    </form>
+    <div class="nota">Asistente virtual de demostración. Un asesor de admisiones confirma toda la información.</div>
+  </section>
+</div>
+
+<script type="module">
+const AGENT_ID = 'agent_1701m70rth64f888ydpqmmr2zvay';
+const AVATAR = '../img/un-logo.png';           // cambia aquí el avatar del asistente
+const TEL = '229 931 6707';
+const NOMBRE_ASIS = 'el asistente';
+document.getElementById('av').src = AVATAR;
+
+const $ = (s) => document.querySelector(s);
+const msgs = $('#msgs'), form = $('#f'), input = $('#in'), quick = $('#quick'), estado = $('#estado');
+let conv = null, connecting = null, typingEl = null, pending = [], gotFirst = false, sdk = null, userName = '';
+try { userName = localStorage.getItem('un_nombre') || ''; } catch (e) {}
+
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+function md(t) {
+  let h = esc(String(t).trim()).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/^\s*[-*]\s+/gm, '• ');
+  return h.replace(/(229\s?931\s?6707)/g, '<a href="tel:2299316707">$1</a>');
+}
+function add(role, html) { const d = document.createElement('div'); d.className = 'msg ' + role; d.innerHTML = html; msgs.appendChild(d); msgs.scrollTop = msgs.scrollHeight; return d; }
+function typing(on) {
+  if (on && !typingEl) { typingEl = document.createElement('div'); typingEl.className = 'typing'; typingEl.innerHTML = '<i></i><i></i><i></i>'; msgs.appendChild(typingEl); }
+  if (!on && typingEl) { typingEl.remove(); typingEl = null; }
+  msgs.scrollTop = msgs.scrollHeight;
+}
+function setEstado(t, ok = true) { estado.textContent = t; estado.style.color = ok ? '#BFF0D0' : '#FFE08A'; }
+async function loadSdk() {
+  if (sdk) return sdk;
+  for (const u of ['https://esm.sh/@elevenlabs/client@0', 'https://cdn.jsdelivr.net/npm/@elevenlabs/client@0/+esm']) {
+    try { sdk = await import(u); return sdk; } catch (e) {}
+  }
+  throw new Error('sin sdk');
+}
+const fallback = () => 'No pude conectarme en este momento. Puedes llamar a Admisiones al <a href="tel:2299316707">' + TEL + '</a> y con gusto te atienden.';
+
+function fmtTel(t) { const d = String(t || '').replace(/\D/g, '').slice(-10); return d.length === 10 ? d.slice(0, 3) + ' ' + d.slice(3, 6) + ' ' + d.slice(6) : t; }
+// Demo: el interesado NO se envía a ningún sistema. Solo se muestra cómo le llegaría a Admisiones.
+function registrarProspecto(p) {
+  p = p || {}; const tel = String(p.whatsapp || '').replace(/\D/g, '');
+  if (!p.nombre || tel.length < 10) return 'Faltan datos: pide el nombre y un WhatsApp de 10 dígitos antes de registrar.';
+  const folio = 'UN-' + Date.now().toString(36).slice(-5).toUpperCase();
+  const rows = [['Nombre', p.nombre], ['WhatsApp', fmtTel(tel)], ['Correo', p.email], ['Carrera', p.carrera], ['Notas', p.notas]].filter((r) => r[1]);
+  const lvl = { alto: 'Interés alto', medio: 'Interés medio', bajo: 'Explorando' }[p.interes];
+  add('lead', '<div class="lead-h"><b>Así le llegaría a Admisiones</b>' + (lvl ? '<span class="lead-lvl">' + lvl + '</span>' : '') + '</div>' +
+    '<dl>' + rows.map(([k, v]) => '<dt>' + k + '</dt><dd>' + esc(v) + '</dd>').join('') + '</dl>' +
+    '<div class="lead-f">Folio ' + folio + ' · Demo: en la versión real, su equipo recibe esta ficha al momento.</div>');
+  return 'Prospecto registrado con folio ' + folio + '. Confírmale a la persona que un asesor le escribirá por WhatsApp.';
+}
+function guardarNombre(p) {
+  const n = String((p && p.nombre) || '').trim().split(/\s+/)[0] || ''; if (!n) return 'No recibí el nombre.';
+  userName = n.charAt(0).toUpperCase() + n.slice(1); try { localStorage.setItem('un_nombre', userName); } catch (e) {}
+  return 'Nombre guardado: ' + userName + '. Salúdala por su nombre y continúa.';
+}
+const clientTools = { registrar_prospecto: registrarProspecto, guardar_nombre: guardarNombre };
+
+async function connect() {
+  if (conv) return conv; if (connecting) return connecting;
+  setEstado('● Conectando…', false); typing(true);
+  connecting = (async () => {
+    const { Conversation } = await loadSdk();
+    const c = await Conversation.startSession({
+      agentId: AGENT_ID, connectionType: 'websocket', textOnly: true,
+      dynamicVariables: { modo: 'texto', nombre: userName || 'sin nombre' },
+      overrides: Object.assign({ conversation: { textOnly: true } },
+        userName ? { agent: { firstMessage: '¡Hola de nuevo, ' + userName + '! ¿En qué te ayudo hoy?' } } : {}),
+      clientTools,
+      onConnect: () => setEstado('● En línea'),
+      onDisconnect: () => { const had = !!typingEl; typing(false); conv = null; connecting = null; gotFirst = false; setEstado('● En línea'); if (had) add('sys', fallback()); },
+      onMessage: ({ message, source }) => { if (source === 'user') return; typing(false); add('ai', md(message)); if (!gotFirst) { gotFirst = true; flush(); } },
+    });
+    conv = c;
+    setTimeout(() => { if (!gotFirst) { gotFirst = true; typing(false); flush(); } }, 4000);
+    return c;
+  })();
+  try { return await connecting; }
+  catch (e) { connecting = null; typing(false); setEstado('● Sin conexión', false); add('sys', fallback()); throw e; }
+}
+function flush() { while (pending.length) deliver(pending.shift()); }
+function deliver(q) { try { conv.sendUserMessage(q); typing(true); } catch (e) { typing(false); conv = null; add('sys', 'Se perdió la conexión. Intenta de nuevo, por favor.'); } }
+async function send(q) {
+  q = (q || '').trim(); if (!q) return;
+  add('me', esc(q)); quick.style.display = 'none';
+  if (conv && gotFirst) { deliver(q); return; }
+  pending.push(q); try { await connect(); } catch (e) { pending = []; }
+}
+form.addEventListener('submit', (e) => { e.preventDefault(); const q = input.value; input.value = ''; send(q); });
+quick.querySelectorAll('button').forEach((b) => b.addEventListener('click', () => send(b.dataset.q)));
+// El asistente saluda en cuanto se abre la página.
+connect().catch(() => {});
+window.__un = { send, state: () => ({ conectado: !!conv, mensajes: msgs.querySelectorAll('.msg.ai').length }) };
+</script>
+</body>
+</html>
