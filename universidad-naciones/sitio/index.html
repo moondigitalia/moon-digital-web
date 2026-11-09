@@ -24,7 +24,7 @@ img{display:block;max-width:100%}
 button{font-family:inherit;cursor:pointer}
 em.c{font-family:"Fraunces",Georgia,serif;font-style:italic;font-weight:600}
 /* isla dinámica: abierta arriba, cerrada al bajar, se abre al subir o al picarla */
-.top{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:30;display:flex;align-items:center;gap:8px;padding:7px;border-radius:999px;background:rgba(11,31,87,.82);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 14px 40px rgba(4,12,40,.35),inset 0 0 0 1px rgba(255,255,255,.14);max-width:calc(100vw - 24px);transition:padding .5s cubic-bezier(.2,.8,.2,1),box-shadow .5s,background .5s}
+.top{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:30;display:flex;align-items:center;gap:8px;padding:7px;border-radius:999px;background:var(--navy);box-shadow:0 0 0 3px #fff,0 18px 44px rgba(11,31,87,.35);max-width:calc(100vw - 24px);transition:padding .5s cubic-bezier(.2,.8,.2,1),box-shadow .5s,background .5s}
 .marca{display:flex;align-items:center;gap:12px;color:#fff;text-decoration:none;min-width:0;padding-right:10px}
 .marca img{width:44px;height:44px;border-radius:50%;background:#fff;flex:none}
 .marca b{font-size:17px;font-weight:800;line-height:1.1;white-space:nowrap}
@@ -35,26 +35,26 @@ em.c{font-family:"Fraunces",Georgia,serif;font-style:italic;font-weight:600}
 .top.cerrada{cursor:pointer;padding:6px}
 .top.cerrada .menu{max-width:0;opacity:0;transition:max-width .5s cubic-bezier(.2,.8,.2,1),opacity .2s ease}
 .top.cerrada .abrir{display:grid}
-.top.cerrada:hover{background:rgba(11,31,87,.92)}
+.top.cerrada:hover{background:#13307E}
 .pill{display:inline-flex;align-items:center;gap:10px;border:0;border-radius:999px;font-weight:800;text-decoration:none;white-space:nowrap;transition:transform .35s cubic-bezier(.34,1.45,.5,1),background .3s,box-shadow .3s}
 .pill:hover{transform:scale(1.04)}
 .pill:active{transform:scale(.97)}
 .pill.blanco{background:#fff;color:var(--navy);padding:10px 20px 10px 10px;font-size:16px}
 .pill.blanco i{width:34px;height:34px;border-radius:50%;background:var(--azul);color:#fff;display:grid;place-items:center;flex:none}
 /* portada: el video en su propio espacio y el texto abajo */
-.hero{position:relative;overflow:hidden;color:#fff;padding:100px clamp(16px,5vw,80px) clamp(40px,7vh,80px);background:radial-gradient(120% 90% at 85% 100%,#3B6BF0 0%,#1D46C2 38%,#0B1F57 78%)}
+.hero{position:relative;overflow:hidden;color:var(--navy);padding:100px clamp(16px,5vw,80px) clamp(90px,12vh,130px);background:radial-gradient(60% 50% at 100% 100%,rgba(255,210,94,.28) 0%,rgba(255,210,94,0) 70%),radial-gradient(55% 45% at 0% 0%,rgba(59,107,240,.16) 0%,rgba(59,107,240,0) 70%),var(--bg)}
 .hero .in{position:relative;width:100%;max-width:1400px;margin:0 auto}
-.marco{position:relative;border-radius:clamp(24px,3vw,40px);overflow:hidden;height:clamp(220px,min(52vh,46vw),640px);box-shadow:0 30px 70px rgba(4,12,40,.45)}
+.marco{position:relative;border-radius:clamp(24px,3vw,40px);overflow:hidden;height:clamp(220px,min(52vh,46vw),640px);box-shadow:0 30px 70px rgba(11,31,87,.22)}
 .marco video,.marco .foto{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.texto{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:clamp(20px,4vw,64px);align-items:end;margin-top:clamp(28px,5vh,56px)}
+.texto{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:clamp(20px,4vw,64px);align-items:start;margin-top:clamp(28px,5vh,56px)}
 .hero h1{font-size:clamp(42px,5.4vw,88px);font-weight:800;line-height:1.02;letter-spacing:-.03em;text-wrap:balance}
-.hero h1 em{color:var(--sol)}
-.hero .lead{font-size:clamp(19px,1.5vw,24px);line-height:1.5;margin-top:16px;max-width:32em;text-wrap:pretty}
+.hero h1 em{color:var(--azul)}
+.hero .lead{font-size:clamp(19px,1.5vw,24px);font-weight:700;color:var(--gray);line-height:1.5;margin-top:16px;max-width:32em;text-wrap:pretty}
 .datos{display:flex;flex-wrap:wrap;gap:10px}
-.datos span{border:2px solid rgba(255,255,255,.55);border-radius:999px;padding:9px 18px;font-size:17px;font-weight:700;white-space:nowrap}
+.datos span{color:var(--navy);background:#fff;border:2px solid var(--line);border-radius:999px;padding:9px 18px;font-size:17px;font-weight:700;white-space:nowrap}
 .acciones{display:flex;flex-wrap:wrap;gap:12px;margin-top:18px}
-.pill.sol{background:var(--sol);color:var(--navy);padding:16px 28px;font-size:18px}
-.pill.vidrio{background:rgba(255,255,255,.14);color:#fff;padding:8px 24px 8px 8px;font-size:18px;box-shadow:inset 0 0 0 2px rgba(255,255,255,.6)}
+.pill.sol{background:var(--sol);color:var(--navy);padding:16px 28px;font-size:18px;box-shadow:0 10px 24px rgba(242,183,49,.35)}
+.pill.vidrio{background:var(--navy);color:#fff;padding:8px 24px 8px 8px;font-size:18px}
 .pill.vidrio i{width:44px;height:44px;border-radius:50%;background:#fff;color:var(--navy);display:grid;place-items:center;flex:none}
 /* entrada: el escudo y el lema */
 .entrada{position:fixed;inset:0;z-index:100;display:grid;place-items:center;text-align:center;color:#fff;background:radial-gradient(120% 90% at 50% 110%,#3B6BF0 0%,#1D46C2 38%,#0B1F57 78%);clip-path:inset(0 0 0 0);transition:clip-path 1s cubic-bezier(.7,0,.2,1);padding:24px;cursor:pointer}
@@ -76,16 +76,16 @@ em.c{font-family:"Fraunces",Georgia,serif;font-style:italic;font-weight:600}
 .prueba .in{max-width:1400px;margin:0 auto}
 .eyebrow{font-size:16px;font-weight:800;letter-spacing:.28em;text-transform:uppercase;color:var(--azul)}
 .prueba h2{font-size:clamp(32px,3.6vw,56px);font-weight:800;color:var(--navy);letter-spacing:-.025em;line-height:1.06;margin-top:10px;text-wrap:balance}
-.tarjetas{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(16px,2vw,28px);margin-top:clamp(24px,4vh,44px)}
+.tarjetas{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:clamp(16px,2vw,28px);margin-top:clamp(24px,4vh,44px)}
 .tarjeta{position:relative;border:0;text-align:left;border-radius:36px;padding:28px 28px 0;min-height:400px;display:flex;flex-direction:column;overflow:hidden;color:#fff;transition:transform .45s cubic-bezier(.2,.7,.2,1),box-shadow .45s}
 .tarjeta:hover{transform:translateY(-6px);box-shadow:0 24px 50px rgba(11,31,87,.25)}
 .tarjeta.t1{background:radial-gradient(circle at 80% 90%,#3B6BF0 0%,#1D46C2 45%,#0B1F57 100%)}
 .tarjeta.t2{background:radial-gradient(circle at 80% 90%,#FFE08C 0%,#FFD25E 40%,#F2B731 100%);color:var(--navy)}
 .tarjeta.t3{background:#fff;color:var(--navy);box-shadow:inset 0 0 0 2px var(--line)}
-.tarjeta small{font-size:15px;font-weight:800;letter-spacing:.22em;text-transform:uppercase;opacity:.9}
+.tarjeta small{font-size:15px;font-weight:800;letter-spacing:.22em;text-transform:uppercase}
 .tarjeta b{display:block;font-size:clamp(26px,2.2vw,34px);font-weight:800;line-height:1.08;margin-top:8px;max-width:9em}
-.tarjeta p{font-size:18px;line-height:1.45;margin-top:10px;max-width:17em}
-.tarjeta .ir{margin-top:16px;display:inline-flex;align-items:center;gap:8px;font-weight:800;font-size:17px}
+.tarjeta p{font-size:18px;font-weight:700;line-height:1.45;margin-top:10px;max-width:17em}
+.tarjeta .ir{margin-top:16px;display:inline-flex;align-items:center;gap:8px;font-weight:800;font-size:18px}
 .tarjeta img{margin-top:auto;align-self:flex-end;height:220px;width:auto;margin-right:-6px;transition:transform .5s cubic-bezier(.34,1.45,.5,1)}
 .tarjeta:hover img{transform:translateY(-8px) rotate(-2deg)}
 /* pie */
@@ -96,7 +96,8 @@ footer .moon{display:flex;align-items:center;gap:10px;white-space:nowrap}
 footer .moon img{height:24px}
 /* Uni flotante */
 .burbuja{position:fixed;right:clamp(14px,2.4vw,32px);bottom:clamp(14px,2.4vw,32px);z-index:40;display:flex;align-items:center;gap:12px}
-.burbuja .dice{background:#fff;color:var(--navy);font-size:17px;font-weight:800;padding:12px 18px;border-radius:22px 22px 6px 22px;box-shadow:0 12px 30px rgba(11,31,87,.25);white-space:nowrap;animation:llega .8s cubic-bezier(.2,.8,.2,1) both 1.4s}
+.burbuja .dice{background:#fff;color:var(--navy);font-size:17px;font-weight:800;padding:12px 18px;border-radius:22px 22px 6px 22px;box-shadow:0 12px 30px rgba(11,31,87,.25);white-space:nowrap;opacity:0;transform:translateX(12px) scale(.96);transform-origin:right center;pointer-events:none;transition:opacity .4s ease,transform .5s cubic-bezier(.2,.8,.2,1)}
+.burbuja.habla .dice,.burbuja:hover .dice{opacity:1;transform:none}
 .burbuja button{width:78px;height:78px;border-radius:50%;border:4px solid #fff;background:var(--azul);padding:0;box-shadow:0 14px 34px rgba(11,31,87,.35);animation:flota 3.2s ease-in-out infinite;flex:none}
 .burbuja button img{width:100%;height:100%;border-radius:50%;object-fit:cover;background:#fff}
 @keyframes flota{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
@@ -229,7 +230,7 @@ form input:focus{border-color:var(--azul)}
   </div>
 </footer>
 
-<div class="burbuja espera" id="burbuja"><span class="dice">Hey, ¿te ayudo?</span><button type="button" data-uni aria-label="Platicar con Uni"><img src="img/uni-logo.webp" alt=""></button></div>
+<div class="burbuja" id="burbuja"><span class="dice">Hey, ¿te ayudo?</span><button type="button" data-uni aria-label="Platicar con Uni"><img src="img/uni-logo.webp" alt=""></button></div>
 
 <div class="chat" id="chat" aria-hidden="true"><button class="cerrar" type="button" id="cerrarChat" aria-label="Cerrar a Uni"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button></div>
 
@@ -260,20 +261,22 @@ form input:focus{border-color:var(--azul)}
   $('#lista').innerHTML=CARRERAS.map(function(c){return '<span>'+c+'</span>'}).join('');
 
   // entrada: escudo + lema, una vez por visita (un clic la salta)
-  var ent=$('#entrada'),visto=false;try{visto=sessionStorage.getItem('un_entrada')==='1'}catch(e){}
-  function sale(){if(ent.classList.contains('fuera'))return;ent.classList.add('fuera');document.documentElement.style.overflow='';try{sessionStorage.setItem('un_entrada','1')}catch(e){}setTimeout(function(){ent.style.display='none'},1100)}
+  var ent=$('#entrada'),visto=false;
+  function sale(){if(ent.classList.contains('fuera'))return;ent.classList.add('fuera');document.documentElement.style.overflow='';setTimeout(function(){ent.style.display='none'},1100)}
   if(visto||/[?&]sin-entrada/.test(location.search)){ent.style.display='none'}else{document.documentElement.style.overflow='hidden';setTimeout(sale,3400);ent.addEventListener('click',sale)}
-  // isla: abierta arriba, cerrada al bajar, abierta al subir o al picarla
-  var top=$('#top'),ultimo=scrollY,abiertaAMano=false;
-  function isla(){var y=scrollY,baja=y>ultimo+4,sube=y<ultimo-4;
-    if(y<60){top.classList.remove('cerrada');abiertaAMano=false}
-    else if(baja&&!abiertaAMano)top.classList.add('cerrada');
-    else if(sube){top.classList.remove('cerrada');abiertaAMano=false}
-    if(baja&&abiertaAMano&&Math.abs(y-ultimoAbierto)>220){top.classList.add('cerrada');abiertaAMano=false}
-    if(baja||sube)ultimo=y}
-  var ultimoAbierto=0;
-  addEventListener('scroll',isla,{passive:true});
-  top.addEventListener('click',function(e){if(top.classList.contains('cerrada')){e.preventDefault();e.stopPropagation();top.classList.remove('cerrada');abiertaAMano=true;ultimoAbierto=scrollY}},true);
+  // isla: abierta arriba; se cierra al bajar un buen tramo; se abre al subir un buen tramo o al picarla.
+  // Cuenta lo que se baja o sube seguido y espera entre cambios, para que no esté brincando.
+  var top=$('#top'),ultimo=scrollY,tramo=0,dir=0,quieta=0,pendiente=false;
+  function pon(cerrada){if(top.classList.contains('cerrada')===cerrada)return;top.classList.toggle('cerrada',cerrada);quieta=performance.now()+650;tramo=0}
+  function isla(){pendiente=false;var y=scrollY,d=y-ultimo;ultimo=y;
+    if(y<80){pon(false);return}
+    var nd=d>0?1:d<0?-1:0;if(nd&&nd!==dir){dir=nd;tramo=0}
+    tramo+=Math.abs(d);
+    if(performance.now()<quieta)return;
+    if(dir>0&&tramo>140)pon(true);
+    else if(dir<0&&tramo>90)pon(false)}
+  addEventListener('scroll',function(){if(!pendiente){pendiente=true;requestAnimationFrame(isla)}},{passive:true});
+  top.addEventListener('click',function(e){if(top.classList.contains('cerrada')){e.preventDefault();e.stopPropagation();pon(false)}},true);
   isla();
 
   // ventanas
@@ -344,9 +347,8 @@ form input:focus{border-color:var(--azul)}
   function cierraChat(){chat.classList.remove('on');chat.setAttribute('aria-hidden','true');burbuja.classList.remove('oculta')}
   document.addEventListener('click',function(e){var b=e.target.closest('[data-uni]');if(b){e.preventDefault();abreChat()}});
   $('#cerrarChat').addEventListener('click',cierraChat);
-  // la burbuja de Uni aparece cuando ya no se ven los botones de la portada (así no tapa nada)
-  var acc=document.querySelector('.hero .texto');
-  if('IntersectionObserver' in window){new IntersectionObserver(function(e){burbuja.classList.toggle('espera',e[0].isIntersecting)}).observe(acc)}else{burbuja.classList.remove('espera')}
+  // el "Hey, ¿te ayudo?" sale unos segundos después de la entrada y se guarda solo (Uni siempre queda abajo)
+  setTimeout(function(){burbuja.classList.add('habla');setTimeout(function(){burbuja.classList.remove('habla')},6000)},visto?1500:4200);
   if(location.hash==='#uni')abreChat();
 })();
 </script>
