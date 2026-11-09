@@ -5,17 +5,17 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="robots" content="noindex,nofollow">
 <meta name="theme-color" content="#1F3A8A">
-<meta property="og:title" content="Asistente virtual · Universidad de las Naciones">
+<meta property="og:title" content="Uni · Universidad de las Naciones">
 <meta property="og:description" content="Pregúntale sobre licenciaturas, becas y requisitos. Demo de MOON Digital.">
 <meta property="og:image" content="https://moondigitalia.com/universidad-naciones/img/compartir.png">
-<title>Asistente virtual · Universidad de las Naciones</title>
-<link rel="icon" href="../img/un-logo.png">
+<title>Uni · Universidad de las Naciones</title>
+<link rel="icon" href="../img/uni-cara.webp">
 <link rel="stylesheet" href="/fuentes/material/letras.css">
 <style>
 /* Demo del asistente de la Universidad de las Naciones (mismo motor que Mileni de Tercer Milenio, agente propio).
    Agente: "Asistente UN · Universidad de las Naciones (demo)" en ElevenLabs, solo texto.
    El registro de interesados NO se envía a ningún sistema: solo muestra cómo le llegaría a Admisiones.
-   El avatar se cambia en una sola línea (AVATAR, abajo) cuando llegue el logo del asistente. */
+   El avatar se cambia en una sola línea (AVATAR, abajo). Uni = lobo "moderno" (img/uni-cara.webp y img/uni-cuerpo.webp). */
 :root{--azul:#24408E;--azul2:#1F3A8A;--hondo:#132660;--claro:#DCE5F7;--ink:#101828;--ink2:#26324A;--line:#D5DDEA;--soft:#EEF2F9;--ok:#13744B;--okbg:#DDF3E8}
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
@@ -23,7 +23,10 @@ body{font-family:"DM Sans",system-ui,-apple-system,"Segoe UI",sans-serif;font-we
 .wrap{height:100dvh;display:grid;grid-template-columns:minmax(0,1fr) clamp(360px,40vw,560px);gap:0}
 /* lado de la marca (computadora) */
 .marca{position:relative;overflow:hidden;background:radial-gradient(120% 90% at 20% 10%,#2E4FA6 0%,#24408E 45%,#132660 100%);color:#fff;display:flex;flex-direction:column;padding:clamp(20px,5vh,96px) clamp(28px,8cqi,96px);container-type:inline-size;overflow:hidden;min-height:0}
-.marca>.cont{margin:auto 0;display:flex;flex-direction:column;position:relative}
+.marca>.cont{margin:auto 0;display:grid;grid-template-columns:minmax(0,1fr);align-items:center;gap:clamp(16px,4cqi,56px);position:relative}
+.marca .txt{display:flex;flex-direction:column;min-width:0}
+.marca .uni{display:none;width:min(36cqi,27vh);height:auto;filter:drop-shadow(0 18px 40px rgba(0,0,0,.25))}
+@container (min-width:460px){.marca>.cont{grid-template-columns:minmax(0,1fr) auto}.marca .uni{display:block}}
 .marca::before{content:"";position:absolute;width:780px;height:780px;border-radius:50%;right:-320px;top:-260px;border:2px solid rgba(255,255,255,.12)}
 .marca::after{content:"";position:absolute;width:420px;height:420px;border-radius:50%;left:-200px;bottom:-160px;border:2px solid rgba(255,255,255,.10)}
 .marca .logo{width:clamp(60px,min(22cqi,15vh),190px);aspect-ratio:1;border-radius:50%;position:relative}
@@ -111,24 +114,24 @@ form button:active{transform:scale(.92)}
 <body>
 <div class="wrap">
   <section class="marca" aria-label="Universidad de las Naciones">
-    <div class="cont">
+    <div class="cont"><div class="txt">
     <img class="logo" src="../img/un-logo.png" alt="Universidad de las Naciones">
-    <h1>Pregúntale a tu <em>asistente</em> de la Universidad de las Naciones</h1>
-    <p>Platica con él por voz o por escrito: licenciaturas, becas, requisitos e inscripciones, a cualquier hora.</p>
-    <button type="button" class="btn-voz" id="voz-grande"><span class="mic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></span>Háblale, te contesta con voz</button>
+    <h1>Conoce a <em>Uni,</em> el lobo de la Universidad de las Naciones</h1>
+    <p>Pregúntale por voz o por escrito: licenciaturas, becas, requisitos e inscripciones, a cualquier hora.</p>
+    <button type="button" class="btn-voz" id="voz-grande"><span class="mic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></span>Háblale a Uni</button>
     <div class="lema">La universidad del talento</div>
-    </div>
+    </div><img class="uni" src="../img/uni-cuerpo.webp" alt="Uni, el lobo de la Universidad de las Naciones" width="305" height="688"></div>
     <div class="demo"><img src="../img/moon-blanco.png" alt="MOON Digital"> Demo preparado por MOON Digital</div>
   </section>
 
-  <section class="chat" aria-label="Chat con el asistente">
+  <section class="chat" aria-label="Chat con Uni">
     <div class="ch">
-      <img class="av" id="av" src="../img/un-logo.png" alt="">
-      <div><b>Asistente virtual · Universidad de las Naciones</b><span id="estado">● En línea</span></div>
+      <img class="av" id="av" src="../img/uni-cara.webp" alt="Uni">
+      <div><b>Uni · Universidad de las Naciones</b><span id="estado">● En línea</span></div>
     </div>
     <div class="msgs" id="msgs" aria-live="polite"></div>
     <div class="quick" id="quick">
-      <button type="button" class="q-voz" data-voz="1"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>Háblale por voz</button>
+      <button type="button" class="q-voz" data-voz="1"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>Háblale a Uni</button>
       <button type="button" data-q="¿Qué licenciaturas tienen?">¿Qué licenciaturas tienen?</button>
       <button type="button" data-q="¿Tienen becas?">¿Tienen becas?</button>
       <button type="button" data-q="¿Qué necesito para inscribirme?">¿Qué necesito para inscribirme?</button>
@@ -140,7 +143,7 @@ form button:active{transform:scale(.92)}
       <button type="submit" aria-label="Enviar"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
     </form>
     <div class="voice" id="voice" hidden>
-      <div class="orb" id="orb"><span class="ring r3"></span><span class="ring r2"></span><span class="ring r1"></span><img id="av2" src="../img/un-logo.png" alt=""></div>
+      <div class="orb" id="orb"><span class="ring r3"></span><span class="ring r2"></span><span class="ring r1"></span><img id="av2" src="../img/uni-cara.webp" alt="Uni"></div>
       <p class="v-status" id="v-status" role="status">Conectando…</p>
       <div class="v-actions">
         <button type="button" class="v-mute" id="v-mute" aria-pressed="false">Silenciar</button>
@@ -148,15 +151,15 @@ form button:active{transform:scale(.92)}
       </div>
       <small class="v-time" id="v-time"></small>
     </div>
-    <div class="nota">Asistente virtual de demostración. Un asesor de admisiones confirma toda la información.</div>
+    <div class="nota">Uni es un asistente virtual de demostración. Un asesor de admisiones confirma toda la información.</div>
   </section>
 </div>
 
 <script type="module">
 const AGENT_ID = 'agent_1701m70rth64f888ydpqmmr2zvay';
-const AVATAR = '../img/un-logo.png';           // cambia aquí el avatar del asistente
+const AVATAR = '../img/uni-cara.webp';           // cambia aquí el avatar del asistente
 const TEL = '229 931 6707';
-const NOMBRE_ASIS = 'el asistente';
+const NOMBRE_ASIS = 'Uni';
 document.getElementById('av').src = AVATAR; document.getElementById('av2').src = AVATAR;
 
 const $ = (s) => document.querySelector(s);
@@ -214,7 +217,7 @@ async function connect() {
       agentId: AGENT_ID, connectionType: 'websocket', textOnly: true,
       dynamicVariables: { modo: 'texto', nombre: userName || 'sin nombre' },
       overrides: Object.assign({ conversation: { textOnly: true } },
-        userName ? { agent: { firstMessage: '¡Hola de nuevo, ' + userName + '! ¿En qué te ayudo hoy?' } } : {}),
+        userName ? { agent: { firstMessage: '¡Qué onda de nuevo, ' + userName + '! ¿En qué te ayudo hoy?' } } : {}),
       clientTools,
       onConnect: () => setEstado('● En línea'),
       onDisconnect: () => { const had = !!typingEl; typing(false); conv = null; connecting = null; gotFirst = false; setEstado('● En línea'); if (had) add('sys', fallback()); },
@@ -269,8 +272,8 @@ async function startVoice() {
       dynamicVariables: { modo: 'voz', nombre: userName || 'sin nombre' },
       clientTools,
       overrides: { agent: { firstMessage: userName
-        ? '¡Hola, ' + userName + '! Qué gusto escucharte. ¿En qué te ayudo?'
-        : '¡Hola! Soy el asistente virtual de la Universidad de las Naciones. ¿Cómo te llamas?' } },
+        ? '¡Qué onda, ' + userName + '! Aquí Yuni. ¿En qué te ayudo?'
+        : '¡Qué onda! Soy Yuni, el lobo de la Universidad de las Naciones. ¿Cómo te llamas?' } },
       onConnect: () => {
         if (my !== voiceSeq) return;
         vState('listening', 'Te escucho…');
@@ -283,8 +286,8 @@ async function startVoice() {
       },
       onDisconnect: (d) => { if (my !== voiceSeq || !voiceConv) return; const byAgent = d && d.reason === 'agent'; voiceConv = null; stopVoice(byAgent ? 'Llamada terminada. Puedes seguir escribiendo aquí o volver a llamar cuando quieras.' : undefined); },
       onError: (m) => console.warn('[UN voz]', m),
-      onModeChange: ({ mode }) => { if (my !== voiceSeq) return; vMode = mode; if (!voiceConv) return; mode === 'speaking' ? vState('speaking', 'Te está contestando…') : vState('listening', muted ? 'Micrófono silenciado' : 'Te escucho…'); },
-      onMessage: ({ message, source }) => { if (!message || my !== voiceSeq) return; add(source === 'user' ? 'me' : 'ai', source === 'user' ? esc(message) : md(message)); quick.style.display = 'none'; },
+      onModeChange: ({ mode }) => { if (my !== voiceSeq) return; vMode = mode; if (!voiceConv) return; mode === 'speaking' ? vState('speaking', 'Uni te está contestando…') : vState('listening', muted ? 'Micrófono silenciado' : 'Te escucho…'); },
+      onMessage: ({ message, source }) => { if (!message || my !== voiceSeq) return; add(source === 'user' ? 'me' : 'ai', source === 'user' ? esc(message) : md(message.replace(/\bYuni\b/g, 'Uni'))); quick.style.display = 'none'; },
     });
     if (!voiceStarting || my !== voiceSeq) { try { await c.endSession(); } catch (e) {} return; }
     voiceConv = c;
