@@ -116,7 +116,7 @@ em.c{font-family:var(--c);font-style:italic;font-weight:600;letter-spacing:-.01e
 
 /* 4 · un día */
 .dia{background:var(--bg)}
-.dia .grid{display:grid;grid-template-columns:1.25fr .85fr;gap:clamp(24px,4vw,90px);align-items:center}
+.dia .grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(340px,.85fr);gap:clamp(24px,4vw,90px);align-items:center}
 .linea{margin-top:clamp(20px,3vh,38px);position:relative}
 .linea:before{content:"";position:absolute;left:clamp(44px,3.3vw,60px);top:24px;bottom:30px;width:2px;background:var(--line)}
 .mom{display:flex;gap:clamp(14px,1.5vw,28px);align-items:flex-start;margin-bottom:clamp(10px,1.5vh,18px);position:relative}
@@ -137,7 +137,7 @@ em.c{font-family:var(--c);font-style:italic;font-weight:600;letter-spacing:-.01e
 .bub ul{list-style:none;margin:8px 0}
 .bub li{padding:3px 0 3px 26px;position:relative}
 .bub li i{position:absolute;left:0;top:3px;font-style:normal}
-.bub .tm{display:block;text-align:right;font-size:12px;color:#2A3448;margin-top:4px}
+.bub .tm{display:block;text-align:right;font-size:13px;color:#2A3448;margin-top:4px}
 .bub.yo{background:#D9F2E3;border-radius:20px;border-top-right-radius:6px;margin:12px 0 0 22%;padding:12px 18px}
 .bub.otra{margin-top:12px}
 .ejemplo{text-align:center;font-size:14px;font-weight:600;color:#2A3448;margin-top:12px;width:min(100%,440px);margin-left:auto}
@@ -199,6 +199,12 @@ em.c{font-family:var(--c);font-style:italic;font-weight:600;letter-spacing:-.01e
   .dots{display:none}
   .hint{display:none}
   .fin .disc{left:-80vw;bottom:-30vh;width:160vw}
+}
+@media (max-width:520px){
+  .obras{grid-template-columns:1fr}
+  .obra .tel{width:min(100%,260px)}
+  .vd-extra{display:none}
+  .verdemo{white-space:nowrap;gap:10px;padding-left:20px;padding-right:22px}
 }
 @media (max-width:440px){
   .cover h1{font-size:36px}
@@ -345,7 +351,7 @@ em.c{font-family:var(--c);font-style:italic;font-weight:600;letter-spacing:-.01e
         <div class="mom"><div class="h">22:45</div><div><span class="tag">Admisiones</span><b>Un aspirante pide información para entrar</b><p>Recibe respuesta al momento y queda agendado con un asesor para el día siguiente a las 10:00.</p></div></div>
         <div class="mom"><div class="h">7:00</div><div><span class="tag">Rectoría · al día siguiente</span><b>Llega el resumen de todo lo anterior</b><p>Solo lo que el personal y los aspirantes le contaron al asistente. Nada se adivina.</p></div></div>
       </div>
-      <button class="verdemo" type="button" id="abrirDemo"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12-7.5z" fill="#fff"/></svg>Ver el demo de este día · 3 min, con voz</button>
+      <button class="verdemo" type="button" id="abrirDemo"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12-7.5z" fill="#fff"/></svg>Ver el demo de este día<span class="vd-extra"> · 3 min, con voz</span></button>
     </div>
     <div>
       <div class="cel"><div class="scr">
