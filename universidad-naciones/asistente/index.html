@@ -9,7 +9,7 @@
 <meta property="og:description" content="Pregúntale sobre licenciaturas, becas y requisitos. Demo de MOON Digital.">
 <meta property="og:image" content="https://moondigitalia.com/universidad-naciones/img/compartir.png">
 <title>Uni · Universidad de las Naciones</title>
-<link rel="icon" href="../img/uni-cara.webp">
+<link rel="icon" href="../sitio/img/uni-logo.webp">
 <link rel="stylesheet" href="/fuentes/material/letras.css">
 <style>
 /* Demo del asistente de la Universidad de las Naciones (mismo motor que Mileni de Tercer Milenio, agente propio).
@@ -39,6 +39,7 @@ body{font-family:"DM Sans",system-ui,-apple-system,"Segoe UI",sans-serif;font-we
 /* chat */
 .chat{display:flex;flex-direction:column;background:#F4F6FB;min-height:0;height:100dvh}
 .ch{display:flex;align-items:center;gap:14px;padding:16px 20px;background:var(--azul2);color:#fff;flex:none}
+.embed .ch,.embed .ch[class]{padding-right:68px!important}
 .ch .av{width:52px;height:52px;border-radius:50%;flex:none;background:#fff;object-fit:cover}
 .ch>div{min-width:0}
 .ch b{display:block;font-size:clamp(17px,1.3vw,19px);text-wrap:balance;font-weight:800;line-height:1.15}
@@ -120,13 +121,13 @@ form button:active{transform:scale(.92)}
     <p>Pregúntale por voz o por escrito: licenciaturas, becas, requisitos e inscripciones, a cualquier hora.</p>
     <button type="button" class="btn-voz" id="voz-grande"><span class="mic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></span>Háblale a Uni</button>
     <div class="lema">La universidad del talento</div>
-    </div><img class="uni" src="../img/uni-cuerpo.webp" alt="Uni, el lobo de la Universidad de las Naciones" width="305" height="688"></div>
+    </div><img class="uni" src="../sitio/img/uni-hola.webp" alt="Uni, el lobo de la Universidad de las Naciones" width="314" height="556"></div>
     <div class="demo"><img src="../img/moon-blanco.png" alt="MOON Digital"> Demo preparado por MOON Digital</div>
   </section>
 
   <section class="chat" aria-label="Chat con Uni">
     <div class="ch">
-      <img class="av" id="av" src="../img/uni-cara.webp" alt="Uni">
+      <img class="av" id="av" src="../sitio/img/uni-logo.webp" alt="Uni">
       <div><b>Uni · Universidad de las Naciones</b><span id="estado">● En línea</span></div>
     </div>
     <div class="msgs" id="msgs" aria-live="polite"></div>
@@ -143,7 +144,7 @@ form button:active{transform:scale(.92)}
       <button type="submit" aria-label="Enviar"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
     </form>
     <div class="voice" id="voice" hidden>
-      <div class="orb" id="orb"><span class="ring r3"></span><span class="ring r2"></span><span class="ring r1"></span><img id="av2" src="../img/uni-cara.webp" alt="Uni"></div>
+      <div class="orb" id="orb"><span class="ring r3"></span><span class="ring r2"></span><span class="ring r1"></span><img id="av2" src="../sitio/img/uni-logo.webp" alt="Uni"></div>
       <p class="v-status" id="v-status" role="status">Conectando…</p>
       <div class="v-actions">
         <button type="button" class="v-mute" id="v-mute" aria-pressed="false">Silenciar</button>
@@ -155,9 +156,10 @@ form button:active{transform:scale(.92)}
   </section>
 </div>
 
+<script>if(/[?&]embed=1/.test(location.search))document.documentElement.classList.add('embed')</script>
 <script type="module">
 const AGENT_ID = 'agent_1701m70rth64f888ydpqmmr2zvay';
-const AVATAR = '../img/uni-cara.webp';           // cambia aquí el avatar del asistente
+const AVATAR = '../sitio/img/uni-logo.webp';           // cambia aquí el avatar del asistente
 const TEL = '229 931 6707';
 const NOMBRE_ASIS = 'Uni';
 document.getElementById('av').src = AVATAR; document.getElementById('av2').src = AVATAR;
