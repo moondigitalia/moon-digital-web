@@ -169,7 +169,7 @@ try { userName = localStorage.getItem('un_nombre') || ''; } catch (e) {}
 
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 function md(t) {
-  let h = esc(String(t).trim()).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/^\s*[-*]\s+/gm, '• ');
+  let h = esc(String(t).trim().replace(/\bYuni\b/g, 'Uni')).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/^\s*[-*]\s+/gm, '• ');
   return h.replace(/(229\s?931\s?6707)/g, '<a href="tel:2299316707">$1</a>');
 }
 function add(role, html) { const d = document.createElement('div'); d.className = 'msg ' + role; d.innerHTML = html; msgs.appendChild(d); msgs.scrollTop = msgs.scrollHeight; return d; }
