@@ -36,6 +36,7 @@ body{font-family:"DM Sans",system-ui,-apple-system,"Segoe UI",sans-serif;font-we
 .chat{display:flex;flex-direction:column;background:#F4F6FB;min-height:0;height:100dvh}
 .ch{display:flex;align-items:center;gap:14px;padding:16px 20px;background:var(--azul2);color:#fff;flex:none}
 .ch .av{width:52px;height:52px;border-radius:50%;flex:none;background:#fff;object-fit:cover}
+.ch>div{min-width:0}
 .ch b{display:block;font-size:19px;font-weight:800;line-height:1.15}
 .ch span{display:block;font-size:15px;color:#BFF0D0;font-weight:700}
 .msgs{flex:1;overflow-y:auto;padding:22px 18px 12px;display:flex;flex-direction:column;gap:12px;overscroll-behavior:contain}
@@ -67,8 +68,39 @@ input:focus{border-color:var(--azul)}
 form button{width:56px;height:56px;border-radius:50%;border:0;background:var(--azul);color:#fff;display:grid;place-items:center;cursor:pointer;flex:none;transition:transform .25s}
 form button:active{transform:scale(.92)}
 .nota{font-size:13px;color:var(--ink2);text-align:center;padding:0 16px 10px;background:#fff}
+/* voz */
+.btn-voz{display:inline-flex;align-items:center;gap:14px;margin-top:34px;position:relative;font-family:inherit;font-size:21px;font-weight:800;color:var(--hondo);background:#fff;border:0;border-radius:999px;padding:14px 30px 14px 14px;cursor:pointer;box-shadow:0 0 0 8px rgba(255,255,255,.14);transition:transform .3s cubic-bezier(.34,1.45,.5,1),box-shadow .3s;align-self:flex-start}
+.btn-voz:hover{transform:scale(1.03);box-shadow:0 0 0 12px rgba(255,255,255,.18)}
+.btn-voz .mic{width:52px;height:52px;border-radius:50%;background:var(--azul);color:#fff;display:grid;place-items:center;animation:latido 2.4s ease-in-out infinite}
+@keyframes latido{0%,100%{box-shadow:0 0 0 0 rgba(36,64,142,.45)}50%{box-shadow:0 0 0 10px rgba(36,64,142,0)}}
+.quick .q-voz{background:var(--azul);color:#fff;border-color:var(--azul);display:none;align-items:center;gap:8px}
+.quick .q-voz:hover{background:var(--azul2)}
+#mic{background:#fff;color:var(--azul);border:2px solid var(--azul)}
+.chat.in-voice .msgs,.chat.in-voice .quick,.chat.in-voice form{display:none}
+.voice{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px 22px;background:#F4F6FB;text-align:center;min-height:0}
+.voice[hidden]{display:none}
+.orb{--lvl:0;position:relative;width:260px;height:260px;display:grid;place-items:center;margin-bottom:10px;animation:breathe 4.2s ease-in-out infinite}
+.orb img{position:relative;z-index:2;width:128px;height:128px;border-radius:50%;background:#fff;object-fit:cover;border:4px solid #fff;box-shadow:0 0 0 3px var(--azul2)}
+.orb .ring{position:absolute;left:50%;top:50%;width:128px;height:128px;margin:-64px 0 0 -64px;border-radius:50%;background:var(--azul);transition:transform .14s ease-out,opacity .3s}
+.orb .r1{opacity:.6;transform:scale(calc(1.16 + var(--lvl) * .32));box-shadow:0 0 40px 10px rgba(36,64,142,.45)}
+.orb .r2{opacity:.3;transform:scale(calc(1.42 + var(--lvl) * .55))}
+.orb .r3{opacity:.13;transform:scale(calc(1.72 + var(--lvl) * .8))}
+.voice.connecting .orb{animation-duration:1.3s}
+.voice.connecting .orb .ring{opacity:.08}
+.voice.speaking .orb{animation-duration:2.6s}
+@keyframes breathe{0%,100%{transform:scale(.95)}50%{transform:scale(1.05)}}
+.v-status{font-size:22px;font-weight:800;color:var(--azul2)}
+.v-actions{display:flex;gap:12px}
+.v-actions button{font-family:inherit;height:50px;padding:0 24px;border-radius:999px;font-size:17px;font-weight:800;border:2px solid var(--azul2);cursor:pointer}
+.v-mute{background:#fff;color:var(--azul2)}
+.v-mute[aria-pressed="true"]{background:var(--soft)}
+.v-end{background:#C8322B;border-color:#C8322B!important;color:#fff}
+.v-time{font-size:15px;color:var(--ink2);font-weight:700}
+@media (prefers-reduced-motion:reduce){.orb,.btn-voz .mic{animation:none}}
 @media (max-width:900px){
-  .wrap{grid-template-columns:1fr}
+  .quick .q-voz{display:inline-flex}
+  .wrap{grid-template-columns:minmax(0,1fr)}
+  .chat{min-width:0}
   .marca{display:none}
   .msg{font-size:17px}
 }
@@ -79,7 +111,8 @@ form button:active{transform:scale(.92)}
   <section class="marca" aria-label="Universidad de las Naciones">
     <img class="logo" src="../img/un-logo.png" alt="Universidad de las Naciones">
     <h1>Pregúntale a tu <em>asistente</em> de la Universidad de las Naciones</h1>
-    <p>Licenciaturas, becas, requisitos e inscripciones, a cualquier hora. Cuando quieras, te conecta con un asesor de admisiones.</p>
+    <p>Platica con él por voz o por escrito: licenciaturas, becas, requisitos e inscripciones, a cualquier hora.</p>
+    <button type="button" class="btn-voz" id="voz-grande"><span class="mic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></span>Háblale, te contesta con voz</button>
     <div class="lema">La universidad del talento</div>
     <div class="demo"><img src="../img/moon-blanco.png" alt="MOON Digital"> Demo preparado por MOON Digital</div>
   </section>
@@ -91,6 +124,7 @@ form button:active{transform:scale(.92)}
     </div>
     <div class="msgs" id="msgs" aria-live="polite"></div>
     <div class="quick" id="quick">
+      <button type="button" class="q-voz" data-voz="1"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>Háblale por voz</button>
       <button type="button" data-q="¿Qué licenciaturas tienen?">¿Qué licenciaturas tienen?</button>
       <button type="button" data-q="¿Tienen becas?">¿Tienen becas?</button>
       <button type="button" data-q="¿Qué necesito para inscribirme?">¿Qué necesito para inscribirme?</button>
@@ -98,8 +132,18 @@ form button:active{transform:scale(.92)}
     <form id="f" autocomplete="off">
       <label for="in" style="position:absolute;left:-9999px">Escribe tu pregunta</label>
       <input id="in" placeholder="Escribe tu pregunta…" maxlength="500">
+      <button type="button" id="mic" aria-label="Hablar por voz"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
       <button type="submit" aria-label="Enviar"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
     </form>
+    <div class="voice" id="voice" hidden>
+      <div class="orb" id="orb"><span class="ring r3"></span><span class="ring r2"></span><span class="ring r1"></span><img id="av2" src="../img/un-logo.png" alt=""></div>
+      <p class="v-status" id="v-status" role="status">Conectando…</p>
+      <div class="v-actions">
+        <button type="button" class="v-mute" id="v-mute" aria-pressed="false">Silenciar</button>
+        <button type="button" class="v-end" id="v-end">Terminar</button>
+      </div>
+      <small class="v-time" id="v-time"></small>
+    </div>
     <div class="nota">Asistente virtual de demostración. Un asesor de admisiones confirma toda la información.</div>
   </section>
 </div>
@@ -109,7 +153,7 @@ const AGENT_ID = 'agent_1701m70rth64f888ydpqmmr2zvay';
 const AVATAR = '../img/un-logo.png';           // cambia aquí el avatar del asistente
 const TEL = '229 931 6707';
 const NOMBRE_ASIS = 'el asistente';
-document.getElementById('av').src = AVATAR;
+document.getElementById('av').src = AVATAR; document.getElementById('av2').src = AVATAR;
 
 const $ = (s) => document.querySelector(s);
 const msgs = $('#msgs'), form = $('#f'), input = $('#in'), quick = $('#quick'), estado = $('#estado');
@@ -188,10 +232,81 @@ async function send(q) {
   pending.push(q); try { await connect(); } catch (e) { pending = []; }
 }
 form.addEventListener('submit', (e) => { e.preventDefault(); const q = input.value; input.value = ''; send(q); });
-quick.querySelectorAll('button').forEach((b) => b.addEventListener('click', () => send(b.dataset.q)));
+quick.querySelectorAll('button[data-q]').forEach((b) => b.addEventListener('click', () => send(b.dataset.q)));
 // El asistente saluda en cuanto se abre la página.
 connect().catch(() => {});
-window.__un = { send, state: () => ({ conectado: !!conv, mensajes: msgs.querySelectorAll('.msg.ai').length }) };
+// ───────── Voz ─────────
+// Sesión WebRTC aparte de la de texto. El halo crece con el volumen de la voz. Límite 3 min (demo).
+const VOICE_MAX = 180, chat = $('.chat'), voice = $('#voice'), orb = $('#orb'), vStatus = $('#v-status'), vTime = $('#v-time'), vMute = $('#v-mute');
+let voiceSeq = 0, voiceEnding = null, voiceConv = null, voiceStarting = false, vMode = 'listening', raf = 0, lvl = 0, vTimer = 0, vLeft = 0, muted = false;
+function vState(cls, t) { voice.className = 'voice ' + cls; vStatus.textContent = t; }
+function loop() {
+  let target = 0;
+  if (voiceConv) { try { target = vMode === 'speaking' ? voiceConv.getOutputVolume() * 1.6 : (muted ? 0 : voiceConv.getInputVolume() * 1.1); } catch (e) {} }
+  target = Math.min(1, target || 0); lvl += (target - lvl) * (target > lvl ? 0.35 : 0.12);
+  orb.style.setProperty('--lvl', lvl.toFixed(3)); raf = requestAnimationFrame(loop);
+}
+const fmt = (s) => Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+async function startVoice() {
+  if (voiceConv || voiceStarting) return;
+  voiceStarting = true; const my = ++voiceSeq;
+  if (voiceEnding) { try { await voiceEnding; } catch (e) {} voiceEnding = null; }
+  typing(false); pending = [];
+  if (conv) { const c = conv; conv = null; connecting = null; gotFirst = false; try { await c.endSession(); } catch (e) {} }
+  chat.classList.add('in-voice'); voice.hidden = false;
+  muted = false; vMute.setAttribute('aria-pressed', 'false'); vMute.textContent = 'Silenciar'; vTime.textContent = '';
+  vState('connecting', 'Conectando…'); setEstado('● Llamada de voz');
+  cancelAnimationFrame(raf); raf = requestAnimationFrame(loop);
+  try {
+    const { Conversation } = await loadSdk();
+    if (!voiceStarting || my !== voiceSeq) return;
+    const c = await Conversation.startSession({
+      agentId: AGENT_ID, connectionType: 'webrtc',
+      dynamicVariables: { modo: 'voz', nombre: userName || 'sin nombre' },
+      clientTools,
+      overrides: { agent: { firstMessage: userName
+        ? '¡Hola, ' + userName + '! Qué gusto escucharte. ¿En qué te ayudo?'
+        : '¡Hola! Soy el asistente virtual de la Universidad de las Naciones. ¿Cómo te llamas?' } },
+      onConnect: () => {
+        if (my !== voiceSeq) return;
+        vState('listening', 'Te escucho…');
+        vLeft = VOICE_MAX; vTime.textContent = 'Tiempo restante ' + fmt(vLeft); clearInterval(vTimer);
+        vTimer = setInterval(() => {
+          vLeft--; vTime.textContent = vLeft > 0 ? 'Tiempo restante ' + fmt(vLeft) : 'Despidiéndose…';
+          if (vLeft === 15 && voiceConv) { try { voiceConv.sendContextualUpdate('Aviso del sistema: se terminó el tiempo de la llamada. Despídete ahora en una sola frase, dile que puede seguir escribiendo en el chat o volver a llamar, y usa end_call.'); } catch (e) {} }
+          if (vLeft <= -15) stopVoice('Las llamadas de voz de esta demostración duran hasta 3 minutos. Puedes seguir escribiendo o volver a llamar.');
+        }, 1000);
+      },
+      onDisconnect: (d) => { if (my !== voiceSeq || !voiceConv) return; const byAgent = d && d.reason === 'agent'; voiceConv = null; stopVoice(byAgent ? 'Llamada terminada. Puedes seguir escribiendo aquí o volver a llamar cuando quieras.' : undefined); },
+      onError: (m) => console.warn('[UN voz]', m),
+      onModeChange: ({ mode }) => { if (my !== voiceSeq) return; vMode = mode; if (!voiceConv) return; mode === 'speaking' ? vState('speaking', 'Te está contestando…') : vState('listening', muted ? 'Micrófono silenciado' : 'Te escucho…'); },
+      onMessage: ({ message, source }) => { if (!message || my !== voiceSeq) return; add(source === 'user' ? 'me' : 'ai', source === 'user' ? esc(message) : md(message)); quick.style.display = 'none'; },
+    });
+    if (!voiceStarting || my !== voiceSeq) { try { await c.endSession(); } catch (e) {} return; }
+    voiceConv = c;
+  } catch (e) {
+    console.error('[UN voz]', e); if (my !== voiceSeq) return;
+    const denied = e && (e.name === 'NotAllowedError' || /permission|denied/i.test(e.message || ''));
+    stopVoice(denied ? 'Para platicar por voz, permite el micrófono en tu navegador. También puedes escribir aquí abajo.' : 'No pude iniciar la llamada de voz. Puedes escribir aquí abajo o llamar a Admisiones al <a href="tel:2299316707">' + TEL + '</a>.');
+  } finally { if (my === voiceSeq) voiceStarting = false; }
+}
+function stopVoice(note) {
+  const c = voiceConv; voiceConv = null; voiceStarting = false; voiceSeq++;
+  clearInterval(vTimer); cancelAnimationFrame(raf); lvl = 0; orb.style.setProperty('--lvl', 0);
+  if (c) voiceEnding = Promise.resolve().then(() => c.endSession()).catch(() => {});
+  chat.classList.remove('in-voice'); voice.hidden = true; setEstado('● En línea');
+  add('sys', note || 'Llamada terminada. Puedes seguir escribiendo aquí o volver a llamar.');
+}
+$('#mic').addEventListener('click', startVoice);
+$('#voz-grande').addEventListener('click', startVoice);
+quick.querySelector('[data-voz]').addEventListener('click', startVoice);
+$('#v-end').addEventListener('click', () => stopVoice());
+vMute.addEventListener('click', () => {
+  if (!voiceConv) return; muted = !muted; try { voiceConv.setMicMuted(muted); } catch (e) {}
+  vMute.setAttribute('aria-pressed', String(muted)); vMute.textContent = muted ? 'Activar micrófono' : 'Silenciar';
+  if (vMode !== 'speaking') vState('listening', muted ? 'Micrófono silenciado' : 'Te escucho…');
+});
+window.__un = { send, startVoice, stopVoice, state: () => ({ conectado: !!conv, mensajes: msgs.querySelectorAll('.msg.ai').length }) };
 </script>
 </body>
 </html>
