@@ -7,89 +7,114 @@
 <meta name="theme-color" content="#16161a">
 <title>Oficina MOON</title>
 <style>
-/* PASO 1 (sistemas): todo funciona con datos reales. La piel 3D va encima después sin tocar esto. */
+/* OFICINA MOON — paso 1 (sistemas). La piel 3D se pone encima después sin tocar esto.
+   REGLAS (las mide el juez de la oficina en todas las pantallas):
+   1. Nada se mueve con el teclado: la página mide lo que mide la pantalla, nunca lo que deja el teclado.
+   2. Ningún texto se tapa ni se corta: en el mapa cada texto vive dentro de su cuarto y se acomoda solo (crece con
+      el zoom: para leer de cerca, se acerca); en el panel, el texto se parte en renglones, nunca se sale.
+   3. Nítido en cualquier zoom: el mapa se vuelve a dibujar a su tamaño real al soltar los dedos.
+   4. El mapa es para mirar (mapa + información); lo que es para trabajar (CRM, Librería) usa la pantalla completa.
+      Las alertas solo viven en el mapa.
+   5. Un toque, una acción.
+   6. Nada aparece de golpe: cada vista entra ya lista, con un fundido corto. */
 :root{
-  --fondo:#16161a; --piso:#212127; --cuarto:#2a2a31; --linea:#3a3a43; --tinta:#f1f0ec; --suave:#a9a8b0;
-  --verde:#3ccf7a; --amarillo:#f2c230; --rojo:#ef4b4b; --naranja:#ff7a1a;
-  --alto:100vh;
+  --fondo:#16161a; --piso:#1f1f25; --cuarto:#2b2b33; --linea:#3a3a43; --tinta:#f3f2ee; --suave:#b4b3bb;
+  --verde:#3ccf7a; --amarillo:#f2c230; --rojo:#ef4b4b; --naranja:#ff7a1a; --azul:#8fb6ff;
+  --alto:100vh; --t:160ms;
 }
 [hidden]{display:none!important}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;overflow:hidden;background:var(--fondo);color:var(--tinta);
-  font:600 16px/1.35 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overscroll-behavior:none}
-body{position:fixed;inset:0}
-button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
-input,textarea{font:inherit;font-size:16px}
-@media (prefers-reduced-motion:reduce){*{transition-duration:0s!important;animation-duration:0s!important}}
+  font:700 16px/1.35 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overscroll-behavior:none;-webkit-text-size-adjust:100%}
+body{position:fixed;left:0;top:0;right:0}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;text-align:inherit}
+input{font:inherit;font-size:16px}
+a{color:var(--azul)}
+small{font-size:15px;font-weight:600}
+.vista{position:absolute;left:0;top:0;width:100%;height:var(--alto);opacity:1;transition:opacity var(--t) ease}
+.vista.entra{opacity:0}
 
-/* ---- Dos vistas fijas ---- */
-#juego{position:absolute;inset:0;height:var(--alto);display:grid;grid-template-rows:minmax(0,1fr) minmax(0,1fr);grid-template-columns:minmax(0,1fr)}
-@media (orientation:landscape) and (min-width:700px){#juego{grid-template-rows:none;grid-template-rows:minmax(0,1fr);grid-template-columns:minmax(0,1fr) minmax(340px,38%)}}
-#oficina{position:relative;overflow:hidden;touch-action:none;background:var(--piso);cursor:grab}
-#mundo{position:absolute;left:0;top:0;width:1200px;height:800px;transform-origin:0 0;will-change:transform}
-#panel{position:relative;display:flex;flex-direction:column;min-height:0;background:var(--fondo);border-top:2px solid var(--linea)}
-@media (orientation:landscape) and (min-width:700px){#panel{border-top:0;border-left:2px solid var(--linea)}}
+/* ---------- Mapa + información ---------- */
+#mapa{display:grid;grid-template-rows:minmax(0,1fr) minmax(0,1fr);grid-template-columns:minmax(0,1fr)}
+@media (min-aspect-ratio:1/1) and (min-width:640px){#mapa{grid-template-rows:minmax(0,1fr);grid-template-columns:minmax(0,1fr) minmax(320px,38%)}}
+#oficina{position:relative;overflow:hidden;touch-action:none;background:var(--piso);cursor:grab;user-select:none;-webkit-user-select:none}
+#mundo{position:absolute;left:0;top:0;width:1200px;height:800px;transform-origin:0 0}
+#mundo.mueve{will-change:transform}
+.cuarto{position:absolute;background:var(--cuarto);border-radius:22px;padding:14px 16px;display:flex;flex-direction:column;gap:10px;overflow:hidden}
+.cuarto.sel{box-shadow:inset 0 0 0 3px var(--tinta)}
+.cuarto.gris{background:#26262b}
+.cuarto.cerrado{background:#1b1b20}
+.cuarto h3{font-size:20px;font-weight:900}
+.cuarto .gente{display:flex;flex-wrap:wrap;gap:8px;align-content:flex-start}
+.mono{display:inline-flex;align-items:center;gap:7px;padding:5px 12px 5px 7px;border-radius:16px;background:#3a3a44;font-size:17px;max-width:100%}
+.mono span.n{min-width:0;overflow-wrap:anywhere}
+.mono.muerto{background:#2e2e33;color:var(--suave)}
+.mono.fuera{opacity:.45}
+.claude{background:var(--naranja);color:#141414;padding:7px 12px;border-radius:16px;font-size:17px;overflow-wrap:anywhere}
+.cuarto p{font-size:16px;color:var(--suave)}
+.luz{display:inline-block;width:13px;height:13px;border-radius:50%;flex:none}
+.verde{background:var(--verde)} .amarillo{background:var(--amarillo)} .rojo{background:var(--rojo)} .gris{background:#6b6b73}
+#hud{position:absolute;right:8px;top:8px;display:flex;gap:6px;pointer-events:none}
+#hud span{background:#000b;padding:4px 10px;border-radius:12px;font-size:14px}
 
-/* ---- Cuartos (provisionales: la piel 3D los reemplaza) ---- */
-.cuarto{position:absolute;background:var(--cuarto);border-radius:18px;padding:12px 14px;border:2px solid transparent;transition:border-color .2s}
-.cuarto.sel{border-color:var(--tinta)}
-.cuarto h3{font-size:18px;font-weight:800}
-.cuarto p{font-size:15px;color:var(--suave)}
-.cuarto.gris{background:#24242a;filter:grayscale(1);opacity:.75}
-.cuarto.cerrado{background:#1c1c21}
-.luz{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:6px;vertical-align:1px}
-.luz.verde{background:var(--verde)} .luz.amarillo{background:var(--amarillo)} .luz.rojo{background:var(--rojo)} .luz.gris{background:#666}
-.mono{position:absolute;font-size:15px;font-weight:800;padding:4px 9px;border-radius:12px;background:#33333b;white-space:nowrap}
-.mono.fuera{opacity:.35}
-.burbuja{position:absolute;background:var(--tinta);color:#111;font-size:15px;padding:4px 10px;border-radius:12px;white-space:nowrap}
-
-/* ---- Panel fijo: la línea de en medio es donde se escribe ---- */
-#escribir{display:flex;gap:8px;padding:8px;border-bottom:2px solid var(--linea)}
-#escribir input{flex:1;min-width:0;background:#24242a;border:0;border-radius:14px;padding:12px 14px;color:var(--tinta);outline:none}
-#escribir button{background:var(--tinta);color:#111;border-radius:14px;padding:0 16px;font-weight:800}
-#pestanas{display:flex;gap:4px;padding:6px 8px;overflow-x:auto;scrollbar-width:none}
-#pestanas button{padding:8px 12px;border-radius:12px;color:var(--suave);white-space:nowrap}
-#pestanas button.si{background:#2a2a31;color:var(--tinta)}
-#contenido{overflow-wrap:anywhere;flex:1;min-height:0;overflow-y:auto;padding:4px 12px 16px;-webkit-overflow-scrolling:touch}
-.fila{padding:10px 0;border-bottom:1px solid #2a2a31}
-.fila b{font-weight:800}
+#info{display:flex;flex-direction:column;min-height:0;border-top:2px solid var(--linea)}
+@media (min-aspect-ratio:1/1) and (min-width:640px){#info{border-top:0;border-left:2px solid var(--linea)}}
+.cab{display:flex;align-items:center;gap:10px;padding:10px 14px;min-height:52px;border-bottom:1px solid #2a2a31}
+.cab h2{font-size:18px;font-weight:900;flex:1;min-width:0;overflow-wrap:anywhere}
+.cuerpo{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;padding:4px 14px 18px;-webkit-overflow-scrolling:touch;overflow-wrap:anywhere}
+.fila{display:block;width:100%;padding:10px 0;border-bottom:1px solid #2a2a31}
 .fila small{display:block;color:var(--suave);font-size:15px;font-weight:600}
-.fila.toca{cursor:pointer}
-.barra{height:12px;border-radius:6px;background:#2a2a31;overflow:hidden;margin-top:6px}
-.barra i{display:block;height:100%;border-radius:6px}
-.titulo{font-size:15px;color:var(--suave);margin:12px 0 2px;text-transform:uppercase;letter-spacing:.04em}
-.msj{padding:10px 12px;border-radius:14px;margin:8px 0;background:#24242a;white-space:pre-wrap}
-.msj.yo{background:#33333b;margin-left:20%}
+.titulo{font-size:14px;color:var(--suave);margin:14px 0 2px;letter-spacing:.03em}
+.vida{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:10px;align-items:baseline;padding:8px 0}
+.vida small{color:var(--suave);font-size:15px;font-weight:600}
+.barra{grid-column:1/-1;height:10px;border-radius:5px;background:#2a2a31;overflow:hidden;margin-top:5px}
+.barra i{display:block;height:100%;border-radius:5px}
 .aviso{color:var(--amarillo)}
-a{color:#8fb6ff}
-#hud{position:absolute;left:8px;top:8px;display:flex;gap:6px;flex-wrap:wrap;pointer-events:none}
-#hud span{background:#000a;padding:4px 10px;border-radius:12px;font-size:15px}
+.alerta{color:var(--rojo)}
 
-/* ---- Entrada: elegir personaje ---- */
-#entrada{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:20px;background:var(--fondo);z-index:5}
-#entrada h1{font-size:24px;font-weight:900}
-#personajes{display:flex;gap:12px}
-#personajes button{width:96px;padding:14px 0;border-radius:18px;background:#24242a;font-weight:800;border:2px solid transparent}
-#personajes button.si{border-color:var(--tinta)}
+/* ---------- Pantalla completa (trabajar) ---------- */
+#herramienta{display:flex;flex-direction:column;background:var(--fondo)}
+#volver{color:var(--azul);font-weight:800;padding:6px 4px;white-space:nowrap}
+.escribe{display:flex;gap:8px;padding:10px 14px;border-bottom:1px solid #2a2a31}
+.escribe input{flex:1;min-width:0;background:#24242b;border:0;border-radius:14px;padding:12px 14px;color:var(--tinta);outline:none}
+.escribe button{background:var(--tinta);color:#141414;border-radius:14px;padding:0 16px;font-weight:900}
+.etapas{display:flex;flex-wrap:wrap;gap:6px;padding:10px 0 4px}
+.etapas button{padding:7px 12px;border-radius:14px;background:#24242b;color:var(--suave);font-size:15px}
+.etapas button.si{background:var(--tinta);color:#141414}
+.caras{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:14px 8px;padding:10px 0}
+.cara{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;font-size:15px;line-height:1.2;min-width:0}
+.cara span,.cara small{max-width:100%;overflow-wrap:anywhere}
+.cara small{color:var(--suave);font-size:14px;font-weight:600}
+.circulo{position:relative;width:64px;height:64px;border-radius:50%;display:grid;place-items:center;font-size:26px;font-weight:900;color:#fff;overflow:hidden;flex:none}
+.circulo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#fff}
+.circulo.grande{width:96px;height:96px;font-size:40px}
+.ficha-cab{display:flex;gap:14px;align-items:center;padding:12px 0}
+.ficha-cab > div{min-width:0}
+.msj{padding:10px 12px;border-radius:14px;margin:8px 0;background:#24242b;white-space:pre-wrap}
+.msj.yo{background:#33333b;color:var(--suave)}
+
+/* ---------- Entrada ---------- */
+#entrada{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:20px}
+#entrada h1{font-size:24px;font-weight:900;text-align:center}
+#personajes{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+#personajes button{width:96px;padding:14px 0;border-radius:18px;background:#24242b;font-weight:900;text-align:center;box-shadow:inset 0 0 0 2px transparent}
+#personajes button.si{box-shadow:inset 0 0 0 2px var(--tinta)}
 #entrada form{display:flex;gap:8px;width:min(340px,100%)}
-#entrada input{flex:1;background:#24242a;border:0;border-radius:14px;padding:12px 14px;color:var(--tinta)}
-#entrada form button{background:var(--tinta);color:#111;border-radius:14px;padding:0 16px;font-weight:800}
-#marco{position:absolute;inset:0;border:0;width:100%;height:100%;background:#fff}
+#entrada input{flex:1;min-width:0;background:#24242b;border:0;border-radius:14px;padding:12px 14px;color:var(--tinta)}
+#entrada form button{background:var(--tinta);color:#141414;border-radius:14px;padding:0 16px;font-weight:900}
 </style>
 </head>
 <body>
-<div id="juego" hidden>
+<div id="mapa" class="vista" hidden>
   <div id="oficina"><div id="mundo"></div><div id="hud"></div></div>
-  <div id="panel">
-    <form id="escribir" autocomplete="off">
-      <input id="pregunta" enterkeyhint="send" placeholder="Pregúntale a la Librería…" maxlength="600">
-      <button>Preguntar</button>
-    </form>
-    <nav id="pestanas"></nav>
-    <div id="contenido"></div>
-  </div>
+  <section id="info"><div class="cab"><h2 id="infoT"></h2></div><div class="cuerpo" id="infoC"></div></section>
 </div>
-<div id="entrada" hidden>
+<div id="herramienta" class="vista" hidden>
+  <div class="cab"><button id="volver">‹ Oficina</button><h2 id="herrT"></h2></div>
+  <form class="escribe" id="escribe" autocomplete="off"><input id="texto" enterkeyhint="send" maxlength="600"><button id="enviar">Preguntar</button></form>
+  <div class="cuerpo" id="herrC"></div>
+</div>
+<div id="entrada" class="vista" hidden>
   <h1>¿Quién entra a la oficina?</h1>
   <div id="personajes"></div>
   <form id="clave" hidden><input type="password" id="pass" placeholder="Tu contraseña" autocomplete="current-password"><button>Entrar</button></form>
@@ -97,132 +122,158 @@ a{color:#8fb6ff}
 </div>
 <script>
 'use strict';
-const LLAVE = 'centro.moon.sesion';   // la misma sesión que el Tablero: si ya entraste allá, aquí también
+const LLAVE = 'centro.moon.sesion';   // la misma sesión del Tablero
 const $ = s => document.querySelector(s);
 const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
 const ses = () => { try { return localStorage.getItem(LLAVE) || ''; } catch (e) { return ''; } };
 async function pide(api, accion, datos) {
-  const r = await fetch(api, { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-sesion': ses() }, body: JSON.stringify(Object.assign({ accion }, datos || {})) });
-  const j = await r.json().catch(() => ({ ok: false, error: 'red' }));
-  if (r.status === 401 || j.error === 'sesion') { salir(); }
-  return j;
+  try {
+    const r = await fetch(api, { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-sesion': ses() }, body: JSON.stringify(Object.assign({ accion }, datos || {})) });
+    const j = await r.json().catch(() => ({ ok: false, error: 'red' }));
+    if (r.status === 401 || j.error === 'sesion') salir();
+    return j;
+  } catch (e) { return { ok: false, error: 'red', mensaje: 'Sin conexión. Se vuelve a intentar solo.' }; }
 }
 const centro = (a, d) => pide('/api/centro', a, d);
 const oficina = (a, d) => pide('/api/oficina', a, d);
+const NOMBRE = { kid: 'Kid', daniel: 'Papá', dan: 'Dan' };
 
-// ---------- Alto real de la pantalla y teclado ----------
-// La página mide lo que mide la pantalla SIN teclado: el teclado solo tapa el panel de abajo, nada brinca.
-function medir() { document.documentElement.style.setProperty('--alto', window.innerHeight + 'px'); }
-medir(); addEventListener('resize', () => { if (!document.activeElement || document.activeElement.tagName !== 'INPUT') medir(); });
-if (window.visualViewport) visualViewport.addEventListener('resize', () => { window.scrollTo(0, 0); });
-addEventListener('scroll', () => window.scrollTo(0, 0));
+// ---------- Regla 1: la página mide lo que mide la pantalla; el teclado nunca la cambia ----------
+// Solo se vuelve a medir cuando cambia el ANCHO (girar el aparato o cambiar la ventana), nunca por el teclado.
+let anchoMedido = 0;
+function medir() {
+  if (window.innerWidth === anchoMedido) return false;
+  anchoMedido = window.innerWidth;
+  document.documentElement.style.setProperty('--alto', window.innerHeight + 'px');
+  return true;
+}
+medir();
+addEventListener('resize', () => { if (medir() && !$('#mapa').hidden) ajustarVista(); });
+
+function mostrar(id) {
+  ['mapa', 'herramienta', 'entrada'].forEach(v => { if (v !== id) document.getElementById(v).hidden = true; });
+  const e = document.getElementById(id);
+  if (e.hidden) { e.classList.add('entra'); e.hidden = false; requestAnimationFrame(() => requestAnimationFrame(() => e.classList.remove('entra'))); }
+}
 
 // ---------- Entrada ----------
 let elegido = null;
 async function entrada() {
-  $('#entrada').hidden = false; $('#juego').hidden = true;
+  mostrar('entrada');
   const j = await centro('quienes');
-  const nombres = { kid: 'Kid', daniel: 'Papá', dan: 'Dan' };
-  $('#personajes').innerHTML = (j.usuarios || []).filter(u => nombres[u.id]).map(u => `<button data-id="${u.id}">${nombres[u.id]}</button>`).join('');
-  $('#personajes').onclick = e => {
-    const b = e.target.closest('button'); if (!b) return;
-    elegido = b.dataset.id; [...$('#personajes').children].forEach(x => x.classList.toggle('si', x === b));
-    $('#clave').hidden = false; $('#pass').focus();
-  };
+  $('#personajes').innerHTML = (j.usuarios || []).filter(u => NOMBRE[u.id]).map(u => `<button data-id="${u.id}">${NOMBRE[u.id]}</button>`).join('');
 }
+$('#personajes').onclick = e => {
+  const b = e.target.closest('button'); if (!b) return;
+  elegido = b.dataset.id; [...$('#personajes').children].forEach(x => x.classList.toggle('si', x === b));
+  $('#clave').hidden = false; $('#pass').focus({ preventScroll: true });
+};
 $('#clave').onsubmit = async e => {
   e.preventDefault();
   const j = await centro('entrar', { usuario: elegido, clave: $('#pass').value });
   if (!j.ok) { $('#error').textContent = j.error === 'pausa' ? 'Muchos intentos. Espera 15 minutos.' : j.error === 'sin_clave' ? 'Primero crea tu contraseña en el Tablero.' : 'Esa contraseña no es.'; return; }
   try { localStorage.setItem(LLAVE, j.sesion); } catch (x) {}
-  arrancar();
+  $('#pass').blur(); arrancar();
 };
 function salir() { try { localStorage.removeItem(LLAVE); } catch (e) {} entrada(); }
 
 // ---------- Datos ----------
-let O = null, C = null, pestana = 'vidas', cuartoSel = null;
+let O = null, C = null, sel = { tipo: 'resumen' }, reloj = null;
 async function cargar() {
   const [a, b] = await Promise.all([oficina('estado'), centro('inicio')]);
   if (a.ok) O = a.oficina;
   if (b.ok) C = b;
-  dibujarOficina(); dibujarPanel();
+  // Lo que se está usando no se toca: el mapa se refresca solo si está a la vista; la pantalla completa, nunca.
+  if (!$('#mapa').hidden) { dibujarMundo(); pintarInfo(true); }
 }
 async function arrancar() {
   if (!ses()) return entrada();
-  $('#entrada').hidden = true; $('#juego').hidden = false;
   await cargar();
-  ajustarVista();
-  setInterval(cargar, 5 * 60e3);   // la medición escribe cada hora; con 5 min basta
-}
-
-// ---------- La oficina (provisional, plano) ----------
-const CUARTOS = [
-  { id: 'recepcion', t: 'Recepción · Jason', x: 20, y: 20, w: 260, h: 170, tab: 'jason' },
-  { id: 'clientes', t: 'Clientes que pagan', x: 300, y: 20, w: 560, h: 330, tab: 'asistentes' },
-  { id: 'demos', t: 'Demos', x: 880, y: 20, w: 300, h: 230, tab: 'asistentes' },
-  { id: 'cubiculos', t: 'Cubículos', x: 20, y: 210, w: 260, h: 230, tab: 'equipo' },
-  { id: 'robots', t: 'Estación de robots', x: 880, y: 270, w: 300, h: 200, tab: 'robots' },
-  { id: 'crm', t: 'CRM', x: 300, y: 370, w: 270, h: 200, tab: 'crm' },
-  { id: 'libreria', t: 'Librería', x: 590, y: 370, w: 270, h: 200, tab: 'libreria' },
-  { id: 'crea', t: 'Crea tu recepcionista', x: 20, y: 460, w: 260, h: 110, tab: 'crea' },
-  { id: 'gris', t: 'Cuarto gris', x: 300, y: 590, w: 560, h: 190, tab: 'gris', gris: true },
-  { id: 'cerrado', t: 'Puerta cerrada', x: 880, y: 490, w: 300, h: 290, tab: 'cerrado', cerrado: true },
-];
-function dibujarOficina() {
   if (!O) return;
-  const as = (O.asistentes && O.asistentes.lista) || [];
-  const quien = t => as.filter(a => t.includes(a.tipo));
-  const mono = (a, x, y) => `<div class="mono" style="left:${x}px;top:${y}px"><span class="luz ${a.estado}"></span>${esc(a.nombre)}${a.platicas7d ? ' · ' + a.platicas7d : ''}</div>`;
-  let h = '';
-  for (const c of CUARTOS) {
-    h += `<div class="cuarto${c.gris ? ' gris' : ''}${c.cerrado ? ' cerrado' : ''}${cuartoSel === c.id ? ' sel' : ''}" data-c="${c.id}" style="left:${c.x}px;top:${c.y}px;width:${c.w}px;height:${c.h}px"><h3>${c.t}</h3>`;
-    if (c.id === 'clientes') h += quien(['cliente']).map((a, i) => mono(a, 20 + i * 200, 70)).join('');
-    if (c.id === 'demos') h += quien(['demo']).map((a, i) => mono(a, 14, 50 + i * 44)).join('');
-    if (c.id === 'gris') h += quien(['dijo_no', 'archivado']).concat(as.filter(a => a.tipo === 'prueba' && a.id === 'donde')).map((a, i) => `<div class="mono" style="left:${20 + i * 170}px;top:80px;transform:rotate(-80deg)">✕✕ ${esc(a.nombre)}</div>`).join('');
-    if (c.id === 'cerrado') h += `<p>Pruebas y archivados (${quien(['prueba', 'base', 'copia']).length})</p>`;
-    if (c.id === 'cubiculos') h += (O.cubiculos || []).map((u, i) => `<div class="mono${u.presente ? '' : ' fuera'}" style="left:14px;top:${50 + i * 44}px">${({ kid: 'Kid', daniel: 'Papá', dan: 'Dan' })[u.id]} ${u.presente ? 'en su silla' : '· silla vacía'}</div>`).join('');
-    if (c.id === 'robots') h += `<p>${((O.tareas && O.tareas.lista) || []).length} robots · ${((O.tareas && O.tareas.lista) || []).filter(t => t.resultado !== 'bien').length} con falla</p>`;
-    if (c.id === 'recepcion') { const ll = (C && C.llamadas) || []; h += `<p>${ll.filter(l => Date.now() - Date.parse(l.fecha) < 864e5).length} llamadas hoy</p>`; }
-    if (c.id === 'crm') h += `<p>${((C && C.personas) || []).length} personas</p>`;
-    if (c.id === 'libreria') h += `<p>${O.libreria.hoy} de ${O.libreria.tope} preguntas hoy</p>`;
-    h += '</div>';
-  }
-  // Claude: el robot naranja, junto a lo último que se anotó.
-  const ult = O.actividad && O.actividad.lineas && O.actividad.lineas[0];
-  if (ult) h += `<div class="burbuja" style="left:600px;top:340px;background:var(--naranja);color:#111">🤖 ${esc(ult.texto.slice(0, 60))}…</div>`;
-  $('#mundo').innerHTML = h;
-  $('#hud').innerHTML = (O.medicionAtrasada ? '<span class="aviso">La medición no ha corrido</span>' : '') + `<span>Semana: $${(O.gasto || {}).usd7d || 0} USD</span>`;
+  mostrar('mapa'); ajustarVista(); dibujarMundo(); pintarInfo();
+  clearInterval(reloj); reloj = setInterval(cargar, 60e3);   // leer la base no cuesta: cada minuto
 }
-$('#mundo').addEventListener('click', e => {
-  if (movido) return;
-  const c = e.target.closest('.cuarto'); if (!c) return;
-  cuartoSel = c.dataset.c; pestana = CUARTOS.find(x => x.id === cuartoSel).tab;
-  dibujarOficina(); dibujarPanel();
+addEventListener('popstate', () => {
+  const h = history.state || {};
+  if (h.herramienta) abrirHerramienta(h.herramienta, h.tel, true);
+  else if (O) { mostrar('mapa'); dibujarMundo(); pintarInfo(true); ajustarVista(); }
 });
 
-// ---------- Zoom y arrastre SOLO en la oficina (como n8n): el panel nunca se mueve ----------
+// ---------- Alertas: solo en el mapa ----------
+function alertas() {
+  if (!O) return [];
+  const l = [];
+  ((O.asistentes && O.asistentes.lista) || []).forEach(a => { if (a.estado === 'rojo') l.push(a.nombre + ': ' + (a.nota || 'falla')); });
+  ((O.tareas && O.tareas.lista) || []).forEach(t => { if (t.resultado !== 'bien' || (t.siguiente && Date.now() - Date.parse(t.siguiente) > 2 * 3600e3)) l.push('Robot con falla: ' + t.nombre); });
+  ((O.suscripciones && O.suscripciones.lista) || []).forEach(s => { if (s.color === 'rojo') l.push(s.nombre + (s.faltan < 0 ? ': se pasó la fecha de pago' : ': se cobra en ' + s.faltan + ' días')); });
+  if (O.publicaciones && O.publicaciones.fallidas) l.push(O.publicaciones.fallidas + ' publicaciones fallaron hoy');
+  if (O.medicionAtrasada) l.push('La medición de cada hora no ha corrido');
+  return l;
+}
+
+// ---------- El mundo: cada texto vive dentro de su cuarto y se acomoda solo ----------
+const CUARTOS = [
+  { id: 'recepcion', t: 'Recepción · Jason', x: 20, y: 20, w: 260, h: 170 },
+  { id: 'clientes', t: 'Clientes que pagan', x: 300, y: 20, w: 560, h: 330 },
+  { id: 'demos', t: 'Demos', x: 880, y: 20, w: 300, h: 230 },
+  { id: 'cubiculos', t: 'Cubículos', x: 20, y: 210, w: 260, h: 230 },
+  { id: 'robots', t: 'Robots', x: 880, y: 270, w: 300, h: 200 },
+  { id: 'crm', t: 'CRM', x: 300, y: 370, w: 270, h: 200, herramienta: 'crm' },
+  { id: 'libreria', t: 'Librería', x: 590, y: 370, w: 270, h: 200, herramienta: 'libreria' },
+  { id: 'crea', t: 'Crea tu recepcionista', x: 20, y: 460, w: 260, h: 110, herramienta: 'crea' },
+  { id: 'gris', t: 'Cuarto gris', x: 300, y: 590, w: 560, h: 190 },
+  { id: 'cerrado', t: 'Puerta cerrada', x: 880, y: 490, w: 300, h: 290 },
+];
+function dibujarMundo() {
+  if (!O) return;
+  const as = (O.asistentes && O.asistentes.lista) || [];
+  const mono = (a, clase) => `<span class="mono ${clase || ''}" data-a="${esc(a.id)}"><span class="luz ${a.estado || 'gris'}"></span><span class="n">${clase === 'muerto' ? '✕✕ ' : ''}${esc(a.nombre)}${a.platicas7d ? ' · ' + a.platicas7d : ''}</span></span>`;
+  const ult = O.actividad && O.actividad.lineas && O.actividad.lineas[0];
+  const ll = (C && C.llamadas) || [], hoy = ll.filter(l => Date.now() - Date.parse(l.fecha) < 864e5).length;
+  const dentro = {
+    recepcion: `<div class="gente">${as.filter(a => a.id === 'jason').map(a => mono(a)).join('')}</div><p>${hoy} llamada${hoy === 1 ? '' : 's'} hoy</p>`,
+    clientes: `<div class="gente">${as.filter(a => a.tipo === 'cliente').map(a => mono(a)).join('')}</div>${ult ? `<div class="claude">🤖 ${esc(ult.texto)}</div>` : ''}`,
+    demos: `<div class="gente">${as.filter(a => a.tipo === 'demo').map(a => mono(a)).join('')}</div>`,
+    cubiculos: `<div class="gente">${(O.cubiculos || []).map(u => `<span class="mono${u.presente ? '' : ' fuera'}"><span class="luz ${u.presente ? 'verde' : 'gris'}"></span><span class="n">${NOMBRE[u.id]}${u.presente ? '' : ' · silla vacía'}</span></span>`).join('')}</div>`,
+    robots: `<div class="gente">${((O.tareas && O.tareas.lista) || []).map(t => `<span class="mono"><span class="luz ${t.resultado !== 'bien' ? 'rojo' : 'verde'}"></span><span class="n">🤖</span></span>`).join('')}</div>`,
+    crm: `<p>${((C && C.personas) || []).length} personas</p>`,
+    libreria: `<p>${O.libreria.hoy} de ${O.libreria.tope} preguntas hoy</p>`,
+    crea: '',
+    gris: `<div class="gente">${as.filter(a => a.tipo === 'dijo_no' || a.tipo === 'archivado' || a.id === 'donde').map(a => mono(a, 'muerto')).join('')}</div>`,
+    cerrado: `<p>Pruebas y copias (${as.filter(a => ['prueba', 'base', 'copia'].includes(a.tipo) && a.id !== 'donde').length})</p>`,
+  };
+  $('#mundo').innerHTML = CUARTOS.map(c => `<div class="cuarto${c.id === 'gris' ? ' gris' : ''}${c.id === 'cerrado' ? ' cerrado' : ''}${sel.cuarto === c.id ? ' sel' : ''}" data-c="${c.id}" style="left:${c.x}px;top:${c.y}px;width:${c.w}px;height:${c.h}px"><h3>${esc(c.t)}</h3>${dentro[c.id]}</div>`).join('');
+  const al = alertas().length;
+  $('#hud').innerHTML = `<span>Semana $${(O.gasto || {}).usd7d || 0}</span>` + (al ? `<span class="alerta">● ${al}</span>` : '');
+}
+
+// ---------- Zoom y arrastre solo en el mapa ----------
 const vista = { x: 0, y: 0, z: 1 };
-const dedos = new Map(); let movido = false, ini = null;
-function aplicar() { $('#mundo').style.transform = `translate(${vista.x}px,${vista.y}px) scale(${vista.z})`; }
+const dedos = new Map(); let movido = false, ini = null, nitido = null;
+function aplicar() {
+  const m = $('#mundo'); m.classList.add('mueve');
+  m.style.transform = `translate(${vista.x}px,${vista.y}px) scale(${vista.z})`;
+  // Regla 3: al detenerse, el navegador vuelve a pintar a tamaño real (nada borroso al acercar).
+  clearTimeout(nitido); nitido = setTimeout(() => m.classList.remove('mueve'), 150);
+}
 function ajustarVista() {
-  const r = $('#oficina').getBoundingClientRect();
+  const r = $('#oficina').getBoundingClientRect(); if (!r.width) return;
   vista.z = Math.min(r.width / 1200, r.height / 800); vista.x = (r.width - 1200 * vista.z) / 2; vista.y = (r.height - 800 * vista.z) / 2; aplicar();
 }
-addEventListener('resize', () => { if (!$('#juego').hidden) ajustarVista(); });
 function zoomEn(px, py, nuevo) {
-  nuevo = Math.max(0.15, Math.min(3, nuevo));
+  const r = $('#oficina').getBoundingClientRect(), min = Math.min(r.width / 1200, r.height / 800);
+  nuevo = Math.max(min, Math.min(Math.max(min * 6, 1.5), nuevo));
   vista.x = px - (px - vista.x) * nuevo / vista.z; vista.y = py - (py - vista.y) * nuevo / vista.z; vista.z = nuevo; aplicar();
 }
 const of = $('#oficina');
-of.addEventListener('pointerdown', e => { of.setPointerCapture(e.pointerId); dedos.set(e.pointerId, { x: e.clientX, y: e.clientY }); movido = false; ini = null; });
+of.addEventListener('pointerdown', e => { of.setPointerCapture(e.pointerId); dedos.set(e.pointerId, { x: e.clientX, y: e.clientY, x0: e.clientX, y0: e.clientY }); if (dedos.size === 1) movido = false; ini = null; });
 of.addEventListener('pointermove', e => {
-  if (!dedos.has(e.pointerId)) return;
-  const antes = dedos.get(e.pointerId); dedos.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  const d0 = dedos.get(e.pointerId); if (!d0) return;
+  const ax = d0.x, ay = d0.y; d0.x = e.clientX; d0.y = e.clientY;
   const r = of.getBoundingClientRect();
   if (dedos.size === 1) {
-    const dx = e.clientX - antes.x, dy = e.clientY - antes.y;
-    if (Math.abs(dx) + Math.abs(dy) > 2) movido = true;
-    vista.x += dx; vista.y += dy; aplicar();
+    if (Math.abs(e.clientX - d0.x0) + Math.abs(e.clientY - d0.y0) > 6) movido = true;
+    if (movido) { vista.x += e.clientX - ax; vista.y += e.clientY - ay; aplicar(); }
   } else if (dedos.size === 2) {
     const [a, b] = [...dedos.values()];
     const d = Math.hypot(a.x - b.x, a.y - b.y), cx = (a.x + b.x) / 2 - r.left, cy = (a.y + b.y) / 2 - r.top;
@@ -230,109 +281,166 @@ of.addEventListener('pointermove', e => {
     ini = { d, cx, cy }; movido = true;
   }
 });
-const suelta = e => { dedos.delete(e.pointerId); ini = null; setTimeout(() => { movido = false; }, 0); };
+const suelta = e => { dedos.delete(e.pointerId); ini = null; };
+// El toque se atiende en "click" (después de soltar el dedo): si se atendiera al soltar, el "click" que el celular
+// manda justo después caería sobre la pantalla nueva y abriría otra cosa sin querer.
+of.addEventListener('click', e => { if (!movido) tocar(e.clientX, e.clientY); });
 of.addEventListener('pointerup', suelta); of.addEventListener('pointercancel', suelta);
 of.addEventListener('wheel', e => { e.preventDefault(); const r = of.getBoundingClientRect(); zoomEn(e.clientX - r.left, e.clientY - r.top, vista.z * Math.exp(-e.deltaY * 0.0015)); }, { passive: false });
-// Safari: que el gesto de pellizco no agrande la página entera.
 ['gesturestart', 'gesturechange'].forEach(n => document.addEventListener(n, e => e.preventDefault()));
 
-// ---------- Panel ----------
-const PESTANAS = [['vidas', 'Vidas'], ['asistentes', 'Asistentes'], ['jason', 'Jason'], ['crm', 'CRM'], ['libreria', 'Librería'], ['robots', 'Robots'], ['equipo', 'Equipo'], ['crea', 'Crea tu recepcionista'], ['gris', 'Cuarto gris'], ['cerrado', 'Puerta cerrada']];
-$('#pestanas').onclick = e => { const b = e.target.closest('button'); if (b) { pestana = b.dataset.p; cuartoSel = (CUARTOS.find(c => c.tab === pestana) || {}).id; dibujarOficina(); dibujarPanel(); } };
+// Un toque: el monito que está ahí; si no, el cuarto.
+function tocar(cx, cy) {
+  const el = document.elementFromPoint(cx, cy); if (!el) return;
+  const m = el.closest('[data-a]'), c = el.closest('.cuarto');
+  if (!c) return;
+  const cuarto = CUARTOS.find(k => k.id === c.dataset.c);
+  if (cuarto.herramienta) return abrirHerramienta(cuarto.herramienta);
+  if (m) return elegir({ tipo: 'asistente', id: m.dataset.a, cuarto: cuarto.id });
+  elegir({ tipo: cuarto.id, cuarto: cuarto.id });
+}
+function elegir(s) { sel = s; $('#mundo').querySelectorAll('.cuarto').forEach(x => x.classList.toggle('sel', x.dataset.c === s.cuarto)); pintarInfo(); }
+
+// ---------- Información (abajo o a la derecha) ----------
 const hace = f => { if (!f) return ''; const m = Math.round((Date.now() - Date.parse(f)) / 6e4); return m < 60 ? `hace ${m} min` : m < 1440 ? `hace ${Math.round(m / 60)} h` : `hace ${Math.round(m / 1440)} días`; };
 const fechaC = f => f ? new Date(Date.parse(f)).toLocaleString('es-MX', { timeZone: 'America/Cancun', weekday: 'short', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' }) : '';
-const COLOR = { verde: 'var(--verde)', amarillo: 'var(--amarillo)', rojo: 'var(--rojo)', gris: '#666' };
-let charla = [];
-// La página de un asistente puede venir como dirección completa o solo con su nombre en Vercel.
+const COLOR = { verde: 'var(--verde)', amarillo: 'var(--amarillo)', rojo: 'var(--rojo)', gris: '#6b6b73' };
 const liga = p => { if (!p) return ''; const u = /^https:\/\//.test(p) ? p : /^[a-z0-9-]+$/.test(p) ? `https://${p}.vercel.app` : ''; return u ? `<small><a href="${esc(u)}" target="_blank" rel="noopener">${esc(u)}</a></small>` : ''; };
-
-function dibujarPanel() {
-  $('#pestanas').innerHTML = PESTANAS.map(([p, n]) => `<button data-p="${p}" class="${p === pestana ? 'si' : ''}">${n}</button>`).join('');
-  const k = $('#contenido'); if (!O) { k.innerHTML = '<p class="fila">Cargando…</p>'; return; }
+function filaAsistente(a) {
+  return `<div class="fila"><span class="luz ${a.estado || 'gris'}"></span> ${esc(a.nombre)} · ${esc(a.de)}<small>${a.platicas7d || 0} pláticas · ${a.fallas7d || 0} fallas · $${a.usd7d || 0} USD en 7 días${a.emergencias === false && (a.tipo === 'cliente' || a.tipo === 'demo') ? ' · sin reglas de emergencia' : ''}</small>${a.nota ? `<small>${esc(a.nota)}</small>` : ''}${liga(a.pagina)}</div>`;
+}
+function datosLlamada(l) { try { return JSON.parse(l.datos || '{}'); } catch (e) { return {}; } }
+function pintarInfo(refresco) {
+  if (!O) return;
+  const k = $('#infoC'), y = refresco ? k.scrollTop : 0;
   const as = (O.asistentes && O.asistentes.lista) || [];
-  const filaA = a => `<div class="fila"><span class="luz ${a.estado}"></span><b>${esc(a.nombre)}</b> · ${esc(a.de)}<small>${a.platicas7d || 0} pláticas y ${a.fallas7d || 0} fallas en 7 días · $${a.usd7d || 0} USD${a.emergencias === false && (a.tipo === 'cliente' || a.tipo === 'demo') ? ' · sin reglas de emergencia' : ''}</small><small>${esc(a.nota || '')}</small>${liga(a.pagina)}</div>`;
-  let h = '';
-  if (pestana === 'vidas') {
+  let t = '', h = '';
+  if (sel.tipo === 'resumen') {
+    t = 'Cómo va MOON';
+    const al = alertas();
+    if (al.length) h += `<p class="titulo">Atención</p>` + al.map(x => `<div class="fila alerta">${esc(x)}</div>`).join('');
     const s = (O.suscripciones && O.suscripciones.lista) || [];
-    const vidaFila = x => `<div class="fila"><b>${esc(x.nombre)}</b> · ${x.monto} ${x.moneda}${x.aviso ? ' 🚨💸' : ''}<small>${x.faltan < 0 ? 'Se pasó la fecha de pago hace ' + (-x.faltan) + ' días' : 'Se cobra en ' + x.faltan + ' días (' + x.proxima + ')'}${x.ultimoRecibo ? ' · último recibo ' + x.ultimoRecibo : ' · sin recibo en el correo'}</small>${x.nota ? `<small>${esc(x.nota)}</small>` : ''}<div class="barra"><i style="width:${Math.round(x.nivel * 100)}%;background:${COLOR[x.color]}"></i></div></div>`;
-    const suma = l => { const t = {}; l.forEach(x => { t[x.moneda] = (t[x.moneda] || 0) + Number(x.monto); }); return Object.entries(t).map(([m, v]) => v.toLocaleString('es-MX', { maximumFractionDigits: 2 }) + ' ' + m).join(' + '); };
+    const suma = l => { const o = {}; l.forEach(x => { o[x.moneda] = (o[x.moneda] || 0) + Number(x.monto); }); return Object.entries(o).map(([m, v]) => v.toLocaleString('es-MX', { maximumFractionDigits: 2 }) + ' ' + m).join(' + '); };
+    const vida = x => `<div class="vida"><span>${esc(x.nombre)}${x.aviso ? ' 🚨💸' : ''}</span><small>${x.faltan < 0 ? 'vencida' : x.faltan === 0 ? 'hoy' : 'en ' + x.faltan + ' d'}</small><div class="barra"><i style="width:${Math.round(x.nivel * 100)}%;background:${COLOR[x.color]}"></i></div>${x.color !== 'verde' && x.nota ? `<small style="grid-column:1/-1">${esc(x.nota)}</small>` : ''}</div>`;
     const ias = s.filter(x => x.grupo !== 'otra'), otras = s.filter(x => x.grupo === 'otra');
-    h += `<p class="titulo">IAs · al mes ${suma(ias)}</p>` + ias.map(vidaFila).join('') + `<p class="titulo">Otras herramientas · al mes ${suma(otras)}</p>` + otras.map(vidaFila).join('');
-    const g = O.gasto || {};
-    h += `<p class="titulo">Gasto de los asistentes</p><div class="fila"><b>$${g.usd7d || 0} USD</b> en 7 días<small>${(g.creditos7d || 0).toLocaleString('es-MX')} créditos de ElevenLabs · ${esc(g.nota || '')}</small></div>`;
-    h += `<div class="fila"><b>Librería hoy</b>: ${O.libreria.hoy} preguntas · $${O.libreria.usdHoy} USD</div>`;
-    const p = O.publicaciones || {};
-    h += `<div class="fila"><b>Publicaciones hoy</b>: ${p.total || 0} de ${p.tope || 100}${p.fallidas ? ` · <span class="aviso">${p.fallidas} fallaron</span>` : ''}<div class="barra"><i style="width:${Math.min(100, (p.total || 0))}%;background:${(p.total || 0) > 80 ? 'var(--rojo)' : 'var(--verde)'}"></i></div></div>`;
-    h += `<small class="fila">Medido ${hace((O.medicion || {}).actualizado)}</small>`;
+    h += `<p class="titulo">IAs · ${suma(ias)} al mes</p>` + ias.map(vida).join('') + `<p class="titulo">Otras · ${suma(otras)} al mes</p>` + otras.map(vida).join('');
+    const g = O.gasto || {}, p = O.publicaciones || {};
+    h += `<p class="titulo">Esta semana</p><div class="fila">$${g.usd7d || 0} USD de los asistentes<small>${(g.creditos7d || 0).toLocaleString('es-MX')} créditos de ElevenLabs</small></div>`;
+    h += `<div class="fila">Publicaciones hoy: ${p.total || 0} de ${p.tope || 100}${p.fallidas ? ` · <span class="aviso">${p.fallidas} fallaron</span>` : ''}<small>Medido ${hace((O.medicion || {}).actualizado)}</small></div>`;
+  } else if (sel.tipo === 'asistente') {
+    const a = as.find(x => x.id === sel.id) || {}; t = a.nombre || 'Asistente'; h = filaAsistente(a);
+  } else if (sel.tipo === 'clientes' || sel.tipo === 'demos') {
+    t = sel.tipo === 'clientes' ? 'Clientes que pagan' : 'Demos';
+    h = as.filter(a => a.tipo === (sel.tipo === 'clientes' ? 'cliente' : 'demo')).map(filaAsistente).join('');
+    const ult = O.actividad && O.actividad.lineas && O.actividad.lineas[0];
+    if (sel.tipo === 'clientes' && ult) h += `<p class="titulo">Claude ahorita</p><div class="fila">${esc(ult.texto)}<small>${hace(ult.hora)}</small></div>`;
+  } else if (sel.tipo === 'recepcion') {
+    t = 'Jason, el recepcionista';
+    const ll = ((C && C.llamadas) || []).slice(0, 8);
+    h = ll.length ? ll.map(l => { const d = datosLlamada(l); return `<div class="fila">${esc(d.nombre || 'Sin nombre')}${d.negocio ? ' · ' + esc(d.negocio) : ''}${Number(l.prueba) ? ' · <span class="aviso">prueba</span>' : ''}<small>${fechaC(l.fecha)} · ${esc(d.resultado || (d.cita ? 'Cita: ' + d.cita : 'Sin resultado'))}</small><small>${esc(d.necesidad || (l.resumen || '').slice(0, 140))}</small><small>A quién avisó: todavía no se anota</small></div>`; }).join('') : '<p class="fila">Sin llamadas.</p>';
+  } else if (sel.tipo === 'cubiculos') {
+    t = 'Cubículos';
+    h = (O.cubiculos || []).map(u => `<div class="fila"><span class="luz ${u.presente ? 'verde' : 'gris'}"></span> ${NOMBRE[u.id]}<small>${u.de}:00 a ${u.a}:00, lunes a viernes · ${u.presente ? 'en su horario' : 'fuera de horario'}</small></div>`).join('');
+    h += '<p class="titulo">Lo último que pasó</p>' + ((O.actividad && O.actividad.lineas) || []).slice(0, 6).map(l => `<div class="fila">${esc(l.texto)}<small>${esc(l.quien)} · ${hace(l.hora)}</small></div>`).join('');
+  } else if (sel.tipo === 'robots') {
+    t = 'Robots (tareas automáticas)';
+    h = ((O.tareas && O.tareas.lista) || []).map(x => { const tarde = x.siguiente && Date.now() - Date.parse(x.siguiente) > 2 * 3600e3; return `<div class="fila"><span class="luz ${x.resultado !== 'bien' || tarde ? 'rojo' : 'verde'}"></span> ${esc(x.nombre)}<small>De ${esc(x.deQuien)} · última vez ${hace(x.ultimaVez)} (${esc(x.resultado)}) · siguiente ${fechaC(x.siguiente)}${tarde ? ' · no está corriendo' : ''}</small></div>`; }).join('');
+  } else if (sel.tipo === 'gris') {
+    t = 'Cuarto gris · dijeron que no'; h = as.filter(a => a.tipo === 'dijo_no' || a.tipo === 'archivado' || a.id === 'donde').map(filaAsistente).join('');
+  } else if (sel.tipo === 'cerrado') {
+    t = 'Puerta cerrada · pruebas'; h = as.filter(a => ['prueba', 'base', 'copia'].includes(a.tipo) && a.id !== 'donde').map(filaAsistente).join('');
   }
-  if (pestana === 'asistentes') {
-    h += '<p class="titulo">Clientes que pagan</p>' + as.filter(a => a.tipo === 'cliente').map(filaA).join('');
-    h += '<p class="titulo">Demos</p>' + as.filter(a => a.tipo === 'demo').map(filaA).join('');
-    h += '<p class="titulo">De MOON</p>' + as.filter(a => a.tipo === 'propio').map(filaA).join('');
-  }
-  if (pestana === 'gris') h += '<p class="titulo">Dijeron que no</p>' + as.filter(a => a.tipo === 'dijo_no' || a.tipo === 'archivado' || a.id === 'donde').map(filaA).join('');
-  if (pestana === 'cerrado') h += '<p class="titulo">Pruebas y copias</p>' + as.filter(a => ['prueba', 'base', 'copia'].includes(a.tipo) && a.id !== 'donde').map(filaA).join('');
-  if (pestana === 'jason') {
-    const ll = (C && C.llamadas) || [];
-    h += '<p class="titulo">Llamadas que contestó Jason</p>' + (ll.length ? ll.slice(0, 30).map(l => { let d = {}; try { d = JSON.parse(l.datos || '{}'); } catch (e) {} return `<div class="fila toca" data-tel="${esc(l.quien)}"><b>${esc(d.nombre || 'Sin nombre')}</b>${d.negocio ? ' · ' + esc(d.negocio) : ''}${Number(l.prueba) ? ' · <span class="aviso">prueba</span>' : ''}<small>${fechaC(l.fecha)} · ${esc(d.resultado || (d.cita ? 'Cita: ' + d.cita : 'Sin resultado anotado'))}</small><small>${esc((l.resumen || '').slice(0, 160))}</small></div>`; }).join('') : '<p class="fila">Sin llamadas.</p>');
-  }
-  if (pestana === 'crm') h += crmLista();
-  if (pestana === 'ficha') h += fichaHtml;
-  if (pestana === 'robots') h += '<p class="titulo">Tareas automáticas</p>' + ((O.tareas && O.tareas.lista) || []).map(t => { const tarde = t.siguiente && Date.now() - Date.parse(t.siguiente) > 2 * 3600e3; return `<div class="fila"><span class="luz ${t.resultado !== 'bien' || tarde ? 'rojo' : 'verde'}"></span><b>${esc(t.nombre)}</b> · de ${esc(t.deQuien)}<small>Última vez: ${fechaC(t.ultimaVez)} (${esc(t.resultado)}) · Siguiente: ${fechaC(t.siguiente)}${tarde ? ' · no está corriendo' : ''}</small></div>`; }).join('');
-  if (pestana === 'equipo') {
-    h += '<p class="titulo">Cubículos (lunes a viernes, hora de Cancún)</p>' + (O.cubiculos || []).map(u => `<div class="fila"><span class="luz ${u.presente ? 'verde' : 'gris'}"></span><b>${({ kid: 'Kid', daniel: 'Papá', dan: 'Dan' })[u.id]}</b><small>${u.de}:00 a ${u.a}:00 · ${u.presente ? 'en su horario' : 'fuera de horario'}</small></div>`).join('');
-    h += '<p class="titulo">Lo último que pasó</p>' + ((O.actividad && O.actividad.lineas) || []).slice(0, 12).map(l => `<div class="fila">${esc(l.texto)}<small>${esc(l.quien)} · ${fechaC(l.hora)}</small></div>`).join('');
-  }
-  if (pestana === 'crea') h += '<iframe id="marco" style="position:relative;height:100%;min-height:420px;border-radius:14px" src="/prueba/nueva?dentro=1" title="Crea tu recepcionista"></iframe>';
-  if (pestana === 'libreria') h += '<p class="titulo">Librería: pregúntale lo que sea de MOON</p>' + (charla.length ? charla.map(m => `<div class="msj${m.yo ? ' yo' : ''}">${esc(m.texto)}</div>`).join('') : '<p class="fila">Escribe arriba. Ejemplos: «¿Cómo funciona Jason?», «¿Qué diferencia hay entre créditos y tokens?», «¿Podemos hacer un asistente para un dentista?»</p>');
-  k.innerHTML = h;
-  if (pestana === 'libreria') k.scrollTop = k.scrollHeight;
+  if (sel.tipo !== 'resumen') h = `<button class="fila" id="aResumen" style="color:var(--azul)">‹ Cómo va MOON</button>` + h;
+  $('#infoT').textContent = t; k.innerHTML = h; k.scrollTop = y;
+  const ar = $('#aResumen'); if (ar) ar.onclick = () => elegir({ tipo: 'resumen' });
 }
 
-// ---------- CRM ----------
-let fichaHtml = '';
-const ETAPA = { 'pendiente': 'Pendientes', 'en proceso': 'En proceso', 'cerrado': 'Cerrados', 'en órbita': 'En órbita', 'portafolio': 'Portafolio', 'archivo': 'Descartados' };
-function crmLista() {
+// ---------- Pantalla completa: CRM y Librería ----------
+let herr = null, etapaCRM = 'todos', busca = '', charla = [];
+const ETAPA = { 'pendiente': ['Pendientes', '#f08a24'], 'en proceso': ['En proceso', '#3f86ee'], 'cerrado': ['Cerrados', '#2fb36b'], 'en órbita': ['En órbita', '#8a5cf0'], 'portafolio': ['Portafolio', '#8d8d96'], 'archivo': ['Descartados', '#e04848'] };
+function abrirHerramienta(cual, tel, desdeHistoria) {
+  if (cual === 'crea') { location.href = '/prueba/nueva?dentro=1'; return; }   // su propia página completa (la misma del Tablero)
+  if (!desdeHistoria) history.pushState({ herramienta: cual, tel }, '');
+  herr = { cual, tel };
+  const inp = $('#texto');
+  if (cual === 'crm') { $('#herrT').textContent = tel ? 'Ficha' : 'CRM'; inp.placeholder = 'Busca nombre, negocio o teléfono'; inp.value = busca; $('#enviar').hidden = true; $('#escribe').hidden = !!tel; }
+  if (cual === 'libreria') { $('#herrT').textContent = 'Librería'; inp.placeholder = 'Pregúntale lo que sea de MOON'; inp.value = ''; $('#enviar').hidden = false; $('#escribe').hidden = false; }
+  mostrar('herramienta');
+  if (cual === 'crm' && tel) return pintarFicha(tel);
+  pintarHerramienta();
+}
+$('#volver').onclick = () => history.back();
+function cara(p, grande) {
+  const pan = ((C && C.paneles) || []).find(x => x.tel === p.tel);
+  const color = (ETAPA[p.etapa || 'pendiente'] || ETAPA.pendiente)[1];
+  const img = p.foto || (pan && pan.icono ? String(pan.icono).split('|')[0].replace(/#(color|llena)$/, '') : '');
+  const ini = esc(String(p.nombre || p.negocio || '?').trim().slice(0, 1).toUpperCase());
+  return `<span class="circulo${grande ? ' grande' : ''}" style="background:${color}">${ini}${img ? `<img src="${esc(img)}" alt="" onerror="this.remove()">` : ''}</span>`;
+}
+function pintarHerramienta() {
+  const k = $('#herrC');
+  if (herr.cual === 'libreria') {
+    // La respuesta más nueva va arriba, pegada al cuadro de escribir: el teclado nunca la tapa.
+    const pares = []; for (let i = 0; i < charla.length; i += 2) pares.push(charla.slice(i, i + 2));
+    k.innerHTML = pares.length ? pares.reverse().map(([q, r]) => `<div class="msj yo">${esc(q.texto)}</div><div class="msj">${esc(r ? r.texto : '')}</div>`).join('') : '<p class="fila"><small>Ejemplos: ¿Cómo funciona Jason? · ¿Qué diferencia hay entre créditos y tokens? · ¿Podemos hacer un asistente para un dentista?</small></p>';
+    k.scrollTop = 0; return;
+  }
   const ps = (C && C.personas) || [];
-  return Object.entries(ETAPA).map(([e, n]) => { const g = ps.filter(p => (p.etapa || 'pendiente') === e); return g.length ? `<p class="titulo">${n} (${g.length})</p>` + g.map(p => `<div class="fila toca" data-tel="${esc(p.tel)}"><b>${esc(p.nombre || 'Sin nombre')}</b>${p.negocio ? ' · ' + esc(p.negocio) : ''}${Number(p.es_prueba) ? ' · <span class="aviso">prueba</span>' : ''}<small>${esc(p.necesidad || p.giro || '')}</small></div>`).join('') : ''; }).join('');
+  const sinAc = x => String(x || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  const q = sinAc(busca.trim()), dig = q.replace(/\D/g, '');
+  const grupos = [['todos', 'Todos', ps.length]].concat(Object.entries(ETAPA).map(([e, [n]]) => [e, n, ps.filter(p => (p.etapa || 'pendiente') === e && !Number(p.es_prueba)).length])).concat([['pruebas', 'Pruebas', ps.filter(p => Number(p.es_prueba)).length]]).filter(g => g[2] || g[0] === 'todos');
+  const lista = q ? ps.filter(p => sinAc([p.nombre, p.negocio, p.giro, p.necesidad, p.notas_equipo, p.correo].join(' ')).includes(q) || (dig.length >= 3 && String(p.telefono || p.tel || '').includes(dig)))
+    : etapaCRM === 'todos' ? ps : etapaCRM === 'pruebas' ? ps.filter(p => Number(p.es_prueba)) : ps.filter(p => (p.etapa || 'pendiente') === etapaCRM && !Number(p.es_prueba));
+  k.innerHTML = (q ? `<p class="titulo">${lista.length} encontrado${lista.length === 1 ? '' : 's'}</p>` : `<div class="etapas">${grupos.map(([e, n, c]) => `<button data-e="${e}" class="${e === etapaCRM ? 'si' : ''}">${n} ${c}</button>`).join('')}</div>`) +
+    (lista.length ? `<div class="caras">${lista.map(p => `<button class="cara" data-tel="${esc(p.tel)}">${cara(p)}<span>${esc(p.nombre || 'Sin nombre')}</span>${p.negocio ? `<small>${esc(p.negocio)}</small>` : ''}${Number(p.es_prueba) ? '<small>prueba</small>' : ''}</button>`).join('')}</div>` : '<p class="fila"><small>Nadie aquí.</small></p>');
 }
-$('#contenido').addEventListener('click', async e => {
-  const f = e.target.closest('[data-tel]');
-  if (f && f.dataset.tel) return abrirFicha(f.dataset.tel);
-  const d = e.target.closest('[data-doc]');
-  if (d) { d.querySelector('small').textContent = 'Abriendo…'; const j = await centro('documento', { id: d.dataset.doc }); const sm = d.querySelector('small'); if (j.ok && j.doc && j.doc.compartir) { sm.innerHTML = `<a href="${esc(j.doc.compartir)}" target="_blank" rel="noopener">${esc(j.doc.compartir)}</a>`; d.removeAttribute('data-doc'); } else sm.textContent = 'No se pudo abrir'; }
+$('#herrC').addEventListener('click', e => {
+  const b = e.target.closest('[data-e]'); if (b) { etapaCRM = b.dataset.e; return pintarHerramienta(); }
+  const c = e.target.closest('[data-tel]'); if (c) return abrirHerramienta('crm', c.dataset.tel);
+  const d = e.target.closest('[data-doc]'); if (d) abrirDoc(d.dataset.doc, d.dataset.url);
 });
-async function abrirFicha(tel) {
-  pestana = 'ficha'; fichaHtml = '<p class="fila">Cargando…</p>'; dibujarPanel();
-  const j = await centro('ficha', { tel });
-  const p = j.persona || {}; const tel10 = String(p.tel || tel);
-  const docs = ((C && C.documentos) || []).filter(d => d.tel === tel10);
-  const panel = ((C && C.paneles) || []).find(x => x.tel === tel10);
-  const proy = ((C && C.proyectos) || []).filter(x => x.tel === tel10);
-  fichaHtml = `<p class="titulo"><a href="#" onclick="pestana='crm';dibujarPanel();return false">← CRM</a></p>
-    <div class="fila"><b>${esc(p.nombre || 'Sin nombre')}</b>${p.negocio ? ' · ' + esc(p.negocio) : ''}<small>${esc(ETAPA[p.etapa] || p.etapa || '')} · ${esc(p.temperatura || '')}${Number(p.es_prueba) ? ' · prueba' : ''}</small>
-    <small>Tel: +52 ${esc(tel10)}${p.correo ? ' · ' + esc(p.correo) : ''}</small>${p.proxima_cita ? `<small>Próxima cita: ${esc(p.proxima_cita)}</small>` : ''}</div>
-    ${p.necesidad ? `<div class="fila"><b>Qué necesita</b><small>${esc(p.necesidad)}</small></div>` : ''}
-    ${p.notas_equipo ? `<div class="fila"><b>Notas del equipo</b><small>${esc(p.notas_equipo)}</small></div>` : ''}
-    ${panel && panel.demo ? `<div class="fila"><b>Demo</b><small><a href="${esc(panel.demo)}" target="_blank" rel="noopener">${esc(panel.demo)}</a></small></div>` : ''}
-    ${proy.map(x => `<div class="fila"><b>Proyecto: ${esc(x.nombre)}</b><small>Fase: ${esc(x.fase)}${x.nota ? ' · ' + esc(x.nota) : ''}</small></div>`).join('')}
-    <p class="titulo">Presentaciones, contratos y material (${docs.length})</p>
-    ${docs.map(d => `<div class="fila toca" data-doc="${esc(d.id)}"><b>${esc(d.titulo)}</b><small>${esc(d.seccion)} · toca para abrir</small></div>`).join('') || '<p class="fila">Nada subido.</p>'}
-    <p class="titulo">Historial</p>${(j.contactos || []).map(c => `<div class="fila">${esc(c.resumen || '')}<small>${esc(c.canal)} · ${fechaC(c.fecha)}</small></div>`).join('') || '<p class="fila">Sin contactos.</p>'}`;
-  dibujarPanel();
-}
-
-// ---------- Librería ----------
-$('#escribir').onsubmit = async e => {
+$('#texto').addEventListener('input', () => { if (herr && herr.cual === 'crm') { busca = $('#texto').value; pintarHerramienta(); } });
+$('#escribe').onsubmit = async e => {
   e.preventDefault();
-  const q = $('#pregunta').value.trim(); if (!q) return;
-  $('#pregunta').value = ''; pestana = 'libreria'; cuartoSel = 'libreria';
-  const antes = charla.slice(-6);
-  charla.push({ yo: true, texto: q }, { texto: 'Buscando en la Librería…' }); dibujarOficina(); dibujarPanel();
+  if (herr.cual !== 'libreria') { $('#texto').blur(); return; }
+  const q = $('#texto').value.trim(); if (!q) return;
+  $('#texto').value = '';
+  const antes = charla.map(m => ({ yo: !!m.yo, texto: m.texto })).slice(-6);
+  charla.push({ yo: true, texto: q }, { texto: 'Buscando en la Librería…' }); pintarHerramienta();
   const j = await oficina('libreria', { pregunta: q, antes });
   charla[charla.length - 1] = { texto: j.ok ? j.respuesta : (j.mensaje || 'No se pudo contestar. Intenta de nuevo.') };
-  dibujarPanel();
+  pintarHerramienta();
 };
+// Regla 5: un toque abre el documento. La ventana se abre en el mismo toque; si el navegador la bloquea, se abre aquí.
+async function abrirDoc(id, url) {
+  // (window.open con "noopener" siempre regresa vacío: se abre normal y se le corta el lazo con esta página)
+  const w = window.open('', '_blank'); if (w) w.opener = null;
+  if (url) { if (w) w.location.href = url; else location.href = url; return; }
+  const j = await centro('documento', { id });
+  const link = j.ok && j.doc && (j.doc.compartir || j.doc.url);
+  if (!link) { if (w) w.close(); return; }
+  if (w) w.location.href = link; else location.href = link;
+}
+async function pintarFicha(tel) {
+  const p0 = ((C && C.personas) || []).find(x => String(x.tel) === String(tel)) || {};
+  const pinta = (p, contactos) => {
+    const docs = ((C && C.documentos) || []).filter(d => String(d.tel) === String(tel));
+    const pan = ((C && C.paneles) || []).find(x => x.tel === tel), proy = ((C && C.proyectos) || []).filter(x => x.tel === tel);
+    const E = ETAPA[p.etapa || 'pendiente'] || ETAPA.pendiente;
+    $('#herrC').innerHTML = `<div class="ficha-cab">${cara(p, true)}<div><div style="font-size:20px;overflow-wrap:anywhere">${esc(p.nombre || 'Sin nombre')}</div>${p.negocio ? `<small style="color:var(--suave)">${esc(p.negocio)}</small><br>` : ''}<small style="color:${E[1]}">${E[0]}${p.temperatura ? ' · ' + esc(p.temperatura) : ''}${Number(p.es_prueba) ? ' · prueba' : ''}</small></div></div>
+      ${pan && pan.demo ? `<a class="fila" href="${esc(pan.demo)}" target="_blank" rel="noopener">Abrir su demo<small>${esc(pan.demo)}</small></a>` : ''}
+      ${docs.map(d => `<button class="fila" data-doc="${esc(d.id)}" data-url="${d.formato === 'link' && /^https:\/\//.test(d.url || '') ? esc(d.url) : ''}" style="color:var(--azul)">${esc(d.titulo)}<small>${esc(d.seccion)}</small></button>`).join('')}
+      <p class="titulo">Datos</p>
+      <div class="fila">Tel: +52 ${esc(p.telefono || tel)}${p.correo ? `<small>${esc(p.correo)}</small>` : ''}${p.proxima_cita ? `<small>Próxima cita: ${esc(p.proxima_cita)}</small>` : ''}</div>
+      ${p.necesidad ? `<div class="fila">Qué necesita<small>${esc(p.necesidad)}</small></div>` : ''}
+      ${p.notas_equipo ? `<div class="fila">Notas del equipo<small>${esc(p.notas_equipo)}</small></div>` : ''}
+      ${proy.map(x => `<div class="fila">Proyecto: ${esc(x.nombre)}<small>Fase: ${esc(x.fase)}${x.nota ? ' · ' + esc(x.nota) : ''}</small></div>`).join('')}
+      ${contactos ? `<p class="titulo">Historial</p>` + (contactos.slice(0, 12).map(c => `<div class="fila">${esc(c.resumen || '')}<small>${esc(c.canal)} · ${fechaC(c.fecha)}</small></div>`).join('') || '<p class="fila"><small>Sin contactos.</small></p>') : ''}`;
+  };
+  pinta(p0, null); $('#herrC').scrollTop = 0;   // lo que ya se sabe sale al instante; el historial llega después
+  const j = await centro('ficha', { tel });
+  if (herr && herr.tel === tel && j.ok) pinta(Object.assign({}, p0, j.persona || {}), j.contactos || []);
+}
 
 arrancar();
 </script>
