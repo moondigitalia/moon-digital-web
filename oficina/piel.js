@@ -206,10 +206,10 @@
     const [titulo, sub] = c.n.split(' · '), k = 64, max = c.w * k - 36;
     let fs1 = Math.min(36, max / (titulo.length * 0.68)), fs2 = sub ? Math.min(22, max / (sub.length * 0.56)) : 0;
     // dónde queda libre el piso de cada cuarto (medido contra sus muebles); 'y' = las letras corren a lo largo del otro lado
-    const LUGAR = { recepcion: [4.2, 4.5, 'x', 3.3], clientes: [12, 5.2], demos: [22, 5.3], cubiculos: [1.35, 12.4, 'x', 2.3], robots: [22, 11.3], crm: [9.6, 13.35], libreria: [14.5, 10.75], crea: [3, 17.45], gris: [12, 18.5], oracion: [19.9, 18.55, 'x', 3.2], cerrado: [24, 18.4] };
+    const LUGAR = { recepcion: [3, 4.35, 'x', 5], clientes: [12, 5.2], demos: [22, 5.3], cubiculos: [0.95, 8.8, 'y', 3.4], robots: [22, 11.3], crm: [9.6, 13.35], libreria: [14.5, 10.75], crea: [3, 17.45], gris: [12, 18.5], oracion: [18.75, 16.0, 'y', 2.4], cerrado: [24, 18.4] };
     const L = LUGAR[c.id] || [c.x + c.w / 2, c.y + c.h * 0.62], [ox, oy] = iso(L[0], L[1]);
     const largo = (L[3] || (L[2] === 'y' ? c.h : c.w)) * k - 36; if (L[2] === 'y' || L[3]) { fs1 = Math.min(36, largo / (titulo.length * 0.68)); fs2 = sub ? Math.min(22, largo / (sub.length * 0.56)) : 0; }
-    const m = L[2] === 'y' ? `matrix(${-TW / 2 / k},${TH / 2 / k},${-TW / 2 / k},${-TH / 2 / k},${ox},${oy})` : `matrix(${TW / 2 / k},${TH / 2 / k},${-TW / 2 / k},${TH / 2 / k},${ox},${oy})`;
+    const m = L[2] === 'y' ? `matrix(${TW / 2 / k},${-TH / 2 / k},${TW / 2 / k},${TH / 2 / k},${ox},${oy})` : `matrix(${TW / 2 / k},${TH / 2 / k},${-TW / 2 / k},${TH / 2 / k},${ox},${oy})`;
     return `<g class="letrero" transform="${m}" fill="#fbfaf6" font-weight="900" text-anchor="middle" stroke="#1d2a2b" stroke-width="5" stroke-linejoin="round" paint-order="stroke" stroke-opacity=".55" style="pointer-events:none"><text x="0" y="${sub ? -fs2 - 8 : 0}" font-size="${fs1.toFixed(1)}" opacity=".92" letter-spacing="1">${esc(titulo.toUpperCase())}</text>${sub ? `<text x="0" y="0" font-size="${fs2.toFixed(1)}" opacity=".85">${esc(sub)}</text>` : ''}</g>`;
   }
   // nombre corto de una tarea: sin lo de entre paréntesis y a lo más ~16 letras sin cortar palabras
@@ -330,12 +330,12 @@
   function paso(t) {
     const V = VIDA;
     if (t < (V.pausaHasta || 0)) { V.ultimo = t; requestAnimationFrame(paso); return; }   // mientras el dedo mueve el mapa, la oficina se queda quieta (arrastrar fluido en celulares lentos)
-    const dt = Math.min(0.1, (t - V.ultimo) / 1000); V.ultimo = t; V.reloj += dt;
+    const dt = Math.max(0, Math.min(0.1, (t - V.ultimo) / 1000));   // nunca negativo (el reloj del cuadro puede venir un poquito antes): con 0 de distancia daba 0/0 y Claude se quedaba caminando en su lugar V.ultimo = t; V.reloj += dt;
     const lista = Object.values(V.actores).filter(a => a.g && a.g.isConnected);
     lista.forEach(a => {
       if (a.camino.length) {
         const [tx, ty] = a.camino[0], dx = tx - a.pos[0], dy = ty - a.pos[1], d = Math.hypot(dx, dy), avance = TIEMPO.paso * dt;
-        if (d <= avance) { a.pos = [tx, ty]; a.camino.shift(); if (!a.camino.length) llegar(a, lista); } else { a.pos = [a.pos[0] + dx / d * avance, a.pos[1] + dy / d * avance]; }
+        if (d <= avance || d < 1e-6) { a.pos = [tx, ty]; a.camino.shift(); if (!a.camino.length) llegar(a, lista); } else { a.pos = [a.pos[0] + dx / d * avance, a.pos[1] + dy / d * avance]; }
         colocar(a);
       } else if (a.espera > 0) { a.espera -= dt; if (a.espera <= 0 && a.claudeFijo) { const op = ['crm', 'libreria', 'robots', 'demos', 'recepcion', 'cubiculos', 'clientes'].filter(r => r !== a.destino); a.destino = op[Math.floor(Math.random() * op.length)]; a.burbuja = null; a.camino = ruta(a.pos, adentro(a.destino)); }
         else if (a.espera <= 0 && a.modo === 'fuera' && !a.claudeFijo) { a.camino = a.lado ? ruta(a.pos, salida(a)).concat([a.casa]) : ruta(a.pos, a.casa); a.modo = 'regreso'; } colocar(a); }
@@ -473,10 +473,10 @@
       lado('derecha', c.x + c.w, c.y, c.y + c.h, 'y', 12, gris ? '#868885' : '#a2b4a1', 0.16, 0);
     });
     // vida: plantas en las esquinas, archiveros, sillón de espera en recepción, tapetes
-    [[0.4, 4.5], [16.5, 0.5], [25.5, 0.5], [0.4, 12.5], [11.5, 13.5], [16.5, 18.5], [25.5, 11.5], [21.5, 18.5], [0.4, 17.5]].forEach(([x, y]) => planta(x, y));
+    [[0.4, 4.5], [16.5, 0.5], [25.5, 0.5], [5.6, 6.4], [16.5, 18.5], [25.5, 11.5], [21.5, 18.5], [0.4, 17.5]].forEach(([x, y]) => planta(x, y));
     archivero(4.6, 0.15); archivero(0.15, 6.2); archivero(7.2, 12.2); archivero(22.2, 13.3); archivero(23, 13.3); archivero(24.6, 16);
-    sillon(0.6, 3.6, 2);
-    tapete(8, 3.6, 8, 3.2, '#2f5658'); tapete(19, 14.2, 2, 3.4, '#a3563b'); tapete(12.8, 11.2, 3.4, 2, '#5a4a3a');
+    pon(5.0, 1.6, caja(4.7, 0.6, 0.8, 2, 10, ['#c46a4a', '#a3563b', '#8e4a33']) + caja(5.28, 0.6, 0.22, 2, 24, ['#c46a4a', '#a3563b', '#8e4a33']));   // sillón de espera a un lado (el frente queda libre para leer el nombre)
+    tapete(8, 3.6, 8, 3.2, '#2f5658'); tapete(19.9, 14.2, 1.9, 3.0, '#a3563b'); tapete(12.8, 11.2, 3.4, 2, '#5a4a3a');
 
     // Sillón individual (demos): asiento acolchonado, respaldo y brazos
     const TELA = ['#5a8fb0', '#477592', '#3d6680'];
@@ -487,8 +487,8 @@
     // Recepción: Jason detrás del escritorio con su teléfono (brilla si hubo llamada en la última hora)
     const ll = (C && C.llamadas) || [], reciente = ll.some(l => Date.now() - Date.parse(l.fecha) < 3600e3);
     const jason = as.find(a => a.id === 'jason');
-    pon(2.7, 3.1, caja(1.2, 2.6, 3, 1, 24, ROBLE_O) + caraY(1.25, 4.15, 3.6, 4, 20, '#a07a4f') + caja(1.15, 2.55, 3.1, 1.1, 3, ROBLE, 24) + papeles(1.6, 2.8, 27) + lampara(1.4, 3.2, 27) + taza(2.9, 3.0, 27));
-    pon(2.6, 2.4, `<g>${(() => { const [px, py] = iso(3.6, 3, 27); return `<g class="${reciente ? 'suena' : ''}" style="transform-origin:${px}px ${py - 6}px"><rect x="${px - 6}" y="${py - 10}" width="12" height="8" rx="2" fill="#222"/></g>${reciente ? `<circle cx="${px}" cy="${py - 6}" r="12" fill="#3ccf7a" opacity=".35" filter="url(#brillo)"/>` : ''}`; })()}</g>`);
+    pon(2.6, 3.0, caja(1.6, 2.6, 2, 0.8, 24, ROBLE_O) + caraY(1.65, 3.55, 3.4, 4, 20, '#a07a4f') + caja(1.55, 2.55, 2.1, 0.9, 3, ROBLE, 24) + papeles(1.8, 2.75, 27) + lampara(2.0, 3.15, 27));
+    pon(2.6, 2.4, `<g>${(() => { const [px, py] = iso(3.25, 2.95, 27); return `<g class="${reciente ? 'suena' : ''}" style="transform-origin:${px}px ${py - 6}px"><rect x="${px - 6}" y="${py - 10}" width="12" height="8" rx="2" fill="#222"/></g>${reciente ? `<circle cx="${px}" cy="${py - 6}" r="12" fill="#3ccf7a" opacity=".35" filter="url(#brillo)"/>` : ''}`; })()}</g>`);
     silla(2.3, 1.6);
     if (jason) pon(2.3, 1.6, monito(2.3, 1.6, { id: 'jason', actor: true, cuarto: 'recepcion', nombre: 'Jason', estado: jason.estado, ropa: '#2f3b55', pelo: '#3a2a1f', diadema: true, sentado: true }));
 
@@ -524,8 +524,8 @@
     ((O.tareas && O.tareas.lista) || []).forEach((t, i) => { const x = 19.6 + (i % 3) * 2.4, y = 8.6 + Math.floor(i / 3) * 2; pon(x, y, robotRuedas(x, y, t, i)); });
 
     // CRM: archiveros; Librería: libreros y mesa de lectura
-    pon(8, 10, archiveroAlto(7.4, 9.4, 1.2, 0.8, 38) + archiveroAlto(8.8, 9.4, 1.2, 0.8, 38));
-    pon(10, 12.2, mesa(8.8, 11.6, 2, 1.2) + papeles(9.1, 11.9, 22) + papeles(9.8, 12.2, 22) + compu(9.4, 11.5, 22));
+    pon(8.6, 9.5, archiveroAlto(7.3, 9.15, 0.75, 0.6, 30) + archiveroAlto(8.15, 9.15, 0.75, 0.6, 30) + archiveroAlto(9.0, 9.15, 0.75, 0.6, 30));   // archiveros pegados a la pared, más bajos que ella
+    pon(10, 11.5, mesa(8.8, 10.8, 2, 1.1) + papeles(9.1, 11.1, 22) + papeles(9.8, 11.4, 22) + compu(9.4, 10.7, 22));
     [0, 1, 2, 3].forEach(i => pon(12.6 + i * 0.95, 9.4, librero(12.3 + i * 0.95, 9.3, 0.8, 0.6, 46, i)));
     pon(14.6, 12.2, mesa(13.6, 11.6, 2, 1.2) + lampara(15.3, 11.9, 22) + (() => { const [bx, by] = iso(14.4, 12.2, 22.5); return `<path d="M${bx - 14},${by} l14,-5 l14,5 l-14,6 z" fill="#f4f2ea" stroke="#c9c4b5"/><path d="M${bx},${by - 5} v11" stroke="#c9c4b5"/>`; })());
     // Crear tu recepcionista: banco de trabajo con un "+"
@@ -549,8 +549,8 @@
     const nPruebas = as.filter(a => ['prueba', 'base', 'copia'].includes(a.tipo) && a.id !== 'donde').length;
     pon(24, 16.5, etiqueta(...iso(24, 16.5), nPruebas + ' guardados'));
     // Cuarto de oración: solo Jesús, con dos velitas
-    [[19, 17.6], [21, 17.6]].forEach(([x, y]) => pon(x, y, caja(x - 0.15, y - 0.15, 0.3, 0.3, 10, ['#efe6d2', '#cfc4ad', '#b9ae98']) + (() => { const [vx, vy] = iso(x, y, 16); return `<circle cx="${vx}" cy="${vy}" r="10" fill="#ffcf6b" opacity=".35" filter="url(#brillo)"/><ellipse cx="${vx}" cy="${vy}" rx="2.2" ry="4" fill="#ffd97a"/>`; })()));
-    pon(20, 16, monito(20, 16, { id: 'jesus', piel3d: 'jesus', cuarto: 'oracion', nombre: 'Jesús', ropa: '#efe6d2', pelo: '#4a2c18' }));
+    [[19.7, 17.7], [21.4, 17.5]].forEach(([x, y]) => pon(x, y, caja(x - 0.15, y - 0.15, 0.3, 0.3, 10, ['#efe6d2', '#cfc4ad', '#b9ae98']) + (() => { const [vx, vy] = iso(x, y, 16); return `<circle cx="${vx}" cy="${vy}" r="10" fill="#ffcf6b" opacity=".35" filter="url(#brillo)"/><ellipse cx="${vx}" cy="${vy}" rx="2.2" ry="4" fill="#ffd97a"/>`; })()));
+    pon(20.2, 15.5, monito(20.2, 15.5, { id: 'jesus', piel3d: 'jesus', cuarto: 'oracion', nombre: 'Jesús', ropa: '#efe6d2', pelo: '#4a2c18' }));
 
     cosas.sort((a, b) => a[0] - b[0]);
     return {
