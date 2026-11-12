@@ -81,33 +81,45 @@ async function libreria(d, yo) {
   const llave = process.env.ANTHROPIC_LLAVE;
   if (!llave) return { ok: false, error: 'llave' };
   const intentos = []; MODELOS.forEach(m => { intentos.push([m, true]); intentos.push([m, false]); });   // si la búsqueda no está disponible, contesta sin ella
+  const p = { e: 1, c: 0.1, w: 1.25, s: 5 };   // precio de Haiku por millón de pedacitos (estimado: se confirma contra el recibo)
+  let micro = 0;
   for (const [modelo, conBusqueda] of intentos) {
-    const r = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'x-api-key': llave, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
-      body: JSON.stringify({
-        model: modelo, max_tokens: 1200,
-        // El libro va con "memoria rápida" (cache): la segunda pregunta del día cuesta ~10 veces menos en leerlo.
-        system: [{ type: 'text', text: REGLAS }, { type: 'text', text: '# Lo que sabe la Librería\n\n' + saber, cache_control: { type: 'ephemeral' } }],
-        messages: historia.concat([{ role: 'user', content: pregunta }]),
-        // Para lo que no está en la Librería: busca en internet (máximo 3 búsquedas por pregunta, ~1 centavo de dólar cada una).
-        tools: conBusqueda ? [{ type: 'web_search_20250305', name: 'web_search', max_uses: 3 }] : undefined,
-      }),
-    });
-    const j = await r.json().catch(() => ({}));
-    if (r.status === 404 || (r.status === 400 && /model|tool|web_search/i.test((j.error || {}).message || ''))) continue;
-    if (!r.ok) return { ok: false, error: 'ia', mensaje: 'La Librería no pudo contestar ahorita. Intenta en un minuto.' };
-    const respuesta = (j.content || []).filter(x => x.type === 'text').map(x => x.text).join('\n').trim();
-    const u = j.usage || {};
-    // Precio por millón de palabras-pedacito (tokens) del modelo barato; se guarda en millonésimas de dólar.
-    const p = { e: 1, c: 0.1, w: 1.25, s: 5 };   // precio de Haiku (estimado: se confirma contra el recibo de Anthropic)
-    const busquedas = (u.server_tool_use && u.server_tool_use.web_search_requests) || 0;
-    const micro = Math.round((u.input_tokens || 0) * p.e + (u.cache_read_input_tokens || 0) * p.c + (u.cache_creation_input_tokens || 0) * p.w + (u.output_tokens || 0) * p.s) + busquedas * 10000;   // cada búsqueda: 1 centavo
+    const mensajes = historia.concat([{ role: 'user', content: pregunta }]);
+    let j = null, r = null;
+    // Cuando busca en internet, la IA puede "pausar" a la mitad (pause_turn): se le deja continuar hasta 3 veces.
+    for (let vuelta = 0; vuelta < 4; vuelta++) {
+      r = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'x-api-key': llave, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
+        body: JSON.stringify({
+          model: modelo, max_tokens: 1500,
+          // El libro va con "memoria rápida" (cache): la segunda pregunta del día cuesta ~10 veces menos en leerlo.
+          system: [{ type: 'text', text: REGLAS }, { type: 'text', text: '# Lo que sabe la Librería\n\n' + saber, cache_control: { type: 'ephemeral' } }],
+          messages: mensajes,
+          // Para lo que no está en la Librería: busca en internet (máximo 3 búsquedas por pregunta, ~1 centavo de dólar cada una).
+          tools: conBusqueda ? [{ type: 'web_search_20250305', name: 'web_search', max_uses: 3 }] : undefined,
+        }),
+      });
+      j = await r.json().catch(() => ({}));
+      if (!r.ok) break;
+      const u = j.usage || {};
+      micro += Math.round((u.input_tokens || 0) * p.e + (u.cache_read_input_tokens || 0) * p.c + (u.cache_creation_input_tokens || 0) * p.w + (u.output_tokens || 0) * p.s) + ((u.server_tool_use && u.server_tool_use.web_search_requests) || 0) * 10000;
+      if (j.stop_reason !== 'pause_turn') break;
+      mensajes.push({ role: 'assistant', content: j.content });
+    }
+    if (r.status === 404 || (r.status === 400 && /model|tool|web_search/i.test(((j || {}).error || {}).message || ''))) continue;
+    if (!r.ok) return { ok: false, error: 'ia', mensaje: 'Jason no pudo contestar ahorita. Intenta en un minuto.' };
+    // Solo el texto final (lo que dice después de buscar), nunca vacío: si salió vacío, se intenta sin búsqueda.
+    const bloques = (j.content || []), ultimoTool = bloques.map(x => x.type).lastIndexOf('web_search_tool_result');
+    const respuesta = bloques.slice(ultimoTool + 1).filter(x => x.type === 'text').map(x => x.text).join('').trim() || bloques.filter(x => x.type === 'text').map(x => x.text).join('').trim();
+    if (!respuesta) continue;
     await sql('INSERT INTO libreria_preguntas (quien, pregunta, respuesta, micro_usd, fecha) VALUES (?,?,?,?,?)', [yo.id, pregunta, t(respuesta, 4000), micro, new Date().toISOString()]);
     return { ok: true, respuesta, centavos: Math.round(micro / 1e4 * 100) / 100 };
   }
-  return { ok: false, error: 'modelo' };
+  if (micro) await sql('INSERT INTO libreria_preguntas (quien, pregunta, respuesta, micro_usd, fecha) VALUES (?,?,?,?,?)', [yo.id, pregunta, '', micro, new Date().toISOString()]);
+  return { ok: false, error: 'vacia', mensaje: 'Jason no logró armar la respuesta. Pregúntale de otra forma o en un minuto.' };
 }
+
 
 module.exports = async (req, res) => {
   res.setHeader('Cache-Control', 'no-store');

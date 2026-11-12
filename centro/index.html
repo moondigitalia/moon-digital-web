@@ -382,6 +382,8 @@ html:not(.ancho) .agenda>.fila:only-child{border-radius:20px}
 .f-bloque{display:grid;gap:8px;flex:none}
 .ficha1.apretada{gap:8px;padding:12px}.ficha1.apretada .boton{height:42px}.ficha1.apretada .f-etapas button{min-height:34px}.ficha1.apretada .f-quien .icono{width:40px!important;height:40px!important}.ficha1.apretada .f-enlaces .enlace{min-height:28px}
 .p-acciones{display:flex;gap:6px;flex-wrap:nowrap;min-width:0}
+.teclado .f-todo:focus-within{overflow:hidden!important}
+.ed-arch{display:grid;gap:8px}.teclado form.pasos>.ed-arch:not(:focus-within){display:none}
 .pilita{flex:1 1 auto;justify-content:center;min-width:0;display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 10px;border-radius:99px;background:var(--tarjeta);box-shadow:var(--sombra-chica);font-size:13px;font-weight:800;color:var(--tinta);white-space:nowrap}
 .pilita svg{width:14px;height:14px;flex:none}.pilita.rojo{color:var(--rojo)}
 .f-nota1{flex:none;max-height:88px;text-align:start;font:inherit;font-weight:600;min-height:44px}
@@ -644,6 +646,10 @@ function medir() {
   cl.toggle('bajo', H <= 620);
   cl.toggle('bajo2', H <= 600 && W <= 899);
   cl.toggle('teclado', H0 < altoMax * 0.78);
+  // Con el teclado arriba, un formulario "pasos" deja ver solo el campo que se escribe: si vive dentro de algo que se
+  // desliza, se regresa arriba para que ese campo quede a la vista (nunca escondido arriba de la pantalla).
+  const act = document.activeElement;
+  if (cl.contains('teclado') && act && act.closest && act.closest('form.pasos')) { const f = act.closest('form.pasos'), d = act.closest('.desliza'); const sube = () => { f.scrollTop = 0; if (d) d.scrollTop = 0; }; sube(); requestAnimationFrame(sube); setTimeout(sube, 60); }
 }
 function alMedir() { medir(); clearTimeout(reloj); reloj = setTimeout(() => { if (alCambiarTamano) alCambiarTamano(); else if (D && !pila.length) pinta(true); }, 90); }
 medir();
@@ -673,6 +679,7 @@ document.addEventListener('mousedown', e => { if (escribiendo() && e.target.clos
 const camposDe = f => [...f.querySelectorAll('input:not([type=hidden]):not([type=file]):not([type=checkbox]):not([type=radio]):not([type=range]):not([type=date]),textarea')].filter(x => !x.disabled);
 document.addEventListener('focusin', e => {
   const f = e.target.closest && e.target.closest('form.pasos'); if (!f) return;
+  if (document.documentElement.classList.contains('teclado')) { const d = f.closest('.desliza'); requestAnimationFrame(() => { f.scrollTop = 0; if (d) d.scrollTop = 0; }); }
   const l = camposDe(f), i = l.indexOf(e.target); if (i < 0) return;
   const ultimo = i === l.length - 1;
   f.classList.toggle('no-ultimo', !ultimo);
@@ -1249,8 +1256,9 @@ async function capaFicha(c, sil) {
   const util = v => v !== '' && v != null && !/^otros?$/i.test(String(v).trim());
   const datos = [['Negocio', P.negocio], ['Teléfono', P.telefono], ['Correo', P.correo], ['Giro', P.giro], ['Servicio', P.servicio], ['Llegó por', P.origen], ['Necesita', P.necesidad], ['Volumen', P.volumen], ['Urgencia', P.urgencia], ['Decide', P.decide], ['Cita', P.proxima_cita]].filter(x => util(x[1]));
   marco(pan ? nombreCorto(P) : nombreDe(P), 'Subir archivo', `<div class="cuerpo" style="grid-template-rows:auto minmax(0,1fr)">
-    <div class="p-acciones" style="flex-wrap:wrap"><button class="pilita" id="editar">${I.lapiz} Editar</button>${tel ? `<a class="pilita" href="tel:+52${tel.slice(-10)}">${I.tel} Llamar</a><a class="pilita" href="https://wa.me/52${tel.slice(-10)}" target="_blank" rel="noopener">${I.wa} WhatsApp</a>` : ''}<button class="pilita rojo" id="quitar">${I.basura} ${paga ? 'Quitar<span class="largo"> de Clientes</span>' : 'Papelera'}</button></div>
+    <div class="p-acciones" style="flex-wrap:wrap"><button class="pilita${c.editando ? ' on' : ''}" id="editar">${c.editando ? '✓ Listo' : I.lapiz + ' Editar'}</button>${tel ? `<a class="pilita" href="tel:+52${tel.slice(-10)}">${I.tel} Llamar</a><a class="pilita" href="https://wa.me/52${tel.slice(-10)}" target="_blank" rel="noopener">${I.wa} WhatsApp</a>` : ''}<button class="pilita rojo" id="quitar">${I.basura} ${paga ? 'Quitar<span class="largo"> de Clientes</span>' : 'Papelera'}</button></div>
     <div class="desliza f-todo" style="min-height:0;overflow-y:auto;display:grid;align-content:start;gap:12px;padding-bottom:12px">
+      ${c.editando ? cuerpoEdicion(P, pan, docs, nomSec) : `
       ${pan ? `<div class="demo f-demo" style="--c:${pan.color};min-height:clamp(250px,40vh,340px)"><div class="demo-logo">${icono(pan.imagen ? Object.assign({}, pan, { icono: pan.imagen }) : pan, P, 0)}</div>
         <div class="demo-info"><span class="eti">Su demo</span><b>${esc(nombreCorto(P))}</b><span>${esc(dominio(pan.demo))}</span></div>
         <div class="demo-botones"><button class="boton demo-boton" id="demo">Abrir demo ${I.abre}</button><button class="redondo demo-enviar" id="demoEnviar" aria-label="Enviar el demo" title="Enviar el demo">${I.enviar}</button></div></div>` : ''}
@@ -1258,13 +1266,14 @@ async function capaFicha(c, sil) {
       <div class="f-bloque"><span class="eti">¿En qué va?</span><div class="f-etapas" id="etapas">${Object.keys(ETAPA).map(e => `<button class="${(P.etapa || 'pendiente') === e ? 'on' : ''}" data-e="${e}" style="--c:${ETAPA[e].c};--cf:${ETAPA[e].cf}">${ETAPA[e].n}</button>`).join('')}</div></div>
       ${P.notas_equipo ? `<div><span class="eti">Nota del equipo</span><button class="nota" id="nota" style="display:block;width:100%;margin-top:6px;height:auto;overflow:visible;text-align:start;font:inherit;font-weight:600">${esc(P.notas_equipo)}</button></div>` : '<button class="boton dos" id="nota">Escribir una nota</button>'}
       ${datos.length ? `<div><span class="eti">Datos</span><div class="lista" style="margin-top:6px">${datos.map(([k, v]) => `<div class="fila chica" style="cursor:default;grid-template-columns:100px minmax(0,1fr)"><span class="eti" style="letter-spacing:.1em">${esc(k)}</span><span class="q"><b style="font-weight:600">${esc(v)}</b></span></div>`).join('')}</div></div>` : ''}
-      <label class="mini" style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="prueba"${P.es_prueba ? ' checked' : ''}> Es de prueba (no cuenta como cliente)</label>
+      <label class="mini" style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="prueba"${P.es_prueba ? ' checked' : ''}> Es de prueba (no cuenta como cliente)</label>`}
     </div></div>`, I.subir);
   if (sil) app.querySelector('.vista').style.animation = 'none';
   const lienzo = app.querySelector('.f-todo'); if (c.scroll) lienzo.scrollTop = c.scroll; lienzo.onscroll = () => { c.scroll = lienzo.scrollTop; };
   const guarda = async datos => { const r = await api('editar_persona', Object.assign({ tel: c.tel }, datos)); if (r.ok) { Object.assign(per0, datos); if (c.ext && c.ext.persona) Object.assign(c.ext.persona, datos); delete FICHAS[c.tel]; } return r; };
   document.getElementById('accion').onclick = () => abrir({ tipo: 'subir', tel: c.tel });
-  document.getElementById('editar').onclick = () => abrir({ tipo: 'editarContacto', tel: c.tel });
+  document.getElementById('editar').onclick = () => { c.editando = !c.editando; pinta(true); };
+  if (c.editando) return activarEdicion(c, P, pan, docs, guarda);
   let seguro = false;
   document.getElementById('quitar').onclick = async ev => {
     const b = ev.currentTarget;
@@ -1285,6 +1294,60 @@ async function capaFicha(c, sil) {
       if (lr.bottom > info.top - 8) { const libre = info.top - 8 - lr.top; l.style.setProperty('--lg', Math.max(0, libre) + 'px'); l.style.display = libre < 44 ? 'none' : ''; } else l.style.display = ''; };
     ajustaLogo(); alCambiarTamano = ajustaLogo;
   }
+}
+// MODO EDICIÓN de la ficha (Kid, 11-nov-2026): la misma pantalla, pero cada cosa se cambia ahí mismo:
+// foto, nombre, datos, link del demo, nombre de cada archivo, cambiarlo por otro o quitarlo. Cada cambio se guarda solo.
+function cuerpoEdicion(P, pan, docs, nomSec) {
+  // Un solo formulario "pasos": con el teclado arriba se ve solo el campo que estás escribiendo (regla del Tablero).
+  const campo = (k, n, v, extra) => `<label class="et-campo">${n}<input class="campo" data-campo="${k}" value="${esc(v || '')}" ${extra || ''}></label>`;
+  return `<form class="editando pasos" id="fEdita" novalidate style="display:flex;flex-direction:column;gap:12px;border-radius:var(--r);background:var(--tarjeta);box-shadow:var(--sombra);padding:16px" onsubmit="return false">
+    ${campoFoto(P.foto || '')}
+    ${campo('negocio', 'Negocio', P.negocio, 'maxlength="120"')}
+    ${campo('nombre', 'Nombre de la persona', P.nombre, 'maxlength="80"')}
+    ${campo('telefono', 'Teléfono', P.telefono, 'inputmode="tel" maxlength="30"')}
+    ${campo('correo', 'Correo', P.correo, 'inputmode="email" maxlength="120"')}
+    <label class="et-campo">Link del demo<input class="campo" data-demo value="${esc(pan ? pan.demo : '')}" inputmode="url" placeholder="https://…" maxlength="300"></label>
+    <label class="et-campo">Nota del equipo<textarea class="campo" data-campo="notas_equipo" rows="3">${esc(P.notas_equipo || '')}</textarea></label>
+    ${docs.map(d => `<div class="ed-arch" data-ed="${esc(d.id)}">
+      <label class="et-campo">Archivo · ${esc(nomSec(d.seccion))}<input class="campo" data-titulo value="${esc(d.titulo)}" maxlength="120"></label>
+      <div class="p-acciones" style="flex-wrap:wrap">${d.formato === 'link' ? '' : `<button type="button" class="pilita" data-cambiar>${I.subir} Cambiar archivo</button>`}<button type="button" class="pilita rojo" data-quitar>${I.basura} Quitar</button></div></div>`).join('')}
+    <div class="botones"><button type="button" class="boton dos" id="edSubir">${I.subir} Subir archivo</button></div>
+    <div class="aviso"></div>
+  </form>`;
+}
+function activarEdicion(c, P, pan, docs, guarda) {
+  const per0 = personaDe(c.tel);
+  document.getElementById('quitar').hidden = true;   // en edición no se manda a nadie a la papelera por error
+  const listo = msg => avisoFlotante(msg || 'Guardado');
+  activarFoto(async foto => { const r = await guarda({ foto }); if (r.ok) { recargar(true); listo('Foto guardada'); } else avisoFlotante('Esa foto no se pudo guardar. Prueba con otra.'); });
+  app.querySelectorAll('[data-campo]').forEach(i => i.onchange = async () => {
+    const k = i.dataset.campo, v = i.value.trim();
+    if ((k === 'negocio' || k === 'nombre') && !v && !(k === 'negocio' ? per0.nombre : per0.negocio)) { avisoFlotante('Escribe al menos el negocio o el nombre'); i.value = per0[k] || ''; return; }
+    const r = await guarda({ [k]: v }); if (r.ok) { recargar(true); listo(); } else avisoFlotante('No se pudo guardar');
+  });
+  const dm = app.querySelector('[data-demo]');
+  dm.onchange = async () => {
+    const v = dm.value.trim();
+    if (v && !/^https:\/\/\S+\.\S+$/.test(v)) { avisoFlotante('El link debe empezar con https://'); return; }
+    const r = await api('panel_guardar', { tel: c.tel, demo: v });
+    if (r.ok) { await recargar(true); listo(v ? 'Link del demo guardado' : 'Se quitó el demo'); } else avisoFlotante('No se pudo guardar el link');
+  };
+  app.querySelectorAll('[data-ed]').forEach(caja => {
+    const id = caja.dataset.ed, d = docs.find(x => x.id === id);
+    caja.querySelector('[data-titulo]').onchange = async e => {
+      const titulo = e.target.value.trim(); if (!titulo) { e.target.value = d.titulo; return; }
+      const r = await api('doc_renombrar', { id, titulo }); if (r.ok) { d.titulo = titulo; recargar(true); listo('Nombre guardado'); } else avisoFlotante('No se pudo cambiar el nombre');
+    };
+    const cb = caja.querySelector('[data-cambiar]'); if (cb) cb.onclick = () => abrir({ tipo: 'subir', tel: c.tel, sec: d.seccion, reemplaza: id });
+    let seguro = false;
+    caja.querySelector('[data-quitar]').onclick = async ev => {
+      const b = ev.currentTarget;
+      if (!seguro) { seguro = true; b.innerHTML = `${I.basura} ¿Seguro? Toca otra vez`; return; }
+      const r = await api('doc_quitar', { id }); if (r.ok) { await recargar(true); avisoFlotante('Está en la papelera (se puede recuperar)'); pinta(true); }
+    };
+  });
+  document.getElementById('edSubir').onclick = () => abrir({ tipo: 'subir', tel: c.tel });
+  document.getElementById('accion').onclick = () => abrir({ tipo: 'subir', tel: c.tel });
 }
 function capaEditarContacto(c) {
   const p = personaDe(c.tel); if (!p) return cerrar();

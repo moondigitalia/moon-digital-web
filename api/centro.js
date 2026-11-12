@@ -265,6 +265,18 @@ async function conSocio(d, yo) {
     ]);
     return { ok: true, lista: per, docs };
   }
+  // ---- Link del demo de una persona (Kid, 11-nov-2026: se edita desde la misma ficha). Vacío = quitarle el demo. ----
+  if (yo.tipo === 'socio' && d.accion === 'panel_guardar') {
+    const tel = llave(d.tel); if (!tel || !(await sql('SELECT tel FROM personas WHERE tel = ?', [tel]))[0]) return { ok: false, error: 'persona' };
+    const demo = t(d.demo, 300);
+    if (demo && !/^https:\/\/[^\s]+\.[^\s]+$/.test(demo)) return { ok: false, error: 'link' };
+    if (!demo) { await sql('DELETE FROM paneles WHERE tel = ?', [tel]); await anotar(yo.id, 'le quitó el link del demo a ' + tel); return { ok: true }; }
+    const orden = ((await sql('SELECT COALESCE(MAX(orden), 0) + 1 n FROM paneles'))[0] || {}).n || 1;
+    await sql(`INSERT INTO paneles (tel, orden, demo, color, actualizado) VALUES (?, ?, ?, ?, ?)
+               ON CONFLICT(tel) DO UPDATE SET demo = excluded.demo, actualizado = excluded.actualizado`, [tel, orden, demo, '#1f3a6e', ahora()]);
+    await anotar(yo.id, 'cambió el link del demo de ' + tel);
+    return { ok: true };
+  }
   // ---- Archivos: solo los socios cambian el nombre o los mandan a la papelera (nunca se borran de golpe) ----
   if (yo.tipo === 'socio' && ['doc_renombrar', 'doc_quitar', 'doc_recuperar'].includes(d.accion)) {
     const doc = (await sql('SELECT id, tel, titulo FROM documentos WHERE id = ?', [t(d.id, 80)]))[0];

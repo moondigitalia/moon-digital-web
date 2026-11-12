@@ -11,6 +11,9 @@
     },
     "api/demo-eventos.js": {
       "includeFiles": "{api/_docs/**}"
+    },
+    "api/oficina.js": {
+      "maxDuration": 60
     }
   },
   "rewrites": [
