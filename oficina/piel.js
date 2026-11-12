@@ -17,17 +17,17 @@
 
   // Los cuartos en la rejilla (x, y, ancho, largo). Los nombres son cortos a propósito.
   const CUARTOS = [
-    { id: 'recepcion', n: 'Recepción', x: 0, y: 0, w: 6, h: 5, piso: '#47767a' },
-    { id: 'clientes', n: 'Clientes', x: 7, y: 0, w: 10, h: 8, piso: '#3f6d70' },
+    { id: 'recepcion', n: 'Recepción · Jason', x: 0, y: 0, w: 6, h: 5, piso: '#47767a' },
+    { id: 'clientes', n: 'Clientes que pagan', x: 7, y: 0, w: 10, h: 8, piso: '#3f6d70' },
     { id: 'demos', n: 'Demos', x: 18, y: 0, w: 8, h: 6, piso: '#4a7468' },
     { id: 'cubiculos', n: 'Equipo', x: 0, y: 6, w: 6, h: 7, piso: '#45706f' },
-    { id: 'robots', n: 'Robots', x: 18, y: 7, w: 8, h: 5, piso: '#5d6a6c' },
-    { id: 'crm', n: 'CRM', x: 7, y: 9, w: 5, h: 5, piso: '#46707a', herramienta: 'crm' },
-    { id: 'libreria', n: 'Librería', x: 12, y: 9, w: 5, h: 5, piso: '#7a6a55', herramienta: 'libreria' },
-    { id: 'crea', n: 'Crear', x: 0, y: 14, w: 6, h: 4, piso: '#4d7a72', herramienta: 'crea' },
-    { id: 'gris', n: 'Cuarto gris', x: 7, y: 15, w: 10, h: 4, piso: '#6b4e36' },
+    { id: 'robots', n: 'Robots · tareas solas', x: 18, y: 7, w: 8, h: 5, piso: '#5d6a6c' },
+    { id: 'crm', n: 'CRM · tus clientes', x: 7, y: 9, w: 5, h: 5, piso: '#46707a', herramienta: 'crm' },
+    { id: 'libreria', n: 'Librería · pregúntale a Jason', x: 12, y: 9, w: 5, h: 5, piso: '#7a6a55', herramienta: 'libreria' },
+    { id: 'crea', n: 'Crea tu recepcionista', x: 0, y: 14, w: 6, h: 4, piso: '#4d7a72', herramienta: 'crea' },
+    { id: 'gris', n: 'Cuarto gris · dijeron que no', x: 7, y: 15, w: 10, h: 4, piso: '#6b4e36' },
     { id: 'oracion', n: 'Oración', x: 18, y: 13, w: 4, h: 6, piso: '#8a7860' },
-    { id: 'cerrado', n: 'Archivo', x: 22, y: 13, w: 4, h: 6, piso: '#8b8478' },
+    { id: 'cerrado', n: 'Archivo · pruebas', x: 22, y: 13, w: 4, h: 6, piso: '#8b8478' },
   ];
   const LUZ = { mostaza: ['#e0a53c', 0.16], amarilla: ['#f4d56a', 0.12], morada: ['#6b4fd0', 0.22] };
   const COLOR = { verde: '#3ccf7a', amarillo: '#f2c230', rojo: '#ef4b4b', gris: '#7d7d86' };
@@ -169,7 +169,7 @@
     const alto = o.acostado ? 22 : ALTO_MONO * (pose === 'sentado' ? 0.85 : 1);
     DUENO = o.actor ? o.id : '';
     if (o.acostado) cuerpoRect(sx, sy, 60, 24); else cuerpoRect(sx, sy, 34, alto + 18);
-    if (o.nombre) etiqueta(sx, sy + 16, o.nombre, o.clase || '', o.opciones || [[0, 0], [0, -alto - 40], [44, -alto / 2], [-44, -alto / 2], [0, 22]]);
+    if (o.nombre) etiqueta(sx, sy - alto - 30, o.nombre, o.clase || '', o.opciones || [[0, 0], [0, -20], [46, 10], [-46, 10], [0, alto + 46]]);
     DUENO = '';
     const zz = o.dormido ? `<text class="zz" x="${sx + 14}" y="${sy - alto - 6}" font-size="13" font-weight="900" fill="#b9b8c2">z</text>` : '';
     return `<g class="mono-3d${o.actor ? ' actor' : ''}" data-a="${esc(o.id || '')}"${o.cuarto ? ` data-c="${o.cuarto}"` : ''}${o.actor ? ` data-actor="${esc(o.id)}" data-tx="${x}" data-ty="${y}" data-alto="${Math.round(alto)}"${o.lado ? ` data-lado="${o.lado.join(',')}"` : ''}${o.dormido ? ' data-dormido="1"' : ''}${o.estado === 'rojo' ? ' data-falla="1"' : ''}` : ''}><ellipse cx="${sx}" cy="${sy}" rx="14" ry="5" fill="#0006"/>${imgMono(sk, pose, sx, sy)}${zz}
@@ -178,7 +178,7 @@
   // Claude: el monito todo naranja (con monitos 3D); mientras llegan, un robot chiquito naranja.
   function robotNaranja(x, y, texto) {
     if (MET && MET.claude) { const corto = texto && (texto.length > 46 ? texto.slice(0, 44).replace(/\s+\S*$/, '') + '…' : texto);
-      return monito3d(x, y, { id: 'claude', actor: true, nombre: corto ? '🤖 ' + corto : '', clase: 'nom-claude', opciones: [[0, 0], [0, -86], [0, 22]] }, 'claude'); }
+      return monito3d(x, y, { id: 'claude', actor: true, nombre: 'Claude', clase: 'nom-claude' }, 'claude'); }
     const [sx, sy] = iso(x, y, 0);
     cuerpoRect(sx, sy, 26 * ESC, 52 * ESC);
     DUENO = 'claude';
@@ -194,12 +194,26 @@
   function robotRuedas(x, y, t, i) {
     const [sx, sy] = iso(x, y, 0), mal = t.resultado !== 'bien';
     DUENO = 'robot-' + i;
-    return `<g class="mono-3d actor" data-c="robots" data-actor="robot-${i}" data-tx="${x}" data-ty="${y}" data-alto="${Math.round(40 * ESC)}" data-robot="${esc(t.nombre)}"><g transform="translate(${sx},${sy}) scale(${ESC})"><ellipse cx="0" cy="2" rx="13" ry="5" fill="#0006"/>
+    return `<g class="mono-3d actor" data-c="robots" data-a="robot-${i}" data-actor="robot-${i}" data-tx="${x}" data-ty="${y}" data-alto="${Math.round(40 * ESC)}" data-robot="${esc(t.nombre)}"><g transform="translate(${sx},${sy}) scale(${ESC})"><ellipse cx="0" cy="2" rx="13" ry="5" fill="#0006"/>
       <circle cx="-7" cy="-2" r="4" fill="#222"/><circle cx="7" cy="-2" r="4" fill="#222"/>
       <rect x="-11" y="-22" width="22" height="18" rx="5" fill="#9b9aa5"/><path d="M-9,-22 a9,9 0 0 1 18,0z" fill="#b9b8c2"/>
       <rect x="-6" y="-17" width="12" height="5" rx="2.5" fill="#2b2b31"/></g>
-      ${luzEstado(sx, sy - 38 * ESC, mal ? 'rojo' : 'verde')}${(cuerpoRect(sx, sy, 26 * ESC, 48 * ESC), etiqueta(sx, sy + 16, 'Robot ' + (i + 1), 'nom-robot', [[0, 0], [0, -72]]), DUENO = '', '')}</g>`;
+      ${luzEstado(sx, sy - 38 * ESC, mal ? 'rojo' : 'verde')}${(cuerpoRect(sx, sy, 26 * ESC, 48 * ESC), etiqueta(sx, sy - 66, corto(t.nombre), 'nom-robot', [[0, 0], [0, -20], [0, 82]]), DUENO = '', '')}</g>`;
   }
+  // EL NOMBRE DEL CUARTO VA PINTADO EN EL PISO (como en los juegos de oficinas y hospitales): letras grandes y suaves,
+  // acostadas en la perspectiva del piso, sin globo. Así no parece un personaje más. Título grande y, abajo, qué es.
+  function letrero(c) {
+    const [titulo, sub] = c.n.split(' · '), k = 64, max = c.w * k - 36;
+    let fs1 = Math.min(36, max / (titulo.length * 0.68)), fs2 = sub ? Math.min(22, max / (sub.length * 0.56)) : 0;
+    // dónde queda libre el piso de cada cuarto (medido contra sus muebles); 'y' = las letras corren a lo largo del otro lado
+    const LUGAR = { recepcion: [4.2, 4.5, 'x', 3.3], clientes: [12, 5.2], demos: [22, 5.3], cubiculos: [1.35, 12.4, 'x', 2.3], robots: [22, 11.3], crm: [9.6, 13.35], libreria: [14.5, 10.75], crea: [3, 17.45], gris: [12, 18.5], oracion: [19.9, 18.55, 'x', 3.2], cerrado: [24, 18.4] };
+    const L = LUGAR[c.id] || [c.x + c.w / 2, c.y + c.h * 0.62], [ox, oy] = iso(L[0], L[1]);
+    const largo = (L[3] || (L[2] === 'y' ? c.h : c.w)) * k - 36; if (L[2] === 'y' || L[3]) { fs1 = Math.min(36, largo / (titulo.length * 0.68)); fs2 = sub ? Math.min(22, largo / (sub.length * 0.56)) : 0; }
+    const m = L[2] === 'y' ? `matrix(${-TW / 2 / k},${TH / 2 / k},${-TW / 2 / k},${-TH / 2 / k},${ox},${oy})` : `matrix(${TW / 2 / k},${TH / 2 / k},${-TW / 2 / k},${TH / 2 / k},${ox},${oy})`;
+    return `<g class="letrero" transform="${m}" fill="#fbfaf6" font-weight="900" text-anchor="middle" stroke="#1d2a2b" stroke-width="5" stroke-linejoin="round" paint-order="stroke" stroke-opacity=".55" style="pointer-events:none"><text x="0" y="${sub ? -fs2 - 8 : 0}" font-size="${fs1.toFixed(1)}" opacity=".92" letter-spacing="1">${esc(titulo.toUpperCase())}</text>${sub ? `<text x="0" y="0" font-size="${fs2.toFixed(1)}" opacity=".85">${esc(sub)}</text>` : ''}</g>`;
+  }
+  // nombre corto de una tarea: sin lo de entre paréntesis y a lo más ~16 letras sin cortar palabras
+  function corto(n) { n = String(n || '').replace(/\s*\(.*?\)\s*/g, ' ').trim(); if (n.length <= 16) return n; const w = n.split(' '); let r = ''; for (const p of w) { if ((r + ' ' + p).trim().length > 16) break; r = (r + ' ' + p).trim(); } return r || n.slice(0, 16); }
   function telarana(x, y) {
     const [sx, sy] = iso(x, y, MURO - 4);
     return `<g stroke="#bdbdc6" stroke-width=".8" opacity=".55" fill="none"><path d="M${sx},${sy} l26,12 M${sx},${sy} l0,26 M${sx},${sy} l18,22"/>
@@ -214,7 +228,7 @@
   // Pasillos (rectángulos en la rejilla) y líneas por donde se camina.
   const PASILLOS = [[6, 0, 7, LARGO], [17, 0, 18, LARGO], [7, 8, 17, 9], [7, 14, 17, 15], [18, 6, ANCHO, 7], [18, 12, ANCHO, 13]];
   const LINEAS = [{ x: 6.5 }, { x: 17.5 }, { y: 8.5, de: 6.5, a: 17.5 }, { y: 14.5, de: 6.5, a: 17.5 }, { y: 6.5, de: 17.5, a: ANCHO - 0.5 }, { y: 12.5, de: 17.5, a: ANCHO - 0.5 }];
-  const AGUA = [17.5, 10.6];
+  const AGUA = [7.6, 7.3];   // el garrafón: en la esquina de Clientes, a la vista (en el pasillo lo tapaban las paredes)
   // Por dónde se entra a cada cuarto: [adentro, puerta en el pasillo]
   const PUERTAS = {
     recepcion: [[5.4, 2.5], [6.5, 2.5]], cubiculos: [[5.4, 9.6], [6.5, 9.6]], crea: [[5.4, 16], [6.5, 16]],
@@ -223,7 +237,7 @@
   };
   // Camino entre dos puertas siguiendo los pasillos (búsqueda del camino más corto en la red de pasillos).
   function camino(desde, hasta) {
-    const nodos = [desde, hasta, AGUA, [6.5, 8.5], [6.5, 14.5], [17.5, 8.5], [17.5, 14.5], [17.5, 6.5], [17.5, 12.5]];
+    const nodos = [desde, hasta, [6.5, 8.5], [6.5, 14.5], [17.5, 8.5], [17.5, 14.5], [17.5, 6.5], [17.5, 12.5]];
     Object.values(PUERTAS).forEach(p => nodos.push(p[1]));
     const en = (n, l) => l.x !== undefined ? Math.abs(n[0] - l.x) < 0.01 : Math.abs(n[1] - l.y) < 0.01 && n[0] >= l.de - 0.01 && n[0] <= l.a + 0.01;
     const vec = nodos.map(() => []);
@@ -271,7 +285,7 @@
       a.lado = g.dataset.lado ? g.dataset.lado.split(',').map(Number) : null;   // por dónde se sale del escritorio
       a.quieto = !!g.dataset.dormido || !!g.dataset.falla;
       a.marcador = a.marcador && a.marcador.isConnected ? a.marcador : null;
-      if (id === 'claude' && PUERTAS[destinoClaude] && a.destino !== destinoClaude) { a.destino = destinoClaude; const d = PUERTAS[destinoClaude][0]; a.camino = ruta(a.pos, destinoClaude === 'clientes' ? casa : [d[0] - 0.6, d[1] - 1.2]); a.modo = 'fuera'; a.claudeFijo = true; }
+      if (id === 'claude' && PUERTAS[destinoClaude] && a.destino !== destinoClaude) { a.destino = destinoClaude; const d = PUERTAS[destinoClaude][0]; a.camino = ruta(a.pos, destinoClaude === 'clientes' ? casa : adentro(destinoClaude)); a.modo = 'fuera'; a.claudeFijo = true; }
       if (id === 'jason') a.quieto = a.quieto || ((C && C.llamadas) || []).some(l => Date.now() - Date.parse(l.fecha) < 600e3);
       colocar(a);
     });
@@ -280,6 +294,8 @@
     if (!V.corriendo) { V.corriendo = true; requestAnimationFrame(t => paso(t)); }
     V.raiz = raiz; V.capa = capa;
   }
+  // un punto un poco adentro de la puerta de un cuarto (para que Claude entre y se ponga a trabajar ahí)
+  function adentro(id) { const [[ix, iy], [px, py]] = PUERTAS[id], dx = ix - px, dy = iy - py, n = Math.hypot(dx, dy) || 1; return [ix + dx / n * 1.1 - dy / n * 0.6, iy + dy / n * 1.1 + dx / n * 0.6]; }
   function burbujaDe(id, texto, color, seg) { const a = VIDA && VIDA.actores[id]; if (a) { a.burbuja = { texto, color, hasta: VIDA.reloj + seg }; colocar(a); } }
   function colocar(a) {
     if (!a.g || !a.g.isConnected) return;
@@ -313,7 +329,7 @@
   }
   function paso(t) {
     const V = VIDA;
-    if (V.pausa) { V.ultimo = t; requestAnimationFrame(paso); return; }   // mientras el dedo mueve el mapa, la oficina se queda quieta (arrastrar fluido en celulares lentos)
+    if (t < (V.pausaHasta || 0)) { V.ultimo = t; requestAnimationFrame(paso); return; }   // mientras el dedo mueve el mapa, la oficina se queda quieta (arrastrar fluido en celulares lentos)
     const dt = Math.min(0.1, (t - V.ultimo) / 1000); V.ultimo = t; V.reloj += dt;
     const lista = Object.values(V.actores).filter(a => a.g && a.g.isConnected);
     lista.forEach(a => {
@@ -321,7 +337,8 @@
         const [tx, ty] = a.camino[0], dx = tx - a.pos[0], dy = ty - a.pos[1], d = Math.hypot(dx, dy), avance = TIEMPO.paso * dt;
         if (d <= avance) { a.pos = [tx, ty]; a.camino.shift(); if (!a.camino.length) llegar(a, lista); } else { a.pos = [a.pos[0] + dx / d * avance, a.pos[1] + dy / d * avance]; }
         colocar(a);
-      } else if (a.espera > 0) { a.espera -= dt; if (a.espera <= 0 && a.modo === 'fuera' && !a.claudeFijo) { a.camino = a.lado ? ruta(a.pos, salida(a)).concat([a.casa]) : ruta(a.pos, a.casa); a.modo = 'regreso'; } colocar(a); }
+      } else if (a.espera > 0) { a.espera -= dt; if (a.espera <= 0 && a.claudeFijo) { const op = ['crm', 'libreria', 'robots', 'demos', 'recepcion', 'cubiculos', 'clientes'].filter(r => r !== a.destino); a.destino = op[Math.floor(Math.random() * op.length)]; a.burbuja = null; a.camino = ruta(a.pos, adentro(a.destino)); }
+        else if (a.espera <= 0 && a.modo === 'fuera' && !a.claudeFijo) { a.camino = a.lado ? ruta(a.pos, salida(a)).concat([a.casa]) : ruta(a.pos, a.casa); a.modo = 'regreso'; } colocar(a); }
       else if (a.modo === 'casa' && !a.quieto && !a.claudeFijo) {
         a.prox -= dt;
         if (a.prox <= 0) {
@@ -342,14 +359,14 @@
       a.camino = rutaDesde(a, PUERTAS[quali ? 'clientes' : ids[Math.floor(Math.random() * ids.length)]][0]); a.objetivo = 'visita'; a.modo = 'fuera'; return;
     }
     const r = Math.random(), libres = lista.filter(b => b !== a && b.modo === 'casa' && !b.quieto && !b.claudeFijo && !b.camino.length);
-    if (r < 0.4) { a.camino = rutaDesde(a, [AGUA[0] - 0.6, AGUA[1] + 0.5]); a.objetivo = 'agua'; }
+    if (r < 0.4) { a.camino = rutaDesde(a, [AGUA[0] + 0.75, AGUA[1] + 0.05]); a.objetivo = 'agua'; }
     else if (r < 0.75 && libres.length) { const b = libres[Math.floor(Math.random() * libres.length)]; a.camino = rutaDesde(a, (b.lado ? [b.casa[0] + b.lado[0], b.casa[1] + 0.35] : [b.casa[0] + 0.9, b.casa[1] + 0.6])); a.objetivo = 'platica'; a.con = b; }
     else { const ids = Object.keys(PUERTAS); const c = PUERTAS[ids[Math.floor(Math.random() * ids.length)]]; a.camino = rutaDesde(a, c[0]); a.objetivo = 'visita'; }
     a.modo = 'fuera';
   }
   function llegar(a, lista) {
     if (a.modo === 'regreso') { a.modo = 'casa'; a.pos = a.casa.slice(); return; }
-    if (a.claudeFijo) { a.burbuja = { texto: '🔧', color: '#ff7a1a', hasta: VIDA.reloj + 99999 }; return; }
+    if (a.claudeFijo) { const q = 25 + Math.random() * 20; a.burbuja = { texto: '🔧', color: '#ff7a1a', hasta: VIDA.reloj + q }; a.espera = q; return; }   // trabaja un rato ahí y luego se va a otro cuarto
     const q = TIEMPO.quedarse[0] + Math.random() * (TIEMPO.quedarse[1] - TIEMPO.quedarse[0]);
     if (a.objetivo === 'agua') { a.burbuja = { texto: '💧', color: '#7fb6e6', hasta: VIDA.reloj + q }; a.espera = q; }
     else if (a.objetivo === 'platica' && a.con) { a.burbuja = { texto: '…', color: '#f3f2ee', hasta: VIDA.reloj + TIEMPO.platica }; a.con.burbuja = { texto: '…', color: '#f3f2ee', hasta: VIDA.reloj + TIEMPO.platica }; a.espera = TIEMPO.platica; }
@@ -362,7 +379,7 @@
     ETQ = []; CUERPOS = [];
     const as = (O.asistentes && O.asistentes.lista) || [];
     const R = id => CUARTOS.find(c => c.id === id);
-    let fondo = '', cosas = [];   // cosas: [profundidad, svg]
+    let fondo = '', cosas = [], LETREROS = '';   // cosas: [profundidad, svg]
     const pon = (x, y, svg) => cosas.push([x + y, svg]);
 
     // Pasillos: por aquí caminan los monitos de un cuarto a otro
@@ -377,7 +394,8 @@
         <polygon points="${P([a, b, d, e])}" fill="url(#piso)" opacity=".5"/>
         <polygon points="${P([a, b, d, e])}" fill="${lc}" opacity="${lo}"/>
         ${elegido ? `<polygon points="${P([a, b, d, e])}" fill="none" stroke="#f3f2ee" stroke-width="3"/>` : ''}
-        ${etiqueta(...iso(c.x + c.w / 2, c.y + c.h - 0.55), c.n, 'nom-cuarto', [[0, 0], [0, -26], [-40, -12], [40, -12]])}</g>`;
+</g>`;
+      LETREROS += letrero(c);
     });
 
     // la luz de la hora ya mezclada en el color (un solo dibujo por tramo: más ligero en celulares lentos)
@@ -390,7 +408,7 @@
       demos: { atras: { 1: 'ventana', 4: 'ventana', 6: 'rejilla' }, izquierda: { 2: 'corcho' } },
       cubiculos: { atras: { 3: 'rejilla' }, izquierda: { 1: 'ventana', 3: 'corcho', 5: 'ventana' } },
       robots: { atras: { 2: 'rejilla', 5: 'pizarron' } },
-      crm: { atras: { 1: 'pizarron', 3: 'corcho' }, izquierda: { 2: 'ventana' } },
+      crm: { atras: { 3: 'corcho', 4: 'pizarron' }, izquierda: { 2: 'ventana' } },   // los tramos 0 a 2 los tapan los archiveros
       libreria: { atras: { 4: 'ventana' } },
       crea: { atras: { 2: 'pizarron' }, izquierda: { 1: 'ventana' } },
       oracion: { atras: { 3: 'ventana' }, izquierda: { 3: 'cruz' } },
@@ -460,6 +478,9 @@
     sillon(0.6, 3.6, 2);
     tapete(8, 3.6, 8, 3.2, '#2f5658'); tapete(19, 14.2, 2, 3.4, '#a3563b'); tapete(12.8, 11.2, 3.4, 2, '#5a4a3a');
 
+    // Sillón individual (demos): asiento acolchonado, respaldo y brazos
+    const TELA = ['#5a8fb0', '#477592', '#3d6680'];
+    const sillonChico = (x, y) => pon(x - 0.03, y - 0.03, caja(x - 0.4, y - 0.42, 0.8, 0.22, 34, TELA) + caja(x - 0.42, y - 0.32, 0.18, 0.7, 20, TELA) + caja(x + 0.24, y - 0.32, 0.18, 0.7, 20, TELA) + caja(x - 0.26, y - 0.3, 0.52, 0.66, 13, ['#6aa3c6', '#5a8fb0', '#4d7d9b']));
     // Sillas: donde alguien se sienta hay silla (se queda aunque el monito se levante a caminar)
     const silla = (x, y) => pon(x - 0.02, y - 0.02, caja(x - 0.28, y - 0.28, 0.56, 0.56, 13, NEGRO) + caja(x - 0.3, y - 0.36, 0.6, 0.1, 34, NEGRO));
 
@@ -485,7 +506,8 @@
     // Demos
     as.filter(a => a.tipo === 'demo').forEach((a, i) => {
       const x = 19.6 + (i % 3) * 2.4, y = 2.2 + Math.floor(i / 3) * 2.6;
-      pon(x, y, monito(x, y, { id: a.id, actor: true, dormido: !a.platicas7d, cuarto: 'demos', nombre: a.nombre, estado: a.estado, ropa: ['#5a7ac4', '#b0864a', '#4a9aa0'][i % 3] }));
+      sillonChico(x, y);
+      pon(x, y, monito(x, y, { id: a.id, sentado: true, lado: [0, 0.9], actor: true, dormido: !a.platicas7d, cuarto: 'demos', nombre: a.nombre, estado: a.estado, ropa: ['#5a7ac4', '#b0864a', '#4a9aa0'][i % 3] }));
     });
 
     // Equipo: tres cubículos; si están en su horario, sentados; si no, la silla vacía
@@ -519,7 +541,8 @@
     [[9.5, 15.8], [13.2, 18.3], [15.8, 16.4]].forEach(([x, y]) => pon(x, y, arana(x, y)));
 
     // Garrafón de agua en el cruce de pasillos (a donde van por agua)
-    pon(AGUA[0], AGUA[1], caja(AGUA[0] - 0.25, AGUA[1] - 0.25, 0.5, 0.5, 14, GRIS) + (() => { const [gx, gy] = iso(AGUA[0], AGUA[1], 14); return `<path d="M${gx - 7},${gy - 2} q0,-16 7,-18 q7,2 7,18 z" fill="#7fb6e6" opacity=".85"/>`; })());
+    pon(AGUA[0], AGUA[1], caja(AGUA[0] - 0.24, AGUA[1] - 0.24, 0.48, 0.48, 28, ['#f1f1ec', '#d6d6cf', '#bdbdb5']) + caraY(AGUA[0] - 0.1, AGUA[0] + 0.1, AGUA[1] + 0.24, 16, 20, '#3a6fb0')
+      + (() => { const [gx, gy] = iso(AGUA[0], AGUA[1], 28); return `<path d="M${gx - 11},${gy - 1} v-20 q0,-6 11,-7 q11,1 11,7 v20 q-11,6 -22,0 z" fill="#5aa6e6" opacity=".9"/><path d="M${gx - 11},${gy - 21} q11,6 22,0" stroke="#3a86c6" fill="none"/><rect x="${gx - 4}" y="${gy - 31}" width="8" height="5" rx="2" fill="#3a86c6"/><path d="M${gx - 6},${gy - 16} v10" stroke="#ffffffaa" stroke-width="3" stroke-linecap="round"/>`; })());
     // Archivo (puerta cerrada): una puerta con candado
     const [qx, qy] = iso(24, 13, 0);
     fondo += `<g data-c="cerrado"><polygon points="${P([iso(23.2, 13, 0), iso(24.8, 13, 0), iso(24.8, 13, 38), iso(23.2, 13, 38)])}" fill="#2a2a2f" stroke="#77757f"/><circle cx="${qx + 6}" cy="${qy - 18}" r="3" fill="#c9a64a"/></g>`;
@@ -535,13 +558,13 @@
       svg: `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="display:block;overflow:visible">
         <defs><filter id="brillo" x="-1" y="-1" width="3" height="3"><feGaussianBlur stdDeviation="4"/></filter>
           <linearGradient id="piso" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".10"/><stop offset="1" stop-color="#000" stop-opacity=".18"/></linearGradient></defs>
-${fondo}<g class="escena">${cosas.map(c => `<g class="d" data-d="${c[0].toFixed(3)}">${c[1]}</g>`).join('')}</g>${acomodar()}
+${fondo}${LETREROS}<g class="escena">${cosas.map(c => `<g class="d" data-d="${c[0].toFixed(3)}">${c[1]}</g>`).join('')}</g>${acomodar()}
       </svg>`,
     };
   }
   // De un punto del dibujo al cuarto que está debajo (para tocar muebles, pasillos o el piso).
   function cuartoEn(wx, wy) { const a = (wx - OX) / (TW / 2), b = (wy - OY) / (TH / 2); const x = (a + b) / 2, y = (b - a) / 2; const c = cuartoDe(x, y); return c ? c.id : null; }
-  function pausa(si) { if (VIDA) VIDA.pausa = !!si; }
+  function pausa(si) { if (VIDA) VIDA.pausaHasta = si ? performance.now() + 350 : 0; }   // la pausa se vence sola: nunca se queda todo congelado
   const api = { pausa, dibuja, MONO, luzDe, vida, ruta, cuartoEn, cargar, cargado: false };
   window.Piel = api;
 })();

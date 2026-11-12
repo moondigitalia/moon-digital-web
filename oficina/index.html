@@ -290,7 +290,7 @@ function zoomEn(px, py, nuevo) {
 }
 const of = $('#oficina');
 of.addEventListener('pointerdown', e => { if (window.Piel && Piel.pausa) Piel.pausa(true); of.setPointerCapture(e.pointerId); dedos.set(e.pointerId, { x: e.clientX, y: e.clientY, x0: e.clientX, y0: e.clientY }); if (dedos.size === 1) movido = false; ini = null; });
-of.addEventListener('pointermove', e => {
+of.addEventListener('pointermove', e => { if (dedos.size && window.Piel && Piel.pausa) Piel.pausa(true);
   const d0 = dedos.get(e.pointerId); if (!d0) return;
   const ax = d0.x, ay = d0.y; d0.x = e.clientX; d0.y = e.clientY;
   const r = of.getBoundingClientRect();
@@ -318,6 +318,7 @@ function tocar(cx, cy) {
   const m = el.closest('[data-a]'), c = el.closest('[data-c]');
   if (m && m.dataset.a === 'claude') return elegir({ tipo: 'cubiculos', cuarto: 'cubiculos' });   // el robot naranja: lo último que pasó
   if (m && /^equipo-/.test(m.dataset.a)) return elegir({ tipo: 'cubiculos', cuarto: 'cubiculos' });
+  if (m && /^robot-/.test(m.dataset.a)) return elegir({ tipo: 'robot', i: Number(m.dataset.a.slice(6)), cuarto: 'robots' });   // cada robot dice qué hace
   let cid = c ? c.dataset.c : null;
   if (!cid && window.Piel) { const r = of.getBoundingClientRect(); cid = Piel.cuartoEn((cx - r.left - vista.x) / vista.z, (cy - r.top - vista.y) / vista.z); }   // un mueble o el piso: el cuarto que está debajo
   if (!cid) return;
@@ -374,6 +375,11 @@ function pintarInfo(refresco) {
   } else if (sel.tipo === 'robots') {
     t = 'Robots (tareas automáticas)';
     h = ((O.tareas && O.tareas.lista) || []).map(x => { const tarde = x.siguiente && Date.now() - Date.parse(x.siguiente) > 2 * 3600e3; return `<div class="fila"><span class="luz ${x.resultado !== 'bien' || tarde ? 'rojo' : 'verde'}"></span> ${esc(x.nombre)}<small>De ${esc(x.deQuien)} · última vez ${hace(x.ultimaVez)} (${esc(x.resultado)}) · siguiente ${fechaC(x.siguiente)}${tarde ? ' · no está corriendo' : ''}</small></div>`; }).join('');
+  } else if (sel.tipo === 'robot') {
+    const x = ((O.tareas && O.tareas.lista) || [])[sel.i] || {}, tarde = x.siguiente && Date.now() - Date.parse(x.siguiente) > 2 * 3600e3;
+    t = '🤖 ' + (x.nombre || 'Robot');
+    h = `<div class="fila"><span class="luz ${x.resultado !== 'bien' || tarde ? 'rojo' : 'verde'}"></span> ${x.resultado === 'bien' && !tarde ? 'Trabajando bien' : tarde ? 'No está corriendo' : 'Algo falló'}<small>Lo pidió ${esc(x.deQuien || '')} · trabaja solo, sin que nadie lo active</small></div>`
+      + `<div class="fila">Última vez<small>${hace(x.ultimaVez)} (${esc(x.resultado || '')})</small></div><div class="fila">Siguiente vez<small>${fechaC(x.siguiente)}</small></div>`;
   } else if (sel.tipo === 'gris') {
     t = 'Cuarto gris · dijeron que no'; h = as.filter(a => a.tipo === 'dijo_no' || a.tipo === 'archivado' || a.id === 'donde').map(filaAsistente).join('');
   } else if (sel.tipo === 'oracion') {
