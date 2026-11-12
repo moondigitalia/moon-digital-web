@@ -54,6 +54,11 @@ small{font-size:15px;font-weight:600}
 .cuarto p{font-size:16px;color:var(--suave)}
 .luz{display:inline-block;width:13px;height:13px;border-radius:50%;flex:none}
 .verde{background:var(--verde)} .amarillo{background:var(--amarillo)} .rojo{background:var(--rojo)} .gris{background:#6b6b73}
+/* Piel 3D: los nombres solo aparecen cuando ya se pueden leer (nivel de acercamiento) */
+#mundo svg .nom{display:none}
+#mundo.leer svg .nom{display:inline}
+#mundo svg [data-c],#mundo svg [data-a]{cursor:pointer}
+.globo{background:#ff7a1a;color:#141414;font:800 12px/1.25 system-ui,sans-serif;padding:6px 9px;border-radius:12px;display:inline-block;max-width:200px}
 #hud{position:absolute;right:8px;top:8px;display:flex;gap:6px;pointer-events:none}
 #hud span{background:#000b;padding:4px 10px;border-radius:12px;font-size:14px}
 
@@ -110,6 +115,7 @@ small{font-size:15px;font-weight:600}
   <form id="clave" hidden><input type="password" id="pass" placeholder="Tu contraseña" autocomplete="current-password"><button>Entrar</button></form>
   <p id="error" class="aviso"></p>
 </div>
+<script src="/oficina/piel.js"></script>
 <script>
 'use strict';
 const LLAVE = 'centro.moon.sesion';   // la misma sesión del Tablero
@@ -200,7 +206,7 @@ function alertas() {
   const l = [];
   ((O.asistentes && O.asistentes.lista) || []).forEach(a => { if (a.estado === 'rojo') l.push(a.nombre + ': ' + (a.nota || 'falla')); });
   ((O.tareas && O.tareas.lista) || []).forEach(t => { if (t.resultado !== 'bien' || (t.siguiente && Date.now() - Date.parse(t.siguiente) > 2 * 3600e3)) l.push('Robot con falla: ' + t.nombre); });
-  ((O.suscripciones && O.suscripciones.lista) || []).forEach(s => { if (s.color === 'rojo') l.push(s.nombre + (s.faltan < 0 ? ': se pasó la fecha de pago' : ': se cobra en ' + s.faltan + ' días')); });
+  ((O.suscripciones && O.suscripciones.lista) || []).forEach(s => { if (s.color === 'rojo') l.push(s.nombre + (s.faltan < 0 ? ': se pasó la fecha de pago' : ': se cobra ' + (s.faltan === 0 ? 'hoy' : s.faltan === 1 ? 'mañana' : 'en ' + s.faltan + ' días'))); });
   if (O.publicaciones && O.publicaciones.fallidas) l.push(O.publicaciones.fallidas + ' publicaciones fallaron hoy');
   if (O.medicionAtrasada) l.push('La medición de cada hora no ha corrido');
   return l;
@@ -221,6 +227,17 @@ const CUARTOS = [
 ];
 function dibujarMundo() {
   if (!O) return;
+  if (window.Piel) {
+    const luz = new URLSearchParams(location.search).get('luz');
+    const hora = luz === 'morada' ? 21 : luz === 'amarilla' ? 15 : luz === 'mostaza' ? 9 : (O.ahora ? O.ahora.hora : 12);
+    const r = Piel.dibuja(O, C, sel, hora);
+    const cambio = MUNDO.w !== r.ancho; MUNDO.w = r.ancho; MUNDO.h = r.alto; MUNDO.mono = r.monito;
+    const m = $('#mundo'); m.style.width = r.ancho + 'px'; m.style.height = r.alto + 'px'; m.innerHTML = r.svg;
+    if (cambio) ajustarVista();
+    const al = alertas().length;
+    $('#hud').innerHTML = `<span>Semana $${(O.gasto || {}).usd7d || 0}</span>` + (al ? `<span class="alerta">● ${al}</span>` : '');
+    return;
+  }
   const as = (O.asistentes && O.asistentes.lista) || [];
   const mono = (a, clase) => `<span class="mono ${clase || ''}" data-a="${esc(a.id)}"><span class="luz ${a.estado || 'gris'}"></span><span class="n">${clase === 'muerto' ? '✕✕ ' : ''}${esc(a.nombre)}${a.platicas7d ? ' · ' + a.platicas7d : ''}</span></span>`;
   const ult = O.actividad && O.actividad.lineas && O.actividad.lineas[0];
@@ -244,20 +261,24 @@ function dibujarMundo() {
 
 // ---------- Zoom y arrastre solo en el mapa ----------
 const vista = { x: 0, y: 0, z: 1 };
+const MUNDO = { w: 1200, h: 800, mono: 0 };   // con la piel 3D, toma las medidas de su dibujo
 const dedos = new Map(); let movido = false, ini = null, nitido = null;
 function aplicar() {
   const m = $('#mundo'); m.classList.add('mueve');
   m.style.transform = `translate(${vista.x}px,${vista.y}px) scale(${vista.z})`;
+  m.classList.toggle('leer', vista.z * 12 >= 11);
   // Regla 3: al detenerse, el navegador vuelve a pintar a tamaño real (nada borroso al acercar).
   clearTimeout(nitido); nitido = setTimeout(() => m.classList.remove('mueve'), 150);
 }
 function ajustarVista() {
   const r = $('#oficina').getBoundingClientRect(); if (!r.width) return;
-  vista.z = Math.min(r.width / 1200, r.height / 800); vista.x = (r.width - 1200 * vista.z) / 2; vista.y = (r.height - 800 * vista.z) / 2; aplicar();
+  vista.z = Math.min(r.width / MUNDO.w, r.height / MUNDO.h); vista.x = (r.width - MUNDO.w * vista.z) / 2; vista.y = (r.height - MUNDO.h * vista.z) / 2; aplicar();
 }
 function zoomEn(px, py, nuevo) {
-  const r = $('#oficina').getBoundingClientRect(), min = Math.min(r.width / 1200, r.height / 800);
-  nuevo = Math.max(min, Math.min(Math.max(min * 6, 1.5), nuevo));
+  // Lo más lejos: la oficina completa. Lo más cerca: un monito de 160 px de alto (con la piel) o 6 veces la vista completa.
+  const r = $('#oficina').getBoundingClientRect(), min = Math.min(r.width / MUNDO.w, r.height / MUNDO.h);
+  const max = MUNDO.mono ? 160 / MUNDO.mono : Math.max(min * 6, 1.5);
+  nuevo = Math.max(min, Math.min(Math.max(max, min), nuevo));
   vista.x = px - (px - vista.x) * nuevo / vista.z; vista.y = py - (py - vista.y) * nuevo / vista.z; vista.z = nuevo; aplicar();
 }
 const of = $('#oficina');
@@ -287,14 +308,16 @@ of.addEventListener('wheel', e => { e.preventDefault(); const r = of.getBounding
 // Un toque: el monito que está ahí; si no, el cuarto.
 function tocar(cx, cy) {
   const el = document.elementFromPoint(cx, cy); if (!el) return;
-  const m = el.closest('[data-a]'), c = el.closest('.cuarto');
+  const m = el.closest('[data-a]'), c = el.closest('[data-c]');
+  if (m && m.dataset.a === 'claude') return elegir({ tipo: 'cubiculos', cuarto: 'cubiculos' });   // el robot naranja: lo último que pasó
+  if (m && /^equipo-/.test(m.dataset.a)) return elegir({ tipo: 'cubiculos', cuarto: 'cubiculos' });
   if (!c) return;
-  const cuarto = CUARTOS.find(k => k.id === c.dataset.c);
+  const cuarto = CUARTOS.find(k => k.id === c.dataset.c); if (!cuarto) return;
   if (cuarto.herramienta) return abrirHerramienta(cuarto.herramienta);
   if (m) return elegir({ tipo: 'asistente', id: m.dataset.a, cuarto: cuarto.id });
   elegir({ tipo: cuarto.id, cuarto: cuarto.id });
 }
-function elegir(s) { sel = s; $('#mundo').querySelectorAll('.cuarto').forEach(x => x.classList.toggle('sel', x.dataset.c === s.cuarto)); pintarInfo(); }
+function elegir(s) { sel = s; if (window.Piel) dibujarMundo(); else $('#mundo').querySelectorAll('.cuarto').forEach(x => x.classList.toggle('sel', x.dataset.c === s.cuarto)); pintarInfo(); }
 
 // ---------- Información (abajo o a la derecha) ----------
 const hace = f => { if (!f) return ''; const m = Math.round((Date.now() - Date.parse(f)) / 6e4); return m < 60 ? `hace ${m} min` : m < 1440 ? `hace ${Math.round(m / 60)} h` : `hace ${Math.round(m / 1440)} días`; };
