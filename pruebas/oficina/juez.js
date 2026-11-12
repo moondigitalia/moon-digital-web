@@ -61,7 +61,7 @@ const posiciones = () => [...document.querySelectorAll('.cab, #escribe, #texto, 
     t = await p.evaluate(revisaTextos); ver(!t.length, n + ': textos con zoom → ' + t.slice(0, 3).join(' · '));
     // Tocar cuartos de mirar: la información cambia, el mapa sigue a la vista
     await p.evaluate(() => { ajustarVista(); });
-    for (const c of ['recepcion', 'clientes', 'robots', 'cubiculos', 'gris', 'cerrado']) {
+    for (const c of ['clientes', 'demos', 'robots', 'cubiculos', 'gris', 'cerrado']) {
       const rc = await p.$eval(`.cuarto[data-c=${c}]`, e => { const b = e.getBoundingClientRect(); return { x: b.left + b.width * 0.85, y: b.top + b.height * 0.85 }; });
       if (tactil) await p.touchscreen.tap(rc.x, rc.y); else await p.mouse.click(rc.x, rc.y);
       await p.waitForTimeout(60);
@@ -69,49 +69,36 @@ const posiciones = () => [...document.querySelectorAll('.cab, #escribe, #texto, 
       ver(ok, n + ': tocar ' + c + ' muestra su información');
       t = await p.evaluate(revisaTextos); ver(!t.length, n + ': textos de ' + c + ' → ' + t.slice(0, 3).join(' · '));
     }
-    // Regla 4: el CRM usa la pantalla completa; las alertas no salen ahí; regresar vuelve al mapa
+    // Regla 4: el CRM es el del Tablero (con su orden, fotos y botón de editar), y regresa a la Oficina
     await p.evaluate(() => ajustarVista());
-    const crm = await p.$eval('.cuarto[data-c=crm]', e => { const b = e.getBoundingClientRect(); return { x: b.left + b.width / 2, y: b.top + b.height * 0.8 }; });
-    if (tactil) await p.touchscreen.tap(crm.x, crm.y); else await p.mouse.click(crm.x, crm.y);
-    await p.waitForTimeout(250);
-    ver(await p.evaluate(() => document.getElementById('mapa').hidden && !document.getElementById('herramienta').hidden), n + ': CRM en pantalla completa');
+    await ctx.route(/\/tablero/, r => r.fulfill({ contentType: 'text/html', body: '<p>tablero</p>' }));
+    for (const [cuarto, capa] of [['crm', 'crm'], ['crea', 'demo'], ['recepcion', 'llamadas']]) {
+      const rc = await p.$eval(`.cuarto[data-c=${cuarto}]`, e => { const b = e.getBoundingClientRect(); return { x: b.left + b.width / 2, y: b.top + b.height * 0.8 }; });
+      if (tactil) await p.touchscreen.tap(rc.x, rc.y); else await p.mouse.click(rc.x, rc.y);
+      await p.waitForURL(/\/tablero/, { timeout: 3000 }).catch(() => {});
+      ver(new RegExp('/tablero\\?abrir=' + capa + '&volver=/oficina$').test(p.url()), n + ': ' + cuarto + ' abre la pantalla del Tablero (' + p.url() + ')');
+      await p.goBack(); await p.waitForSelector('#mapa:not([hidden]) .cuarto'); await p.waitForTimeout(200); await p.evaluate(() => ajustarVista());
+    }
+    // Librería en pantalla completa; las alertas no salen ahí
+    await p.evaluate(() => abrirHerramienta('libreria')); await p.waitForTimeout(250);
+    ver(await p.evaluate(() => document.getElementById('mapa').hidden && !document.getElementById('herramienta').hidden), n + ': Librería en pantalla completa');
     ver(await p.evaluate(() => !document.querySelector('#herramienta .alerta')), n + ': sin alertas fuera del mapa');
-    t = await p.evaluate(revisaTextos); ver(!t.length, n + ': textos del CRM → ' + t.slice(0, 3).join(' · '));
     // Regla 1: el teclado no mueve nada (se abre: la ventana visible se achica; se cierra: vuelve)
     await p.focus('#texto'); const antes = await p.evaluate(posiciones);
     await p.setViewportSize({ width: w, height: Math.round(h * 0.55) }); await p.waitForTimeout(80);
     const con = await p.evaluate(posiciones);
-    await p.keyboard.type('Max'); await p.waitForTimeout(50);
     await p.setViewportSize({ width: w, height: h }); await p.evaluate(() => document.activeElement.blur()); await p.waitForTimeout(80);
-    await p.fill('#texto', ''); await p.dispatchEvent('#texto', 'input');
     const despues = await p.evaluate(posiciones);
     ver(antes === con && antes === despues, n + ': el teclado no mueve nada (0 píxeles)');
-    // Buscar en el mismo cuadro
-    await p.fill('#texto', 'maximiliano'); await p.dispatchEvent('#texto', 'input');
-    ver(await p.$$eval('.cara', x => x.length) === 1, n + ': buscar encuentra a la persona');
-    t = await p.evaluate(revisaTextos); ver(!t.length, n + ': textos de búsqueda con nombre largo → ' + t.slice(0, 3).join(' · '));
-    await p.fill('#texto', ''); await p.dispatchEvent('#texto', 'input');
-    // Ficha y documentos de un toque (Regla 5)
-    await p.click('.cara[data-tel="5512345678"]', { timeout: 5000 }); await p.waitForTimeout(150);
-    t = await p.evaluate(revisaTextos); ver(!t.length, n + ': textos de la ficha → ' + t.slice(0, 3).join(' · '));
-    for (const doc of ['d1', 'd2']) {
-      const [pop] = await Promise.all([ctx.waitForEvent('page', { timeout: 3000 }).catch(() => null), p.click(`[data-doc=${doc}]`, { timeout: 5000 })]);
-      if (pop) await pop.waitForURL(/ver\/abc|example\.com/, { timeout: 3000 }).catch(() => {});
-      ver(pop && /moondigitalia\.com\/ver\/abc|example\.com\/contrato/.test(pop.url()), n + ': un toque abre el documento ' + doc + (pop ? ' (' + pop.url() + ')' : ''));
-      if (pop) await pop.close();
-    }
-    // Regresar: ficha → CRM → mapa
-    await p.click('#volver'); await p.waitForTimeout(150);
-    ver(await p.evaluate(() => !document.getElementById('herramienta').hidden && document.getElementById('herrT').textContent === 'CRM'), n + ': regresar de la ficha al CRM');
-    await p.click('#volver'); await p.waitForTimeout(250);
-    ver(await p.evaluate(() => !document.getElementById('mapa').hidden), n + ': regresar al mapa');
-    // Librería: la respuesta nueva queda arriba, pegada al cuadro
-    await p.evaluate(() => abrirHerramienta('libreria')); await p.waitForTimeout(200);
+    // La respuesta nueva queda arriba, pegada al cuadro
     await p.fill('#texto', '¿Qué hace Jason?'); await p.press('#texto', 'Enter'); await p.waitForTimeout(200);
     const resp = await p.evaluate(() => { const m = document.querySelectorAll('#herrC .msj')[1]; const e = document.getElementById('escribe').getBoundingClientRect(); return m && m.textContent.includes('Respuesta de prueba') && m.getBoundingClientRect().top - e.bottom < 120; });
     ver(resp, n + ': la Librería contesta justo debajo del cuadro');
+    t = await p.evaluate(revisaTextos); ver(!t.length, n + ': textos de la Librería → ' + t.slice(0, 3).join(' · '));
+    await p.click('#volver'); await p.waitForTimeout(250);
+    ver(await p.evaluate(() => !document.getElementById('mapa').hidden && document.getElementById('herramienta').hidden), n + ': regresar al mapa');
     // Regla 6: cada vista entra con fundido (nada de golpe) y sin fondo blanco
-    ver(await p.evaluate(() => getComputedStyle(document.getElementById('herramienta')).transitionDuration !== '0s' && getComputedStyle(document.body).backgroundColor !== 'rgb(255, 255, 255)'), n + ': entra con fundido, sin blanco');
+    ver(await p.evaluate(() => getComputedStyle(document.getElementById('herramienta')).transitionDuration !== '0s' && getComputedStyle(document.getElementById('herramienta')).backgroundColor !== 'rgba(0, 0, 0, 0)' && getComputedStyle(document.body).backgroundColor !== 'rgb(255, 255, 255)'), n + ': cambia con fundido sobre fondo lleno (sin parpadeo ni blanco)');
     ver(!errores.length, n + ': sin errores ' + errores.join(' | '));
     } catch (e) { await p.screenshot({ path: __dirname + '/fallo-' + w + 'x' + h + '.png' }).catch(() => {}); console.log(await p.evaluate(() => [location.href, document.getElementById('herramienta').hidden, document.getElementById('mapa').hidden, document.getElementById('escribe').hidden, history.length]).catch(e => e.message)); ver(false, n + ': se trabó → ' + e.message.split('\n')[0] + ' @ ' + (e.stack.match(/juez\.js:(\d+)/) || [])[1]); }
     await ctx.close();

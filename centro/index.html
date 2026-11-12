@@ -802,7 +802,7 @@ async function arrancar() {
   const copia = !D && leerCopia();
   if (copia) {
     if (copia.f && !Object.keys(FOTOS).length) FOTOS = await prepararFotos(copia.f);
-    D = copia.d; transicion(() => pinta());
+    D = copia.d; abrirDeLink(); transicion(() => pinta());
     api('fotos').then(async f => { if (f && f.ok) { guardarCopia(null, f.fotos); } });
     return recargar().then(() => guardarCopia(D));
   }
@@ -812,7 +812,19 @@ async function arrancar() {
   if (f && f.ok) { FOTOS = await prepararFotos(f.fotos); guardarCopia(null, f.fotos); }
   if (!r.ok) { if (r.error !== 'sesion' && !D) app.innerHTML = '<div class="entrada"><div class="caja"><h1>Sin conexión</h1><p>Revisa tu internet.</p><button class="boton" onclick="arrancar()">Reintentar</button></div></div>'; return; }
   D = r; guardarCopia(D);
+  abrirDeLink();
   transicion(() => pinta());
+}
+// Desde la Oficina (11-nov-2026): /tablero?abrir=crm&volver=/oficina abre directo esa pantalla del Tablero, y al
+// cerrarla regresa a la Oficina (no al inicio del Tablero). Sin esos datos, el Tablero se comporta igual que siempre.
+const LINK = new URLSearchParams(location.search);
+const ABRIR_OK = ['crm', 'demo', 'llamadas', 'citas', 'clientes', 'casa'];
+const VOLVER = /^\/oficina$/.test(LINK.get('volver') || '') ? LINK.get('volver') : '';
+let abiertoDeLink = false;
+function abrirDeLink() {
+  if (abiertoDeLink) return; abiertoDeLink = true;
+  const a = LINK.get('abrir');
+  if (ABRIR_OK.includes(a) && !esEmb() && !pila.length) pila = [{ tipo: a }];
 }
 // Solo se repinta si de verdad cambió algo: si no, la pantalla ni se toca.
 async function recargar(callado) {
@@ -881,6 +893,7 @@ function pinta(silencioso) {
   if (esEmb() && pila.some(x => !CAPAS_EMB.includes(x.tipo))) pila = [];
   const c = pila[pila.length - 1];
   if (!c || c.tipo !== 'demo') veloFuera(false);
+  if (!c && VOLVER && abiertoDeLink) { location.replace(VOLVER); return; }   // vino de la Oficina: regresa allá
   if (!c) return esEmb() ? pintaInicioEmbajador(silencioso) : pintaInicio(silencioso);
   if (c.tipo === 'documento') setTimeout(() => ponOpcionesDoc(c), 0);
   ({ tareas: capaTareas, tarea: capaTarea, nuevaTarea: capaNuevaTarea, crm: capaCRM, crmLista: capaCRMLista, editarContacto: capaEditarContacto, subir: capaSubir, ficha: capaFicha, nuevoCliente: capaNuevoCliente, proyectos: capaProyectos, proyecto: capaProyecto, nuevoProyecto: capaProyecto, equipo: capaEquipo, moon: capaMoon, lector: capaLector, clientes: capaClientes, cliente: capaFicha, seccion: capaSeccion, documento: capaDocumento, casa: capaCasa, demo: capaDemo, nota: capaNota, editarProyecto: capaProyecto, qr: capaQR, cuenta: capaCuenta, frase: capaFrase, foto: capaFoto, docOpciones: capaDocOpciones, emProspectos: capaEmProspectos, emComisiones: capaEmComisiones, emMaterial: capaEmMaterial, emCuenta: capaEmCuenta, embajador: capaEmbajador, comision: capaComision, bitacora: capaBitacora, papelera: capaPapelera, llamadas: capaLlamadas, citas: capaCitas, cita: capaCita })[c.tipo](c, silencioso);

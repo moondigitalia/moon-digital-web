@@ -31,8 +31,8 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;text-a
 input{font:inherit;font-size:16px}
 a{color:var(--azul)}
 small{font-size:15px;font-weight:600}
-.vista{position:absolute;left:0;top:0;width:100%;height:var(--alto);opacity:1;transition:opacity var(--t) ease}
-.vista.entra{opacity:0}
+.vista{position:absolute;left:0;top:0;width:100%;height:var(--alto);background:var(--fondo);transition:opacity var(--t) ease}
+.vista.sale{opacity:0;pointer-events:none}
 
 /* ---------- Mapa + información ---------- */
 #mapa{display:grid;grid-template-rows:minmax(0,1fr) minmax(0,1fr);grid-template-columns:minmax(0,1fr)}
@@ -78,18 +78,6 @@ small{font-size:15px;font-weight:600}
 .escribe{display:flex;gap:8px;padding:10px 14px;border-bottom:1px solid #2a2a31}
 .escribe input{flex:1;min-width:0;background:#24242b;border:0;border-radius:14px;padding:12px 14px;color:var(--tinta);outline:none}
 .escribe button{background:var(--tinta);color:#141414;border-radius:14px;padding:0 16px;font-weight:900}
-.etapas{display:flex;flex-wrap:wrap;gap:6px;padding:10px 0 4px}
-.etapas button{padding:7px 12px;border-radius:14px;background:#24242b;color:var(--suave);font-size:15px}
-.etapas button.si{background:var(--tinta);color:#141414}
-.caras{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:14px 8px;padding:10px 0}
-.cara{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;font-size:15px;line-height:1.2;min-width:0}
-.cara span,.cara small{max-width:100%;overflow-wrap:anywhere}
-.cara small{color:var(--suave);font-size:14px;font-weight:600}
-.circulo{position:relative;width:64px;height:64px;border-radius:50%;display:grid;place-items:center;font-size:26px;font-weight:900;color:#fff;overflow:hidden;flex:none}
-.circulo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#fff}
-.circulo.grande{width:96px;height:96px;font-size:40px}
-.ficha-cab{display:flex;gap:14px;align-items:center;padding:12px 0}
-.ficha-cab > div{min-width:0}
 .msj{padding:10px 12px;border-radius:14px;margin:8px 0;background:#24242b;white-space:pre-wrap}
 .msj.yo{background:#33333b;color:var(--suave)}
 
@@ -111,7 +99,7 @@ small{font-size:15px;font-weight:600}
 </div>
 <div id="herramienta" class="vista" hidden>
   <div class="cab"><button id="volver">‹ Oficina</button><h2 id="herrT"></h2></div>
-  <form class="escribe" id="escribe" autocomplete="off"><input id="texto" enterkeyhint="send" maxlength="600"><button id="enviar">Preguntar</button></form>
+  <form class="escribe" id="escribe" autocomplete="off"><input id="texto" enterkeyhint="send" maxlength="600"><button>Preguntar</button></form>
   <div class="cuerpo" id="herrC"></div>
 </div>
 <div id="entrada" class="vista" hidden>
@@ -151,9 +139,14 @@ medir();
 addEventListener('resize', () => { if (medir() && !$('#mapa').hidden) ajustarVista(); });
 
 function mostrar(id) {
-  ['mapa', 'herramienta', 'entrada'].forEach(v => { if (v !== id) document.getElementById(v).hidden = true; });
-  const e = document.getElementById(id);
-  if (e.hidden) { e.classList.add('entra'); e.hidden = false; requestAnimationFrame(() => requestAnimationFrame(() => e.classList.remove('entra'))); }
+  // Como en el Tablero: la vista nueva ya está completa DEBAJO y la anterior se desvanece ENCIMA.
+  // Nunca se aparece "desde transparente" (eso se ve como parpadeo).
+  const nueva = document.getElementById(id);
+  const vieja = ['mapa', 'herramienta', 'entrada'].map(v => document.getElementById(v)).find(e => e !== nueva && !e.hidden);
+  nueva.hidden = false; nueva.style.zIndex = 1;
+  if (!vieja) return;
+  vieja.style.zIndex = 2; vieja.classList.add('sale');
+  setTimeout(() => { vieja.hidden = true; vieja.classList.remove('sale'); vieja.style.zIndex = ''; }, 170);
 }
 
 // ---------- Entrada ----------
@@ -213,7 +206,7 @@ function alertas() {
 
 // ---------- El mundo: cada texto vive dentro de su cuarto y se acomoda solo ----------
 const CUARTOS = [
-  { id: 'recepcion', t: 'Recepción · Jason', x: 20, y: 20, w: 260, h: 170 },
+  { id: 'recepcion', t: 'Recepción · Jason', x: 20, y: 20, w: 260, h: 170, herramienta: 'llamadas' },
   { id: 'clientes', t: 'Clientes que pagan', x: 300, y: 20, w: 560, h: 330 },
   { id: 'demos', t: 'Demos', x: 880, y: 20, w: 300, h: 230 },
   { id: 'cubiculos', t: 'Cubículos', x: 20, y: 210, w: 260, h: 230 },
@@ -355,92 +348,35 @@ function pintarInfo(refresco) {
   const ar = $('#aResumen'); if (ar) ar.onclick = () => elegir({ tipo: 'resumen' });
 }
 
-// ---------- Pantalla completa: CRM y Librería ----------
-let herr = null, etapaCRM = 'todos', busca = '', charla = [];
-const ETAPA = { 'pendiente': ['Pendientes', '#f08a24'], 'en proceso': ['En proceso', '#3f86ee'], 'cerrado': ['Cerrados', '#2fb36b'], 'en órbita': ['En órbita', '#8a5cf0'], 'portafolio': ['Portafolio', '#8d8d96'], 'archivo': ['Descartados', '#e04848'] };
+// ---------- Pantalla completa ----------
+// El CRM y Crea tu recepcionista SON los del Tablero (con su orden, sus fotos y su botón de editar): se abren ahí
+// mismo y, al cerrarlos, regresan a la Oficina. Aquí solo vive la Librería.
+const TABLERO = { crm: 'crm', crea: 'demo', llamadas: 'llamadas' };
+let charla = [];
 function abrirHerramienta(cual, tel, desdeHistoria) {
-  if (cual === 'crea') { location.href = '/prueba/nueva?dentro=1'; return; }   // su propia página completa (la misma del Tablero)
-  if (!desdeHistoria) history.pushState({ herramienta: cual, tel }, '');
-  herr = { cual, tel };
-  const inp = $('#texto');
-  if (cual === 'crm') { $('#herrT').textContent = tel ? 'Ficha' : 'CRM'; inp.placeholder = 'Busca nombre, negocio o teléfono'; inp.value = busca; $('#enviar').hidden = true; $('#escribe').hidden = !!tel; }
-  if (cual === 'libreria') { $('#herrT').textContent = 'Librería'; inp.placeholder = 'Pregúntale lo que sea de MOON'; inp.value = ''; $('#enviar').hidden = false; $('#escribe').hidden = false; }
-  mostrar('herramienta');
-  if (cual === 'crm' && tel) return pintarFicha(tel);
-  pintarHerramienta();
+  if (TABLERO[cual]) { location.href = '/tablero?abrir=' + TABLERO[cual] + '&volver=/oficina'; return; }
+  if (!desdeHistoria) history.pushState({ herramienta: cual }, '');
+  $('#herrT').textContent = 'Librería'; $('#texto').placeholder = 'Pregúntale lo que sea de MOON'; $('#texto').value = '';
+  mostrar('herramienta'); pintarLibreria();
 }
 $('#volver').onclick = () => history.back();
-function cara(p, grande) {
-  const pan = ((C && C.paneles) || []).find(x => x.tel === p.tel);
-  const color = (ETAPA[p.etapa || 'pendiente'] || ETAPA.pendiente)[1];
-  const img = p.foto || (pan && pan.icono ? String(pan.icono).split('|')[0].replace(/#(color|llena)$/, '') : '');
-  const ini = esc(String(p.nombre || p.negocio || '?').trim().slice(0, 1).toUpperCase());
-  return `<span class="circulo${grande ? ' grande' : ''}" style="background:${color}">${ini}${img ? `<img src="${esc(img)}" alt="" onerror="this.remove()">` : ''}</span>`;
-}
-function pintarHerramienta() {
+function pintarLibreria() {
+  // La respuesta más nueva va arriba, pegada al cuadro de escribir: el teclado nunca la tapa.
+  const pares = []; for (let i = 0; i < charla.length; i += 2) pares.push(charla.slice(i, i + 2));
   const k = $('#herrC');
-  if (herr.cual === 'libreria') {
-    // La respuesta más nueva va arriba, pegada al cuadro de escribir: el teclado nunca la tapa.
-    const pares = []; for (let i = 0; i < charla.length; i += 2) pares.push(charla.slice(i, i + 2));
-    k.innerHTML = pares.length ? pares.reverse().map(([q, r]) => `<div class="msj yo">${esc(q.texto)}</div><div class="msj">${esc(r ? r.texto : '')}</div>`).join('') : '<p class="fila"><small>Ejemplos: ¿Cómo funciona Jason? · ¿Qué diferencia hay entre créditos y tokens? · ¿Podemos hacer un asistente para un dentista?</small></p>';
-    k.scrollTop = 0; return;
-  }
-  const ps = (C && C.personas) || [];
-  const sinAc = x => String(x || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
-  const q = sinAc(busca.trim()), dig = q.replace(/\D/g, '');
-  const grupos = [['todos', 'Todos', ps.length]].concat(Object.entries(ETAPA).map(([e, [n]]) => [e, n, ps.filter(p => (p.etapa || 'pendiente') === e && !Number(p.es_prueba)).length])).concat([['pruebas', 'Pruebas', ps.filter(p => Number(p.es_prueba)).length]]).filter(g => g[2] || g[0] === 'todos');
-  const lista = q ? ps.filter(p => sinAc([p.nombre, p.negocio, p.giro, p.necesidad, p.notas_equipo, p.correo].join(' ')).includes(q) || (dig.length >= 3 && String(p.telefono || p.tel || '').includes(dig)))
-    : etapaCRM === 'todos' ? ps : etapaCRM === 'pruebas' ? ps.filter(p => Number(p.es_prueba)) : ps.filter(p => (p.etapa || 'pendiente') === etapaCRM && !Number(p.es_prueba));
-  k.innerHTML = (q ? `<p class="titulo">${lista.length} encontrado${lista.length === 1 ? '' : 's'}</p>` : `<div class="etapas">${grupos.map(([e, n, c]) => `<button data-e="${e}" class="${e === etapaCRM ? 'si' : ''}">${n} ${c}</button>`).join('')}</div>`) +
-    (lista.length ? `<div class="caras">${lista.map(p => `<button class="cara" data-tel="${esc(p.tel)}">${cara(p)}<span>${esc(p.nombre || 'Sin nombre')}</span>${p.negocio ? `<small>${esc(p.negocio)}</small>` : ''}${Number(p.es_prueba) ? '<small>prueba</small>' : ''}</button>`).join('')}</div>` : '<p class="fila"><small>Nadie aquí.</small></p>');
+  k.innerHTML = pares.length ? pares.reverse().map(([q, r]) => `<div class="msj yo">${esc(q.texto)}</div><div class="msj">${esc(r ? r.texto : '')}</div>`).join('') : '<p class="fila"><small>Ejemplos: ¿Cómo funciona Jason? · ¿Qué diferencia hay entre créditos y tokens? · ¿Podemos hacer un asistente para un dentista?</small></p>';
+  k.scrollTop = 0;
 }
-$('#herrC').addEventListener('click', e => {
-  const b = e.target.closest('[data-e]'); if (b) { etapaCRM = b.dataset.e; return pintarHerramienta(); }
-  const c = e.target.closest('[data-tel]'); if (c) return abrirHerramienta('crm', c.dataset.tel);
-  const d = e.target.closest('[data-doc]'); if (d) abrirDoc(d.dataset.doc, d.dataset.url);
-});
-$('#texto').addEventListener('input', () => { if (herr && herr.cual === 'crm') { busca = $('#texto').value; pintarHerramienta(); } });
 $('#escribe').onsubmit = async e => {
   e.preventDefault();
-  if (herr.cual !== 'libreria') { $('#texto').blur(); return; }
   const q = $('#texto').value.trim(); if (!q) return;
   $('#texto').value = '';
   const antes = charla.map(m => ({ yo: !!m.yo, texto: m.texto })).slice(-6);
-  charla.push({ yo: true, texto: q }, { texto: 'Buscando en la Librería…' }); pintarHerramienta();
+  charla.push({ yo: true, texto: q }, { texto: 'Buscando en la Librería…' }); pintarLibreria();
   const j = await oficina('libreria', { pregunta: q, antes });
   charla[charla.length - 1] = { texto: j.ok ? j.respuesta : (j.mensaje || 'No se pudo contestar. Intenta de nuevo.') };
-  pintarHerramienta();
+  pintarLibreria();
 };
-// Regla 5: un toque abre el documento. La ventana se abre en el mismo toque; si el navegador la bloquea, se abre aquí.
-async function abrirDoc(id, url) {
-  // (window.open con "noopener" siempre regresa vacío: se abre normal y se le corta el lazo con esta página)
-  const w = window.open('', '_blank'); if (w) w.opener = null;
-  if (url) { if (w) w.location.href = url; else location.href = url; return; }
-  const j = await centro('documento', { id });
-  const link = j.ok && j.doc && (j.doc.compartir || j.doc.url);
-  if (!link) { if (w) w.close(); return; }
-  if (w) w.location.href = link; else location.href = link;
-}
-async function pintarFicha(tel) {
-  const p0 = ((C && C.personas) || []).find(x => String(x.tel) === String(tel)) || {};
-  const pinta = (p, contactos) => {
-    const docs = ((C && C.documentos) || []).filter(d => String(d.tel) === String(tel));
-    const pan = ((C && C.paneles) || []).find(x => x.tel === tel), proy = ((C && C.proyectos) || []).filter(x => x.tel === tel);
-    const E = ETAPA[p.etapa || 'pendiente'] || ETAPA.pendiente;
-    $('#herrC').innerHTML = `<div class="ficha-cab">${cara(p, true)}<div><div style="font-size:20px;overflow-wrap:anywhere">${esc(p.nombre || 'Sin nombre')}</div>${p.negocio ? `<small style="color:var(--suave)">${esc(p.negocio)}</small><br>` : ''}<small style="color:${E[1]}">${E[0]}${p.temperatura ? ' · ' + esc(p.temperatura) : ''}${Number(p.es_prueba) ? ' · prueba' : ''}</small></div></div>
-      ${pan && pan.demo ? `<a class="fila" href="${esc(pan.demo)}" target="_blank" rel="noopener">Abrir su demo<small>${esc(pan.demo)}</small></a>` : ''}
-      ${docs.map(d => `<button class="fila" data-doc="${esc(d.id)}" data-url="${d.formato === 'link' && /^https:\/\//.test(d.url || '') ? esc(d.url) : ''}" style="color:var(--azul)">${esc(d.titulo)}<small>${esc(d.seccion)}</small></button>`).join('')}
-      <p class="titulo">Datos</p>
-      <div class="fila">Tel: +52 ${esc(p.telefono || tel)}${p.correo ? `<small>${esc(p.correo)}</small>` : ''}${p.proxima_cita ? `<small>Próxima cita: ${esc(p.proxima_cita)}</small>` : ''}</div>
-      ${p.necesidad ? `<div class="fila">Qué necesita<small>${esc(p.necesidad)}</small></div>` : ''}
-      ${p.notas_equipo ? `<div class="fila">Notas del equipo<small>${esc(p.notas_equipo)}</small></div>` : ''}
-      ${proy.map(x => `<div class="fila">Proyecto: ${esc(x.nombre)}<small>Fase: ${esc(x.fase)}${x.nota ? ' · ' + esc(x.nota) : ''}</small></div>`).join('')}
-      ${contactos ? `<p class="titulo">Historial</p>` + (contactos.slice(0, 12).map(c => `<div class="fila">${esc(c.resumen || '')}<small>${esc(c.canal)} · ${fechaC(c.fecha)}</small></div>`).join('') || '<p class="fila"><small>Sin contactos.</small></p>') : ''}`;
-  };
-  pinta(p0, null); $('#herrC').scrollTop = 0;   // lo que ya se sabe sale al instante; el historial llega después
-  const j = await centro('ficha', { tel });
-  if (herr && herr.tel === tel && j.ok) pinta(Object.assign({}, p0, j.persona || {}), j.contactos || []);
-}
 
 arrancar();
 </script>
