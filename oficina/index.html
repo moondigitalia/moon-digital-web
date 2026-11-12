@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=overlays-content">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#16161a">
+<title>Oficina MOON</title>
+<style>
+/* PASO 1 (sistemas): todo funciona con datos reales. La piel 3D va encima después sin tocar esto. */
+:root{
+  --fondo:#16161a; --piso:#212127; --cuarto:#2a2a31; --linea:#3a3a43; --tinta:#f1f0ec; --suave:#a9a8b0;
+  --verde:#3ccf7a; --amarillo:#f2c230; --rojo:#ef4b4b; --naranja:#ff7a1a;
+  --alto:100vh;
+}
+[hidden]{display:none!important}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:var(--fondo);color:var(--tinta);
+  font:600 16px/1.35 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overscroll-behavior:none}
+body{position:fixed;inset:0}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+input,textarea{font:inherit;font-size:16px}
+@media (prefers-reduced-motion:reduce){*{transition-duration:0s!important;animation-duration:0s!important}}
+
+/* ---- Dos vistas fijas ---- */
+#juego{position:absolute;inset:0;height:var(--alto);display:grid;grid-template-rows:minmax(0,1fr) minmax(0,1fr);grid-template-columns:minmax(0,1fr)}
+@media (orientation:landscape) and (min-width:700px){#juego{grid-template-rows:none;grid-template-rows:minmax(0,1fr);grid-template-columns:minmax(0,1fr) minmax(340px,38%)}}
+#oficina{position:relative;overflow:hidden;touch-action:none;background:var(--piso);cursor:grab}
+#mundo{position:absolute;left:0;top:0;width:1200px;height:800px;transform-origin:0 0;will-change:transform}
+#panel{position:relative;display:flex;flex-direction:column;min-height:0;background:var(--fondo);border-top:2px solid var(--linea)}
+@media (orientation:landscape) and (min-width:700px){#panel{border-top:0;border-left:2px solid var(--linea)}}
+
+/* ---- Cuartos (provisionales: la piel 3D los reemplaza) ---- */
+.cuarto{position:absolute;background:var(--cuarto);border-radius:18px;padding:12px 14px;border:2px solid transparent;transition:border-color .2s}
+.cuarto.sel{border-color:var(--tinta)}
+.cuarto h3{font-size:18px;font-weight:800}
+.cuarto p{font-size:15px;color:var(--suave)}
+.cuarto.gris{background:#24242a;filter:grayscale(1);opacity:.75}
+.cuarto.cerrado{background:#1c1c21}
+.luz{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:6px;vertical-align:1px}
+.luz.verde{background:var(--verde)} .luz.amarillo{background:var(--amarillo)} .luz.rojo{background:var(--rojo)} .luz.gris{background:#666}
+.mono{position:absolute;font-size:15px;font-weight:800;padding:4px 9px;border-radius:12px;background:#33333b;white-space:nowrap}
+.mono.fuera{opacity:.35}
+.burbuja{position:absolute;background:var(--tinta);color:#111;font-size:15px;padding:4px 10px;border-radius:12px;white-space:nowrap}
+
+/* ---- Panel fijo: la línea de en medio es donde se escribe ---- */
+#escribir{display:flex;gap:8px;padding:8px;border-bottom:2px solid var(--linea)}
+#escribir input{flex:1;min-width:0;background:#24242a;border:0;border-radius:14px;padding:12px 14px;color:var(--tinta);outline:none}
+#escribir button{background:var(--tinta);color:#111;border-radius:14px;padding:0 16px;font-weight:800}
+#pestanas{display:flex;gap:4px;padding:6px 8px;overflow-x:auto;scrollbar-width:none}
+#pestanas button{padding:8px 12px;border-radius:12px;color:var(--suave);white-space:nowrap}
+#pestanas button.si{background:#2a2a31;color:var(--tinta)}
+#contenido{overflow-wrap:anywhere;flex:1;min-height:0;overflow-y:auto;padding:4px 12px 16px;-webkit-overflow-scrolling:touch}
+.fila{padding:10px 0;border-bottom:1px solid #2a2a31}
+.fila b{font-weight:800}
+.fila small{display:block;color:var(--suave);font-size:15px;font-weight:600}
+.fila.toca{cursor:pointer}
+.barra{height:12px;border-radius:6px;background:#2a2a31;overflow:hidden;margin-top:6px}
+.barra i{display:block;height:100%;border-radius:6px}
+.titulo{font-size:15px;color:var(--suave);margin:12px 0 2px;text-transform:uppercase;letter-spacing:.04em}
+.msj{padding:10px 12px;border-radius:14px;margin:8px 0;background:#24242a;white-space:pre-wrap}
+.msj.yo{background:#33333b;margin-left:20%}
+.aviso{color:var(--amarillo)}
+a{color:#8fb6ff}
+#hud{position:absolute;left:8px;top:8px;display:flex;gap:6px;flex-wrap:wrap;pointer-events:none}
+#hud span{background:#000a;padding:4px 10px;border-radius:12px;font-size:15px}
+
+/* ---- Entrada: elegir personaje ---- */
+#entrada{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:20px;background:var(--fondo);z-index:5}
+#entrada h1{font-size:24px;font-weight:900}
+#personajes{display:flex;gap:12px}
+#personajes button{width:96px;padding:14px 0;border-radius:18px;background:#24242a;font-weight:800;border:2px solid transparent}
+#personajes button.si{border-color:var(--tinta)}
+#entrada form{display:flex;gap:8px;width:min(340px,100%)}
+#entrada input{flex:1;background:#24242a;border:0;border-radius:14px;padding:12px 14px;color:var(--tinta)}
+#entrada form button{background:var(--tinta);color:#111;border-radius:14px;padding:0 16px;font-weight:800}
+#marco{position:absolute;inset:0;border:0;width:100%;height:100%;background:#fff}
+</style>
+</head>
+<body>
+<div id="juego" hidden>
+  <div id="oficina"><div id="mundo"></div><div id="hud"></div></div>
+  <div id="panel">
+    <form id="escribir" autocomplete="off">
+      <input id="pregunta" enterkeyhint="send" placeholder="Pregúntale a la Librería…" maxlength="600">
+      <button>Preguntar</button>
+    </form>
+    <nav id="pestanas"></nav>
+    <div id="contenido"></div>
+  </div>
+</div>
+<div id="entrada" hidden>
+  <h1>¿Quién entra a la oficina?</h1>
+  <div id="personajes"></div>
+  <form id="clave" hidden><input type="password" id="pass" placeholder="Tu contraseña" autocomplete="current-password"><button>Entrar</button></form>
+  <p id="error" class="aviso"></p>
+</div>
+<script>
+'use strict';
+const LLAVE = 'centro.moon.sesion';   // la misma sesión que el Tablero: si ya entraste allá, aquí también
+const $ = s => document.querySelector(s);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+const ses = () => { try { return localStorage.getItem(LLAVE) || ''; } catch (e) { return ''; } };
+async function pide(api, accion, datos) {
+  const r = await fetch(api, { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-sesion': ses() }, body: JSON.stringify(Object.assign({ accion }, datos || {})) });
+  const j = await r.json().catch(() => ({ ok: false, error: 'red' }));
+  if (r.status === 401 || j.error === 'sesion') { salir(); }
+  return j;
+}
+const centro = (a, d) => pide('/api/centro', a, d);
+const oficina = (a, d) => pide('/api/oficina', a, d);
+
+// ---------- Alto real de la pantalla y teclado ----------
+// La página mide lo que mide la pantalla SIN teclado: el teclado solo tapa el panel de abajo, nada brinca.
+function medir() { document.documentElement.style.setProperty('--alto', window.innerHeight + 'px'); }
+medir(); addEventListener('resize', () => { if (!document.activeElement || document.activeElement.tagName !== 'INPUT') medir(); });
+if (window.visualViewport) visualViewport.addEventListener('resize', () => { window.scrollTo(0, 0); });
+addEventListener('scroll', () => window.scrollTo(0, 0));
+
+// ---------- Entrada ----------
+let elegido = null;
+async function entrada() {
+  $('#entrada').hidden = false; $('#juego').hidden = true;
+  const j = await centro('quienes');
+  const nombres = { kid: 'Kid', daniel: 'Papá', dan: 'Dan' };
+  $('#personajes').innerHTML = (j.usuarios || []).filter(u => nombres[u.id]).map(u => `<button data-id="${u.id}">${nombres[u.id]}</button>`).join('');
+  $('#personajes').onclick = e => {
+    const b = e.target.closest('button'); if (!b) return;
+    elegido = b.dataset.id; [...$('#personajes').children].forEach(x => x.classList.toggle('si', x === b));
+    $('#clave').hidden = false; $('#pass').focus();
+  };
+}
+$('#clave').onsubmit = async e => {
+  e.preventDefault();
+  const j = await centro('entrar', { usuario: elegido, clave: $('#pass').value });
+  if (!j.ok) { $('#error').textContent = j.error === 'pausa' ? 'Muchos intentos. Espera 15 minutos.' : j.error === 'sin_clave' ? 'Primero crea tu contraseña en el Tablero.' : 'Esa contraseña no es.'; return; }
+  try { localStorage.setItem(LLAVE, j.sesion); } catch (x) {}
+  arrancar();
+};
+function salir() { try { localStorage.removeItem(LLAVE); } catch (e) {} entrada(); }
+
+// ---------- Datos ----------
+let O = null, C = null, pestana = 'vidas', cuartoSel = null;
+async function cargar() {
+  const [a, b] = await Promise.all([oficina('estado'), centro('inicio')]);
+  if (a.ok) O = a.oficina;
+  if (b.ok) C = b;
+  dibujarOficina(); dibujarPanel();
+}
+async function arrancar() {
+  if (!ses()) return entrada();
+  $('#entrada').hidden = true; $('#juego').hidden = false;
+  await cargar();
+  ajustarVista();
+  setInterval(cargar, 5 * 60e3);   // la medición escribe cada hora; con 5 min basta
+}
+
+// ---------- La oficina (provisional, plano) ----------
+const CUARTOS = [
+  { id: 'recepcion', t: 'Recepción · Jason', x: 20, y: 20, w: 260, h: 170, tab: 'jason' },
+  { id: 'clientes', t: 'Clientes que pagan', x: 300, y: 20, w: 560, h: 330, tab: 'asistentes' },
+  { id: 'demos', t: 'Demos', x: 880, y: 20, w: 300, h: 230, tab: 'asistentes' },
+  { id: 'cubiculos', t: 'Cubículos', x: 20, y: 210, w: 260, h: 230, tab: 'equipo' },
+  { id: 'robots', t: 'Estación de robots', x: 880, y: 270, w: 300, h: 200, tab: 'robots' },
+  { id: 'crm', t: 'CRM', x: 300, y: 370, w: 270, h: 200, tab: 'crm' },
+  { id: 'libreria', t: 'Librería', x: 590, y: 370, w: 270, h: 200, tab: 'libreria' },
+  { id: 'crea', t: 'Crea tu recepcionista', x: 20, y: 460, w: 260, h: 110, tab: 'crea' },
+  { id: 'gris', t: 'Cuarto gris', x: 300, y: 590, w: 560, h: 190, tab: 'gris', gris: true },
+  { id: 'cerrado', t: 'Puerta cerrada', x: 880, y: 490, w: 300, h: 290, tab: 'cerrado', cerrado: true },
+];
+function dibujarOficina() {
+  if (!O) return;
+  const as = (O.asistentes && O.asistentes.lista) || [];
+  const quien = t => as.filter(a => t.includes(a.tipo));
+  const mono = (a, x, y) => `<div class="mono" style="left:${x}px;top:${y}px"><span class="luz ${a.estado}"></span>${esc(a.nombre)}${a.platicas7d ? ' · ' + a.platicas7d : ''}</div>`;
+  let h = '';
+  for (const c of CUARTOS) {
+    h += `<div class="cuarto${c.gris ? ' gris' : ''}${c.cerrado ? ' cerrado' : ''}${cuartoSel === c.id ? ' sel' : ''}" data-c="${c.id}" style="left:${c.x}px;top:${c.y}px;width:${c.w}px;height:${c.h}px"><h3>${c.t}</h3>`;
+    if (c.id === 'clientes') h += quien(['cliente']).map((a, i) => mono(a, 20 + i * 200, 70)).join('');
+    if (c.id === 'demos') h += quien(['demo']).map((a, i) => mono(a, 14, 50 + i * 44)).join('');
+    if (c.id === 'gris') h += quien(['dijo_no', 'archivado']).concat(as.filter(a => a.tipo === 'prueba' && a.id === 'donde')).map((a, i) => `<div class="mono" style="left:${20 + i * 170}px;top:80px;transform:rotate(-80deg)">✕✕ ${esc(a.nombre)}</div>`).join('');
+    if (c.id === 'cerrado') h += `<p>Pruebas y archivados (${quien(['prueba', 'base', 'copia']).length})</p>`;
+    if (c.id === 'cubiculos') h += (O.cubiculos || []).map((u, i) => `<div class="mono${u.presente ? '' : ' fuera'}" style="left:14px;top:${50 + i * 44}px">${({ kid: 'Kid', daniel: 'Papá', dan: 'Dan' })[u.id]} ${u.presente ? 'en su silla' : '· silla vacía'}</div>`).join('');
+    if (c.id === 'robots') h += `<p>${((O.tareas && O.tareas.lista) || []).length} robots · ${((O.tareas && O.tareas.lista) || []).filter(t => t.resultado !== 'bien').length} con falla</p>`;
+    if (c.id === 'recepcion') { const ll = (C && C.llamadas) || []; h += `<p>${ll.filter(l => Date.now() - Date.parse(l.fecha) < 864e5).length} llamadas hoy</p>`; }
+    if (c.id === 'crm') h += `<p>${((C && C.personas) || []).length} personas</p>`;
+    if (c.id === 'libreria') h += `<p>${O.libreria.hoy} de ${O.libreria.tope} preguntas hoy</p>`;
+    h += '</div>';
+  }
+  // Claude: el robot naranja, junto a lo último que se anotó.
+  const ult = O.actividad && O.actividad.lineas && O.actividad.lineas[0];
+  if (ult) h += `<div class="burbuja" style="left:600px;top:340px;background:var(--naranja);color:#111">🤖 ${esc(ult.texto.slice(0, 60))}…</div>`;
+  $('#mundo').innerHTML = h;
+  $('#hud').innerHTML = (O.medicionAtrasada ? '<span class="aviso">La medición no ha corrido</span>' : '') + `<span>Semana: $${(O.gasto || {}).usd7d || 0} USD</span>`;
+}
+$('#mundo').addEventListener('click', e => {
+  if (movido) return;
+  const c = e.target.closest('.cuarto'); if (!c) return;
+  cuartoSel = c.dataset.c; pestana = CUARTOS.find(x => x.id === cuartoSel).tab;
+  dibujarOficina(); dibujarPanel();
+});
+
+// ---------- Zoom y arrastre SOLO en la oficina (como n8n): el panel nunca se mueve ----------
+const vista = { x: 0, y: 0, z: 1 };
+const dedos = new Map(); let movido = false, ini = null;
+function aplicar() { $('#mundo').style.transform = `translate(${vista.x}px,${vista.y}px) scale(${vista.z})`; }
+function ajustarVista() {
+  const r = $('#oficina').getBoundingClientRect();
+  vista.z = Math.min(r.width / 1200, r.height / 800); vista.x = (r.width - 1200 * vista.z) / 2; vista.y = (r.height - 800 * vista.z) / 2; aplicar();
+}
+addEventListener('resize', () => { if (!$('#juego').hidden) ajustarVista(); });
+function zoomEn(px, py, nuevo) {
+  nuevo = Math.max(0.15, Math.min(3, nuevo));
+  vista.x = px - (px - vista.x) * nuevo / vista.z; vista.y = py - (py - vista.y) * nuevo / vista.z; vista.z = nuevo; aplicar();
+}
+const of = $('#oficina');
+of.addEventListener('pointerdown', e => { of.setPointerCapture(e.pointerId); dedos.set(e.pointerId, { x: e.clientX, y: e.clientY }); movido = false; ini = null; });
+of.addEventListener('pointermove', e => {
+  if (!dedos.has(e.pointerId)) return;
+  const antes = dedos.get(e.pointerId); dedos.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  const r = of.getBoundingClientRect();
+  if (dedos.size === 1) {
+    const dx = e.clientX - antes.x, dy = e.clientY - antes.y;
+    if (Math.abs(dx) + Math.abs(dy) > 2) movido = true;
+    vista.x += dx; vista.y += dy; aplicar();
+  } else if (dedos.size === 2) {
+    const [a, b] = [...dedos.values()];
+    const d = Math.hypot(a.x - b.x, a.y - b.y), cx = (a.x + b.x) / 2 - r.left, cy = (a.y + b.y) / 2 - r.top;
+    if (ini) { zoomEn(cx, cy, vista.z * d / ini.d); vista.x += cx - ini.cx; vista.y += cy - ini.cy; aplicar(); }
+    ini = { d, cx, cy }; movido = true;
+  }
+});
+const suelta = e => { dedos.delete(e.pointerId); ini = null; setTimeout(() => { movido = false; }, 0); };
+of.addEventListener('pointerup', suelta); of.addEventListener('pointercancel', suelta);
+of.addEventListener('wheel', e => { e.preventDefault(); const r = of.getBoundingClientRect(); zoomEn(e.clientX - r.left, e.clientY - r.top, vista.z * Math.exp(-e.deltaY * 0.0015)); }, { passive: false });
+// Safari: que el gesto de pellizco no agrande la página entera.
+['gesturestart', 'gesturechange'].forEach(n => document.addEventListener(n, e => e.preventDefault()));
+
+// ---------- Panel ----------
+const PESTANAS = [['vidas', 'Vidas'], ['asistentes', 'Asistentes'], ['jason', 'Jason'], ['crm', 'CRM'], ['libreria', 'Librería'], ['robots', 'Robots'], ['equipo', 'Equipo'], ['crea', 'Crea tu recepcionista'], ['gris', 'Cuarto gris'], ['cerrado', 'Puerta cerrada']];
+$('#pestanas').onclick = e => { const b = e.target.closest('button'); if (b) { pestana = b.dataset.p; cuartoSel = (CUARTOS.find(c => c.tab === pestana) || {}).id; dibujarOficina(); dibujarPanel(); } };
+const hace = f => { if (!f) return ''; const m = Math.round((Date.now() - Date.parse(f)) / 6e4); return m < 60 ? `hace ${m} min` : m < 1440 ? `hace ${Math.round(m / 60)} h` : `hace ${Math.round(m / 1440)} días`; };
+const fechaC = f => f ? new Date(Date.parse(f)).toLocaleString('es-MX', { timeZone: 'America/Cancun', weekday: 'short', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' }) : '';
+const COLOR = { verde: 'var(--verde)', amarillo: 'var(--amarillo)', rojo: 'var(--rojo)', gris: '#666' };
+let charla = [];
+// La página de un asistente puede venir como dirección completa o solo con su nombre en Vercel.
+const liga = p => { if (!p) return ''; const u = /^https:\/\//.test(p) ? p : /^[a-z0-9-]+$/.test(p) ? `https://${p}.vercel.app` : ''; return u ? `<small><a href="${esc(u)}" target="_blank" rel="noopener">${esc(u)}</a></small>` : ''; };
+
+function dibujarPanel() {
+  $('#pestanas').innerHTML = PESTANAS.map(([p, n]) => `<button data-p="${p}" class="${p === pestana ? 'si' : ''}">${n}</button>`).join('');
+  const k = $('#contenido'); if (!O) { k.innerHTML = '<p class="fila">Cargando…</p>'; return; }
+  const as = (O.asistentes && O.asistentes.lista) || [];
+  const filaA = a => `<div class="fila"><span class="luz ${a.estado}"></span><b>${esc(a.nombre)}</b> · ${esc(a.de)}<small>${a.platicas7d || 0} pláticas y ${a.fallas7d || 0} fallas en 7 días · $${a.usd7d || 0} USD${a.emergencias === false && (a.tipo === 'cliente' || a.tipo === 'demo') ? ' · sin reglas de emergencia' : ''}</small><small>${esc(a.nota || '')}</small>${liga(a.pagina)}</div>`;
+  let h = '';
+  if (pestana === 'vidas') {
+    const s = (O.suscripciones && O.suscripciones.lista) || [];
+    const vidaFila = x => `<div class="fila"><b>${esc(x.nombre)}</b> · ${x.monto} ${x.moneda}${x.aviso ? ' 🚨💸' : ''}<small>${x.faltan < 0 ? 'Se pasó la fecha de pago hace ' + (-x.faltan) + ' días' : 'Se cobra en ' + x.faltan + ' días (' + x.proxima + ')'}${x.ultimoRecibo ? ' · último recibo ' + x.ultimoRecibo : ' · sin recibo en el correo'}</small>${x.nota ? `<small>${esc(x.nota)}</small>` : ''}<div class="barra"><i style="width:${Math.round(x.nivel * 100)}%;background:${COLOR[x.color]}"></i></div></div>`;
+    const suma = l => { const t = {}; l.forEach(x => { t[x.moneda] = (t[x.moneda] || 0) + Number(x.monto); }); return Object.entries(t).map(([m, v]) => v.toLocaleString('es-MX', { maximumFractionDigits: 2 }) + ' ' + m).join(' + '); };
+    const ias = s.filter(x => x.grupo !== 'otra'), otras = s.filter(x => x.grupo === 'otra');
+    h += `<p class="titulo">IAs · al mes ${suma(ias)}</p>` + ias.map(vidaFila).join('') + `<p class="titulo">Otras herramientas · al mes ${suma(otras)}</p>` + otras.map(vidaFila).join('');
+    const g = O.gasto || {};
+    h += `<p class="titulo">Gasto de los asistentes</p><div class="fila"><b>$${g.usd7d || 0} USD</b> en 7 días<small>${(g.creditos7d || 0).toLocaleString('es-MX')} créditos de ElevenLabs · ${esc(g.nota || '')}</small></div>`;
+    h += `<div class="fila"><b>Librería hoy</b>: ${O.libreria.hoy} preguntas · $${O.libreria.usdHoy} USD</div>`;
+    const p = O.publicaciones || {};
+    h += `<div class="fila"><b>Publicaciones hoy</b>: ${p.total || 0} de ${p.tope || 100}${p.fallidas ? ` · <span class="aviso">${p.fallidas} fallaron</span>` : ''}<div class="barra"><i style="width:${Math.min(100, (p.total || 0))}%;background:${(p.total || 0) > 80 ? 'var(--rojo)' : 'var(--verde)'}"></i></div></div>`;
+    h += `<small class="fila">Medido ${hace((O.medicion || {}).actualizado)}</small>`;
+  }
+  if (pestana === 'asistentes') {
+    h += '<p class="titulo">Clientes que pagan</p>' + as.filter(a => a.tipo === 'cliente').map(filaA).join('');
+    h += '<p class="titulo">Demos</p>' + as.filter(a => a.tipo === 'demo').map(filaA).join('');
+    h += '<p class="titulo">De MOON</p>' + as.filter(a => a.tipo === 'propio').map(filaA).join('');
+  }
+  if (pestana === 'gris') h += '<p class="titulo">Dijeron que no</p>' + as.filter(a => a.tipo === 'dijo_no' || a.tipo === 'archivado' || a.id === 'donde').map(filaA).join('');
+  if (pestana === 'cerrado') h += '<p class="titulo">Pruebas y copias</p>' + as.filter(a => ['prueba', 'base', 'copia'].includes(a.tipo) && a.id !== 'donde').map(filaA).join('');
+  if (pestana === 'jason') {
+    const ll = (C && C.llamadas) || [];
+    h += '<p class="titulo">Llamadas que contestó Jason</p>' + (ll.length ? ll.slice(0, 30).map(l => { let d = {}; try { d = JSON.parse(l.datos || '{}'); } catch (e) {} return `<div class="fila toca" data-tel="${esc(l.quien)}"><b>${esc(d.nombre || 'Sin nombre')}</b>${d.negocio ? ' · ' + esc(d.negocio) : ''}${Number(l.prueba) ? ' · <span class="aviso">prueba</span>' : ''}<small>${fechaC(l.fecha)} · ${esc(d.resultado || (d.cita ? 'Cita: ' + d.cita : 'Sin resultado anotado'))}</small><small>${esc((l.resumen || '').slice(0, 160))}</small></div>`; }).join('') : '<p class="fila">Sin llamadas.</p>');
+  }
+  if (pestana === 'crm') h += crmLista();
+  if (pestana === 'ficha') h += fichaHtml;
+  if (pestana === 'robots') h += '<p class="titulo">Tareas automáticas</p>' + ((O.tareas && O.tareas.lista) || []).map(t => { const tarde = t.siguiente && Date.now() - Date.parse(t.siguiente) > 2 * 3600e3; return `<div class="fila"><span class="luz ${t.resultado !== 'bien' || tarde ? 'rojo' : 'verde'}"></span><b>${esc(t.nombre)}</b> · de ${esc(t.deQuien)}<small>Última vez: ${fechaC(t.ultimaVez)} (${esc(t.resultado)}) · Siguiente: ${fechaC(t.siguiente)}${tarde ? ' · no está corriendo' : ''}</small></div>`; }).join('');
+  if (pestana === 'equipo') {
+    h += '<p class="titulo">Cubículos (lunes a viernes, hora de Cancún)</p>' + (O.cubiculos || []).map(u => `<div class="fila"><span class="luz ${u.presente ? 'verde' : 'gris'}"></span><b>${({ kid: 'Kid', daniel: 'Papá', dan: 'Dan' })[u.id]}</b><small>${u.de}:00 a ${u.a}:00 · ${u.presente ? 'en su horario' : 'fuera de horario'}</small></div>`).join('');
+    h += '<p class="titulo">Lo último que pasó</p>' + ((O.actividad && O.actividad.lineas) || []).slice(0, 12).map(l => `<div class="fila">${esc(l.texto)}<small>${esc(l.quien)} · ${fechaC(l.hora)}</small></div>`).join('');
+  }
+  if (pestana === 'crea') h += '<iframe id="marco" style="position:relative;height:100%;min-height:420px;border-radius:14px" src="/prueba/nueva?dentro=1" title="Crea tu recepcionista"></iframe>';
+  if (pestana === 'libreria') h += '<p class="titulo">Librería: pregúntale lo que sea de MOON</p>' + (charla.length ? charla.map(m => `<div class="msj${m.yo ? ' yo' : ''}">${esc(m.texto)}</div>`).join('') : '<p class="fila">Escribe arriba. Ejemplos: «¿Cómo funciona Jason?», «¿Qué diferencia hay entre créditos y tokens?», «¿Podemos hacer un asistente para un dentista?»</p>');
+  k.innerHTML = h;
+  if (pestana === 'libreria') k.scrollTop = k.scrollHeight;
+}
+
+// ---------- CRM ----------
+let fichaHtml = '';
+const ETAPA = { 'pendiente': 'Pendientes', 'en proceso': 'En proceso', 'cerrado': 'Cerrados', 'en órbita': 'En órbita', 'portafolio': 'Portafolio', 'archivo': 'Descartados' };
+function crmLista() {
+  const ps = (C && C.personas) || [];
+  return Object.entries(ETAPA).map(([e, n]) => { const g = ps.filter(p => (p.etapa || 'pendiente') === e); return g.length ? `<p class="titulo">${n} (${g.length})</p>` + g.map(p => `<div class="fila toca" data-tel="${esc(p.tel)}"><b>${esc(p.nombre || 'Sin nombre')}</b>${p.negocio ? ' · ' + esc(p.negocio) : ''}${Number(p.es_prueba) ? ' · <span class="aviso">prueba</span>' : ''}<small>${esc(p.necesidad || p.giro || '')}</small></div>`).join('') : ''; }).join('');
+}
+$('#contenido').addEventListener('click', async e => {
+  const f = e.target.closest('[data-tel]');
+  if (f && f.dataset.tel) return abrirFicha(f.dataset.tel);
+  const d = e.target.closest('[data-doc]');
+  if (d) { d.querySelector('small').textContent = 'Abriendo…'; const j = await centro('documento', { id: d.dataset.doc }); const sm = d.querySelector('small'); if (j.ok && j.doc && j.doc.compartir) { sm.innerHTML = `<a href="${esc(j.doc.compartir)}" target="_blank" rel="noopener">${esc(j.doc.compartir)}</a>`; d.removeAttribute('data-doc'); } else sm.textContent = 'No se pudo abrir'; }
+});
+async function abrirFicha(tel) {
+  pestana = 'ficha'; fichaHtml = '<p class="fila">Cargando…</p>'; dibujarPanel();
+  const j = await centro('ficha', { tel });
+  const p = j.persona || {}; const tel10 = String(p.tel || tel);
+  const docs = ((C && C.documentos) || []).filter(d => d.tel === tel10);
+  const panel = ((C && C.paneles) || []).find(x => x.tel === tel10);
+  const proy = ((C && C.proyectos) || []).filter(x => x.tel === tel10);
+  fichaHtml = `<p class="titulo"><a href="#" onclick="pestana='crm';dibujarPanel();return false">← CRM</a></p>
+    <div class="fila"><b>${esc(p.nombre || 'Sin nombre')}</b>${p.negocio ? ' · ' + esc(p.negocio) : ''}<small>${esc(ETAPA[p.etapa] || p.etapa || '')} · ${esc(p.temperatura || '')}${Number(p.es_prueba) ? ' · prueba' : ''}</small>
+    <small>Tel: +52 ${esc(tel10)}${p.correo ? ' · ' + esc(p.correo) : ''}</small>${p.proxima_cita ? `<small>Próxima cita: ${esc(p.proxima_cita)}</small>` : ''}</div>
+    ${p.necesidad ? `<div class="fila"><b>Qué necesita</b><small>${esc(p.necesidad)}</small></div>` : ''}
+    ${p.notas_equipo ? `<div class="fila"><b>Notas del equipo</b><small>${esc(p.notas_equipo)}</small></div>` : ''}
+    ${panel && panel.demo ? `<div class="fila"><b>Demo</b><small><a href="${esc(panel.demo)}" target="_blank" rel="noopener">${esc(panel.demo)}</a></small></div>` : ''}
+    ${proy.map(x => `<div class="fila"><b>Proyecto: ${esc(x.nombre)}</b><small>Fase: ${esc(x.fase)}${x.nota ? ' · ' + esc(x.nota) : ''}</small></div>`).join('')}
+    <p class="titulo">Presentaciones, contratos y material (${docs.length})</p>
+    ${docs.map(d => `<div class="fila toca" data-doc="${esc(d.id)}"><b>${esc(d.titulo)}</b><small>${esc(d.seccion)} · toca para abrir</small></div>`).join('') || '<p class="fila">Nada subido.</p>'}
+    <p class="titulo">Historial</p>${(j.contactos || []).map(c => `<div class="fila">${esc(c.resumen || '')}<small>${esc(c.canal)} · ${fechaC(c.fecha)}</small></div>`).join('') || '<p class="fila">Sin contactos.</p>'}`;
+  dibujarPanel();
+}
+
+// ---------- Librería ----------
+$('#escribir').onsubmit = async e => {
+  e.preventDefault();
+  const q = $('#pregunta').value.trim(); if (!q) return;
+  $('#pregunta').value = ''; pestana = 'libreria'; cuartoSel = 'libreria';
+  const antes = charla.slice(-6);
+  charla.push({ yo: true, texto: q }, { texto: 'Buscando en la Librería…' }); dibujarOficina(); dibujarPanel();
+  const j = await oficina('libreria', { pregunta: q, antes });
+  charla[charla.length - 1] = { texto: j.ok ? j.respuesta : (j.mensaje || 'No se pudo contestar. Intenta de nuevo.') };
+  dibujarPanel();
+};
+
+arrancar();
+</script>
+</body>
+</html>

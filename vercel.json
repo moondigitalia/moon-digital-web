@@ -57,6 +57,10 @@
     {
       "source": "/presentacion/:codigo",
       "destination": "/presentacion/index.html"
+    },
+    {
+      "source": "/oficina",
+      "destination": "/oficina/index.html"
     }
   ],
   "redirects": [
