@@ -18,7 +18,7 @@
    5. Un toque, una acción.
    6. Nada aparece de golpe: cada vista entra ya lista, con un fundido corto. */
 :root{
-  --fondo:#16161a; --piso:#1f1f25; --cuarto:#2b2b33; --linea:#3a3a43; --tinta:#f3f2ee; --suave:#b4b3bb;
+  --fondo:#16161a; --piso:#1e2b2d; --cuarto:#2b2b33; --linea:#3a3a43; --tinta:#f3f2ee; --suave:#b4b3bb;
   --verde:#3ccf7a; --amarillo:#f2c230; --rojo:#ef4b4b; --naranja:#ff7a1a; --azul:#8fb6ff;
   --alto:100vh; --t:160ms;
 }
@@ -58,7 +58,8 @@ small{font-size:15px;font-weight:600}
 #mundo svg .nom{display:none}
 #mundo.leer svg .nom{display:inline}
 #mundo svg [data-c],#mundo svg [data-a]{cursor:pointer}
-.suena{animation:suena .9s ease-in-out infinite}
+.suena{animation:suena .9s ease-in-out 6}
+#mundo.mueve .suena{animation-play-state:paused}   /* mientras se mueve el mapa no se vuelve a pintar todo por el teléfono */
 @keyframes suena{0%,60%,100%{transform:rotate(0)}10%,30%,50%{transform:rotate(-14deg)}20%,40%{transform:rotate(14deg)}}
 .globo{background:#ff7a1a;color:#141414;font:800 12px/1.25 system-ui,sans-serif;padding:6px 9px;border-radius:12px;display:inline-block;max-width:200px}
 #hud{position:absolute;right:8px;top:8px;display:flex;gap:6px;pointer-events:none}
@@ -288,7 +289,7 @@ function zoomEn(px, py, nuevo) {
   vista.x = px - (px - vista.x) * nuevo / vista.z; vista.y = py - (py - vista.y) * nuevo / vista.z; vista.z = nuevo; aplicar();
 }
 const of = $('#oficina');
-of.addEventListener('pointerdown', e => { of.setPointerCapture(e.pointerId); dedos.set(e.pointerId, { x: e.clientX, y: e.clientY, x0: e.clientX, y0: e.clientY }); if (dedos.size === 1) movido = false; ini = null; });
+of.addEventListener('pointerdown', e => { if (window.Piel && Piel.pausa) Piel.pausa(true); of.setPointerCapture(e.pointerId); dedos.set(e.pointerId, { x: e.clientX, y: e.clientY, x0: e.clientX, y0: e.clientY }); if (dedos.size === 1) movido = false; ini = null; });
 of.addEventListener('pointermove', e => {
   const d0 = dedos.get(e.pointerId); if (!d0) return;
   const ax = d0.x, ay = d0.y; d0.x = e.clientX; d0.y = e.clientY;
@@ -303,7 +304,7 @@ of.addEventListener('pointermove', e => {
     ini = { d, cx, cy }; movido = true;
   }
 });
-const suelta = e => { dedos.delete(e.pointerId); ini = null; };
+const suelta = e => { dedos.delete(e.pointerId); ini = null; if (!dedos.size && window.Piel && Piel.pausa) Piel.pausa(false); };
 // El toque se atiende en "click" (después de soltar el dedo): si se atendiera al soltar, el "click" que el celular
 // manda justo después caería sobre la pantalla nueva y abriría otra cosa sin querer.
 of.addEventListener('click', e => { if (!movido) tocar(e.clientX, e.clientY); });

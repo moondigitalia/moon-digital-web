@@ -35,11 +35,47 @@
   function luzDe(hora) { return hora >= 6 && hora < 12 ? 'mostaza' : hora >= 12 && hora < 18 ? 'amarilla' : 'morada'; }
 
   // ---------- piezas ----------
-  function caja(x, y, w, h, alto, c) {   // un mueble: tapa y dos lados con su luz "horneada"
-    const a = iso(x, y + h, 0), b = iso(x + w, y + h, 0), d = iso(x + w, y, 0);
-    const at = iso(x, y + h, alto), bt = iso(x + w, y + h, alto), dt = iso(x + w, y, alto), ct = iso(x, y, alto);
+  function caja(x, y, w, h, alto, c, z0) {   // un mueble: tapa y dos lados con su luz "horneada" (z0: desde qué altura)
+    z0 = z0 || 0; const zt = z0 + alto;
+    const a = iso(x, y + h, z0), b = iso(x + w, y + h, z0), d = iso(x + w, y, z0);
+    const at = iso(x, y + h, zt), bt = iso(x + w, y + h, zt), dt = iso(x + w, y, zt), ct = iso(x, y, zt);
     return `<polygon points="${P([a, b, bt, at])}" fill="${c[1]}"/><polygon points="${P([b, d, dt, bt])}" fill="${c[2]}"/><polygon points="${P([ct, dt, bt, at])}" fill="${c[0]}"/>`;
   }
+  // MUEBLES CON SAZÓN: cada mueble es reconocible (patas, cubierta, cajones, lomos de libros, pantalla con su base)
+  const ROBLE = ['#c49a68', '#a07a4f', '#8a6841'], ROBLE_O = ['#8a6841', '#6f5233', '#5e452b'], METAL = ['#9aa3a0', '#7b8481', '#6a7370'];
+  // una cara plana encima del mueble (a la altura z): papeles, teclado, tapete de escritorio
+  const plano = (x, y, w, h, z, col, extra) => `<polygon points="${P([iso(x, y, z), iso(x + w, y, z), iso(x + w, y + h, z), iso(x, y + h, z)])}" fill="${col}"${extra || ''}/>`;
+  // dibujo sobre la cara de enfrente (+y) de un mueble: de x0 a x1, de z0 a z1
+  const caraY = (x0, x1, y, z0, z1, col) => `<polygon points="${P([iso(x0, y, z0), iso(x1, y, z0), iso(x1, y, z1), iso(x0, y, z1)])}" fill="${col}"/>`;
+  const caraX = (y0, y1, x, z0, z1, col) => `<polygon points="${P([iso(x, y0, z0), iso(x, y1, z0), iso(x, y1, z1), iso(x, y0, z1)])}" fill="${col}"/>`;
+  function mesa(x, y, w, h, o) {   // cuatro patas, cubierta con canto, y si se pide, cajonera
+    o = o || {}; const alto = o.alto || 22, pata = 0.09; let s = '';
+    if (o.cajonera) s += caja(x + w - 0.75, y + 0.06, 0.68, h - 0.12, alto - 3, ROBLE_O) + [0.3, 0.55, 0.8].map(f => caraX(y + 0.2, y + h - 0.2, x + w - 0.07, (alto - 3) * f - 1, (alto - 3) * f, '#4a3726')).join('');
+    [[x + 0.06, y + 0.06], [x + w - pata - 0.06, y + 0.06], [x + 0.06, y + h - pata - 0.06], [x + w - pata - 0.06, y + h - pata - 0.06]].forEach(([a, b]) => { s += caja(a, b, pata, pata, alto - 3, ROBLE_O); });
+    return s + caja(x, y, w, h, 3, o.color || ROBLE, alto - 3);
+  }
+  function compu(x, y, z) {   // pantalla de espaldas a la vista (le da la cara a quien está sentado), base, teclado y ratón
+    return plano(x - 0.05, y + 0.42, 0.55, 0.18, z + 0.3, '#2b2b31') + `<circle cx="${iso(x + 0.62, y + 0.5, z)[0]}" cy="${iso(x + 0.62, y + 0.5, z)[1] - 1}" r="2" fill="#2b2b31"/>`
+      + caja(x + 0.2, y + 0.82, 0.12, 0.12, 6, NEGRO, z) + caja(x - 0.12, y + 0.85, 0.7, 0.07, 19, NEGRO, z + 5)
+      + `<circle cx="${iso(x + 0.23, y + 0.92, z + 15)[0]}" cy="${iso(x + 0.23, y + 0.92, z + 15)[1]}" r="1.6" fill="#7d7b86"/>`
+      + `<ellipse cx="${iso(x + 0.23, y + 0.8, z + 22)[0]}" cy="${iso(x + 0.23, y + 0.8, z + 22)[1]}" rx="7" ry="2.5" fill="#7fc3ff" opacity=".3"/>`;
+  }
+  const papeles = (x, y, z) => plano(x, y, 0.35, 0.25, z + 0.2, '#f4f2ea') + plano(x + 0.05, y + 0.04, 0.35, 0.25, z + 0.4, '#ffffff') + plano(x + 0.1, y + 0.1, 0.22, 0.03, z + 0.5, '#9aa6b8');
+  const taza = (x, y, z) => caja(x, y, 0.1, 0.1, 5, ['#f3f2ee', '#d8d6cf', '#c4c2bb'], z);
+  function lampara(x, y, z) { const [bx, by] = iso(x, y, z), [cx, cy] = iso(x, y, z + 16);
+    return `<ellipse cx="${bx}" cy="${by}" rx="5" ry="2.5" fill="#2b2b31"/><path d="M${bx},${by} L${bx + 3},${cy + 4}" stroke="#2b2b31" stroke-width="2"/><path d="M${cx - 6},${cy + 6} L${cx},${cy - 3} L${cx + 8},${cy + 4} Z" fill="#2f7d5a"/><ellipse cx="${cx + 1}" cy="${cy + 9}" rx="8" ry="3" fill="#ffe7a3" opacity=".3"/>`; }
+  function librero(x, y, w, h, alto, lomos) {   // marco de madera y repisas con lomos de libros de colores
+    let s = caja(x, y, w, h, alto, ROBLE_O); const col = ['#c4573f', '#3f6fb0', '#e0b13c', '#4f9a5a', '#8a5ab0', '#f3f2ee', '#d07a3a'], trazos = col.map(() => '');
+    const q = (x0, x1, z0, z1) => 'M' + P([iso(x0, y + h, z0), iso(x1, y + h, z0), iso(x1, y + h, z1), iso(x0, y + h, z1)]).replace(/ /g, 'L') + 'Z';
+    for (let r = 0; r < 3; r++) { const z0 = 4 + r * (alto - 6) / 3, z1 = z0 + (alto - 6) / 3 - 3;
+      s += caraY(x + 0.05, x + w - 0.05, y + h, z0 - 1, z1 + 1, '#3d2c1e');
+      for (let k = 0, xx = x + 0.08; xx < x + w - 0.12; k++) { const ancho = 0.07 + ((k * 7 + r * 3 + lomos) % 4) * 0.025, alt = z1 - ((k + r + lomos) % 3) * 2;
+        trazos[(k + r * 2 + lomos) % col.length] += q(xx, Math.min(xx + ancho, x + w - 0.08), z0, alt); xx += ancho + 0.012; } }
+    return s + trazos.map((d, i) => d ? `<path d="${d}" fill="${col[i]}"/>` : '').join('');   // un trazo por color: más ligero
+  }
+  function archiveroAlto(x, y, w, h, alto) { let s = caja(x, y, w, h, alto, METAL);
+    for (let k = 0; k < 4; k++) { const z = 3 + k * (alto - 4) / 4; s += caraY(x + 0.04, x + w - 0.04, y + h, z, z + 1, '#5a625f') + caraY(x + w / 2 - 0.08, x + w / 2 + 0.08, y + h, z + (alto - 4) / 8, z + (alto - 4) / 8 + 1.6, '#3a403c'); }
+    return s; }
   const MADERA = ['#8f7a60', '#6f5e49', '#5e4f3d'], GRIS = ['#8a8994', '#66656f', '#55545d'], NEGRO = ['#3a3a42', '#2b2b31', '#232328'];
 
   function luzEstado(cx, cy, estado) {
@@ -136,7 +172,7 @@
     if (o.nombre) etiqueta(sx, sy + 16, o.nombre, o.clase || '', o.opciones || [[0, 0], [0, -alto - 40], [44, -alto / 2], [-44, -alto / 2], [0, 22]]);
     DUENO = '';
     const zz = o.dormido ? `<text class="zz" x="${sx + 14}" y="${sy - alto - 6}" font-size="13" font-weight="900" fill="#b9b8c2">z</text>` : '';
-    return `<g class="mono-3d${o.actor ? ' actor' : ''}" data-a="${esc(o.id || '')}"${o.cuarto ? ` data-c="${o.cuarto}"` : ''}${o.actor ? ` data-actor="${esc(o.id)}" data-tx="${x}" data-ty="${y}" data-alto="${Math.round(alto)}"${o.dormido ? ' data-dormido="1"' : ''}${o.estado === 'rojo' ? ' data-falla="1"' : ''}` : ''}><ellipse cx="${sx}" cy="${sy}" rx="14" ry="5" fill="#0006"/>${imgMono(sk, pose, sx, sy)}${zz}
+    return `<g class="mono-3d${o.actor ? ' actor' : ''}" data-a="${esc(o.id || '')}"${o.cuarto ? ` data-c="${o.cuarto}"` : ''}${o.actor ? ` data-actor="${esc(o.id)}" data-tx="${x}" data-ty="${y}" data-alto="${Math.round(alto)}"${o.lado ? ` data-lado="${o.lado.join(',')}"` : ''}${o.dormido ? ' data-dormido="1"' : ''}${o.estado === 'rojo' ? ' data-falla="1"' : ''}` : ''}><ellipse cx="${sx}" cy="${sy}" rx="14" ry="5" fill="#0006"/>${imgMono(sk, pose, sx, sy)}${zz}
       ${o.estado ? luzEstado(sx, sy - alto - 10, o.estado) : ''}</g>`;
   }
   // Claude: el monito todo naranja (con monitos 3D); mientras llegan, un robot chiquito naranja.
@@ -232,6 +268,7 @@
       let a = V.actores[id];
       if (!a) a = V.actores[id] = { id, casa, pos: casa.slice(), camino: [], espera: 0, prox: (6 + Math.random() * TIEMPO.idaMax) * (id === 'jason' ? 3 : 1), modo: 'casa', burbuja: null };
       a.casa = casa; a.g = g; a.alto = Number(g.dataset.alto) || 50;
+      a.lado = g.dataset.lado ? g.dataset.lado.split(',').map(Number) : null;   // por dónde se sale del escritorio
       a.quieto = !!g.dataset.dormido || !!g.dataset.falla;
       a.marcador = a.marcador && a.marcador.isConnected ? a.marcador : null;
       if (id === 'claude' && PUERTAS[destinoClaude] && a.destino !== destinoClaude) { a.destino = destinoClaude; const d = PUERTAS[destinoClaude][0]; a.camino = ruta(a.pos, destinoClaude === 'clientes' ? casa : [d[0] - 0.6, d[1] - 1.2]); a.modo = 'fuera'; a.claudeFijo = true; }
@@ -275,14 +312,16 @@
     } else if (b) b.remove();
   }
   function paso(t) {
-    const V = VIDA; const dt = Math.min(0.1, (t - V.ultimo) / 1000); V.ultimo = t; V.reloj += dt;
+    const V = VIDA;
+    if (V.pausa) { V.ultimo = t; requestAnimationFrame(paso); return; }   // mientras el dedo mueve el mapa, la oficina se queda quieta (arrastrar fluido en celulares lentos)
+    const dt = Math.min(0.1, (t - V.ultimo) / 1000); V.ultimo = t; V.reloj += dt;
     const lista = Object.values(V.actores).filter(a => a.g && a.g.isConnected);
     lista.forEach(a => {
       if (a.camino.length) {
         const [tx, ty] = a.camino[0], dx = tx - a.pos[0], dy = ty - a.pos[1], d = Math.hypot(dx, dy), avance = TIEMPO.paso * dt;
         if (d <= avance) { a.pos = [tx, ty]; a.camino.shift(); if (!a.camino.length) llegar(a, lista); } else { a.pos = [a.pos[0] + dx / d * avance, a.pos[1] + dy / d * avance]; }
         colocar(a);
-      } else if (a.espera > 0) { a.espera -= dt; if (a.espera <= 0 && a.modo === 'fuera' && !a.claudeFijo) { a.camino = ruta(a.pos, a.casa); a.modo = 'regreso'; } colocar(a); }
+      } else if (a.espera > 0) { a.espera -= dt; if (a.espera <= 0 && a.modo === 'fuera' && !a.claudeFijo) { a.camino = a.lado ? ruta(a.pos, salida(a)).concat([a.casa]) : ruta(a.pos, a.casa); a.modo = 'regreso'; } colocar(a); }
       else if (a.modo === 'casa' && !a.quieto && !a.claudeFijo) {
         a.prox -= dt;
         if (a.prox <= 0) {
@@ -295,15 +334,17 @@
     });
     requestAnimationFrame(paso);
   }
+  const salida = a => [a.casa[0] + a.lado[0], a.casa[1] + a.lado[1]];
+  const rutaDesde = (a, X) => a.lado ? [salida(a)].concat(ruta(salida(a), X)) : ruta(a.pos, X);   // primero se levanta y sale por un lado del escritorio
   function salir(a, lista) {
     if (/^robot-/.test(a.id)) {   // los robots no van por agua: ruedan a trabajar a un cuarto y regresan
       const quali = /quali/i.test(a.g.dataset.robot || ''), ids = ['clientes', 'demos', 'crm', 'libreria', 'recepcion'];
-      a.camino = ruta(a.pos, PUERTAS[quali ? 'clientes' : ids[Math.floor(Math.random() * ids.length)]][0]); a.objetivo = 'visita'; a.modo = 'fuera'; return;
+      a.camino = rutaDesde(a, PUERTAS[quali ? 'clientes' : ids[Math.floor(Math.random() * ids.length)]][0]); a.objetivo = 'visita'; a.modo = 'fuera'; return;
     }
     const r = Math.random(), libres = lista.filter(b => b !== a && b.modo === 'casa' && !b.quieto && !b.claudeFijo && !b.camino.length);
-    if (r < 0.4) { a.camino = ruta(a.pos, [AGUA[0] - 0.6, AGUA[1] + 0.5]); a.objetivo = 'agua'; }
-    else if (r < 0.75 && libres.length) { const b = libres[Math.floor(Math.random() * libres.length)]; a.camino = ruta(a.pos, [b.casa[0] + 0.9, b.casa[1] + 0.6]); a.objetivo = 'platica'; a.con = b; }
-    else { const ids = Object.keys(PUERTAS); const c = PUERTAS[ids[Math.floor(Math.random() * ids.length)]]; a.camino = ruta(a.pos, c[0]); a.objetivo = 'visita'; }
+    if (r < 0.4) { a.camino = rutaDesde(a, [AGUA[0] - 0.6, AGUA[1] + 0.5]); a.objetivo = 'agua'; }
+    else if (r < 0.75 && libres.length) { const b = libres[Math.floor(Math.random() * libres.length)]; a.camino = rutaDesde(a, (b.lado ? [b.casa[0] + b.lado[0], b.casa[1] + 0.35] : [b.casa[0] + 0.9, b.casa[1] + 0.6])); a.objetivo = 'platica'; a.con = b; }
+    else { const ids = Object.keys(PUERTAS); const c = PUERTAS[ids[Math.floor(Math.random() * ids.length)]]; a.camino = rutaDesde(a, c[0]); a.objetivo = 'visita'; }
     a.modo = 'fuera';
   }
   function llegar(a, lista) {
@@ -425,8 +466,8 @@
     // Recepción: Jason detrás del escritorio con su teléfono (brilla si hubo llamada en la última hora)
     const ll = (C && C.llamadas) || [], reciente = ll.some(l => Date.now() - Date.parse(l.fecha) < 3600e3);
     const jason = as.find(a => a.id === 'jason');
-    pon(2, 2.2, caja(1.2, 2.6, 3, 1, 22, MADERA));
-    pon(2.6, 2.4, `<g>${(() => { const [px, py] = iso(3.6, 3, 22); return `<g class="${reciente ? 'suena' : ''}" style="transform-origin:${px}px ${py - 6}px"><rect x="${px - 6}" y="${py - 10}" width="12" height="8" rx="2" fill="#222"/></g>${reciente ? `<circle cx="${px}" cy="${py - 6}" r="12" fill="#3ccf7a" opacity=".35" filter="url(#brillo)"/>` : ''}`; })()}</g>`);
+    pon(2.7, 3.1, caja(1.2, 2.6, 3, 1, 24, ROBLE_O) + caraY(1.25, 4.15, 3.6, 4, 20, '#a07a4f') + caja(1.15, 2.55, 3.1, 1.1, 3, ROBLE, 24) + papeles(1.6, 2.8, 27) + lampara(1.4, 3.2, 27) + taza(2.9, 3.0, 27));
+    pon(2.6, 2.4, `<g>${(() => { const [px, py] = iso(3.6, 3, 27); return `<g class="${reciente ? 'suena' : ''}" style="transform-origin:${px}px ${py - 6}px"><rect x="${px - 6}" y="${py - 10}" width="12" height="8" rx="2" fill="#222"/></g>${reciente ? `<circle cx="${px}" cy="${py - 6}" r="12" fill="#3ccf7a" opacity=".35" filter="url(#brillo)"/>` : ''}`; })()}</g>`);
     silla(2.3, 1.6);
     if (jason) pon(2.3, 1.6, monito(2.3, 1.6, { id: 'jason', actor: true, cuarto: 'recepcion', nombre: 'Jason', estado: jason.estado, ropa: '#2f3b55', pelo: '#3a2a1f', diadema: true, sentado: true }));
 
@@ -434,9 +475,9 @@
     const clientes = as.filter(a => a.tipo === 'cliente');
     clientes.forEach((a, i) => {
       const x = 9 + i * 4, y = 2.6;
-      pon(x, y - 0.8, caja(x - 1, y - 1.6, 2.4, 1, 22, MADERA) + caja(x - 0.3, y - 1.5, 1, 0.2, 40, NEGRO));
+      pon(x + 0.1, y + 1, mesa(x - 1, y + 0.45, 2.4, 1, { cajonera: true }) + compu(x - 0.2, y + 0.45, 22) + papeles(x + 0.5, y + 0.6, 22) + taza(x - 0.8, y + 0.9, 22) + lampara(x + 1.1, y + 1.1, 22));
       silla(x, y);
-      pon(x, y, monito(x, y, { id: a.id, actor: true, dormido: !a.platicas7d, cuarto: 'clientes', nombre: a.nombre, estado: a.estado, ropa: ['#c45a7a', '#3f7d6a', '#7a5ac4'][i % 3], sentado: true }));
+      pon(x, y, monito(x, y, { id: a.id, lado: [1.6, 0], actor: true, dormido: !a.platicas7d, cuarto: 'clientes', nombre: a.nombre, estado: a.estado, ropa: ['#c45a7a', '#3f7d6a', '#7a5ac4'][i % 3], sentado: true }));
     });
     const ult = O.actividad && O.actividad.lineas && O.actividad.lineas[0];
     pon(11, 6, robotNaranja(11, 6, ult && ult.texto));
@@ -451,9 +492,9 @@
     const ROPA = { kid: '#2c2c34', daniel: '#40506e', dan: '#6e4a40' };
     (O.cubiculos || []).forEach((u, i) => {
       const x = 2.4, y = 7.8 + i * 2;
-      pon(x - 0.5, y - 0.5, caja(x - 1.6, y - 0.6, 2.6, 0.9, 22, MADERA));
+      pon(x + 1.2, y + 0.9, mesa(x + 0.2, y + 0.45, 2, 0.85, { cajonera: true }) + compu(x + 0.95, y + 0.4, 22) + papeles(x + 0.3, y + 0.55, 22) + (i === 0 ? lampara(x + 2, y + 1.1, 22) : taza(x + 1.9, y + 0.9, 22)));
       silla(x + 1.2, y);
-      if (u.presente) pon(x + 1.2, y, monito(x + 1.2, y, { id: 'equipo-' + u.id, actor: true, cuarto: 'cubiculos', nombre: ({ kid: 'Kid', daniel: 'Papá', dan: 'Dan' })[u.id], ropa: ROPA[u.id], sentado: true }));
+      if (u.presente) pon(x + 1.2, y, monito(x + 1.2, y, { id: 'equipo-' + u.id, lado: [1.7, 0], actor: true, cuarto: 'cubiculos', nombre: ({ kid: 'Kid', daniel: 'Papá', dan: 'Dan' })[u.id], ropa: ROPA[u.id], sentado: true }));
       else pon(x + 1.2, y, `<g data-c="cubiculos">${etiqueta(...iso(x + 1.2, y, -16), ({ kid: 'Kid', daniel: 'Papá', dan: 'Dan' })[u.id] + ' · fuera')}</g>`);
     });
 
@@ -461,12 +502,13 @@
     ((O.tareas && O.tareas.lista) || []).forEach((t, i) => { const x = 19.6 + (i % 3) * 2.4, y = 8.6 + Math.floor(i / 3) * 2; pon(x, y, robotRuedas(x, y, t, i)); });
 
     // CRM: archiveros; Librería: libreros y mesa de lectura
-    pon(8, 10, caja(7.4, 9.4, 1.2, 0.8, 38, GRIS) + caja(8.8, 9.4, 1.2, 0.8, 38, GRIS));
-    pon(10, 12, caja(8.8, 11.6, 2, 1.2, 20, MADERA));
-    ['#7a5a3a', '#4a6a8a', '#8a4a4a', '#5a7a4a'].forEach((col, i) => pon(12.6 + i * 0.95, 9.4, caja(12.3 + i * 0.95, 9.3, 0.8, 0.6, 46, [col, '#3d3127', '#31281f'])));
-    pon(14.5, 12, caja(13.6, 11.6, 2, 1.2, 20, MADERA));
+    pon(8, 10, archiveroAlto(7.4, 9.4, 1.2, 0.8, 38) + archiveroAlto(8.8, 9.4, 1.2, 0.8, 38));
+    pon(10, 12.2, mesa(8.8, 11.6, 2, 1.2) + papeles(9.1, 11.9, 22) + papeles(9.8, 12.2, 22) + compu(9.4, 11.5, 22));
+    [0, 1, 2, 3].forEach(i => pon(12.6 + i * 0.95, 9.4, librero(12.3 + i * 0.95, 9.3, 0.8, 0.6, 46, i)));
+    pon(14.6, 12.2, mesa(13.6, 11.6, 2, 1.2) + lampara(15.3, 11.9, 22) + (() => { const [bx, by] = iso(14.4, 12.2, 22.5); return `<path d="M${bx - 14},${by} l14,-5 l14,5 l-14,6 z" fill="#f4f2ea" stroke="#c9c4b5"/><path d="M${bx},${by - 5} v11" stroke="#c9c4b5"/>`; })());
     // Crear tu recepcionista: banco de trabajo con un "+"
-    pon(3, 16, caja(1.6, 15.4, 3, 1.2, 22, MADERA) + (() => { const [px, py] = iso(3.1, 16, 26); return `<text x="${px}" y="${py}" text-anchor="middle" font-size="22" font-weight="900" fill="#f3f2ee" opacity=".85">+</text>`; })());
+    pon(3.2, 16.2, mesa(1.6, 15.4, 3, 1.2, { color: ['#b6b9b2', '#94978f', '#82857e'] }) + caja(1.9, 15.6, 0.7, 0.4, 6, ['#d65a4a', '#b8463a', '#a33d32'], 22) + compu(3.2, 15.4, 22) + papeles(2.1, 16.1, 22)
+      + (() => { const [px, py] = iso(4.1, 16.3, 24); return `<circle cx="${px}" cy="${py - 4}" r="9" fill="#3ccf7a"/><text x="${px}" y="${py + 1}" text-anchor="middle" font-size="15" font-weight="900" fill="#141414">+</text>`; })());
 
     // Cuarto gris: los que dijeron que no, en el piso con ojos de tache, telarañas y arañitas
     as.filter(a => a.tipo === 'dijo_no' || a.tipo === 'archivado' || a.id === 'donde').forEach((a, i) => {
@@ -493,12 +535,13 @@
       svg: `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="display:block;overflow:visible">
         <defs><filter id="brillo" x="-1" y="-1" width="3" height="3"><feGaussianBlur stdDeviation="4"/></filter>
           <linearGradient id="piso" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".10"/><stop offset="1" stop-color="#000" stop-opacity=".18"/></linearGradient></defs>
-        <rect x="${-W}" y="${-H}" width="${W * 3}" height="${H * 3}" fill="#1e2b2d"/>${fondo}<g class="escena">${cosas.map(c => `<g class="d" data-d="${c[0].toFixed(3)}">${c[1]}</g>`).join('')}</g>${acomodar()}
+${fondo}<g class="escena">${cosas.map(c => `<g class="d" data-d="${c[0].toFixed(3)}">${c[1]}</g>`).join('')}</g>${acomodar()}
       </svg>`,
     };
   }
   // De un punto del dibujo al cuarto que está debajo (para tocar muebles, pasillos o el piso).
   function cuartoEn(wx, wy) { const a = (wx - OX) / (TW / 2), b = (wy - OY) / (TH / 2); const x = (a + b) / 2, y = (b - a) / 2; const c = cuartoDe(x, y); return c ? c.id : null; }
-  const api = { dibuja, MONO, luzDe, vida, ruta, cuartoEn, cargar, cargado: false };
+  function pausa(si) { if (VIDA) VIDA.pausa = !!si; }
+  const api = { pausa, dibuja, MONO, luzDe, vida, ruta, cuartoEn, cargar, cargado: false };
   window.Piel = api;
 })();
