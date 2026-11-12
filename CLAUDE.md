@@ -13,6 +13,8 @@ botón de editar, documentos) y se perdieron horas en lo que ya funcionaba.
    nada aparece "desde transparente", letras de campos de 16 px, la página no se mueve con el teclado.
 
 ## Jueces antes de publicar
-- Oficina: `bash pruebas/oficina/correr.sh` (las 6 reglas en 15 pantallas, reducir movimiento y procesador lento).
+- Oficina: `bash pruebas/oficina/correr.sh` (las 6 reglas en 15 pantallas, reducir movimiento y procesador lento, y la
+  piel 3D: monitos ≥ 12 px al ver todo, 160 px de cerca, nombres sin encimarse). La piel vive en `oficina/piel.js`:
+  se enchufa encima; sin ella la Oficina sigue funcionando con cuartos planos.
 - Tablero: `pruebas/centro/LEEME.md`, y `node pruebas/centro/juez-link-oficina.js` si se toca el link desde la Oficina.
 - Solo se corre el juez del área que tocó el cambio.
