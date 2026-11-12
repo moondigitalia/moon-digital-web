@@ -18,5 +18,6 @@ http.createServer((q,r)=>{let b='';q.on('data',c=>b+=c);q.on('end',()=>{
   if(d.accion==='documento')j={ok:true,doc:{compartir:'https://moondigitalia.com/ver/abc'}};
   if(d.accion==='libreria')j={ok:true,respuesta:'Respuesta de prueba a: '+d.pregunta};
   r.setHeader('content-type','application/json');return r.end(JSON.stringify(j));}
+ if(q.url.startsWith('/oficina/monitos/')){const f=require('path').resolve(__dirname,'../..')+q.url.split('?')[0];if(!fs.existsSync(f)){r.statusCode=404;return r.end();}r.setHeader('content-type',f.endsWith('.json')?'application/json':'image/webp');return r.end(fs.readFileSync(f));}
  if(q.url.startsWith('/oficina/piel.js')){r.setHeader('content-type','text/javascript');return r.end(fs.readFileSync(require('path').resolve(__dirname,'../..')+'/oficina/piel.js'));}
  r.setHeader('content-type','text/html');r.end(q.url.startsWith('/prueba')?'<p>crea</p>':fs.readFileSync(require('path').resolve(__dirname,'../..')+'/oficina/index.html'));});}).listen(8811);

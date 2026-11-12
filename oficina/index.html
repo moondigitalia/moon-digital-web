@@ -225,7 +225,8 @@ const CUARTOS = [
   { id: 'libreria', t: 'Librería', x: 590, y: 370, w: 270, h: 200, herramienta: 'libreria' },
   { id: 'crea', t: 'Crea tu recepcionista', x: 20, y: 460, w: 260, h: 110, herramienta: 'crea' },
   { id: 'gris', t: 'Cuarto gris', x: 300, y: 590, w: 560, h: 190 },
-  { id: 'cerrado', t: 'Puerta cerrada', x: 880, y: 490, w: 300, h: 290 },
+  { id: 'oracion', t: 'Oración', x: 880, y: 490, w: 140, h: 290 },
+  { id: 'cerrado', t: 'Puerta cerrada', x: 1040, y: 490, w: 140, h: 290 },
 ];
 function dibujarMundo() {
   if (!O) return;
@@ -236,6 +237,7 @@ function dibujarMundo() {
     const cambio = MUNDO.w !== r.ancho; MUNDO.w = r.ancho; MUNDO.h = r.alto; MUNDO.mono = r.monito;
     const m = $('#mundo'); m.style.width = r.ancho + 'px'; m.style.height = r.alto + 'px'; m.innerHTML = r.svg;
     Piel.vida(m, O, C);   // los monitos siguen donde iban aunque se vuelva a dibujar
+    if (Piel.cargar && !Piel.cargado) Piel.cargar().then(dibujarMundo);   // los monitos 3D llegan después; mientras, los dibujados
     if (cambio) ajustarVista();
     const al = alertas().length;
     $('#hud').innerHTML = `<span>Semana $${(O.gasto || {}).usd7d || 0}</span>` + (al ? `<span class="alerta">● ${al}</span>` : '');
@@ -255,6 +257,7 @@ function dibujarMundo() {
     libreria: `<div class="gente"><span class="mono"><span class="luz verde"></span><span class="n">Jason</span></span></div><p>${O.libreria.hoy} de ${O.libreria.tope} preguntas hoy</p>`,
     crea: '',
     gris: `<div class="gente">${as.filter(a => a.tipo === 'dijo_no' || a.tipo === 'archivado' || a.id === 'donde').map(a => mono(a, 'muerto')).join('')}</div>`,
+    oracion: `<div class="gente"><span class="mono"><span class="n">Jesús</span></span></div>`,
     cerrado: `<p>Pruebas y copias (${as.filter(a => ['prueba', 'base', 'copia'].includes(a.tipo) && a.id !== 'donde').length})</p>`,
   };
   $('#mundo').innerHTML = CUARTOS.map(c => `<div class="cuarto${c.id === 'gris' ? ' gris' : ''}${c.id === 'cerrado' ? ' cerrado' : ''}${sel.cuarto === c.id ? ' sel' : ''}" data-c="${c.id}" style="left:${c.x}px;top:${c.y}px;width:${c.w}px;height:${c.h}px"><h3>${esc(c.t)}</h3>${dentro[c.id]}</div>`).join('');
@@ -372,6 +375,8 @@ function pintarInfo(refresco) {
     h = ((O.tareas && O.tareas.lista) || []).map(x => { const tarde = x.siguiente && Date.now() - Date.parse(x.siguiente) > 2 * 3600e3; return `<div class="fila"><span class="luz ${x.resultado !== 'bien' || tarde ? 'rojo' : 'verde'}"></span> ${esc(x.nombre)}<small>De ${esc(x.deQuien)} · última vez ${hace(x.ultimaVez)} (${esc(x.resultado)}) · siguiente ${fechaC(x.siguiente)}${tarde ? ' · no está corriendo' : ''}</small></div>`; }).join('');
   } else if (sel.tipo === 'gris') {
     t = 'Cuarto gris · dijeron que no'; h = as.filter(a => a.tipo === 'dijo_no' || a.tipo === 'archivado' || a.id === 'donde').map(filaAsistente).join('');
+  } else if (sel.tipo === 'oracion') {
+    t = 'Cuarto de oración'; h = '<div class="fila">Aquí está Jesús. Un lugar para detenernos, dar gracias y pedir guía antes de seguir.</div>';
   } else if (sel.tipo === 'cerrado') {
     t = 'Puerta cerrada · pruebas'; h = as.filter(a => ['prueba', 'base', 'copia'].includes(a.tipo) && a.id !== 'donde').map(filaAsistente).join('');
   }

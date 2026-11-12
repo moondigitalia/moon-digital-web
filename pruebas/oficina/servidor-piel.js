@@ -38,7 +38,7 @@ http.createServer((q, r) => {
     const f = u === '/oficina' ? '/oficina/index.html' : u;
     const ruta = path.join(RAIZ, f);
     if (!ruta.startsWith(RAIZ) || !fs.existsSync(ruta) || fs.statSync(ruta).isDirectory()) { r.statusCode = 404; return r.end(); }
-    r.setHeader('content-type', ruta.endsWith('.js') ? 'text/javascript' : 'text/html; charset=utf-8');
+    r.setHeader('content-type', ruta.endsWith('.js') ? 'text/javascript' : ruta.endsWith('.webp') ? 'image/webp' : ruta.endsWith('.json') ? 'application/json' : 'text/html; charset=utf-8');
     r.end(fs.readFileSync(ruta));
   });
 }).listen(process.env.PUERTO || 8822);

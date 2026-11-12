@@ -1,0 +1,175 @@
+{
+"claude": {
+"acostado": [
+211,
+105
+],
+"w": 108,
+"h": 206,
+"px": 76.3,
+"py": 202.6,
+"poses": [
+"camina",
+"camina_b",
+"reposo",
+"sentado"
+]
+},
+"verde": {
+"acostado": [
+211,
+105
+],
+"w": 108,
+"h": 206,
+"px": 76.3,
+"py": 202.6,
+"poses": [
+"camina",
+"camina_b",
+"reposo",
+"sentado"
+]
+},
+"jesus": {
+"acostado": [
+205,
+130
+],
+"w": 124,
+"h": 202,
+"px": 78.7,
+"py": 200.8,
+"poses": [
+"reposo"
+]
+},
+"kid": {
+"acostado": [
+211,
+105
+],
+"w": 108,
+"h": 206,
+"px": 76.3,
+"py": 202.6,
+"poses": [
+"camina",
+"camina_b",
+"reposo",
+"sentado"
+]
+},
+"cielo": {
+"acostado": [
+211,
+124
+],
+"w": 118,
+"h": 206,
+"px": 79.7,
+"py": 202.6,
+"poses": [
+"camina",
+"camina_b",
+"reposo",
+"sentado"
+]
+},
+"mostaza": {
+"acostado": [
+211,
+105
+],
+"w": 108,
+"h": 206,
+"px": 76.3,
+"py": 202.6,
+"poses": [
+"camina",
+"camina_b",
+"reposo",
+"sentado"
+]
+},
+"coral": {
+"acostado": [
+211,
+127
+],
+"w": 122,
+"h": 206,
+"px": 83.2,
+"py": 202.6,
+"poses": [
+"camina",
+"camina_b",
+"reposo",
+"sentado"
+]
+},
+"lila": {
+"acostado": [
+211,
+127
+],
+"w": 122,
+"h": 206,
+"px": 83.2,
+"py": 202.6,
+"poses": [
+"camina",
+"camina_b",
+"reposo",
+"sentado"
+]
+},
+"morado": {
+"acostado": [
+211,
+105
+],
+"w": 108,
+"h": 206,
+"px": 76.3,
+"py": 202.6,
+"poses": [
+"camina",
+"camina_b",
+"reposo",
+"sentado"
+]
+},
+"turquesa": {
+"acostado": [
+211,
+105
+],
+"w": 108,
+"h": 206,
+"px": 76.3,
+"py": 202.6,
+"poses": [
+"camina",
+"camina_b",
+"reposo",
+"sentado"
+]
+},
+"jason": {
+"acostado": [
+211,
+105
+],
+"w": 108,
+"h": 206,
+"px": 76.3,
+"py": 202.6,
+"poses": [
+"camina",
+"camina_b",
+"reposo",
+"sentado"
+]
+}
+}
