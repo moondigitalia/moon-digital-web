@@ -232,7 +232,7 @@ function dibujarMundo() {
     cubiculos: `<div class="gente">${(O.cubiculos || []).map(u => `<span class="mono${u.presente ? '' : ' fuera'}"><span class="luz ${u.presente ? 'verde' : 'gris'}"></span><span class="n">${NOMBRE[u.id]}${u.presente ? '' : ' · silla vacía'}</span></span>`).join('')}</div>`,
     robots: `<div class="gente">${((O.tareas && O.tareas.lista) || []).map(t => `<span class="mono"><span class="luz ${t.resultado !== 'bien' ? 'rojo' : 'verde'}"></span><span class="n">🤖</span></span>`).join('')}</div>`,
     crm: `<p>${((C && C.personas) || []).length} personas</p>`,
-    libreria: `<p>${O.libreria.hoy} de ${O.libreria.tope} preguntas hoy</p>`,
+    libreria: `<div class="gente"><span class="mono"><span class="luz verde"></span><span class="n">Jason</span></span></div><p>${O.libreria.hoy} de ${O.libreria.tope} preguntas hoy</p>`,
     crea: '',
     gris: `<div class="gente">${as.filter(a => a.tipo === 'dijo_no' || a.tipo === 'archivado' || a.id === 'donde').map(a => mono(a, 'muerto')).join('')}</div>`,
     cerrado: `<p>Pruebas y copias (${as.filter(a => ['prueba', 'base', 'copia'].includes(a.tipo) && a.id !== 'donde').length})</p>`,
@@ -360,7 +360,7 @@ let charla = [];
 function abrirHerramienta(cual, tel, desdeHistoria) {
   if (TABLERO[cual]) { location.href = '/tablero?abrir=' + TABLERO[cual] + '&volver=/oficina'; return; }
   if (!desdeHistoria) history.pushState({ herramienta: cual }, '');
-  $('#herrT').textContent = 'Librería'; $('#texto').placeholder = 'Pregúntale lo que sea de MOON'; $('#texto').value = '';
+  $('#herrT').textContent = 'Jason · Librería'; $('#texto').placeholder = 'Pregúntale a Jason lo que sea'; $('#texto').value = '';
   mostrar('herramienta'); pintarLibreria();
 }
 $('#volver').onclick = () => history.back();
@@ -368,7 +368,7 @@ function pintarLibreria() {
   // La respuesta más nueva va arriba, pegada al cuadro de escribir: el teclado nunca la tapa.
   const pares = []; for (let i = 0; i < charla.length; i += 2) pares.push(charla.slice(i, i + 2));
   const k = $('#herrC');
-  k.innerHTML = pares.length ? pares.reverse().map(([q, r]) => `<div class="msj yo">${esc(q.texto)}</div><div class="msj">${esc(r ? r.texto : '')}</div>`).join('') : '<p class="fila"><small>Ejemplos: ¿Cómo funciona Jason? · ¿Qué diferencia hay entre créditos y tokens? · ¿Podemos hacer un asistente para un dentista?</small></p>';
+  k.innerHTML = pares.length ? pares.reverse().map(([q, r]) => `<div class="msj yo">${esc(q.texto)}</div><div class="msj">${esc(r ? r.texto : '')}</div>`).join('') : '<p class="fila"><small>Ejemplos: ¿Se puede poner un asistente en Instagram? · ¿Qué diferencia hay entre créditos y tokens? · ¿Podemos hacer un asistente para un dentista?</small></p>';
   k.scrollTop = 0;
 }
 $('#escribe').onsubmit = async e => {
@@ -376,7 +376,7 @@ $('#escribe').onsubmit = async e => {
   const q = $('#texto').value.trim(); if (!q) return;
   $('#texto').value = '';
   const antes = charla.map(m => ({ yo: !!m.yo, texto: m.texto })).slice(-6);
-  charla.push({ yo: true, texto: q }, { texto: 'Buscando en la Librería…' }); pintarLibreria();
+  charla.push({ yo: true, texto: q }, { texto: 'Jason está investigando…' }); pintarLibreria();
   const j = await oficina('libreria', { pregunta: q, antes });
   charla[charla.length - 1] = { texto: j.ok ? j.respuesta : (j.mensaje || 'No se pudo contestar. Intenta de nuevo.') };
   pintarLibreria();

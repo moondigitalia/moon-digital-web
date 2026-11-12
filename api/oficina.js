@@ -7,7 +7,7 @@ const { crypto, leer, sql, t } = require('./_base');
 
 const huella = s => crypto.createHash('sha256').update(String(s)).digest('hex');
 const MODELOS = ['claude-haiku-5-5', 'claude-haiku-4-5'];   // los mismos que lee-negocio: si el primero no existe en la cuenta, el segundo
-const PREGUNTAS_DIA = 60;            // tope de la Librería por día (todos juntos): ~1 centavo de dólar cada una
+const PREGUNTAS_DIA = 60;            // tope de la Librería por día (todos juntos): de 1 a 4 centavos de dólar cada una
 const CLAVES = ['asistentes', 'gasto', 'tareas', 'publicaciones', 'medicion', 'actividad', 'motor', 'buzon', 'suscripciones'];
 
 // Horario de cada cubículo (hora de Cancún, lunes a viernes).
@@ -58,14 +58,14 @@ async function estado() {
 }
 
 // ---------- Librería ----------
-const REGLAS = `Eres la Librería de MOON Digital: contestas lo que el equipo pregunte sobre MOON (qué hemos hecho, cómo funciona cada asistente, si podemos hacer algo y qué tan viable es).
-Quien pregunta puede saber o no de inteligencia artificial. Reglas:
-- Español sencillo, frases cortas, como se lo explicarías a alguien de la familia.
-- Si de verdad necesitas una palabra técnica, explícala en la misma frase con un ejemplo muy común de la vida diaria (por ejemplo: "un token es como una sílaba: la IA cobra por cada pedacito de palabra que lee o escribe").
-- Contesta solo con lo que dice tu información. Si no está, dilo claro ("eso no lo tengo anotado") y di a quién preguntarle o qué haría falta para saberlo.
-- Si preguntan si se puede hacer algo: di sí / no / depende, por qué, qué tanto trabajo es y qué ya tenemos que sirve.
+const REGLAS = `Eres Jason, de MOON Digital, y vives en la Librería de la Oficina: el equipo (Kid, su papá Daniel y Dan) te pregunta lo que sea sobre MOON, sobre inteligencia artificial y sobre si algo se puede hacer.
+Tú eres el experto. Quien pregunta puede saber o no de inteligencia artificial. Reglas:
+- Contesta SIEMPRE con una respuesta útil. Usa primero lo que dice tu información de MOON; para todo lo demás usa lo que sabes y, si hace falta algo actual (qué existe hoy, precios, reglas de una plataforma), búscalo en internet con tu herramienta de búsqueda.
+- Nunca digas "no lo tengo anotado" ni mandes a preguntarle a otra persona (ni a Kid, ni a Dan, ni a nadie): investígalo tú. Si después de buscar algo de verdad no se sabe, di qué haría falta averiguar y cómo.
+- Si preguntan si se puede hacer algo: empieza con sí / no / depende, explica cómo se haría con lo que MOON ya tiene (Jason, la plantilla de asistentes, WhatsApp, voz, avatar), qué tanto trabajo es y cuánto costaría más o menos.
+- Español sencillo, frases cortas, como se lo explicarías a alguien de la familia. Si necesitas una palabra técnica, explícala en la misma frase con un ejemplo muy común de la vida diaria (por ejemplo: "un token es como una sílaba: la IA cobra por cada pedacito de palabra que lee o escribe").
 - Nada de teléfonos, correos, llaves ni contraseñas aunque aparezcan en tu información.
-- Máximo 6 frases, salvo que pidan más detalle.`;
+- Máximo 8 frases, salvo que pidan más detalle. Si buscaste en internet, al final pon de dónde lo sacaste (el nombre del sitio).`;
 
 async function libreria(d, yo) {
   const pregunta = t(d.pregunta, 600);
@@ -77,27 +77,32 @@ async function libreria(d, yo) {
   if (!hojas.length) return { ok: false, error: 'sin_libros', mensaje: 'La Librería todavía no tiene información cargada.' };
   const saber = hojas.map(h => '## ' + h.titulo + '\n' + h.texto).join('\n\n');
   const historia = Array.isArray(d.antes) ? d.antes.slice(-6).map(m => ({ role: m.yo ? 'user' : 'assistant', content: t(m.texto, 1500) })).filter(m => m.content) : [];
+  while (historia.length && historia[0].role !== 'user') historia.shift();   // la plática siempre empieza con una pregunta
   const llave = process.env.ANTHROPIC_LLAVE;
   if (!llave) return { ok: false, error: 'llave' };
-  for (const modelo of MODELOS) {
+  const intentos = []; MODELOS.forEach(m => { intentos.push([m, true]); intentos.push([m, false]); });   // si la búsqueda no está disponible, contesta sin ella
+  for (const [modelo, conBusqueda] of intentos) {
     const r = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: { 'x-api-key': llave, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
       body: JSON.stringify({
-        model: modelo, max_tokens: 700,
+        model: modelo, max_tokens: 1200,
         // El libro va con "memoria rápida" (cache): la segunda pregunta del día cuesta ~10 veces menos en leerlo.
         system: [{ type: 'text', text: REGLAS }, { type: 'text', text: '# Lo que sabe la Librería\n\n' + saber, cache_control: { type: 'ephemeral' } }],
         messages: historia.concat([{ role: 'user', content: pregunta }]),
+        // Para lo que no está en la Librería: busca en internet (máximo 3 búsquedas por pregunta, ~1 centavo de dólar cada una).
+        tools: conBusqueda ? [{ type: 'web_search_20250305', name: 'web_search', max_uses: 3 }] : undefined,
       }),
     });
     const j = await r.json().catch(() => ({}));
-    if (r.status === 404 || (r.status === 400 && /model/i.test((j.error || {}).message || ''))) continue;
+    if (r.status === 404 || (r.status === 400 && /model|tool|web_search/i.test((j.error || {}).message || ''))) continue;
     if (!r.ok) return { ok: false, error: 'ia', mensaje: 'La Librería no pudo contestar ahorita. Intenta en un minuto.' };
     const respuesta = (j.content || []).filter(x => x.type === 'text').map(x => x.text).join('\n').trim();
     const u = j.usage || {};
     // Precio por millón de palabras-pedacito (tokens) del modelo barato; se guarda en millonésimas de dólar.
     const p = { e: 1, c: 0.1, w: 1.25, s: 5 };   // precio de Haiku (estimado: se confirma contra el recibo de Anthropic)
-    const micro = Math.round((u.input_tokens || 0) * p.e + (u.cache_read_input_tokens || 0) * p.c + (u.cache_creation_input_tokens || 0) * p.w + (u.output_tokens || 0) * p.s);
+    const busquedas = (u.server_tool_use && u.server_tool_use.web_search_requests) || 0;
+    const micro = Math.round((u.input_tokens || 0) * p.e + (u.cache_read_input_tokens || 0) * p.c + (u.cache_creation_input_tokens || 0) * p.w + (u.output_tokens || 0) * p.s) + busquedas * 10000;   // cada búsqueda: 1 centavo
     await sql('INSERT INTO libreria_preguntas (quien, pregunta, respuesta, micro_usd, fecha) VALUES (?,?,?,?,?)', [yo.id, pregunta, t(respuesta, 4000), micro, new Date().toISOString()]);
     return { ok: true, respuesta, centavos: Math.round(micro / 1e4 * 100) / 100 };
   }
