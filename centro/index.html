@@ -1194,63 +1194,34 @@ function capaNuevaTarea(c) {
 /* ---------- CRM ---------- */
 function grupoDe(k) { return k === 'todos' ? GRUPO_TODOS : k === 'pruebas' ? GRUPO_PRUEBAS : ETAPA[k]; }
 function capaCRM(c) {
-  // Cada etapa es una tarjeta con cuántos hay y quiénes son; al picarla se abre la lista completa (ahí sí se desliza).
+  // REGLA DE 2 TOQUES (Kid, 11-nov-2026): toque 1 = CRM (todos aquí, con las etapas como filtro en esta misma pantalla);
+  // toque 2 = la persona (su ficha completa). Nada de pantallas intermedias.
   const base = reales(), pruebas = D.personas.filter(p => p.es_prueba);
   const grupos = ['todos'].concat(Object.keys(ETAPA)).concat(pruebas.length ? ['pruebas'] : []);
-  const de = k => k === 'todos' ? base : k === 'pruebas' ? pruebas : base.filter(p => (p.etapa || 'pendiente') === k);
-  marco('CRM de MOON', 'Nuevo cliente', `<div class="cuerpo" style="grid-template-rows:auto minmax(0,1fr)">
+  const de = k => k === 'todos' ? base.concat(pruebas) : k === 'pruebas' ? pruebas : base.filter(p => (p.etapa || 'pendiente') === k);
+  c.g = grupos.includes(c.g) ? c.g : 'todos';
+  marco('CRM de MOON', 'Nuevo cliente', `<div class="cuerpo" style="grid-template-rows:auto auto minmax(0,1fr)">
     <label class="buscador">${I.lupa}<input id="busca" placeholder="Buscar cliente, teléfono o nota" enterkeyhint="search"></label>
-    <div class="lista agenda desliza" id="resultados" hidden></div>
-    <div class="etapas">${grupos.map(k => { const G = grupoDe(k), l = de(k); return `<button class="etapa" data-g="${k}" style="--c:${G.c};--cf:${G.cf}"><span class="et-cab"><b>${G.n}</b><i>${l.length}</i></span></button>`; }).join('')}</div></div>`);
-  app.querySelectorAll('.etapa').forEach(b => b.onclick = () => abrir({ tipo: 'crmLista', g: b.dataset.g }));
-  document.getElementById('accion').onclick = () => abrir({ tipo: 'nuevoCliente', etapa: 'pendiente' });
-  const busca = document.getElementById('busca');
-  // Busca desde la primera letra (nombre, negocio, teléfono, correo o nota) y sin importar acentos ni mayúsculas.
+    <div class="pils" id="filtros">${grupos.filter(k => k === 'todos' || de(k).length).map(k => { const G = grupoDe(k); return `<button class="pil solo${c.g === k ? ' on' : ''}" data-g="${k}" style="--c:#fff;--cf:${G.c}">${G.n} ${de(k).length}</button>`; }).join('')}</div>
+    <div class="lista agenda desliza" id="resultados"></div></div>`);
+  document.getElementById('accion').onclick = () => abrir({ tipo: 'nuevoCliente', etapa: Object.keys(ETAPA).includes(c.g) ? c.g : 'pendiente' });
+  const busca = document.getElementById('busca'), res = document.getElementById('resultados');
   const sinAc = x => String(x || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-  const res = document.getElementById('resultados'), cartas = app.querySelector('.etapas');
-  const buscar = () => {
+  const dibuja = () => {
     const q = sinAc(busca.value.trim()); c.busca = busca.value;
-    if (!q) { res.hidden = true; cartas.hidden = false; return; }
     const digitos = q.replace(/\D/g, '');
-    const hay = base.concat(pruebas).filter(p => sinAc([p.nombre, p.negocio, p.correo, p.giro, p.necesidad, p.notas_equipo].join(' ')).includes(q) || (digitos.length >= 3 && String(p.telefono || '').replace(/\D/g, '').includes(digitos)));
-    res.innerHTML = hay.length ? hay.map(p => filaPersona(p, true)).join('') : `<div class="vacio"><div><b>Nadie con “${esc(busca.value.trim())}”</b>Prueba con otra parte del nombre.</div></div>`;
+    const items = q ? base.concat(pruebas).filter(p => sinAc([p.nombre, p.negocio, p.correo, p.giro, p.necesidad, p.notas_equipo].join(' ')).includes(q) || (digitos.length >= 3 && String(p.telefono || '').replace(/\D/g, '').includes(digitos))) : de(c.g);
+    res.innerHTML = items.length ? items.map(p => filaPersona(p, c.g === 'todos' || c.g === 'pruebas' || !!q)).join('') : `<div class="vacio"><div><b>${q ? 'Nadie con “' + esc(busca.value.trim()) + '”' : 'Aún no hay nadie aquí'}</b>${q ? 'Prueba con otra parte del nombre.' : ''}</div></div>`;
     res.querySelectorAll('[data-p]').forEach(b => { b.onpointerdown = () => traerFicha(b.dataset.p); b.onclick = () => abrir({ tipo: 'ficha', tel: b.dataset.p }); });
-    res.hidden = false; cartas.hidden = true;
+    if (c.scroll) res.scrollTop = c.scroll;
   };
-  busca.oninput = buscar; busca.onkeydown = e => { if (e.key === 'Enter') busca.blur(); };
-  if (c.busca) { busca.value = c.busca; buscar(); }
-  // Si una descripción no cabe completa en su tarjeta, se quita en todas (la descripción completa sale al abrirla). Nunca texto cortado.
-  const acomoda = () => { const g = app.querySelector('.etapas'); if (!g) return;
-    // Ninguna palabra se parte: si la más larga no cabe, la letra de TODAS las tarjetas baja igual hasta que quepa.
-    const bs = [...g.querySelectorAll('.et-cab b')]; bs.forEach(b => b.style.fontSize = '');
-    let t = parseFloat(getComputedStyle(bs[0]).fontSize);
-    while (t > 12 && bs.some(b => b.scrollWidth > b.clientWidth + 1)) { t -= 1; bs.forEach(b => b.style.fontSize = t + 'px'); }
-    // La última tarjeta se estira para cerrar su fila: nunca queda un hueco.
-    const cols = getComputedStyle(g).gridTemplateColumns.split(' ').length, n = g.children.length, resto = n % cols;
-    [...g.children].forEach(x => x.style.gridColumn = ''); if (resto) g.lastElementChild.style.gridColumn = `span ${cols - resto + 1}`;
- };
-  acomoda(); alCambiarTamano = acomoda;
+  res.onscroll = () => { c.scroll = res.scrollTop; };
+  app.querySelectorAll('#filtros [data-g]').forEach(b => b.onclick = () => { c.g = b.dataset.g; c.scroll = 0; busca.value = ''; app.querySelectorAll('#filtros [data-g]').forEach(x => x.classList.toggle('on', x === b)); dibuja(); });
+  busca.oninput = dibuja; busca.onkeydown = e => { if (e.key === 'Enter') busca.blur(); };
+  if (c.busca) busca.value = c.busca;
+  dibuja();
 }
-function capaCRMLista(c) {
-  const base = reales(), pruebas = D.personas.filter(p => p.es_prueba);
-  c.g = c.g || 'todos';
-  const q = (c.busca || '').toLowerCase();
-  let items = c.g === 'pruebas' ? pruebas : c.g === 'todos' ? base.concat(pruebas) : base.filter(p => (p.etapa || 'pendiente') === c.g);   // "Todos" es TODOS: también los de prueba, marcados
-  if (q) items = base.concat(pruebas).filter(p => [p.nombre, p.negocio, p.telefono, p.correo, p.giro, p.necesidad, p.notas_equipo].join(' ').toLowerCase().includes(q));
-  const G = grupoDe(c.g), titulo = q ? `Resultados de “${c.busca}”` : `${G.n} (${items.length})`;
-  marco(titulo, q ? '' : 'Nuevo cliente', `<div class="cuerpo" style="grid-template-rows:auto auto minmax(0,1fr)">
-    <label class="buscador">${I.lupa}<input id="buscaL" placeholder="Buscar en esta lista: nombre, negocio o teléfono" enterkeyhint="search"></label>
-    ${q ? `<div class="desc" style="--c:var(--tinta);--cf:var(--campo)">${items.length} encontrado${items.length === 1 ? '' : 's'}</div>` : `<div class="desc" style="--c:${G.c};--cf:${G.cf}">${esc(G.d)}</div>`}
-    <div class="lista agenda desliza">${items.length ? items.map(p => filaPersona(p, c.g === 'todos' || c.g === 'pruebas' || !!q)).join('') : `<div class="vacio"><div><b>${q ? 'Sin resultados' : 'Aún no hay nadie aquí'}</b>${q ? 'Prueba con otra palabra.' : ''}</div></div>`}</div></div>`);
-  if (!q) document.getElementById('accion').onclick = () => abrir({ tipo: 'nuevoCliente', etapa: Object.keys(ETAPA).includes(c.g) ? c.g : 'pendiente' });
-  app.querySelectorAll('[data-p]').forEach(b => { b.onpointerdown = () => traerFicha(b.dataset.p); b.onclick = () => abrir({ tipo: 'ficha', tel: b.dataset.p }); });
-  const l = app.querySelector('.desliza'); if (c.scroll) l.scrollTop = c.scroll; l.onscroll = () => { c.scroll = l.scrollTop; };
-  // Buscar dentro de la lista mientras escribes (sin salir de la pantalla).
-  const bl = document.getElementById('buscaL');
-  if (bl) bl.oninput = () => { const t = bl.value.trim().toLowerCase(); let n = 0;
-    l.querySelectorAll('[data-p]').forEach(b => { const per = items.find(x => x.tel === b.dataset.p); const ok = !t || [per && per.nombre, per && per.negocio, per && per.telefono, per && per.tel, per && per.giro, per && per.notas_equipo, b.textContent].join(' ').toLowerCase().includes(t); b.style.display = ok ? '' : 'none'; if (ok) n++; });
-    let v = l.querySelector('.sin-res'); if (!n && t) { if (!v) { v = document.createElement('div'); v.className = 'vacio sin-res'; v.innerHTML = '<div><b>Sin resultados</b>Prueba con otra palabra.</div>'; l.appendChild(v); } } else if (v) v.remove(); };
-}
+const capaCRMLista = capaCRM;   // los atajos de etapa del inicio abren el mismo CRM ya filtrado
 function filaPersona(p, conEtapa) {
   const n = D.proyectos.filter(x => x.tel === p.tel).length;
   const E = ETAPA[p.etapa || 'pendiente'] || ETAPA.pendiente;
@@ -1264,37 +1235,38 @@ function filaPersona(p, conEtapa) {
 // Arriba, tres píldoras: Dejar tarea · Editar · Papelera. Una sola pantalla para el CRM y para Clientes.
 const PAGAN = ['cerrado', 'en órbita', 'portafolio'];
 async function capaFicha(c, sil) {
+  // Toque 2 de 2: TODO lo de la persona en una sola pantalla, sin pestañas. Solo se muestra lo que existe
+  // (nada de "Aún no hay contrato"). Lo que se hace aquí (subir, editar, cambiar etapa) es acción, no otra pantalla.
   const per0 = personaDe(c.tel);
   if (!per0) return cerrar();
   if (!c.cargado) { c.cargado = true; traerFicha(c.tel).then(r => { if (r && r.ok && pila[pila.length - 1] === c) { c.ext = r; pinta(true); } }); }
   const ext = c.ext || {}, P = Object.assign({}, per0, ext.persona || {});
   const pan = (D.paneles || []).find(x => x.tel === c.tel), E = ETAPA[P.etapa || 'pendiente'] || ETAPA.pendiente;
   const tel = String(P.telefono || '').replace(/\D/g, ''), paga = PAGAN.includes(P.etapa);
-  c.tab = ['docs', 'datos', 'seg'].includes(c.tab) ? c.tab : 'docs';
-  let cuerpo = '';
-  if (c.tab === 'docs') cuerpo = pan ? `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr) auto">
-      <div class="demo" style="--c:${pan.color}"><div class="demo-logo">${icono(pan.imagen ? Object.assign({}, pan, { icono: pan.imagen }) : pan, P, 0)}</div>
+  const orden = SECCIONES.map(x => x[0]);
+  const docs = (D.documentos || []).filter(d => d.tel === c.tel).sort((x, y) => orden.indexOf(x.seccion) - orden.indexOf(y.seccion) || (x.orden || 0) - (y.orden || 0));
+  const nomSec = k => (SECCIONES.find(x => x[0] === k) || [k, ''])[1];
+  const util = v => v !== '' && v != null && !/^otros?$/i.test(String(v).trim());
+  const datos = [['Negocio', P.negocio], ['Teléfono', P.telefono], ['Correo', P.correo], ['Giro', P.giro], ['Servicio', P.servicio], ['Llegó por', P.origen], ['Necesita', P.necesidad], ['Volumen', P.volumen], ['Urgencia', P.urgencia], ['Decide', P.decide], ['Cita', P.proxima_cita]].filter(x => util(x[1]));
+  const historial = D.proyectos.filter(x => x.tel === c.tel).map(x => filaProyecto(x))
+    .concat((ext.contactos || []).map(x => `<div class="fila" style="cursor:default"><span class="estado" style="--c:var(--cobalto);--cf:var(--azulf)">${esc(x.tipo)}</span><span class="q"><b style="font-weight:600">${esc(x.resumen || 'Sin resumen')}</b><span>${esc(x.canal)} · ${cuando(x.fecha)}</span></span><span></span></div>`));
+  marco(pan ? nombreCorto(P) : nombreDe(P), 'Subir archivo', `<div class="cuerpo" style="grid-template-rows:auto minmax(0,1fr)">
+    <div class="p-acciones" style="flex-wrap:wrap"><button class="pilita" id="editar">${I.lapiz} Editar</button>${tel ? `<a class="pilita" href="tel:+52${tel.slice(-10)}">${I.tel} Llamar</a><a class="pilita" href="https://wa.me/52${tel.slice(-10)}" target="_blank" rel="noopener">${I.wa} WhatsApp</a>` : ''}<button class="pilita rojo" id="quitar">${I.basura} ${paga ? 'Quitar<span class="largo"> de Clientes</span>' : 'Papelera'}</button></div>
+    <div class="desliza f-todo" style="min-height:0;overflow-y:auto;display:grid;align-content:start;gap:12px;padding-bottom:12px">
+      ${pan ? `<div class="demo f-demo" style="--c:${pan.color};min-height:clamp(250px,40vh,340px)"><div class="demo-logo">${icono(pan.imagen ? Object.assign({}, pan, { icono: pan.imagen }) : pan, P, 0)}</div>
         <div class="demo-info"><span class="eti">Su demo</span><b>${esc(nombreCorto(P))}</b><span>${esc(dominio(pan.demo))}</span></div>
-        <div class="demo-botones"><button class="boton demo-boton" id="demo">Abrir demo ${I.abre}</button><button class="redondo demo-enviar" id="demoEnviar" aria-label="Enviar el demo" title="Enviar el demo">${I.enviar}</button></div></div>
-      ${rectangulos(c.tel, SECCIONES)}</div>`
-    : `<div class="cuerpo" style="grid-template-rows:auto minmax(0,1fr)"><p class="mini">Todavía no tiene demo. Aquí van su propuesta, contrato, material y avance.</p>${rectangulos(c.tel, SECCIONES)}</div>`;
-  else if (c.tab === 'datos') cuerpo = `<div class="cuerpo" style="grid-template-rows:${tel ? 'auto ' : ''}minmax(0,1fr) auto">
-      ${tel ? `<div class="botones f-contacto"><a class="boton" href="tel:+52${tel.slice(-10)}">${I.tel} Llamar</a><a class="boton verde" href="https://wa.me/52${tel.slice(-10)}" target="_blank" rel="noopener">${I.wa} WhatsApp</a></div>` : ''}
-      <div class="lista"></div>
-      <label class="mini" style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="prueba"${P.es_prueba ? ' checked' : ''}> Es una llamada de prueba (no cuenta como cliente)</label></div>`;
-  else cuerpo = `<div class="cuerpo" style="grid-template-rows:auto ${P.proxima_cita ? 'auto ' : ''}auto auto minmax(0,1fr)">
+        <div class="demo-botones"><button class="boton demo-boton" id="demo">Abrir demo ${I.abre}</button><button class="redondo demo-enviar" id="demoEnviar" aria-label="Enviar el demo" title="Enviar el demo">${I.enviar}</button></div></div>` : ''}
+      ${docs.length ? `<div><span class="eti">Archivos</span><div class="lista" style="margin-top:6px">${docs.map(d => `<button class="fila chica" data-doc="${esc(d.id)}"><span class="estado" style="--c:var(--cobalto);--cf:var(--azulf)">${esc(nomSec(d.seccion))}</span><span class="q"><b>${esc(d.titulo)}</b>${d.frase ? `<span>${esc(d.frase)}</span>` : ''}</span><span class="flecha-f">${I.der}</span></button>`).join('')}</div></div>` : ''}
       <div class="f-bloque"><span class="eti">¿En qué va?</span><div class="f-etapas" id="etapas">${Object.keys(ETAPA).map(e => `<button class="${(P.etapa || 'pendiente') === e ? 'on' : ''}" data-e="${e}" style="--c:${ETAPA[e].c};--cf:${ETAPA[e].cf}">${ETAPA[e].n}</button>`).join('')}</div></div>
-      ${P.proxima_cita ? `<div class="par"><span>Cita</span><b>${esc(P.proxima_cita)}</b></div>` : ''}
-      ${P.notas_equipo ? `<button class="nota f-nota1" id="nota"></button>` : '<button class="boton dos" id="nota">Escribir una nota</button>'}
-      <span class="eti">Historial</span><div class="lista"></div></div>`;
-  marco(pan ? nombreCorto(P) : nombreDe(P), c.tab === 'docs' ? 'Subir archivo' : '', `<div class="cuerpo" style="grid-template-rows:auto auto minmax(0,1fr)">
-    <div class="p-acciones"><button class="pilita" id="sigue">${I.mas} Dejar tarea</button><button class="pilita" id="editar">${I.lapiz} Editar</button><button class="pilita rojo" id="quitar">${I.basura} ${paga ? 'Quitar<span class="largo"> de Clientes</span>' : 'Papelera'}</button></div>
-    <div class="tabs" role="tablist">${[['docs', 'Documentos'], ['datos', 'Datos'], ['seg', 'Seguimiento']].map(([k, n]) => `<button data-tab="${k}" class="${c.tab === k ? 'on' : ''}">${n}</button>`).join('')}</div>
-    ${cuerpo}</div>`, I.subir);
+      ${P.notas_equipo ? `<div><span class="eti">Nota del equipo</span><button class="nota" id="nota" style="display:block;width:100%;margin-top:6px;height:auto;overflow:visible;text-align:start;font:inherit;font-weight:600">${esc(P.notas_equipo)}</button></div>` : '<button class="boton dos" id="nota">Escribir una nota</button>'}
+      ${datos.length ? `<div><span class="eti">Datos</span><div class="lista" style="margin-top:6px">${datos.map(([k, v]) => `<div class="fila chica" style="cursor:default;grid-template-columns:100px minmax(0,1fr)"><span class="eti" style="letter-spacing:.1em">${esc(k)}</span><span class="q"><b style="font-weight:600">${esc(v)}</b></span></div>`).join('')}</div></div>` : ''}
+      ${historial.length ? `<div><span class="eti">Historial</span><div class="lista" style="margin-top:6px">${historial.join('')}</div></div>` : (c.ext ? '' : '<p class="mini">Cargando su historial…</p>')}
+      <label class="mini" style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="prueba"${P.es_prueba ? ' checked' : ''}> Es de prueba (no cuenta como cliente)</label>
+    </div></div>`, I.subir);
   if (sil) app.querySelector('.vista').style.animation = 'none';
-  app.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => { c.tab = b.dataset.tab; pinta(true); });   // pestañas: al instante
+  const lienzo = app.querySelector('.f-todo'); if (c.scroll) lienzo.scrollTop = c.scroll; lienzo.onscroll = () => { c.scroll = lienzo.scrollTop; };
   const guarda = async datos => { const r = await api('editar_persona', Object.assign({ tel: c.tel }, datos)); if (r.ok) { Object.assign(per0, datos); if (c.ext && c.ext.persona) Object.assign(c.ext.persona, datos); delete FICHAS[c.tel]; } return r; };
-  document.getElementById('sigue').onclick = () => abrir({ tipo: 'nuevaTarea', para: yo(), cliente: nombreDe(P) });
+  document.getElementById('accion').onclick = () => abrir({ tipo: 'subir', tel: c.tel });
   document.getElementById('editar').onclick = () => abrir({ tipo: 'editarContacto', tel: c.tel });
   let seguro = false;
   document.getElementById('quitar').onclick = async ev => {
@@ -1304,33 +1276,18 @@ async function capaFicha(c, sil) {
     const r = await api('quitar_persona', { tel: c.tel });
     if (r.ok) { await recargar(true); avisoFlotante('Está en la papelera (Equipo › Papelera)'); cerrar(); }
   };
-  const cu = app.querySelector('.vista .cuerpo .cuerpo');
-  if (c.tab === 'docs') {
-    const ac = document.getElementById('accion'); ac.onclick = () => abrir({ tipo: 'subir', tel: c.tel });
-    activarRects(c.tel, SECCIONES);
-    if (pan) {
-      document.getElementById('demo').onclick = () => window.open(pan.demo, '_blank', 'noopener');
-      document.getElementById('demoEnviar').onclick = () => compartir('Demo · ' + nombreCorto(P), pan.demo);
-      // El logo vive en los aros, pero nunca encima del nombre ni de los botones: su tamaño sale del espacio que queda libre.
-      const ajustaLogo = () => { const d = app.querySelector('.demo'), l = app.querySelector('.demo-logo'); if (!d || !l) return; l.style.removeProperty('--lg');
-        const info = app.querySelector('.demo-info').getBoundingClientRect(), lr = l.getBoundingClientRect();
-        if (lr.bottom > info.top - 8) { const libre = info.top - 8 - lr.top; l.style.setProperty('--lg', Math.max(0, libre) + 'px'); l.style.display = libre < 44 ? 'none' : ''; } else l.style.display = ''; };
-      ajustaLogo(); alCambiarTamano = ajustaLogo;
-    }
-  } else if (c.tab === 'datos') {
-    const util = v => v !== '' && v != null && !/^otros?$/i.test(String(v).trim());
-    const datos = [['Negocio', P.negocio], ['Nombre', P.nombre], ['Teléfono', P.telefono || 'Aún no lo tenemos'], ['Correo', P.correo || 'Aún no lo tenemos'], ['Giro', P.giro], ['Servicio', P.servicio], ['Llegó por', P.origen], ['Necesita', P.necesidad], ['Volumen', P.volumen], ['Urgencia', P.urgencia], ['Decide', P.decide], ['Temperatura', P.temperatura]].filter(x => util(x[1]));
-    paginar(cu, datos, ([k, v]) => `<div class="fila chica" style="cursor:default;grid-template-columns:100px minmax(0,1fr)"><span class="eti" style="letter-spacing:.1em">${esc(k)}</span><span class="q"><b style="font-weight:600">${esc(v)}</b></span></div>`, { vacio: '<b>Sin datos todavía</b>Tócale "Editar" para agregarlos.' });
-    document.getElementById('prueba').onchange = async e => { const r = await guarda({ es_prueba: e.target.checked ? 1 : 0 }); if (r.ok) recargar(true); };
-  } else {
-    app.querySelectorAll('#etapas [data-e]').forEach(b => b.onclick = async () => { const antes = per0.etapa; const r = await guarda({ etapa: b.dataset.e }); if (r.ok) { pinta(true); recargar(true); const e = b.dataset.e; avisoFlotante(!PAGAN.includes(antes) && PAGAN.includes(e) ? 'Listo: ya aparece en Clientes' : PAGAN.includes(antes) && !PAGAN.includes(e) ? `Ahora está en ${ETAPA[e].n}: ya no aparece en Clientes` : `Listo: ahora está en ${ETAPA[e].n}`); } });
-    document.getElementById('nota').onclick = () => abrir({ tipo: 'nota', tel: c.tel });
-    // Una nota que no cabe nunca se ve a medias: se avisa que está completa adentro.
-    const n = app.querySelector('button.nota');
-    if (n) for (const txt of [esc(P.notas_equipo), '<b style="color:var(--tinta)">Hay una nota larga.</b> Tócala para leerla completa.', '<b style="color:var(--tinta)">Ver la nota completa</b>']) { n.innerHTML = txt; if (n.scrollHeight <= n.clientHeight + 1) break; }
-    const items = D.proyectos.filter(x => x.tel === c.tel).map(x => filaProyecto(x))
-      .concat((ext.contactos || []).map(x => `<div class="fila" style="cursor:default"><span class="estado" style="--c:var(--cobalto);--cf:var(--azulf)">${esc(x.tipo)}</span><span class="q"><b style="font-weight:600">${esc(x.resumen || 'Sin resumen')}</b><span>${esc(x.canal)} · ${cuando(x.fecha)}</span></span><span></span></div>`));
-    paginar(cu, items, x => x, { vacio: c.ext ? '<b>Nada todavía</b>Aquí aparecen sus proyectos y cada vez que nos buscó.' : '<b>Cargando…</b>', alPintar: l => l.querySelectorAll('[data-y]').forEach(b => b.onclick = () => abrir({ tipo: 'proyecto', id: Number(b.dataset.y) })) });
+  app.querySelectorAll('[data-doc]').forEach(b => b.onclick = () => { const d = docs.find(x => x.id === b.dataset.doc); if (d) abrirDoc(d); });
+  app.querySelectorAll('#etapas [data-e]').forEach(b => b.onclick = async () => { const antes = per0.etapa; const r = await guarda({ etapa: b.dataset.e }); if (r.ok) { pinta(true); recargar(true); const e = b.dataset.e; avisoFlotante(!PAGAN.includes(antes) && PAGAN.includes(e) ? 'Listo: ya aparece en Clientes' : PAGAN.includes(antes) && !PAGAN.includes(e) ? `Ahora está en ${ETAPA[e].n}: ya no aparece en Clientes` : `Listo: ahora está en ${ETAPA[e].n}`); } });
+  document.getElementById('nota').onclick = () => abrir({ tipo: 'nota', tel: c.tel });
+  document.getElementById('prueba').onchange = async e => { const r = await guarda({ es_prueba: e.target.checked ? 1 : 0 }); if (r.ok) recargar(true); };
+  app.querySelectorAll('[data-y]').forEach(b => b.onclick = () => abrir({ tipo: 'proyecto', id: Number(b.dataset.y) }));
+  if (pan) {
+    document.getElementById('demo').onclick = () => window.open(pan.demo, '_blank', 'noopener');
+    document.getElementById('demoEnviar').onclick = () => compartir('Demo · ' + nombreCorto(P), pan.demo);
+    const ajustaLogo = () => { const d = app.querySelector('.demo'), l = app.querySelector('.demo-logo'); if (!d || !l) return; l.style.removeProperty('--lg');
+      const info = app.querySelector('.demo-info').getBoundingClientRect(), lr = l.getBoundingClientRect();
+      if (lr.bottom > info.top - 8) { const libre = info.top - 8 - lr.top; l.style.setProperty('--lg', Math.max(0, libre) + 'px'); l.style.display = libre < 44 ? 'none' : ''; } else l.style.display = ''; };
+    ajustaLogo(); alCambiarTamano = ajustaLogo;
   }
 }
 function capaEditarContacto(c) {
@@ -1707,10 +1664,10 @@ const SECCIONES_MOON = [['presentacion', 'Presentación de MOON'], ['pagina', 'P
 function capaSubir(c) {
   const moon = c.tel === 'moon', per = personaDe(c.tel); if (!moon && !per) return cerrar();
   const secs = moon ? SECCIONES_MOON : SECCIONES;
-  c.sec = c.sec || secs[0][0];
+  c.sec = c.sec || (moon ? secs[0][0] : 'material');   // cliente: solo archivo y nombre (Kid, 11-nov-2026)
   const viejo = c.reemplaza && (D.documentos || []).find(x => x.id === c.reemplaza);
   marco(viejo ? 'Cambiar archivo' : 'Subir a ' + (moon ? 'MOON' : nombreCorto(per)), '', `<form class="hoja editando pasos" id="f" novalidate style="align-self:start">
-    ${viejo ? `<p class="mini">El nuevo archivo toma el lugar de "${esc(viejo.titulo)}". El anterior se va a la papelera (se puede recuperar).</p>` : `<div><div class="eti" style="margin-bottom:8px">¿Dónde va?</div><div class="pils">${secs.map(([k, n]) => `<button type="button" class="pil solo${c.sec === k ? ' on' : ''}" data-sec="${k}">${n}</button>`).join('')}</div></div>`}
+    ${viejo ? `<p class="mini">El nuevo archivo toma el lugar de "${esc(viejo.titulo)}". El anterior se va a la papelera (se puede recuperar).</p>` : !moon ? '' : `<div><div class="eti" style="margin-bottom:8px">¿Dónde va?</div><div class="pils">${secs.map(([k, n]) => `<button type="button" class="pil solo${c.sec === k ? ' on' : ''}" data-sec="${k}">${n}</button>`).join('')}</div></div>`}
     <label class="campo-foto"><span class="cf-vista">${I.subir}</span><span><b id="archNombre">Elegir archivo</b><small>PDF, foto o cualquier archivo · hasta 25 MB</small></span><input type="file" id="arch" hidden></label>
     <label class="et-campo">Nombre que verá el equipo<input class="campo" name="titulo" id="titulo" maxlength="120" placeholder="Ejemplo: Contrato firmado"></label>
     <button class="boton" id="subirBtn">Subir</button><div class="aviso" id="aviso"></div></form>`);
