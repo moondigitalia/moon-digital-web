@@ -70,6 +70,8 @@ small{font-size:15px;font-weight:600}
 .barra{grid-column:1/-1;height:10px;border-radius:5px;background:#2a2a31;overflow:hidden;margin-top:5px}
 .barra i{display:block;height:100%;border-radius:5px}
 .aviso{color:var(--amarillo)}
+.etq{display:inline-block;font-size:14px;padding:2px 9px;border-radius:10px;background:#33333b;color:var(--suave);margin-right:4px}
+.etq.cli{background:#1f3357;color:var(--azul)}
 .alerta{color:var(--rojo)}
 
 /* ---------- Pantalla completa (trabajar) ---------- */
@@ -206,7 +208,7 @@ function alertas() {
 
 // ---------- El mundo: cada texto vive dentro de su cuarto y se acomoda solo ----------
 const CUARTOS = [
-  { id: 'recepcion', t: 'Recepción · Jason', x: 20, y: 20, w: 260, h: 170, herramienta: 'llamadas' },
+  { id: 'recepcion', t: 'Recepción · Jason', x: 20, y: 20, w: 260, h: 170 },
   { id: 'clientes', t: 'Clientes que pagan', x: 300, y: 20, w: 560, h: 330 },
   { id: 'demos', t: 'Demos', x: 880, y: 20, w: 300, h: 230 },
   { id: 'cubiculos', t: 'Cubículos', x: 20, y: 210, w: 260, h: 230 },
@@ -328,9 +330,11 @@ function pintarInfo(refresco) {
     const ult = O.actividad && O.actividad.lineas && O.actividad.lineas[0];
     if (sel.tipo === 'clientes' && ult) h += `<p class="titulo">Claude ahorita</p><div class="fila">${esc(ult.texto)}<small>${hace(ult.hora)}</small></div>`;
   } else if (sel.tipo === 'recepcion') {
-    t = 'Jason, el recepcionista';
-    const ll = ((C && C.llamadas) || []).slice(0, 8);
-    h = ll.length ? ll.map(l => { const d = datosLlamada(l); return `<div class="fila">${esc(d.nombre || 'Sin nombre')}${d.negocio ? ' · ' + esc(d.negocio) : ''}${Number(l.prueba) ? ' · <span class="aviso">prueba</span>' : ''}<small>${fechaC(l.fecha)} · ${esc(d.resultado || (d.cita ? 'Cita: ' + d.cita : 'Sin resultado'))}</small><small>${esc(d.necesidad || (l.resumen || '').slice(0, 140))}</small><small>A quién avisó: todavía no se anota</small></div>`; }).join('') : '<p class="fila">Sin llamadas.</p>';
+    // Igual que las Llamadas del Tablero: quién (negocio), de qué se trató y cuándo; las de nosotros dicen "Prueba".
+    t = 'Jason · llamadas';
+    const ll = ((C && C.llamadas) || []).slice(0, 12);
+    h = ll.length ? ll.map(l => { const d = datosLlamada(l); const per = ((C && C.personas) || []).find(p => p.tel === l.quien) || {};
+      return `<div class="fila"><span class="etq${Number(l.prueba) ? '' : ' cli'}">${Number(l.prueba) ? 'Prueba' : 'Cliente'}</span> ${esc(per.negocio || d.negocio || per.nombre || d.nombre || 'Sin nombre')}<small>${esc(l.resumen || '')} · ${hace(l.fecha)}</small></div>`; }).join('') : '<p class="fila">Todavía no hay llamadas.</p>';
   } else if (sel.tipo === 'cubiculos') {
     t = 'Cubículos';
     h = (O.cubiculos || []).map(u => `<div class="fila"><span class="luz ${u.presente ? 'verde' : 'gris'}"></span> ${NOMBRE[u.id]}<small>${u.de}:00 a ${u.a}:00, lunes a viernes · ${u.presente ? 'en su horario' : 'fuera de horario'}</small></div>`).join('');
@@ -351,7 +355,7 @@ function pintarInfo(refresco) {
 // ---------- Pantalla completa ----------
 // El CRM y Crea tu recepcionista SON los del Tablero (con su orden, sus fotos y su botón de editar): se abren ahí
 // mismo y, al cerrarlos, regresan a la Oficina. Aquí solo vive la Librería.
-const TABLERO = { crm: 'crm', crea: 'demo', llamadas: 'llamadas' };
+const TABLERO = { crm: 'crm', crea: 'demo' };
 let charla = [];
 function abrirHerramienta(cual, tel, desdeHistoria) {
   if (TABLERO[cual]) { location.href = '/tablero?abrir=' + TABLERO[cual] + '&volver=/oficina'; return; }

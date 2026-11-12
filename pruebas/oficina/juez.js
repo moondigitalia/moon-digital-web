@@ -61,7 +61,7 @@ const posiciones = () => [...document.querySelectorAll('.cab, #escribe, #texto, 
     t = await p.evaluate(revisaTextos); ver(!t.length, n + ': textos con zoom → ' + t.slice(0, 3).join(' · '));
     // Tocar cuartos de mirar: la información cambia, el mapa sigue a la vista
     await p.evaluate(() => { ajustarVista(); });
-    for (const c of ['clientes', 'demos', 'robots', 'cubiculos', 'gris', 'cerrado']) {
+    for (const c of ['recepcion', 'clientes', 'demos', 'robots', 'cubiculos', 'gris', 'cerrado']) {
       const rc = await p.$eval(`.cuarto[data-c=${c}]`, e => { const b = e.getBoundingClientRect(); return { x: b.left + b.width * 0.85, y: b.top + b.height * 0.85 }; });
       if (tactil) await p.touchscreen.tap(rc.x, rc.y); else await p.mouse.click(rc.x, rc.y);
       await p.waitForTimeout(60);
@@ -72,7 +72,7 @@ const posiciones = () => [...document.querySelectorAll('.cab, #escribe, #texto, 
     // Regla 4: el CRM es el del Tablero (con su orden, fotos y botón de editar), y regresa a la Oficina
     await p.evaluate(() => ajustarVista());
     await ctx.route(/\/tablero/, r => r.fulfill({ contentType: 'text/html', body: '<p>tablero</p>' }));
-    for (const [cuarto, capa] of [['crm', 'crm'], ['crea', 'demo'], ['recepcion', 'llamadas']]) {
+    for (const [cuarto, capa] of [['crm', 'crm'], ['crea', 'demo']]) {
       const rc = await p.$eval(`.cuarto[data-c=${cuarto}]`, e => { const b = e.getBoundingClientRect(); return { x: b.left + b.width / 2, y: b.top + b.height * 0.8 }; });
       if (tactil) await p.touchscreen.tap(rc.x, rc.y); else await p.mouse.click(rc.x, rc.y);
       await p.waitForURL(/\/tablero/, { timeout: 3000 }).catch(() => {});
