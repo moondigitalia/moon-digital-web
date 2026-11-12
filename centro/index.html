@@ -1248,8 +1248,6 @@ async function capaFicha(c, sil) {
   const nomSec = k => (SECCIONES.find(x => x[0] === k) || [k, ''])[1];
   const util = v => v !== '' && v != null && !/^otros?$/i.test(String(v).trim());
   const datos = [['Negocio', P.negocio], ['Teléfono', P.telefono], ['Correo', P.correo], ['Giro', P.giro], ['Servicio', P.servicio], ['Llegó por', P.origen], ['Necesita', P.necesidad], ['Volumen', P.volumen], ['Urgencia', P.urgencia], ['Decide', P.decide], ['Cita', P.proxima_cita]].filter(x => util(x[1]));
-  const historial = D.proyectos.filter(x => x.tel === c.tel).map(x => filaProyecto(x))
-    .concat((ext.contactos || []).map(x => `<div class="fila" style="cursor:default"><span class="estado" style="--c:var(--cobalto);--cf:var(--azulf)">${esc(x.tipo)}</span><span class="q"><b style="font-weight:600">${esc(x.resumen || 'Sin resumen')}</b><span>${esc(x.canal)} · ${cuando(x.fecha)}</span></span><span></span></div>`));
   marco(pan ? nombreCorto(P) : nombreDe(P), 'Subir archivo', `<div class="cuerpo" style="grid-template-rows:auto minmax(0,1fr)">
     <div class="p-acciones" style="flex-wrap:wrap"><button class="pilita" id="editar">${I.lapiz} Editar</button>${tel ? `<a class="pilita" href="tel:+52${tel.slice(-10)}">${I.tel} Llamar</a><a class="pilita" href="https://wa.me/52${tel.slice(-10)}" target="_blank" rel="noopener">${I.wa} WhatsApp</a>` : ''}<button class="pilita rojo" id="quitar">${I.basura} ${paga ? 'Quitar<span class="largo"> de Clientes</span>' : 'Papelera'}</button></div>
     <div class="desliza f-todo" style="min-height:0;overflow-y:auto;display:grid;align-content:start;gap:12px;padding-bottom:12px">
@@ -1260,7 +1258,6 @@ async function capaFicha(c, sil) {
       <div class="f-bloque"><span class="eti">¿En qué va?</span><div class="f-etapas" id="etapas">${Object.keys(ETAPA).map(e => `<button class="${(P.etapa || 'pendiente') === e ? 'on' : ''}" data-e="${e}" style="--c:${ETAPA[e].c};--cf:${ETAPA[e].cf}">${ETAPA[e].n}</button>`).join('')}</div></div>
       ${P.notas_equipo ? `<div><span class="eti">Nota del equipo</span><button class="nota" id="nota" style="display:block;width:100%;margin-top:6px;height:auto;overflow:visible;text-align:start;font:inherit;font-weight:600">${esc(P.notas_equipo)}</button></div>` : '<button class="boton dos" id="nota">Escribir una nota</button>'}
       ${datos.length ? `<div><span class="eti">Datos</span><div class="lista" style="margin-top:6px">${datos.map(([k, v]) => `<div class="fila chica" style="cursor:default;grid-template-columns:100px minmax(0,1fr)"><span class="eti" style="letter-spacing:.1em">${esc(k)}</span><span class="q"><b style="font-weight:600">${esc(v)}</b></span></div>`).join('')}</div></div>` : ''}
-      ${historial.length ? `<div><span class="eti">Historial</span><div class="lista" style="margin-top:6px">${historial.join('')}</div></div>` : (c.ext ? '' : '<p class="mini">Cargando su historial…</p>')}
       <label class="mini" style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="prueba"${P.es_prueba ? ' checked' : ''}> Es de prueba (no cuenta como cliente)</label>
     </div></div>`, I.subir);
   if (sil) app.querySelector('.vista').style.animation = 'none';
@@ -1280,7 +1277,6 @@ async function capaFicha(c, sil) {
   app.querySelectorAll('#etapas [data-e]').forEach(b => b.onclick = async () => { const antes = per0.etapa; const r = await guarda({ etapa: b.dataset.e }); if (r.ok) { pinta(true); recargar(true); const e = b.dataset.e; avisoFlotante(!PAGAN.includes(antes) && PAGAN.includes(e) ? 'Listo: ya aparece en Clientes' : PAGAN.includes(antes) && !PAGAN.includes(e) ? `Ahora está en ${ETAPA[e].n}: ya no aparece en Clientes` : `Listo: ahora está en ${ETAPA[e].n}`); } });
   document.getElementById('nota').onclick = () => abrir({ tipo: 'nota', tel: c.tel });
   document.getElementById('prueba').onchange = async e => { const r = await guarda({ es_prueba: e.target.checked ? 1 : 0 }); if (r.ok) recargar(true); };
-  app.querySelectorAll('[data-y]').forEach(b => b.onclick = () => abrir({ tipo: 'proyecto', id: Number(b.dataset.y) }));
   if (pan) {
     document.getElementById('demo').onclick = () => window.open(pan.demo, '_blank', 'noopener');
     document.getElementById('demoEnviar').onclick = () => compartir('Demo · ' + nombreCorto(P), pan.demo);
