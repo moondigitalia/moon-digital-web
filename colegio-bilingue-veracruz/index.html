@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#00205C">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Colegio Bilingüe de Veracruz · MOON Digital">
+<meta property="og:description" content="Lo que las familias ven antes de conocerlos: ideas sobre imagen y comunicación.">
+<meta property="og:url" content="https://moondigitalia.com/colegio-bilingue-veracruz/">
+<link rel="icon" href="/img/logo.webp">
+<title>Colegio Bilingüe de Veracruz · MOON Digital</title>
+<link rel="preload" href="/fuentes/material/dm-sans-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/fuentes/material/letras.css">
+<style>
+/* Presentación para el Colegio Bilingüe de Veracruz (pedida por Daniel, 12-nov-2026).
+   Tema: por qué invertir en imagen y comunicación ayuda a las admisiones.
+   5 láminas, una por pantalla; igual en proyector, computadora y celular.
+   Tono: ellos son los expertos, nosotros los asistimos. Los datos llevan su fuente y se pueden abrir. */
+:root{
+  --navy:#00205C; --navy2:#0B2E73; --ink:#0E1B33; --gray:#1F2A3F; --line:#DCE2EC;
+  --blue:#1D4FB8; --claro:#8FB4FF; --bg:#F6F8FC;
+  --moon:conic-gradient(from 200deg,#F28C28,#E0245E,#8A3FD1,#18B5B0,#F28C28);
+  --t:"DM Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --c:"Fraunces",Georgia,serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-snap-type:y proximity;scroll-behavior:smooth;background:var(--navy)}
+body{font-family:var(--t);font-weight:600;color:var(--ink);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;background:var(--bg)}
+img{max-width:100%;display:block}
+a{color:inherit}
+.s{min-height:100vh;min-height:100svh;scroll-snap-align:start;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;padding:clamp(24px,5.5vh,72px) clamp(16px,6vw,110px)}
+.in{width:100%;max-width:1600px;margin:0 auto;position:relative;z-index:1}
+.eyebrow{font-size:clamp(16px,1.1vw,20px);font-weight:800;letter-spacing:.28em;text-transform:uppercase;color:var(--blue)}
+h1,h2{font-weight:800;letter-spacing:-.025em;line-height:1.05;text-wrap:balance}
+h2{font-size:clamp(34px,3.5vw,66px);color:var(--navy);margin-top:.35em}
+.lead{font-size:clamp(20px,1.4vw,27px);font-weight:600;line-height:1.5;color:var(--gray);margin-top:.7em;max-width:58ch;text-wrap:pretty}
+em.c{font-family:var(--c);font-style:italic;font-weight:600;letter-spacing:-.01em}
+.centro{text-align:center}
+.centro .lead{margin-left:auto;margin-right:auto}
+
+/* puntos de navegación */
+.dots{position:fixed;right:clamp(10px,1.4vw,26px);top:50%;transform:translateY(-50%);z-index:50;display:flex;flex-direction:column;gap:12px}
+.dots a{width:12px;height:12px;border-radius:50%;background:rgba(127,140,170,.45);display:block;transition:transform .35s ease,background .35s ease}
+.dots a.on{background:var(--blue);transform:scale(1.35)}
+.dots.oscuro a{background:rgba(255,255,255,.35)} .dots.oscuro a.on{background:#fff}
+
+/* 1 · portada */
+.cover{background:var(--navy);color:#fff}
+.disc{position:absolute;border-radius:50%;background:radial-gradient(circle at 35% 35%,#16408F 0%,#0B2E73 55%,#00205C 100%)}
+.cover .disc{right:-22vw;top:-30vh;width:min(78vw,1150px);aspect-ratio:1}
+.cover .ring{position:absolute;right:-6vw;top:2vh;width:min(40vw,740px);aspect-ratio:1;border-radius:50%;border:2px solid rgba(255,255,255,.09)}
+.top{display:flex;justify-content:space-between;align-items:center;gap:20px;position:absolute;left:clamp(16px,6vw,110px);right:clamp(16px,6vw,110px);top:clamp(22px,4vw,64px);z-index:2}
+.top .cole{font-size:clamp(18px,1.5vw,28px);font-weight:800;line-height:1.1;letter-spacing:-.01em}
+.top .moon{height:clamp(30px,3.6vw,64px);width:auto}
+.cover h1{font-size:clamp(44px,6vw,118px);max-width:11.5em;margin-top:clamp(70px,8vh,120px)}
+.cover h1 .claro{color:var(--claro)}
+.cover .lead{color:#fff;max-width:42ch;margin-top:1em}
+.cover .by{margin-top:clamp(28px,6vh,80px);font-size:clamp(17px,1.15vw,22px);color:#fff}
+.hint{position:absolute;left:50%;bottom:clamp(14px,3vh,34px);transform:translateX(-50%);font-size:clamp(16px,.95vw,17px);color:#fff;letter-spacing:.06em;z-index:2;white-space:nowrap}
+
+/* 2 · el camino de una familia */
+.camino{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(14px,2vw,40px);margin-top:clamp(26px,4.5vh,60px);position:relative}
+.camino:before{content:"";position:absolute;left:12.5%;right:12.5%;top:calc(clamp(84px,7.4vw,140px) / 2);height:3px;background:var(--line);z-index:0}
+.paso2{text-align:center;position:relative;z-index:1}
+.paso2 .n{width:clamp(84px,7.4vw,140px);aspect-ratio:1;border-radius:50%;margin:0 auto;display:grid;place-items:center;background:#fff;border:3px solid var(--navy);color:var(--navy)}
+.paso2 .n svg{width:44%;height:44%}
+.paso2.fin2 .n{background:var(--navy);color:#fff}
+.paso2 b{display:block;font-size:clamp(20px,1.45vw,28px);font-weight:800;color:var(--navy);margin-top:14px;line-height:1.15}
+.paso2 p{font-size:clamp(18px,1.08vw,21px);color:var(--gray);margin:6px auto 0;line-height:1.45;max-width:22ch;text-wrap:balance}
+.frase{margin:clamp(28px,5vh,64px) auto 0;max-width:34em;text-align:center;font-size:clamp(23px,1.9vw,38px);font-weight:800;line-height:1.3;color:var(--navy);text-wrap:balance}
+.frase span{color:var(--blue)}
+
+/* 3 · datos */
+.datos{background:#fff}
+.cifras{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(18px,2.4vw,48px);margin-top:clamp(26px,4.5vh,60px)}
+.cifra{text-align:center;text-decoration:none;color:var(--ink);display:block}
+.cifra .aro{width:clamp(150px,12.5vw,240px);aspect-ratio:1;border-radius:50%;margin:0 auto;padding:clamp(5px,.45vw,8px);background:var(--moon);transition:transform .45s cubic-bezier(.2,.7,.2,1)}
+.cifra:hover .aro,.cifra:focus-visible .aro{transform:scale(1.04)}
+.cifra:focus-visible{outline:none}
+.cifra .aro span{width:100%;height:100%;border-radius:50%;background:#fff;display:grid;place-items:center;font-size:clamp(40px,3.6vw,72px);font-weight:800;letter-spacing:-.03em;color:var(--navy);line-height:1}
+.cifra .aro small{display:block;font-size:.42em;letter-spacing:0;margin-top:.15em}
+.cifra p{font-size:clamp(18px,1.12vw,22px);line-height:1.4;margin:16px auto 0;max-width:23ch;text-wrap:balance}
+.cifra .fuente{display:inline-flex;align-items:center;gap:8px;margin-top:10px;font-size:clamp(16px,.95vw,18px);font-weight:800;color:var(--blue)}
+.cifra .fuente svg{transition:transform .35s ease;flex:none}
+.cifra:hover .fuente svg{transform:translate(3px,-3px)}
+.nota{text-align:center;font-size:clamp(17px,1vw,20px);color:var(--gray);margin-top:clamp(24px,4vh,48px);line-height:1.5}
+
+/* 4 · adentro y afuera */
+.lados{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:clamp(18px,3vw,64px);align-items:start;margin-top:clamp(26px,4.5vh,60px)}
+.lado{text-align:center}
+.lado .ic{width:clamp(96px,8vw,150px);aspect-ratio:1;border-radius:50%;margin:0 auto;display:grid;place-items:center}
+.lado .ic svg{width:46%;height:46%}
+.lado h3{font-size:clamp(24px,1.8vw,36px);font-weight:800;color:var(--navy);margin-top:14px}
+.lado .sub{font-size:clamp(17px,1vw,20px);color:var(--blue);font-weight:800;margin-top:2px}
+.lado ul{list-style:none;margin-top:14px;display:inline-block;text-align:left}
+.lado li{font-size:clamp(19px,1.2vw,23px);padding:6px 0;display:flex;gap:12px;align-items:center}
+.lado li:before{content:"";width:10px;height:10px;border-radius:50%;flex:0 0 10px;background:var(--navy)}
+.lado.afuera li:before{background:var(--moon)}
+.mas{margin-top:calc((clamp(96px,8vw,150px) - clamp(56px,4.4vw,84px)) / 2);width:clamp(56px,4.4vw,84px);aspect-ratio:1;border-radius:50%;background:var(--moon);display:grid;place-items:center;color:#fff;font-size:clamp(34px,2.6vw,50px);font-weight:800;line-height:1}
+
+/* 5 · cierre */
+.fin{background:var(--navy);color:#fff}
+.fin .disc{left:-24vw;bottom:-46vh;width:min(70vw,1200px);aspect-ratio:1;background:radial-gradient(circle at 60% 40%,#16408F 0%,#0B2E73 55%,#00205C 100%)}
+.fin .grid{display:grid;grid-template-columns:1.25fr 1fr;gap:clamp(30px,5vw,110px);align-items:center}
+.fin h2{color:#fff;font-size:clamp(44px,5vw,100px);margin-top:0}
+.fin h2 span{color:var(--claro)}
+.fin .lead{color:#fff;max-width:36ch;margin-top:.8em}
+.pasos{display:grid;gap:clamp(18px,3vh,34px)}
+.paso{display:flex;align-items:center;gap:clamp(16px,1.6vw,26px)}
+.paso .n{flex:0 0 clamp(64px,5.6vw,104px);aspect-ratio:1;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:clamp(30px,2.2vw,44px);font-weight:800}
+.paso b{font-size:clamp(22px,1.5vw,30px);display:block}
+.paso span{font-size:clamp(18px,1.1vw,21px);color:#fff;display:block;margin-top:4px;line-height:1.45;max-width:24em;text-wrap:pretty}
+.firma{display:flex;align-items:center;gap:clamp(16px,2vw,32px);margin-top:clamp(30px,6vh,80px);flex-wrap:wrap}
+.firma img{height:clamp(30px,3vw,54px);width:auto}
+.firma .sep{width:1px;height:clamp(28px,3vw,50px);background:rgba(255,255,255,.3)}
+.firma p{font-size:clamp(18px,1.1vw,21px);color:#fff}
+.firma p b{display:block}
+
+/* pantallas medianas y celular */
+@media (max-width:1100px){
+  .camino{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:34px}
+  .camino:before{display:none}
+  .cifras{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:40px}
+  .fin .grid{grid-template-columns:1fr}
+}
+@media (max-width:760px){
+  .lados{grid-template-columns:1fr}
+  .mas{margin:8px auto}
+}
+@media (max-width:640px){
+  html{scroll-snap-type:none}
+  .s{min-height:auto;padding-top:56px;padding-bottom:64px}
+  .cover{min-height:100svh}
+  .cover .disc{right:-60vw;top:-10vh;width:140vw}
+  .dots,.hint,.firma .sep{display:none}
+  .fin .disc{left:-80vw;bottom:-30vh;width:160vw}
+}
+@media (max-width:600px){
+  .camino{grid-template-columns:1fr}
+  .cifras{grid-template-columns:1fr}
+}
+@media (max-width:440px){
+  .cover h1{font-size:38px}
+  .top .cole{font-size:17px}
+}
+</style>
+</head>
+<body>
+
+<nav class="dots oscuro" id="dots" aria-label="Láminas">
+  <a href="#l1" aria-label="Portada"></a>
+  <a href="#l2" aria-label="Cómo elige una familia"></a>
+  <a href="#l3" aria-label="Lo que dicen los estudios"></a>
+  <a href="#l4" aria-label="Adentro y afuera"></a>
+  <a href="#l5" aria-label="Siguiente paso"></a>
+</nav>
+
+<!-- 1 · PORTADA -->
+<section class="s cover" id="l1" data-oscuro>
+  <div class="disc" aria-hidden="true"></div>
+  <div class="ring" aria-hidden="true"></div>
+  <div class="top">
+    <span class="cole">Colegio Bilingüe<br>de Veracruz</span>
+    <img class="moon" src="img/moon-blanco.png" alt="MOON Digital">
+  </div>
+  <div class="in">
+    <h1>Lo que las familias ven <span class="claro">antes de conocerlos</span></h1>
+    <p class="lead">Ustedes ya cuidan muy bien lo que pasa dentro del colegio. Aquí compartimos algunas ideas para que ese trabajo también se vea desde afuera.</p>
+    <p class="by"><b>MOON Digital</b> · Daniel Contreras Luna, Director General</p>
+  </div>
+  <div class="hint">Deslice hacia abajo o use las flechas del teclado</div>
+</section>
+
+<!-- 2 · CÓMO ELIGE UNA FAMILIA -->
+<section class="s" id="l2">
+  <div class="in centro">
+    <div class="eyebrow">Cómo elige hoy una familia</div>
+    <h2>La decisión empieza <em class="c">antes de la visita</em></h2>
+    <div class="camino">
+      <div class="paso2"><div class="n"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg></div><b>Busca en su celular</b><p>"Colegio bilingüe en Veracruz"</p></div>
+      <div class="paso2"><div class="n"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.4-5A8 8 0 1 1 21 12z"/></svg></div><b>Pregunta a otras familias</b><p>Y luego busca el nombre que le recomendaron</p></div>
+      <div class="paso2"><div class="n"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V10l7-5 7 5v11M10 21v-5h4v5"/></svg></div><b>Visita el colegio</b><p>Viene a confirmar lo que ya vio</p></div>
+      <div class="paso2 fin2"><div class="n"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 10 17.5 19 7"/></svg></div><b>Inscribe a sus hijos</b><p>Cuando lo que vio afuera y adentro coincide</p></div>
+    </div>
+    <p class="frase">Lo de afuera trae a las familias a la visita. <span>Lo de adentro, que ustedes ya cuidan, las convence.</span></p>
+  </div>
+</section>
+
+<!-- 3 · LO QUE DICEN LOS ESTUDIOS -->
+<section class="s datos" id="l3">
+  <div class="in centro">
+    <div class="eyebrow">Lo que dicen los estudios</div>
+    <h2>Cuando un colegio <em class="c">se ve,</em> más familias lo buscan</h2>
+    <div class="cifras">
+      <a class="cifra" href="https://expansion.mx/tecnologia/2025/06/04/escuelas-privadas-estan-en-jaque-digitalizacion" target="_blank" rel="noopener">
+        <div class="aro"><span>29%</span></div>
+        <p>más familias interesadas registradas en escuelas privadas de México que tienen página web</p>
+        <span class="fuente">Estudio Cometa, 2025<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></span>
+      </a>
+      <a class="cifra" href="https://expansion.mx/tecnologia/2025/06/04/escuelas-privadas-estan-en-jaque-digitalizacion" target="_blank" rel="noopener">
+        <div class="aro"><span>3×</span></div>
+        <p>más familias interesadas cuando el colegio tiene sus redes sociales activas</p>
+        <span class="fuente">Estudio Cometa, 2025<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></span>
+      </a>
+      <a class="cifra" href="https://www.cronica.com.mx/nacional/indicadores-salud-deben-tomados-cuenta-elegir-escuela-expertos.html" target="_blank" rel="noopener">
+        <div class="aro"><span><b>8<small>de cada 10</small></b></span></div>
+        <p>familias que buscan escuela privada en México quieren un sistema bilingüe</p>
+        <span class="fuente">MiCole<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></span>
+      </a>
+      <a class="cifra" href="https://www.educationnext.org/?p=49700949" target="_blank" rel="noopener">
+        <div class="aro"><span><b>8<small>de cada 10</small></b></span></div>
+        <p>papás dicen que no encontrar información de una escuela influye en su decisión</p>
+        <span class="fuente">Encuesta a papás, EE. UU.<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></span>
+      </a>
+    </div>
+    <p class="nota">Son estudios de otros colegios y otros momentos. Con ustedes, lo mediríamos con sus propios números de admisiones.</p>
+  </div>
+</section>
+
+<!-- 4 · ADENTRO Y AFUERA -->
+<section class="s" id="l4">
+  <div class="in centro">
+    <div class="eyebrow">Adentro y afuera</div>
+    <h2>Invertir afuera <em class="c">no le quita</em> a lo de adentro</h2>
+    <p class="lead">Es común que casi todo el presupuesto se vaya a lo interno, y tiene mucho sentido. La idea es que una parte acompañe ese trabajo hacia afuera, para que más familias lleguen a conocerlo.</p>
+    <div class="lados">
+      <div class="lado">
+        <div class="ic" style="background:var(--navy)"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c3 2 9 2 12 0v-5"/></svg></div>
+        <h3>Por dentro</h3><div class="sub">Lo que ustedes ya cuidan</div>
+        <ul><li>Maestros</li><li>Programa bilingüe</li><li>Instalaciones</li><li>Trato a cada alumno</li></ul>
+      </div>
+      <div class="mas" aria-hidden="true">+</div>
+      <div class="lado afuera">
+        <div class="ic" style="background:var(--moon)"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></div>
+        <h3>Por fuera</h3><div class="sub">Lo que ven las familias</div>
+        <ul><li>Su página de internet</li><li>Sus redes sociales</li><li>Fotos y videos reales del colegio</li><li>La respuesta cuando una familia pregunta</li></ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 5 · CIERRE -->
+<section class="s fin" id="l5" data-oscuro>
+  <div class="disc" aria-hidden="true"></div>
+  <div class="in grid">
+    <div>
+      <h2>Empecemos por <span>mirarlo juntos.</span></h2>
+      <p class="lead">Ustedes conocen a sus familias mejor que nadie. Nosotros ponemos la imagen y la comunicación a su servicio.</p>
+      <div class="firma">
+        <img src="img/moon-blanco.png" alt="MOON Digital">
+        <span class="sep" aria-hidden="true"></span>
+        <p><b>Daniel Contreras Luna</b>Director General</p>
+      </div>
+    </div>
+    <div class="pasos">
+      <div class="paso"><div class="n" style="background:#fff;color:var(--navy)">1</div><div><b>Platicamos</b><span>Ustedes nos cuentan cómo llegan hoy las familias que se inscriben.</span></div></div>
+      <div class="paso"><div class="n" style="background:var(--blue);color:#fff">2</div><div><b>Buscamos al colegio como una familia</b><span>Vemos juntos qué aparece hoy en internet y en redes.</span></div></div>
+      <div class="paso"><div class="n" style="background:rgba(255,255,255,.14);color:#fff">3</div><div><b>Elegimos por dónde empezar</b><span>Una pieza a la vez, medida con sus propios números.</span></div></div>
+    </div>
+  </div>
+</section>
+
+<script>
+(function(){
+  var ls=[].slice.call(document.querySelectorAll('.s')), dots=document.getElementById('dots'), ds=[].slice.call(dots.querySelectorAll('a'));
+  function actual(){var y=window.innerHeight*0.45,k=0;ls.forEach(function(s,i){if(s.getBoundingClientRect().top<=y)k=i;});return k;}
+  function marcar(){var k=actual();ds.forEach(function(d,i){d.classList.toggle('on',i===k);});dots.classList.toggle('oscuro',ls[k].hasAttribute('data-oscuro'));}
+  window.addEventListener('scroll',marcar,{passive:true});window.addEventListener('resize',marcar);marcar();
+  // flechas, Av Pág y el control remoto del proyector: una lámina a la vez
+  document.addEventListener('keydown',function(e){
+    if(e.altKey||e.ctrlKey||e.metaKey)return;
+    var k=actual(),n=null,r=ls[k].getBoundingClientRect(),h=window.innerHeight;
+    var adelante=['ArrowDown','ArrowRight','PageDown',' '].indexOf(e.key)>-1, atras=['ArrowUp','ArrowLeft','PageUp'].indexOf(e.key)>-1;
+    if(adelante&&r.bottom>h+4){e.preventDefault();window.scrollBy({top:Math.min(h*0.85,r.bottom-h),behavior:'smooth'});return;}
+    if(atras&&r.top<-4){e.preventDefault();window.scrollBy({top:Math.max(-h*0.85,r.top),behavior:'smooth'});return;}
+    if(adelante)n=Math.min(ls.length-1,k+1);
+    if(atras)n=Math.max(0,k-1);
+    if(e.key==='Home')n=0; if(e.key==='End')n=ls.length-1;
+    if(n!==null){e.preventDefault();ls[n].scrollIntoView({behavior:'smooth',block:'start'});}
+  });
+})();
+</script>
+</body>
+</html>
