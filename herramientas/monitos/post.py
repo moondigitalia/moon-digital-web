@@ -32,7 +32,7 @@ for n in nombres:
         im = Image.fromarray(img[y0:y1, x0:x1], 'RGBA').resize((W, H), Image.LANCZOS)
         im.save(OUT + f'{n}_{p}.webp', quality=82, method=6)
         if p == 'reposo':   # acostado en el piso, sin color (cuarto gris): el mismo monito girado
-            g = ImageOps.grayscale(im.convert('RGB')).convert('RGB'); g = g.point(lambda v: int(120 + v * 0.45))
+            g = ImageOps.grayscale(im.convert('RGB')).convert('RGB'); g = ImageEnhance.Contrast(ImageEnhance.Brightness(g).enhance(1.45)).enhance(0.8)
             g.putalpha(im.getchannel('A')); g = g.rotate(80, expand=True, resample=Image.BICUBIC)
             bb = g.getbbox(); g = g.crop(bb); g.save(OUT + f'{n}_acostado.webp', quality=80, method=6)
             meta.setdefault(n, {})['acostado'] = [g.width, g.height]

@@ -25,7 +25,7 @@
     { id: 'crm', n: 'CRM', x: 7, y: 9, w: 5, h: 5, piso: '#46707a', herramienta: 'crm' },
     { id: 'libreria', n: 'Librería', x: 12, y: 9, w: 5, h: 5, piso: '#7a6a55', herramienta: 'libreria' },
     { id: 'crea', n: 'Crear', x: 0, y: 14, w: 6, h: 4, piso: '#4d7a72', herramienta: 'crea' },
-    { id: 'gris', n: 'Cuarto gris', x: 7, y: 15, w: 10, h: 4, piso: '#4a4a4e' },
+    { id: 'gris', n: 'Cuarto gris', x: 7, y: 15, w: 10, h: 4, piso: '#6b4e36' },
     { id: 'oracion', n: 'Oración', x: 18, y: 13, w: 4, h: 6, piso: '#8a7860' },
     { id: 'cerrado', n: 'Archivo', x: 22, y: 13, w: 4, h: 6, piso: '#8b8478' },
   ];
