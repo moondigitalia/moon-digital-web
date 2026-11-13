@@ -266,7 +266,7 @@
 
   // ---------- La vida: los monitos se mueven solos ----------
   // Una sola tabla de tiempos (en segundos).
-  const TIEMPO = { pasito: 0.4, paso: 0.75, idaMin: 18, idaMax: 70, quedarse: [3, 6], platica: 5, mas: 4, burbuja: 4 };
+  const TIEMPO = { pasito: 0.5, paso: 0.6, idaMin: 18, idaMax: 70, quedarse: [3, 6], platica: 5, mas: 4, burbuja: 4 };
   let VIDA = null;
   function vida(raiz, O, C) {
     if (!VIDA) VIDA = { actores: {}, previo: {}, reloj: 0, ultimo: performance.now() };
