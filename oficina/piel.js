@@ -268,8 +268,7 @@
   // Una sola tabla de tiempos (en segundos).
   const TIEMPO = { pasito: 0.5, paso: 0.6, idaMin: 18, idaMax: 70, quedarse: [3, 6], platica: 5, mas: 4, burbuja: 4 };
   let VIDA = null;
-  // Paredes altas (su caja en pantalla y su profundidad): si alguien camina detrás de una, se ve como silueta
-  // completa encima de la pared, nunca "la cabeza atravesándola" (Kid, 13-nov-2026).
+  // Paredes altas (su caja en pantalla y su profundidad): si alguien camina detrás de una, se esconde completo.
   let MUROS = [];
   function tapado(a, key) { const [x, y] = iso(a.pos[0], a.pos[1]), c = { l: x - 14, r: x + 14, t: y - a.alto, b: y };
     let area = 0; for (const m of MUROS) { if (m.d <= key) continue; const w = Math.min(c.r, m.r) - Math.max(c.l, m.l), h = Math.min(c.b, m.b) - Math.max(c.t, m.t); if (w > 0 && h > 0) area = Math.max(area, w * h); }
@@ -326,14 +325,10 @@
         let sig = null; for (const h of esc_.children) { if (h !== caja_ && Number(h.dataset.d) > prof) { sig = h; break; } }
         if (sig !== caja_.nextSibling) esc_.insertBefore(caja_, sig); } }
     const etq = VIDA.raiz && VIDA.raiz.querySelector(`[data-de="${a.id}"]`); if (etq) etq.style.visibility = fuera ? 'hidden' : '';
-    // Detrás de una pared: el monito se esconde y en su lugar va su silueta encima (se entiende que está detrás)
+    // Detrás de una pared alta: el monito se esconde completo (con un desvanecido corto), para que nunca se vea
+    // la cabeza saliendo de la pared (Kid, 13-nov-2026). Al salir de detrás, vuelve a aparecer igual de suave.
     const tras = fuera && im && tapado(a, a.pos[0] + a.pos[1]);
-    a.g.style.visibility = tras ? 'hidden' : '';
-    if (tras) {
-      if (!a.sil || !a.sil.isConnected) { a.sil = document.createElementNS('http://www.w3.org/2000/svg', 'image'); a.sil.setAttribute('class', 'silueta'); VIDA.capa.appendChild(a.sil); }
-      ['href', 'x', 'y', 'width', 'height'].forEach(n => a.sil.setAttribute(n, im.getAttribute(n)));
-      a.sil.setAttribute('transform', a.g.getAttribute('transform') + ' ' + (im.getAttribute('transform') || ''));
-    } else if (a.sil) { a.sil.remove(); a.sil = null; }
+    a.g.style.opacity = tras ? '0' : '';
     let b = a.g.querySelector('.burbuja');
     if (a.burbuja && VIDA.reloj < a.burbuja.hasta) {
       if (!b) { b = document.createElementNS('http://www.w3.org/2000/svg', 'g'); b.setAttribute('class', 'burbuja'); a.g.appendChild(b); }
