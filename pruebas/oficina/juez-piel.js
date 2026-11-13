@@ -35,6 +35,20 @@ const URL = process.env.URL || 'http://localhost:8822/tablero';
   const c = await b.newContext({ viewport: { width: 360, height: 640 }, hasTouch: true, isMobile: true });
   await c.addInitScript(() => { localStorage.setItem('centro.moon.sesion', 'T'.repeat(43)); }); await c.addInitScript(PRELUDIO);
   const p = await c.newPage(); await p.goto(URL); await p.waitForSelector('#mundo svg');
+  // Nadie camina por encima de un mueble (Kid, 13-nov-2026): cada monito, de su lugar a cada cuarto y al agua, ida y vuelta.
+  const pisa = await p.evaluate(() => {
+    const B = Piel.bloques(), PU = Piel.puertas, R = document.getElementById('ofi').shadowRoot;
+    const actores = [...R.querySelectorAll('[data-actor]')].map(g => ({ id: g.dataset.actor, casa: [+g.dataset.tx, +g.dataset.ty], lado: g.dataset.lado ? g.dataset.lado.split(',').map(Number) : null }));
+    const puntos = Object.values(PU).map(x => x[0]).concat([[Piel.agua[0] + 0.75, Piel.agua[1] + 0.05]]);
+    const malos = [];
+    const sobre = (x, y, ini, fin) => Math.hypot(x - ini[0], y - ini[1]) > 0.4 && Math.hypot(x - fin[0], y - fin[1]) > 0.4 && B.some(b => x > b[0] + 0.02 && x < b[2] - 0.02 && y > b[1] + 0.02 && y < b[3] - 0.02);
+    actores.forEach(a => { const sal = a.lado ? [a.casa[0] + a.lado[0], a.casa[1] + a.lado[1]] : a.casa;
+      puntos.forEach(q => [[sal, q], [q, sal]].forEach(([ini, fin]) => { const r = Piel.ruta(ini, fin); let prev = ini;
+        r.forEach(pt => { const n = Math.ceil(Math.hypot(pt[0] - prev[0], pt[1] - prev[1]) / 0.05); for (let k = 0; k <= n; k++) if (sobre(prev[0] + (pt[0] - prev[0]) * k / n, prev[1] + (pt[1] - prev[1]) * k / n, ini, r[r.length - 1])) { malos.push(a.id + ' hacia ' + fin.join(',')); break; } prev = pt; }); })); });
+    return { muebles: B.length, malos: [...new Set(malos)] };
+  });
+  const okm = pisa.muebles > 20 && !pisa.malos.length; if (!okm) mal++;
+  filas.push(`${okm ? '✔' : '✘'} caminos: nadie pisa un mueble (${pisa.muebles} muebles${pisa.malos.length ? ' · ' + pisa.malos.slice(0, 3).join(' | ') : ''})`);
   const cdp = await c.newCDPSession(p); await cdp.send('Emulation.setCPUThrottlingRate', { rate: 4 });
   const ms = await p.evaluate(() => { const t = performance.now(); for (let i = 0; i < 5; i++) dibujarMundo(); return (performance.now() - t) / 5; });
   await p.evaluate(() => { window.__c = []; let u = performance.now(); const f = t => { __c.push(t - u); u = t; if (__c.length < 200) requestAnimationFrame(f); }; requestAnimationFrame(f); });

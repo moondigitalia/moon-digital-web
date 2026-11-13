@@ -35,8 +35,12 @@
   function luzDe(hora) { return hora >= 6 && hora < 12 ? 'mostaza' : hora >= 12 && hora < 18 ? 'amarilla' : 'morada'; }
 
   // ---------- piezas ----------
+  // HUELLAS (Kid, 13-nov-2026: "se atraviesan las cosas en los muebles"): cada caja anota lo que ocupa en el piso. Con
+  // eso, (1) nadie camina por encima de un mueble y (2) un mueble que queda entre el monito y la vista lo tapa.
+  let PEND = [], BLOQUES = [];
   function caja(x, y, w, h, alto, c, z0) {   // un mueble: tapa y dos lados con su luz "horneada" (z0: desde qué altura)
     z0 = z0 || 0; const zt = z0 + alto;
+    PEND.push([x, y, x + w, y + h]);
     const a = iso(x, y + h, z0), b = iso(x + w, y + h, z0), d = iso(x + w, y, z0);
     const at = iso(x, y + h, zt), bt = iso(x + w, y + h, zt), dt = iso(x + w, y, zt), ct = iso(x, y, zt);
     return `<polygon points="${P([a, b, bt, at])}" fill="${c[1]}"/><polygon points="${P([b, d, dt, bt])}" fill="${c[2]}"/><polygon points="${P([ct, dt, bt, at])}" fill="${c[0]}"/>`;
@@ -209,7 +213,8 @@
   const AGUA = [7.6, 7.3];   // el garrafón: en la esquina de Clientes, a la vista (en el pasillo lo tapaban las paredes)
   // Por dónde se entra a cada cuarto: [adentro, puerta en el pasillo]
   const PUERTAS = {
-    recepcion: [[5.4, 2.5], [6.5, 2.5]], cubiculos: [[5.4, 9.6], [6.5, 9.6]], crea: [[5.4, 16], [6.5, 16]],
+    // recepción: el punto de adentro va a un lado del sillón (antes caía encima de él)
+    recepcion: [[5.65, 2.95], [6.5, 2.5]], cubiculos: [[5.4, 9.6], [6.5, 9.6]], crea: [[5.4, 16], [6.5, 16]],
     clientes: [[12, 7.4], [12, 8.5]], crm: [[9.5, 13.4], [9.5, 14.5]], libreria: [[14.5, 13.4], [14.5, 14.5]],
     gris: [[16.4, 17], [17.5, 17]], demos: [[21, 5.4], [21, 6.5]], robots: [[21, 11.4], [21, 12.5]], oracion: [[20, 13.6], [20, 12.5]],
   };
@@ -234,12 +239,60 @@
     return r;
   }
   function cuartoDe(x, y) { return CUARTOS.find(c => x >= c.x && x <= c.x + c.w && y >= c.y && y <= c.y + c.h); }
+  // Si a donde va cae encima de un mueble (o pegado a él), se queda parado junto, en el lugar libre más cercano.
+  function suelto(p) {
+    const c = cuartoDe(p[0], p[1]); if (!c) return p;
+    const ok = (x, y) => x >= c.x + 0.25 && x <= c.x + c.w - 0.25 && y >= c.y + 0.25 && y <= c.y + c.h - 0.25 && !BLOQUES.some(b => x > b[0] - 0.15 && x < b[2] + 0.15 && y > b[1] - 0.15 && y < b[3] + 0.15);
+    if (ok(p[0], p[1])) return p;
+    for (let r = 0.1; r <= 2; r += 0.1) for (let k = 0; k < 16; k++) { const x = p[0] + Math.cos(k * Math.PI / 8) * r, y = p[1] + Math.sin(k * Math.PI / 8) * r; if (ok(x, y)) return [x, y]; }
+    return p;
+  }
   function ruta(de, a) {   // de un punto (dentro de un cuarto o en un pasillo) a otro, pasando por puertas y pasillos
+    a = suelto(a);
     const cd = cuartoDe(de[0], de[1]), ca = cuartoDe(a[0], a[1]);
-    if (cd && ca && cd.id === ca.id) return [a];
-    const pd = cd && PUERTAS[cd.id], pa = ca && PUERTAS[ca.id];
-    const ini = pd ? pd[1] : de, fin = pa ? pa[1] : a;
-    return (pd ? [pd[0]] : []).concat(camino(ini, fin)).concat(pa ? [pa[0], a] : (fin === a ? [] : [a]));
+    let r;
+    if (cd && ca && cd.id === ca.id) r = [a];
+    else {
+      const pd = cd && PUERTAS[cd.id], pa = ca && PUERTAS[ca.id];
+      const ini = pd ? pd[1] : de, fin = pa ? pa[1] : a;
+      r = (pd ? [pd[0]] : []).concat(camino(ini, fin)).concat(pa ? [pa[0], a] : (fin === a ? [] : [a]));
+    }
+    // Dentro de un cuarto se camina rodeando los muebles (nunca por encima).
+    const out = []; let prev = de;
+    r.forEach(q => { const c1 = cuartoDe(prev[0], prev[1]), c2 = cuartoDe(q[0], q[1]); if (c1 && c2 && c1.id === c2.id) out.push(...rodea(prev, q, c1)); else out.push(q); prev = q; });
+    return out;
+  }
+  // Camino dentro de un cuarto sin pisar muebles: rejilla fina, el más corto (A*) y luego se endereza.
+  const PASO = 0.2, HOLGURA = 0.2;
+  function libre(x, y, c, ini, fin) {
+    if (Math.hypot(x - ini[0], y - ini[1]) < 0.35 || Math.hypot(x - fin[0], y - fin[1]) < 0.35) return true;   // su silla y a donde va
+    if (x < c.x + 0.2 || x > c.x + c.w - 0.2 || y < c.y + 0.2 || y > c.y + c.h - 0.2) return false;
+    return !BLOQUES.some(b => x > b[0] - HOLGURA && x < b[2] + HOLGURA && y > b[1] - HOLGURA && y < b[3] + HOLGURA);
+  }
+  function rodea(de, a, c) {
+    const directo = (p, q) => { const n = Math.ceil(Math.hypot(q[0] - p[0], q[1] - p[1]) / 0.08); for (let k = 1; k < n; k++) { const t = k / n; if (!libre(p[0] + (q[0] - p[0]) * t, p[1] + (q[1] - p[1]) * t, c, de, a)) return false; } return true; };
+    if (directo(de, a)) return [a];
+    const W = Math.ceil(c.w / PASO), H = Math.ceil(c.h / PASO), id = (i, j) => j * W + i;
+    const celda = p => [Math.max(0, Math.min(W - 1, Math.floor((p[0] - c.x) / PASO))), Math.max(0, Math.min(H - 1, Math.floor((p[1] - c.y) / PASO)))];
+    const centro = (i, j) => [c.x + (i + 0.5) * PASO, c.y + (j + 0.5) * PASO];
+    const [si, sj] = celda(de), [fi, fj] = celda(a), g = new Map([[id(si, sj), 0]]), vino = new Map(), abiertos = [[0, si, sj]], cerrados = new Set();
+    while (abiertos.length) {
+      abiertos.sort((x, y) => x[0] - y[0]); const [, i, j] = abiertos.shift(), k = id(i, j);
+      if (cerrados.has(k)) continue; cerrados.add(k);
+      if (i === fi && j === fj) break;
+      for (const [di, dj] of [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]]) {
+        const ni = i + di, nj = j + dj; if (ni < 0 || nj < 0 || ni >= W || nj >= H) continue;
+        const [cx, cy] = centro(ni, nj); if (!libre(cx, cy, c, de, a)) continue;
+        if (di && dj && (!libre(...centro(i + di, j), c, de, a) || !libre(...centro(i, j + dj), c, de, a))) continue;   // no cortar esquinas de un mueble
+        const nk = id(ni, nj), ng = g.get(k) + Math.hypot(di, dj);
+        if (ng < (g.has(nk) ? g.get(nk) : Infinity)) { g.set(nk, ng); vino.set(nk, k); abiertos.push([ng + Math.hypot(fi - ni, fj - nj), ni, nj]); }
+      }
+    }
+    if (!vino.has(id(fi, fj))) return [a];   // sin salida (no debería pasar): directo
+    const celdas = []; for (let k = id(fi, fj); k !== id(si, sj); k = vino.get(k)) celdas.unshift(centro(k % W, Math.floor(k / W)));
+    const pts = [de].concat(celdas.slice(0, -1), [a]), rect = [de];   // se endereza: solo las vueltas necesarias
+    for (let k = 1; k < pts.length; k++) if (!directo(rect[rect.length - 1], pts[k])) rect.push(pts[k - 1]);
+    rect.push(a); return rect.slice(1);
   }
 
   // ---------- La vida: los monitos se mueven solos ----------
@@ -285,7 +338,14 @@
     if (fuera) {
       const [x, y] = iso(a.pos[0], a.pos[1]), l = x - 18, r = x + 18, t = y - a.alto - 10, b = y + 4;
       let lo = 0, hi = hijos.length;
-      hijos.forEach((h, i) => { const m = h._m || (h._m = h.dataset.m ? h.dataset.m.split(',').map((v, k) => k ? Number(v) : v) : 0); if (!m) return;
+      hijos.forEach((h, i) => {
+        if (h.dataset.f) {   // un mueble: va encima si el monito no lo ha rebasado (ni por su lado derecho ni por el de enfrente)
+          const f = h._f || (h._f = h.dataset.f.split(',').map(Number)), sb = h._sb || (h._sb = h.getBBox());
+          if (sb.x + sb.width <= l || sb.x >= r || sb.y + sb.height <= t || sb.y >= b) return;
+          const delante = !(a.pos[0] >= f[2] - 0.02 || a.pos[1] >= f[3] - 0.02);
+          if (delante) hi = Math.min(hi, i); else lo = Math.max(lo, i + 1); return;
+        }
+        const m = h._m || (h._m = h.dataset.m ? h.dataset.m.split(',').map((v, k) => k ? Number(v) : v) : 0); if (!m) return;
         const [eje, linea, ml, mt, mr, mb] = m; if (mr <= l || ml >= r || mb <= t || mt >= b) return;
         const detras = eje === 'y' ? a.pos[1] < linea : a.pos[0] < linea;   // la pared queda entre él y la vista
         if (detras) hi = Math.min(hi, i); else lo = Math.max(lo, i + 1); });
@@ -375,7 +435,14 @@
     const as = (O.asistentes && O.asistentes.lista) || [];
     const R = id => CUARTOS.find(c => c.id === id);
     let fondo = '', cosas = [], LETREROS = '';   // cosas: [profundidad, svg]
-    const pon = (x, y, svg) => cosas.push([x + y, svg]);
+    PEND = []; BLOQUES = [];
+    const pon = (x, y, svg) => {
+      const f = PEND; PEND = [];
+      if (!f.length || /data-actor/.test(svg)) return cosas.push([x + y, svg]);
+      const u = [Math.min(...f.map(b => b[0])), Math.min(...f.map(b => b[1])), Math.max(...f.map(b => b[2])), Math.max(...f.map(b => b[3]))];
+      BLOQUES.push(...f.filter(b => (b[2] - b[0]) * (b[3] - b[1]) > 0.02));   // lo chiquito (una taza, una pata) va dentro de su mueble
+      cosas.push([x + y, svg, ` data-f="${u.map(v => v.toFixed(2)).join(',')}"`]);
+    };
 
     // Pasillos: por aquí caminan los monitos de un cuarto a otro
     PASILLOS.forEach(([x0, y0, x1, y1]) => { fondo += `<polygon points="${P([iso(x0, y0), iso(x1, y0), iso(x1, y1), iso(x0, y1)])}" fill="#5b6b68"/>`; });
@@ -470,6 +537,7 @@
       lado('frente', c.y + c.h, c.x, c.x + c.w, 'x', 12, gris ? '#9a9c99' : '#b7c6b4', 0, 0.16);
       lado('derecha', c.x + c.w, c.y, c.y + c.h, 'y', 12, gris ? '#868885' : '#a2b4a1', 0.16, 0);
     });
+    PEND = [];   // lo que dibujaron las paredes no es mueble
     // vida: plantas en las esquinas, archiveros, sillón de espera en recepción, tapetes
     [[0.4, 4.5], [16.5, 0.5], [25.5, 0.5], [5.6, 6.4], [16.5, 18.5], [25.5, 11.5], [21.5, 18.5], [0.4, 17.5]].forEach(([x, y]) => planta(x, y));
     archivero(4.6, 0.15); archivero(0.15, 6.2); archivero(7.2, 12.2); archivero(22.2, 13.3); archivero(23, 13.3); archivero(24.6, 16);
@@ -562,6 +630,6 @@ ${fondo}${LETREROS}<g class="escena">${cosas.map(c => `<g class="d" data-d="${c[
   // La pausa se vence sola (nunca se queda todo congelado); 'fija' solo mientras la oficina está tapada por otra pantalla
   // del Tablero (así un CRM encima no va a saltos en celulares lentos) y se suelta al volver al mapa.
   function pausa(si) { if (VIDA) VIDA.pausaHasta = si === 'fija' ? Infinity : si ? performance.now() + 350 : 0; }
-  const api = { pausa, dibuja, MONO, luzDe, vida, ruta, cuartoEn, cargar, cargado: false };
+  const api = { pausa, dibuja, MONO, luzDe, vida, ruta, cuartoEn, cargar, cargado: false, bloques: () => BLOQUES, puertas: PUERTAS, agua: AGUA };
   window.Piel = api;
 })();
