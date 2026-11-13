@@ -268,11 +268,6 @@
   // Una sola tabla de tiempos (en segundos).
   const TIEMPO = { pasito: 0.5, paso: 0.6, idaMin: 18, idaMax: 70, quedarse: [3, 6], platica: 5, mas: 4, burbuja: 4 };
   let VIDA = null;
-  // Paredes altas (su caja en pantalla y su profundidad): si alguien camina detrás de una, se esconde completo.
-  let MUROS = [];
-  function tapado(a, key) { const [x, y] = iso(a.pos[0], a.pos[1]), c = { l: x - 14, r: x + 14, t: y - a.alto, b: y };
-    let area = 0; for (const m of MUROS) { if (m.d <= key) continue; const w = Math.min(c.r, m.r) - Math.max(c.l, m.l), h = Math.min(c.b, m.b) - Math.max(c.t, m.t); if (w > 0 && h > 0) area = Math.max(area, w * h); }
-    return area > 28 * a.alto * 0.25; }
   function vida(raiz, O, C) {
     if (!VIDA) VIDA = { actores: {}, previo: {}, reloj: 0, ultimo: performance.now() };
     const V = VIDA, capa = raiz.querySelector('.capa-vida') || (() => { const g = document.createElementNS('http://www.w3.org/2000/svg', 'g'); g.setAttribute('class', 'capa-vida'); raiz.querySelector('svg').appendChild(g); return g; })();
@@ -302,6 +297,24 @@
   // un punto un poco adentro de la puerta de un cuarto (para que Claude entre y se ponga a trabajar ahí)
   function adentro(id) { const [[ix, iy], [px, py]] = PUERTAS[id], dx = ix - px, dy = iy - py, n = Math.hypot(dx, dy) || 1; return [ix + dx / n * 1.1 - dy / n * 0.6, iy + dy / n * 1.1 + dx / n * 0.6]; }
   function burbujaDe(id, texto, color, seg) { const a = VIDA && VIDA.actores[id]; if (a) { a.burbuja = { texto, color, hasta: VIDA.reloj + seg }; colocar(a); } }
+  // DÓNDE VA EL QUE CAMINA ENTRE LO DIBUJADO (de atrás hacia adelante). Las paredes son delgadas: con un solo número
+  // de profundidad, la pared de junto podía quedar debajo y la cabeza "atravesaba" la pared. Regla de raíz: una
+  // pared que toca su figura en pantalla va ENCIMA si la pared queda entre él y la vista (él está del otro lado de
+  // su línea), y DEBAJO si él está del lado de la vista. Para lo demás manda la profundidad.
+  function acomodo(caja_, a, prof, fuera) {
+    const esc_ = caja_.parentNode, hijos = [...esc_.children].filter(h => h !== caja_);
+    let p = hijos.findIndex(h => Number(h.dataset.d) > prof); if (p < 0) p = hijos.length;
+    if (fuera) {
+      const [x, y] = iso(a.pos[0], a.pos[1]), l = x - 18, r = x + 18, t = y - a.alto - 10, b = y + 4;
+      let lo = 0, hi = hijos.length;
+      hijos.forEach((h, i) => { const m = h._m || (h._m = h.dataset.m ? h.dataset.m.split(',').map((v, k) => k ? Number(v) : v) : 0); if (!m) return;
+        const [eje, linea, ml, mt, mr, mb] = m; if (mr <= l || ml >= r || mb <= t || mt >= b) return;
+        const detras = eje === 'y' ? a.pos[1] < linea : a.pos[0] < linea;   // la pared queda entre él y la vista
+        if (detras) hi = Math.min(hi, i); else lo = Math.max(lo, i + 1); });
+      p = lo <= hi ? Math.min(Math.max(p, lo), hi) : hi;
+    }
+    const sig = hijos[p] || null; if (sig !== caja_.nextSibling) esc_.insertBefore(caja_, sig);
+  }
   function colocar(a) {
     if (!a.g || !a.g.isConnected) return;
     const [x0, y0] = iso(a.casa[0], a.casa[1]), [x1, y1] = iso(a.pos[0], a.pos[1]);
@@ -320,15 +333,10 @@
     const fuera = a.fuera = Math.hypot(a.pos[0] - a.casa[0], a.pos[1] - a.casa[1]) > 0.05;
     const caja_ = a.g.closest('g.d');
     if (caja_) { if (!caja_.dataset.d0) caja_.dataset.d0 = caja_.dataset.d;   // en su lugar conserva su profundidad original (va encima de su silla)
-      const prof = fuera ? Math.round((a.pos[0] + a.pos[1]) * 4) / 4 : Number(caja_.dataset.d0);
-      if (caja_.dataset.d !== String(prof)) { caja_.dataset.d = String(prof); const esc_ = caja_.parentNode;
-        let sig = null; for (const h of esc_.children) { if (h !== caja_ && Number(h.dataset.d) > prof) { sig = h; break; } }
-        if (sig !== caja_.nextSibling) esc_.insertBefore(caja_, sig); } }
+      const prof = fuera ? a.pos[0] + a.pos[1] : Number(caja_.dataset.d0);
+      const llave = fuera ? a.pos.map(v => Math.round(v * 8)).join(',') : 'casa';
+      if (caja_.dataset.k !== llave) { caja_.dataset.k = llave; acomodo(caja_, a, prof, fuera); } }
     const etq = VIDA.raiz && VIDA.raiz.querySelector(`[data-de="${a.id}"]`); if (etq) etq.style.visibility = fuera ? 'hidden' : '';
-    // Detrás de una pared alta: el monito se esconde completo (con un desvanecido corto), para que nunca se vea
-    // la cabeza saliendo de la pared (Kid, 13-nov-2026). Al salir de detrás, vuelve a aparecer igual de suave.
-    const tras = fuera && im && tapado(a, a.pos[0] + a.pos[1]);
-    a.g.style.opacity = tras ? '0' : '';
     let b = a.g.querySelector('.burbuja');
     if (a.burbuja && VIDA.reloj < a.burbuja.hasta) {
       if (!b) { b = document.createElementNS('http://www.w3.org/2000/svg', 'g'); b.setAttribute('class', 'burbuja'); a.g.appendChild(b); }
@@ -385,7 +393,7 @@
   // ---------- el dibujo completo ----------
   function dibuja(O, C, sel, hora) {
     const [lc, lo] = LUZ[luzDe(hora)];
-    ETQ = []; CUERPOS = []; MUROS = [];
+    ETQ = []; CUERPOS = [];
     const as = (O.asistentes && O.asistentes.lista) || [];
     const R = id => CUARTOS.find(c => c.id === id);
     let fondo = '', cosas = [], LETREROS = '';   // cosas: [profundidad, svg]
@@ -472,9 +480,10 @@
             svg += tramo(...pt(ha - 0.06), ...pt(ha + 0.06), marco, '#7a5230') + tramo(...pt(hb - 0.06), ...pt(hb + 0.06), marco, '#7a5230');
             if (alto > 20) svg += tramo(...pt(ha), ...pt(hb), MURO - 34, col, 34, gx, gy); else svg += tramo(...pt(ha - 0.06), ...pt(hb + 0.06), 4, '#7a5230', 32);
           }
-          cosas.push([prof, `<g data-c="${c.id}">${svg}</g>`]);
-          if (alto > 20) { const ps = [iso(...pt(k0)), iso(...pt(k1)), iso(...pt(k1), alto), iso(...pt(k0), alto)];
-            MUROS.push({ d: prof, l: Math.min(...ps.map(q => q[0])), r: Math.max(...ps.map(q => q[0])), t: Math.min(...ps.map(q => q[1])), b: Math.max(...ps.map(q => q[1])) }); }
+          const ps = [iso(...pt(k0)), iso(...pt(k1)), iso(...pt(k1), Math.max(alto, 34)), iso(...pt(k0), Math.max(alto, 34))];
+          const caj = [Math.min(...ps.map(q => q[0])), Math.min(...ps.map(q => q[1])), Math.max(...ps.map(q => q[0])), Math.max(...ps.map(q => q[1]))].map(v => v.toFixed(1)).join(',');
+          cosas.push([prof, `<g data-c="${c.id}">${svg}</g>`, ` data-m="${eje === 'x' ? 'y' : 'x'},${fijo},${caj}"`]);
+
         }
       };
       const gris = c.id === 'gris' || c.id === 'cerrado';
@@ -569,7 +578,7 @@
       svg: `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="display:block;overflow:visible">
         <defs><filter id="brillo" x="-1" y="-1" width="3" height="3"><feGaussianBlur stdDeviation="4"/></filter>
           <linearGradient id="piso" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".10"/><stop offset="1" stop-color="#000" stop-opacity=".18"/></linearGradient></defs>
-${fondo}${LETREROS}<g class="escena">${cosas.map(c => `<g class="d" data-d="${c[0].toFixed(3)}">${c[1]}</g>`).join('')}</g>${acomodar()}
+${fondo}${LETREROS}<g class="escena">${cosas.map(c => `<g class="d" data-d="${c[0].toFixed(3)}"${c[2] || ''}>${c[1]}</g>`).join('')}</g>${acomodar()}
       </svg>`,
     };
   }
