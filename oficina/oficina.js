@@ -93,7 +93,10 @@ small{font-size:15px;font-weight:600}
 .msj{padding:10px 12px;border-radius:14px;margin:8px 0;background:#24242b;white-space:pre-wrap}
 .msj.yo{background:#33333b;color:var(--suave)}
 #raiz{position:relative;width:100%;height:var(--alto)}
-button.fila{text-align:left}
+button.fila{text-align:left;position:relative;padding-right:30px}
+button.fila::after{content:'›';position:absolute;right:4px;top:50%;transform:translateY(-50%);color:var(--azul);font-size:28px;font-weight:700;line-height:1}
+#aResumen{padding-right:0}
+#aResumen::after{content:none}
 .fila.mas{color:var(--azul);font-weight:800}
 `;
 const CUERPO = `
@@ -343,6 +346,7 @@ function pintarInfo(refresco) {
     h += `<p class="titulo">IAs · ${suma(ias)} al mes</p><p class="contexto chico">Las herramientas de inteligencia artificial que pagamos. La barra muestra cuánto falta para el siguiente cobro: verde hay tiempo, amarillo se acerca, rojo es hoy o ya pasó.</p>` + ias.map(vida).join('') + `<p class="titulo">Otras · ${suma(otras)} al mes</p>` + otras.map(vida).join('');
     const g = O.gasto || {}, p = O.publicaciones || {};
     h += `<p class="titulo">Esta semana</p><div class="fila">$${g.usd7d || 0} USD de los asistentes<small>${(g.creditos7d || 0).toLocaleString('es-MX')} créditos de ElevenLabs</small></div>`;
+    h += '<p class="titulo">Lo último que pasó</p>' + ((O.actividad && O.actividad.lineas) || []).slice(0, 6).map(l => `<div class="fila">${esc(l.texto)}<small>${esc(l.quien)} · ${hace(l.hora)}</small></div>`).join('');
     h += `<div class="fila">Publicaciones hoy: ${p.total || 0} de ${p.tope || 100}${p.fallidas ? ` · <span class="aviso">${p.fallidas} fallaron</span>` : ''}<small>Medido ${hace((O.medicion || {}).actualizado)}</small></div>`;
   } else if (sel.tipo === 'asistente') {
     const a = as.find(x => x.id === sel.id) || {}; t = a.nombre || 'Asistente';
@@ -361,19 +365,18 @@ function pintarInfo(refresco) {
     t = 'Jason · recepcionista';
     const jas = as.find(a => a.id === 'jason') || {}, tel = String(jas.telefono || '');
     const telBonito = tel.replace(/^\+52(\d{2})(\d{4})(\d{4})$/, '+52 $1 $2 $3');
-    h = '<p class="contexto">Jason es el recepcionista de MOON Digital: contesta las llamadas de quien se interesa en nosotros, le explica qué hacemos y le aparta una cita con el equipo. Todo lo que platica queda en el CRM.</p>';
-    if (tel) h += `<p class="contexto chico">Su número es ${esc(telBonito)}: es el que se le da a los clientes. Llámale para escuchar cómo contesta.</p>`;
+    h = '<p class="contexto">Contesta nuestro teléfono, explica qué hacemos y aparta citas con el equipo.</p>';
+    if (tel) h += `<p class="contexto chico">Su número: ${esc(telBonito)}</p>`;
     h += `<div class="acciones">${tel ? `<a class="accion" href="tel:${esc(tel)}">Llamar a Jason</a>` : ''}<button class="accion" data-abre='{"tipo":"citas"}'>Citas que apartó</button></div>`;
-    const prox = ((C && C.citas) || []).filter(c => Date.parse(c.inicio) > Date.now() - 36e5 && !Number(c.prueba)).slice(0, 3);
+    const prox = ((C && C.citas) || []).filter(c => Date.parse(c.inicio) > Date.now() - 36e5 && !Number(c.prueba)).slice(0, 2);
     h += '<p class="titulo">Próximas citas</p>' + (prox.length ? prox.map(c => `<button class="fila" data-abre="${esc(JSON.stringify({ tipo: 'cita', id: c.id }))}">${esc(c.negocio || c.nombre || 'Sin nombre')}<small>${fechaC(c.inicio)} · ${esc(c.tipo || c.canal || '')}${c.necesidad ? ' · ' + esc(c.necesidad) : ''}</small></button>`).join('') : '<div class="fila">No hay citas próximas.<small>Cuando Jason aparte una, aparece aquí.</small></div>');
-    h += '<p class="titulo">Sus llamadas</p><p class="contexto chico">Las que dicen Prueba las hicimos nosotros.</p>';
-    const ll = ((C && C.llamadas) || []).slice(0, 12);
+    h += '<p class="titulo">Sus últimas llamadas</p>';
+    const ll = ((C && C.llamadas) || []).slice(0, 4);
     h += ll.length ? ll.map(l => { const d = datosLlamada(l); const per = ((C && C.personas) || []).find(p => p.tel === l.quien) || {};
-      return `<button class="fila" data-llamada="${esc(String(l.id))}"><span class="etq${Number(l.prueba) ? '' : ' cli'}">${Number(l.prueba) ? 'Prueba' : 'Cliente'}</span> ${esc(per.negocio || d.negocio || per.nombre || d.nombre || 'Sin nombre')}<small>${esc(l.resumen || '')} · ${hace(l.fecha)}</small></button>`; }).join('') + (((C && C.llamadas) || []).length > 12 ? `<button class="fila mas" data-abre='{"tipo":"llamadas"}'>Ver todas las llamadas</button>` : '') : '<p class="fila">Todavía no hay llamadas.</p>';
+      return `<button class="fila" data-llamada="${esc(String(l.id))}"><span class="etq${Number(l.prueba) ? '' : ' cli'}">${Number(l.prueba) ? 'Prueba' : 'Cliente'}</span> ${esc(per.negocio || d.negocio || per.nombre || d.nombre || 'Sin nombre')}<small>${esc(l.resumen || '')} · ${hace(l.fecha)}</small></button>`; }).join('') + (((C && C.llamadas) || []).length > 4 ? `<button class="fila mas" data-abre='{"tipo":"llamadas"}'>Ver todas las llamadas</button>` : '') : '<p class="fila">Todavía no hay llamadas.</p>';
   } else if (sel.tipo === 'cubiculos') {
     t = 'Equipo';
-    h = '<p class="contexto">Las personas de MOON. Cada quien aparece sentado en su cubículo cuando está en su horario de trabajo. Claude, el monito naranja, es el técnico: camina al cuarto donde está trabajando y abajo ves lo último que hizo.</p>' + (O.cubiculos || []).map(u => `<div class="fila"><span class="luz ${u.presente ? 'verde' : 'gris'}"></span> ${NOMBRE[u.id]}<small>${u.de}:00 a ${u.a}:00, lunes a viernes · ${u.presente ? 'en su horario' : 'fuera de horario'}</small></div>`).join('');
-    h += '<p class="titulo">Lo último que pasó</p>' + ((O.actividad && O.actividad.lineas) || []).slice(0, 6).map(l => `<div class="fila">${esc(l.texto)}<small>${esc(l.quien)} · ${hace(l.hora)}</small></div>`).join('');
+    h = '<p class="contexto">Las personas de MOON. Cada quien aparece sentado en su cubículo cuando está en su horario. Claude, el monito naranja, es el técnico: camina al cuarto donde está trabajando.</p>' + (O.cubiculos || []).map(u => `<div class="fila"><span class="luz ${u.presente ? 'verde' : 'gris'}"></span> ${NOMBRE[u.id]}<small>${u.de}:00 a ${u.a}:00, lunes a viernes · ${u.presente ? 'en su horario' : 'fuera de horario'}</small></div>`).join('');
     h += '<p class="titulo">Del equipo</p>'
       + `<button class="fila" data-abre='{"tipo":"cuenta"}'>Tu cuenta<small>Tu foto, tu frase, el tamaño de la letra y cerrar sesión.</small></button>`
       + `<button class="fila" data-abre='{"tipo":"equipo"}'>Equipo y embajadores<small>Quién entra a la oficina, los embajadores, sus comisiones y la papelera.</small></button>`
@@ -390,7 +393,7 @@ function pintarInfo(refresco) {
     const PRUEBAS = '<p class="titulo">Copias y pruebas</p><p class="contexto chico">Las usamos para probar cambios sin tocar a los asistentes de verdad. Nadie de afuera las usa.</p>' + as.filter(a => ['prueba', 'base', 'copia'].includes(a.tipo) && a.id !== 'donde').map(a => filaAsistente(a, true)).join('');
     t = 'Cuarto gris · dijeron que no'; h = '<p class="contexto">Asistentes que hicimos para alguien que dijo que no, o que dejamos de usar. Se guardan aquí, sin borrarlos, por si algún día se retoman o para reusar lo que ya funcionó en otro cliente.</p>' + as.filter(a => a.tipo === 'dijo_no' || a.tipo === 'archivado' || a.id === 'donde').map(a => filaAsistente(a, true)).join('') + PRUEBAS;
   } else if (sel.tipo === 'oracion') {
-    t = 'Cuarto de oración'; h = '<p class="contexto">Aquí está Jesús. Es el cuarto para detenernos, dar gracias y pedir guía antes de seguir: todo lo que hacemos empieza y termina con Él.</p>';
+    t = 'Cuarto de oración'; h = '<p class="contexto">Jesús, el que todo lo hace posible, el que nos apoya en nuestro trabajo.</p>';
 
   }
   if (sel.tipo !== 'resumen') h = `<button class="fila" id="aResumen" style="color:var(--azul)">‹ Volver</button>` + h;
