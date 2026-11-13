@@ -20,6 +20,10 @@ P = {
  'cielo':    ((205,155,115),(150,60,30),(120,180,230),(240,240,235),(30,30,32),0,0,0,-1.00),
  'rosa':     ((245,215,190),(180,120,60),(230,110,160),(230,110,160),(30,30,32),0,0,0,-1.40),
  'lila':     ((165,115,80),(30,24,22),(150,120,200),(240,240,235),(240,240,235),0,0,0,-1.30),
+ # Papá (Kid, 13-nov-2026): pelo castaño, playera azul, pantalón café, zapatos azules
+ 'papa':     ((246,209,169),(95,60,32),(45,90,190),(110,74,44),(45,90,190),0.6,16,-0.62,None),
+ # Dan: rubio un poco más oscuro que Kid, playera negra, jeans azul, tenis negros
+ 'dan':      ((246,209,169),(185,140,62),(34,34,38),(62,92,150),(30,30,32),0.5,14,-0.62,None),
  # Jason: todo blanco
  'jason':    ((236,236,232),(214,214,210),(245,245,242),(228,228,224),(250,250,248),0.48,14,-0.62,None),
  # Claude: todo naranja, sin miedo (piel, pelo, ropa y tenis)
@@ -42,6 +46,7 @@ def receta(n):
                MANGA_COL=lin(pl), DOB_COL=lin(tuple(int(v * 0.75) for v in pl)), PANT_COL=lin(pa), FRANJA_COL=lin(te),
                PIEL_LADO=lin(tuple(int(v * 0.94) for v in piel)), PIEL_BRAZO=lin(piel), TENIS_Y0='462', TENIS_Y1='480', CEJA=','.join(str(int(v)) for v in pelo))
     if largo is None: env.update(FLECO=str(fl), PICO=str(pi), NUCA=str(nuca))
+    if n in ('papa', 'dan'): env.update(TENIS_Y0='450', TENIS_Y1='500')   # zapatos completos de su color (no solo una franja)
     else: env.update(PERSONAJE='monita_' + n, FLECO='0.52', FLECO_LISO='1', LADO_A='55', LADO_B='110', NUCA='-1.05', PELO_LARGO3D='1', PELO_LARGO=str(largo), PELO_DESDE='60')
     return env
 def correr(n):
