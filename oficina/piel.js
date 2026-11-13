@@ -27,7 +27,7 @@
     { id: 'crea', n: 'Crea tu recepcionista', x: 0, y: 14, w: 6, h: 4, piso: '#4d7a72', herramienta: 'crea' },
     { id: 'gris', n: 'Cuarto gris · dijeron que no', x: 7, y: 15, w: 10, h: 4, piso: '#6b4e36' },
     { id: 'oracion', n: 'Oración', x: 18, y: 13, w: 4, h: 6, piso: '#8a7860' },
-    { id: 'cerrado', n: 'Archivo · pruebas', x: 22, y: 13, w: 4, h: 6, piso: '#8b8478' },
+    { id: 'cerrado', n: 'Estado', x: 22, y: 13, w: 4, h: 6, piso: '#4b6c70' },   // Kid, 13-nov-2026: cómo va MOON (antes Archivo)
   ];
   const LUZ = { mostaza: ['#e0a53c', 0.16], amarilla: ['#f4d56a', 0.12], morada: ['#6b4fd0', 0.22] };
   const COLOR = { verde: '#3ccf7a', amarillo: '#f2c230', rojo: '#ef4b4b', gris: '#7d7d86' };
@@ -407,7 +407,7 @@
       libreria: { atras: { 4: 'ventana' } },
       crea: { atras: { 2: 'pizarron' }, izquierda: { 1: 'ventana' } },
       oracion: { atras: { 3: 'ventana' }, izquierda: { 3: 'cruz' } },
-      cerrado: { izquierda: { 3: 'rejilla' } },
+      cerrado: { izquierda: { 3: 'pizarron' } },
     };
     function adorno(c, lado, i, pt) {
       const que = ((ADORNOS[c.id] || {})[lado] || {})[i - (lado === 'atras' ? c.x : c.y)]; if (!que) return '';
@@ -464,7 +464,7 @@
 
         }
       };
-      const gris = c.id === 'gris' || c.id === 'cerrado';
+      const gris = c.id === 'gris';
       lado('atras', c.y, c.x, c.x + c.w, 'x', MURO, gris ? '#8d8f8c' : '#a9bba9', 0, -0.16);
       lado('izquierda', c.x, c.y, c.y + c.h, 'y', MURO, gris ? '#7b7d7a' : '#93a894', -0.16, 0);
       lado('frente', c.y + c.h, c.x, c.x + c.w, 'x', 12, gris ? '#9a9c99' : '#b7c6b4', 0, 0.16);
@@ -541,11 +541,8 @@
     // Garrafón de agua en el cruce de pasillos (a donde van por agua)
     pon(AGUA[0], AGUA[1], caja(AGUA[0] - 0.24, AGUA[1] - 0.24, 0.48, 0.48, 28, ['#f1f1ec', '#d6d6cf', '#bdbdb5']) + caraY(AGUA[0] - 0.1, AGUA[0] + 0.1, AGUA[1] + 0.24, 16, 20, '#3a6fb0')
       + (() => { const [gx, gy] = iso(AGUA[0], AGUA[1], 28); return `<path d="M${gx - 11},${gy - 1} v-20 q0,-6 11,-7 q11,1 11,7 v20 q-11,6 -22,0 z" fill="#5aa6e6" opacity=".9"/><path d="M${gx - 11},${gy - 21} q11,6 22,0" stroke="#3a86c6" fill="none"/><rect x="${gx - 4}" y="${gy - 31}" width="8" height="5" rx="2" fill="#3a86c6"/><path d="M${gx - 6},${gy - 16} v10" stroke="#ffffffaa" stroke-width="3" stroke-linecap="round"/>`; })());
-    // Archivo (puerta cerrada): una puerta con candado
-    const [qx, qy] = iso(24, 13, 0);
-    fondo += `<g data-c="cerrado"><polygon points="${P([iso(23.2, 13, 0), iso(24.8, 13, 0), iso(24.8, 13, 38), iso(23.2, 13, 38)])}" fill="#2a2a2f" stroke="#77757f"/><circle cx="${qx + 6}" cy="${qy - 18}" r="3" fill="#c9a64a"/></g>`;
-    const nPruebas = as.filter(a => ['prueba', 'base', 'copia'].includes(a.tipo) && a.id !== 'donde').length;
-    pon(24, 16.5, etiqueta(...iso(24, 16.5), nPruebas + ' guardados'));
+    // Estado: cuántas cosas hay que atender (el detalle está en el panel al tocar el cuarto)
+    { const n = O.porAtender || 0; pon(24, 16.5, etiqueta(...iso(24, 16.5), n ? n + ' por atender' : 'Todo en orden')); }
     // Cuarto de oración: solo Jesús, con dos velitas
     [[19.7, 17.7], [21.4, 17.5]].forEach(([x, y]) => pon(x, y, caja(x - 0.15, y - 0.15, 0.3, 0.3, 10, ['#efe6d2', '#cfc4ad', '#b9ae98']) + (() => { const [vx, vy] = iso(x, y, 16); return `<circle cx="${vx}" cy="${vy}" r="10" fill="#ffcf6b" opacity=".35" filter="url(#brillo)"/><ellipse cx="${vx}" cy="${vy}" rx="2.2" ry="4" fill="#ffd97a"/>`; })()));
     pon(20.2, 15.5, monito(20.2, 15.5, { id: 'jesus', piel3d: 'jesus', cuarto: 'oracion', nombre: 'Jesús', ropa: '#efe6d2', pelo: '#4a2c18' }));

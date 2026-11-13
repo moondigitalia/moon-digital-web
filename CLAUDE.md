@@ -18,6 +18,9 @@ botón de editar, documentos) y se perdieron horas en lo que ya funcionaba.
   (el dibujo, intacto). Sus estilos no tocan al Tablero ni el Tablero a ellos.
 - Los embajadores nunca ven el mapa (enseña dinero): siguen con su propia pantalla.
 - Mientras una pantalla del Tablero está abierta encima, los monitos se pausan (celulares lentos).
+- Panel de abajo con POCO texto y en orden (Kid, 13-nov-2026): al abrir, un vistazo de 4 renglones que llevan a su
+  cuarto; lo largo (alertas, lo que pagamos, gasto) vive en el cuarto Estado. Lo que escribe una persona (nombre, `para`,
+  teléfono) vive en el cajón `a_mano` de la base: el robot de cada hora nunca lo toca.
 
 ## Jueces antes de publicar
 - Oficina: `bash pruebas/oficina/correr.sh` (las 6 reglas en 15 pantallas, reducir movimiento y procesador lento, y la

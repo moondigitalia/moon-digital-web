@@ -203,6 +203,7 @@ function dibujarMundo() {
   if (window.Piel) {
     const luz = new URLSearchParams(location.search).get('luz');
     const hora = luz === 'morada' ? 21 : luz === 'amarilla' ? 15 : luz === 'mostaza' ? 9 : (O.ahora ? O.ahora.hora : 12);
+    O.porAtender = alertas().length;
     const r = Piel.dibuja(O, C, sel, hora);
     const cambio = MUNDO.w !== r.ancho; MUNDO.w = r.ancho; MUNDO.h = r.alto; MUNDO.mono = r.monito;
     const m = $('#mundo'); m.style.width = r.ancho + 'px'; m.style.height = r.alto + 'px'; m.innerHTML = r.svg;
@@ -317,9 +318,23 @@ function pintarInfo(refresco) {
   const as = (O.asistentes && O.asistentes.lista) || [];
   let t = '', h = '';
   if (sel.tipo === 'resumen') {
-    t = 'Cómo va MOON';
+    // Al abrir: poco texto (Kid, 13-nov-2026). Lo de cómo va MOON vive en el cuarto Estado.
+    t = 'Oficina MOON';
+    const n = alertas().length, ll = (C && C.llamadas) || [], hoy = ll.filter(l => Date.now() - Date.parse(l.fecha) < 864e5).length;
+    const prox = ((C && C.citas) || []).filter(c => Date.parse(c.inicio) > Date.now() - 36e5 && !Number(c.prueba)).length;
+    const cli = as.filter(a => a.tipo === 'cliente'), malos = cli.filter(a => a.estado === 'rojo').length;
+    const g = O.gasto || {};
+    const ir = (cuarto, titulo, linea, clase) => `<button class="fila${clase ? ' ' + clase : ''}" data-cuarto="${cuarto}">${titulo}<small>${linea}</small></button>`;
+    // Un vistazo corto y en orden (Kid, 13-nov-2026): cada renglón lleva a su cuarto; el detalle largo vive en Estado.
+    h = '<p class="contexto">Toca cualquier cuarto o monito del mapa y aquí te explico qué es y para qué sirve.</p>'
+      + ir('cerrado', n ? `${n} ${n === 1 ? 'cosa' : 'cosas'} por atender` : 'Todo en orden', 'Estado: alertas, lo que pagamos y lo que gastan los asistentes.', n ? 'alerta' : '')
+      + ir('recepcion', `Jason · ${hoy} llamada${hoy === 1 ? '' : 's'} hoy`, prox ? `${prox} cita${prox === 1 ? '' : 's'} próxima${prox === 1 ? '' : 's'} con el asesor` : 'Sin citas próximas')
+      + ir('clientes', `Clientes que pagan · ${cli.length}`, malos ? `${malos} con falla: la gente se está quedando sin respuesta` : 'Sus asistentes están contestando bien')
+      + ir('cerrado', `Esta semana · $${g.usd7d || 0} USD`, 'Lo que gastaron los asistentes en voz y respuestas.');
+  } else if (sel.tipo === 'cerrado') {
+    t = 'Estado';
     const al = alertas();
-    h += `<p class="contexto">Aquí ves de un vistazo cómo va el negocio: lo que necesita atención, lo que pagamos cada mes y cuánto gastan los asistentes. Toca cualquier cuarto o monito del mapa para ver su detalle.</p>`;
+    h += `<p class="contexto">Cómo va el negocio: lo que necesita atención, lo que pagamos cada mes y cuánto gastan los asistentes. Lo llena solo un robot cada hora.</p>`;
     if (al.length) h += `<p class="titulo">Atención</p>` + al.map(x => `<div class="fila alerta">${esc(x)}${x.por ? `<small>${esc(x.por)}</small>` : ''}</div>`).join('');
     const s = (O.suscripciones && O.suscripciones.lista) || [];
     const suma = l => { const o = {}; l.forEach(x => { o[x.moneda] = (o[x.moneda] || 0) + Number(x.monto); }); return Object.entries(o).map(([m, v]) => v.toLocaleString('es-MX', { maximumFractionDigits: 2 }) + ' ' + m).join(' + '); };
@@ -372,18 +387,19 @@ function pintarInfo(refresco) {
     h = `<p class="contexto">${esc(x.para || 'Un trabajo que se hace solo, a su hora, sin que nadie lo active.')}</p><div class="fila"><span class="luz ${x.resultado !== 'bien' || tarde ? 'rojo' : 'verde'}"></span> ${x.resultado === 'bien' && !tarde ? 'Trabajando bien' : tarde ? 'No está corriendo' : 'Algo falló'}<small>Lo pidió ${esc(x.deQuien || '')} · trabaja solo, sin que nadie lo active</small></div>`
       + `<div class="fila">Última vez<small>${hace(x.ultimaVez)} (${esc(x.resultado || '')})</small></div><div class="fila">Siguiente vez<small>${fechaC(x.siguiente)}</small></div>`;
   } else if (sel.tipo === 'gris') {
-    t = 'Cuarto gris · dijeron que no'; h = '<p class="contexto">Asistentes que hicimos para alguien que dijo que no, o que dejamos de usar. Se guardan aquí, sin borrarlos, por si algún día se retoman o para reusar lo que ya funcionó en otro cliente.</p>' + as.filter(a => a.tipo === 'dijo_no' || a.tipo === 'archivado' || a.id === 'donde').map(a => filaAsistente(a, true)).join('');
+    const PRUEBAS = '<p class="titulo">Copias y pruebas</p><p class="contexto chico">Las usamos para probar cambios sin tocar a los asistentes de verdad. Nadie de afuera las usa.</p>' + as.filter(a => ['prueba', 'base', 'copia'].includes(a.tipo) && a.id !== 'donde').map(a => filaAsistente(a, true)).join('');
+    t = 'Cuarto gris · dijeron que no'; h = '<p class="contexto">Asistentes que hicimos para alguien que dijo que no, o que dejamos de usar. Se guardan aquí, sin borrarlos, por si algún día se retoman o para reusar lo que ya funcionó en otro cliente.</p>' + as.filter(a => a.tipo === 'dijo_no' || a.tipo === 'archivado' || a.id === 'donde').map(a => filaAsistente(a, true)).join('') + PRUEBAS;
   } else if (sel.tipo === 'oracion') {
     t = 'Cuarto de oración'; h = '<p class="contexto">Aquí está Jesús. Es el cuarto para detenernos, dar gracias y pedir guía antes de seguir: todo lo que hacemos empieza y termina con Él.</p>';
-  } else if (sel.tipo === 'cerrado') {
-    t = 'Archivo · pruebas'; h = '<p class="contexto">Copias y pruebas que usamos para probar cambios sin tocar a los asistentes de verdad, y la plantilla de la que nacen los asistentes nuevos. Nadie de afuera las usa.</p>' + as.filter(a => ['prueba', 'base', 'copia'].includes(a.tipo) && a.id !== 'donde').map(a => filaAsistente(a, true)).join('');
+
   }
-  if (sel.tipo !== 'resumen') h = `<button class="fila" id="aResumen" style="color:var(--azul)">‹ Cómo va MOON</button>` + h;
+  if (sel.tipo !== 'resumen') h = `<button class="fila" id="aResumen" style="color:var(--azul)">‹ Volver</button>` + h;
   $('#infoT').textContent = t; k.innerHTML = h; k.scrollTop = y;
   const ar = $('#aResumen'); if (ar) ar.onclick = () => elegir({ tipo: 'resumen' });
 }
 
 $('#infoC').addEventListener('click', e => {
+  { const r = e.target.closest('[data-cuarto]'); if (r) return elegir({ tipo: r.dataset.cuarto, cuarto: r.dataset.cuarto }); }
   const b = e.target.closest('[data-abre],[data-llamada]'); if (!b) return;
   if (b.dataset.llamada) return T.verLlamada(b.dataset.llamada);
   try { T.abrir(JSON.parse(b.dataset.abre)); } catch (x) {}

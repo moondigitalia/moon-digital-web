@@ -2376,10 +2376,11 @@ const RECORRIDO = 'centro.moon.recorrido';
 // El recorrido de los socios es sobre la Oficina (el mapa): un cuarto a la vez, con qué es y para qué sirve.
 const PASOS_SOCIO = [
   ['#oficina', 'La oficina', 'Es MOON en un mapa: cada cuarto es una parte del negocio. Toca un cuarto o un monito y abajo te explica qué es.'],
-  ['#info', 'Lo que tocaste', 'Aquí se explica lo que tocaste. Lo que se puede abrir te lleva a su pantalla, y al cerrarla vuelves al mapa.'],
-  ['.cuarto[data-c="recepcion"]', 'Jason', 'Nuestro recepcionista: sus llamadas y las citas que apartó con el asesor.'],
+  ['.cuarto[data-c="cerrado"]', 'Estado', 'Cómo va MOON: lo que hay que atender, lo que pagamos cada mes y lo que gastan los asistentes.'],
+  ['.cuarto[data-c="recepcion"]', 'Jason', 'Nuestro recepcionista: llámale, ve sus llamadas y las citas que apartó con el asesor.'],
   ['.cuarto[data-c="crm"]', 'CRM', 'Todas las personas que nos han buscado, ordenadas por en qué van.'],
   ['.cuarto[data-c="clientes"]', 'Clientes que pagan', 'Sus asistentes y la ficha de cada cliente: contrato, documentos y cuánto lo usan.'],
+  ['.cuarto[data-c="libreria"]', 'Librería', 'Pregúntale a Jason lo que sea de MOON o de cómo se haría algo; si no lo sabe, lo busca en internet.'],
   ['.cuarto[data-c="crea"]', 'Crea tu recepcionista', 'Ármale un recepcionista a un cliente y mándale el link para que le hable.'],
   ['.cuarto[data-c="cubiculos"]', 'Equipo', 'Tu cuenta (foto, letra, cerrar sesión), el equipo, los embajadores y lo hecho en casa.'],
 ];
