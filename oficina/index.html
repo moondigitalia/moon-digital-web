@@ -72,6 +72,9 @@ small{font-size:15px;font-weight:600}
 .cuerpo{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;padding:4px 14px 18px;-webkit-overflow-scrolling:touch;overflow-wrap:anywhere}
 .fila{display:block;width:100%;padding:10px 0;border-bottom:1px solid #2a2a31}
 .fila small{display:block;color:var(--suave);font-size:15px;font-weight:600}
+.acciones{display:flex;gap:10px;margin:6px 0 4px;flex-wrap:wrap}
+.accion{flex:1 1 0;min-width:140px;text-align:center;padding:12px 14px;border-radius:999px;background:var(--azul);color:#101317;font-weight:800;font-size:16px;text-decoration:none}
+.accion+.accion{background:#2a2a31;color:#f3f2ee}
 .contexto{margin:10px 0 6px;font-size:16px;line-height:1.45;font-weight:600;color:#e9e8e3}
 .contexto.chico{font-size:14px;color:var(--suave);margin-top:4px}
 .titulo{font-size:14px;color:var(--suave);margin:14px 0 2px;letter-spacing:.03em}
@@ -323,6 +326,7 @@ function tocar(cx, cy) {
   const m = el.closest('[data-a]'), c = el.closest('[data-c]');
   if (m && m.dataset.a === 'claude') return elegir({ tipo: 'cubiculos', cuarto: 'cubiculos' });   // el robot naranja: lo último que pasó
   if (m && /^equipo-/.test(m.dataset.a)) return elegir({ tipo: 'cubiculos', cuarto: 'cubiculos' });
+  if (m && m.dataset.a === 'jason') return elegir({ tipo: 'recepcion', cuarto: 'recepcion' });   // Jason: lo útil de Jason (llamarle, sus citas y llamadas)
   if (m && /^robot-/.test(m.dataset.a)) return elegir({ tipo: 'robot', i: Number(m.dataset.a.slice(6)), cuarto: 'robots' });   // cada robot dice qué hace
   let cid = c ? c.dataset.c : null;
   if (!cid && window.Piel) { const r = of.getBoundingClientRect(); cid = Piel.cuartoEn((cx - r.left - vista.x) / vista.z, (cy - r.top - vista.y) / vista.z); }   // un mueble o el piso: el cuarto que está debajo
@@ -374,8 +378,14 @@ function pintarInfo(refresco) {
     if (sel.tipo === 'clientes' && ult) h += `<p class="titulo">Claude ahorita</p><div class="fila">${esc(ult.texto)}<small>${hace(ult.hora)}</small></div>`;
   } else if (sel.tipo === 'recepcion') {
     // Igual que las Llamadas del Tablero: quién (negocio), de qué se trató y cuándo; las de nosotros dicen "Prueba".
-    t = 'Jason · llamadas';
-    h = '<p class="contexto">Jason es el recepcionista de MOON Digital: contesta las llamadas y mensajes de quien se interesa en nosotros, toma sus datos y los deja en el CRM. Aquí ves sus llamadas más recientes; las que dicen Prueba las hicimos nosotros.</p>';
+    t = 'Jason · recepcionista';
+    const jas = as.find(a => a.id === 'jason') || {}, tel = String(jas.telefono || '');
+    const telBonito = tel.replace(/^\+52(\d{2})(\d{4})(\d{4})$/, '+52 $1 $2 $3');
+    h = '<p class="contexto">Jason es el recepcionista de MOON Digital: contesta las llamadas de quien se interesa en nosotros, le explica qué hacemos y le aparta una cita con el equipo. Todo lo que platica queda en el CRM.</p>';
+    if (tel) h += `<p class="contexto chico">Su número es ${esc(telBonito)}: es el que se le da a los clientes. Llámale para escuchar cómo contesta.</p><div class="acciones"><a class="accion" href="tel:${esc(tel)}">Llamar a Jason</a><a class="accion" href="/tablero?abrir=citas&volver=/oficina">Citas que apartó</a></div>`;
+    const prox = ((C && C.citas) || []).filter(c => Date.parse(c.inicio) > Date.now() - 36e5 && !Number(c.prueba)).slice(0, 3);
+    h += '<p class="titulo">Próximas citas</p>' + (prox.length ? prox.map(c => `<div class="fila">${esc(c.negocio || c.nombre || 'Sin nombre')}<small>${fechaC(c.inicio)} · ${esc(c.tipo || c.canal || '')}${c.necesidad ? ' · ' + esc(c.necesidad) : ''}</small></div>`).join('') : '<div class="fila">No hay citas próximas.<small>Cuando Jason aparte una, aparece aquí.</small></div>');
+    h += '<p class="titulo">Sus llamadas</p><p class="contexto chico">Las que dicen Prueba las hicimos nosotros.</p>';
     const ll = ((C && C.llamadas) || []).slice(0, 12);
     h += ll.length ? ll.map(l => { const d = datosLlamada(l); const per = ((C && C.personas) || []).find(p => p.tel === l.quien) || {};
       return `<div class="fila"><span class="etq${Number(l.prueba) ? '' : ' cli'}">${Number(l.prueba) ? 'Prueba' : 'Cliente'}</span> ${esc(per.negocio || d.negocio || per.nombre || d.nombre || 'Sin nombre')}<small>${esc(l.resumen || '')} · ${hace(l.fecha)}</small></div>`; }).join('') : '<p class="fila">Todavía no hay llamadas.</p>';
