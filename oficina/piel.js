@@ -206,11 +206,11 @@
     const [titulo, sub] = c.n.split(' · '), k = 64, max = c.w * k - 36;
     let fs1 = Math.min(36, max / (titulo.length * 0.68)), fs2 = sub ? Math.min(22, max / (sub.length * 0.56)) : 0;
     // dónde queda libre el piso de cada cuarto (medido contra sus muebles); 'y' = las letras corren a lo largo del otro lado
-    const LUGAR = { recepcion: [3, 4.35, 'x', 5], clientes: [12, 5.2], demos: [22, 5.3], cubiculos: [0.95, 8.8, 'y', 3.4], robots: [22, 11.3], crm: [9.6, 13.35], libreria: [14.5, 10.75], crea: [3, 17.45], gris: [12, 18.5], oracion: [18.75, 16.0, 'y', 2.4], cerrado: [24, 18.4] };
+    const LUGAR = { recepcion: [3, 4.35, 'x', 5], clientes: [12, 5.2], demos: [22, 5.3], cubiculos: [0.95, 8.8, 'y', 3.4, 'logo'], robots: [22, 11.3], crm: [9.6, 13.35], libreria: [14.5, 10.75], crea: [3, 17.45], gris: [12, 18.5], oracion: [18.75, 16.0, 'y', 2.4], cerrado: [24, 18.4] };
     const L = LUGAR[c.id] || [c.x + c.w / 2, c.y + c.h * 0.62], [ox, oy] = iso(L[0], L[1]);
     const largo = (L[3] || (L[2] === 'y' ? c.h : c.w)) * k - 36; if (L[2] === 'y' || L[3]) { fs1 = Math.min(36, largo / (titulo.length * 0.68)); fs2 = sub ? Math.min(22, largo / (sub.length * 0.56)) : 0; }
     const m = L[2] === 'y' ? `matrix(${TW / 2 / k},${-TH / 2 / k},${TW / 2 / k},${TH / 2 / k},${ox},${oy})` : `matrix(${TW / 2 / k},${TH / 2 / k},${-TW / 2 / k},${TH / 2 / k},${ox},${oy})`;
-    return `<g class="letrero" transform="${m}" fill="#fbfaf6" font-weight="900" text-anchor="middle" stroke="#1d2a2b" stroke-width="5" stroke-linejoin="round" paint-order="stroke" stroke-opacity=".55" style="pointer-events:none"><text x="0" y="${sub ? -fs2 - 8 : 0}" font-size="${fs1.toFixed(1)}" opacity=".92" letter-spacing="1">${esc(titulo.toUpperCase())}</text>${sub ? `<text x="0" y="0" font-size="${fs2.toFixed(1)}" opacity=".85">${esc(sub)}</text>` : ''}</g>`;
+    return `<g class="letrero" transform="${m}" fill="#fbfaf6" font-weight="900" text-anchor="middle" stroke="#1d2a2b" stroke-width="5" stroke-linejoin="round" paint-order="stroke" stroke-opacity=".55" style="pointer-events:none"><text x="0" y="${sub ? -fs2 - 8 : 0}" font-size="${fs1.toFixed(1)}" opacity=".92" letter-spacing="1">${esc(titulo.toUpperCase())}</text>${sub ? `<text x="0" y="0" font-size="${fs2.toFixed(1)}" opacity=".85">${esc(sub)}</text>` : ''}${L[4] === 'logo' ? `<image href="/oficina/logo-moon.webp" x="${-largo * 0.42}" y="12" width="${largo * 0.84}" height="${largo * 0.84 * 124 / 480}" opacity=".9"/>` : ''}</g>`;   // el logo de MOON abajo de "Equipo"
   }
   // nombre corto de una tarea: sin lo de entre paréntesis y a lo más ~16 letras sin cortar palabras
   function corto(n) { n = String(n || '').replace(/\s*\(.*?\)\s*/g, ' ').trim(); if (n.length <= 16) return n; const w = n.split(' '); let r = ''; for (const p of w) { if ((r + ' ' + p).trim().length > 16) break; r = (r + ' ' + p).trim(); } return r || n.slice(0, 16); }
@@ -533,10 +533,10 @@
     // Equipo: tres cubículos; si están en su horario, sentados; si no, la silla vacía
     const ROPA = { kid: '#2c2c34', daniel: '#40506e', dan: '#6e4a40' };
     (O.cubiculos || []).forEach((u, i) => {
-      const x = 2.4, y = 7.8 + i * 2;
+      const x = 3.2, y = 7.8 + i * 2;   // cubículos un poco a la derecha: deja libre el piso del nombre y el logo
       pon(x + 1.2, y + 0.9, mesa(x + 0.2, y + 0.45, 2, 0.85, { cajonera: true }) + compu(x + 0.95, y + 0.4, 22) + papeles(x + 0.3, y + 0.55, 22) + (i === 0 ? lampara(x + 2, y + 1.1, 22) : taza(x + 1.9, y + 0.9, 22)));
       silla(x + 1.2, y);
-      if (u.presente) pon(x + 1.2, y, monito(x + 1.2, y, { id: 'equipo-' + u.id, lado: [1.7, 0], actor: true, cuarto: 'cubiculos', nombre: ({ kid: 'Kid', daniel: 'Papá', dan: 'Dan' })[u.id], ropa: ROPA[u.id], sentado: true }));
+      if (u.presente) pon(x + 1.2, y, monito(x + 1.2, y, { id: 'equipo-' + u.id, lado: [1.15, 0], actor: true, cuarto: 'cubiculos', nombre: ({ kid: 'Kid', daniel: 'Papá', dan: 'Dan' })[u.id], ropa: ROPA[u.id], sentado: true }));
       else pon(x + 1.2, y, `<g data-c="cubiculos">${etiqueta(...iso(x + 1.2, y, -16), ({ kid: 'Kid', daniel: 'Papá', dan: 'Dan' })[u.id] + ' · fuera')}</g>`);
     });
 
