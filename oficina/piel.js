@@ -266,7 +266,7 @@
 
   // ---------- La vida: los monitos se mueven solos ----------
   // Una sola tabla de tiempos (en segundos).
-  const TIEMPO = { pasito: 0.28, paso: 1.5, idaMin: 18, idaMax: 70, quedarse: [3, 6], platica: 5, mas: 4, burbuja: 4 };
+  const TIEMPO = { pasito: 0.4, paso: 0.75, idaMin: 18, idaMax: 70, quedarse: [3, 6], platica: 5, mas: 4, burbuja: 4 };
   let VIDA = null;
   function vida(raiz, O, C) {
     if (!VIDA) VIDA = { actores: {}, previo: {}, reloj: 0, ultimo: performance.now() };
@@ -429,7 +429,7 @@
     // OBJETOS DEL PISO: plantas, archiveros, sillón, tapete (para que se sienta oficina viva, no cárcel)
     const planta = (x, y) => pon(x, y, caja(x - 0.18, y - 0.18, 0.36, 0.36, 12, ['#b8734a', '#9a5f3c', '#874f31']) + (() => { const [px, py] = iso(x, y, 12);
       return `<g fill="#4f9a5a"><ellipse cx="${px - 6}" cy="${py - 8}" rx="6" ry="11" transform="rotate(-25 ${px - 6} ${py - 8})"/><ellipse cx="${px + 6}" cy="${py - 9}" rx="6" ry="11" transform="rotate(25 ${px + 6} ${py - 9})"/><ellipse cx="${px}" cy="${py - 14}" rx="5" ry="12" fill="#5cb068"/></g>`; })());
-    const archivero = (x, y) => pon(x + 0.3, y + 0.25, caja(x, y, 0.6, 0.5, 30, ['#7d8580', '#5f6762', '#525955']) + (() => { const [ax, ay] = iso(x + 0.6, y + 0.25, 0); return `<path d="M${ax - 6},${ay - 22} h8 M${ax - 6},${ay - 12} h8" stroke="#3a403c" stroke-width="2"/>`; })());
+    const archivero = (x, y) => pon(x + 0.6, y + 0.5, caja(x, y, 0.6, 0.5, 30, ['#7d8580', '#5f6762', '#525955']) + (() => { const [ax, ay] = iso(x + 0.6, y + 0.25, 0); return `<path d="M${ax - 6},${ay - 22} h8 M${ax - 6},${ay - 12} h8" stroke="#3a403c" stroke-width="2"/>`; })());
     const sillon = (x, y, w) => pon(x + w / 2, y + 0.4, caja(x, y, w, 0.8, 10, ['#c46a4a', '#a3563b', '#8e4a33']) + caja(x, y, w, 0.22, 24, ['#c46a4a', '#a3563b', '#8e4a33']));
     const tapete = (x, y, w, h, col) => { fondo += `<polygon points="${P([iso(x, y), iso(x + w, y), iso(x + w, y + h), iso(x, y + h)])}" fill="${col}" opacity=".55"/>`; };
 
@@ -475,7 +475,7 @@
     // vida: plantas en las esquinas, archiveros, sillón de espera en recepción, tapetes
     [[0.4, 4.5], [16.5, 0.5], [25.5, 0.5], [5.6, 6.4], [16.5, 18.5], [25.5, 11.5], [21.5, 18.5], [0.4, 17.5]].forEach(([x, y]) => planta(x, y));
     archivero(4.6, 0.15); archivero(0.15, 6.2); archivero(7.2, 12.2); archivero(22.2, 13.3); archivero(23, 13.3); archivero(24.6, 16);
-    pon(5.0, 1.6, caja(4.7, 0.6, 0.8, 2, 10, ['#c46a4a', '#a3563b', '#8e4a33']) + caja(5.28, 0.6, 0.22, 2, 24, ['#c46a4a', '#a3563b', '#8e4a33']));   // sillón de espera a un lado (el frente queda libre para leer el nombre)
+    pon(5.5, 2.6, caja(4.7, 0.6, 0.8, 2, 10, ['#c46a4a', '#a3563b', '#8e4a33']) + caja(5.28, 0.6, 0.22, 2, 24, ['#c46a4a', '#a3563b', '#8e4a33']));   // sillón de espera a un lado (el frente queda libre para leer el nombre)
     tapete(8, 3.6, 8, 3.2, '#2f5658'); tapete(19.9, 14.2, 1.9, 3.0, '#a3563b'); tapete(12.8, 11.2, 3.4, 2, '#5a4a3a');
 
     // Sillón individual (demos): asiento acolchonado, respaldo y brazos
@@ -524,9 +524,9 @@
     ((O.tareas && O.tareas.lista) || []).forEach((t, i) => { const x = 19.6 + (i % 3) * 2.4, y = 8.6 + Math.floor(i / 3) * 2; pon(x, y, robotRuedas(x, y, t, i)); });
 
     // CRM: archiveros; Librería: libreros y mesa de lectura
-    pon(8.6, 9.5, archiveroAlto(7.3, 9.15, 0.75, 0.6, 30) + archiveroAlto(8.15, 9.15, 0.75, 0.6, 30) + archiveroAlto(9.0, 9.15, 0.75, 0.6, 30));   // archiveros pegados a la pared, más bajos que ella
+    pon(9.75, 9.75, archiveroAlto(7.3, 9.15, 0.75, 0.6, 30) + archiveroAlto(8.15, 9.15, 0.75, 0.6, 30) + archiveroAlto(9.0, 9.15, 0.75, 0.6, 30));   // archiveros pegados a la pared, más bajos que ella
     pon(10, 11.5, mesa(8.8, 10.8, 2, 1.1) + papeles(9.1, 11.1, 22) + papeles(9.8, 11.4, 22) + compu(9.4, 10.7, 22));
-    [0, 1, 2, 3].forEach(i => pon(12.6 + i * 0.95, 9.4, librero(12.3 + i * 0.95, 9.3, 0.8, 0.6, 46, i)));
+    [0, 1, 2, 3].forEach(i => pon(13.1 + i * 0.95, 9.9, librero(12.3 + i * 0.95, 9.3, 0.8, 0.6, 46, i)));
     pon(14.6, 12.2, mesa(13.6, 11.6, 2, 1.2) + lampara(15.3, 11.9, 22) + (() => { const [bx, by] = iso(14.4, 12.2, 22.5); return `<path d="M${bx - 14},${by} l14,-5 l14,5 l-14,6 z" fill="#f4f2ea" stroke="#c9c4b5"/><path d="M${bx},${by - 5} v11" stroke="#c9c4b5"/>`; })());
     // Crear tu recepcionista: banco de trabajo con un "+"
     pon(3.2, 16.2, mesa(1.6, 15.4, 3, 1.2, { color: ['#b6b9b2', '#94978f', '#82857e'] }) + caja(1.9, 15.6, 0.7, 0.4, 6, ['#d65a4a', '#b8463a', '#a33d32'], 22) + compu(3.2, 15.4, 22) + papeles(2.1, 16.1, 22)
