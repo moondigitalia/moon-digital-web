@@ -118,9 +118,11 @@
   const GUARDADAS = [];
   function cargar() {
     return fetch(RUTA + 'monitos.json').then(r => r.json()).then(j => {
-      const listas = Object.entries(j).map(([n, m]) => Promise.all(m.poses.concat(m.acostado ? ['acostado'] : []).map(p => new Promise(ok => { const i = new Image(); i.onload = i.onerror = ok; i.src = `${RUTA}${n}_${p}.webp`; GUARDADAS.push(i); }))));
-      return Promise.all(listas).then(() => { MET = j; api.cargado = true; });
-    }).catch(() => { api.cargado = true; });
+      // La lista llega en un instante y con ella ya se dibujan los monitos 3D; las poses se piden de fondo
+      // (así el primer paso de cada uno ya está y no parpadea).
+      MET = j; api.cargado = true;
+      Object.entries(j).forEach(([n, m]) => m.poses.concat(m.acostado ? ['acostado'] : []).forEach(p => { const i = new Image(); i.src = `${RUTA}${n}_${p}.webp`; GUARDADAS.push(i); }));
+    }).catch(() => { api.cargado = false; });   // si falla, se vuelve a pedir en el siguiente dibujo
   }
   // Quién usa qué monito: el equipo y Jason fijos; los demás asistentes toman colores en orden (sin el naranja de Claude)
   const FIJO = { kid: 'kid', 'equipo-kid': 'kid', 'equipo-daniel': 'papa', 'equipo-dan': 'dan', jason: 'jason', claude: 'claude', jesus: 'jesus' };
@@ -136,33 +138,7 @@
   function monito(x, y, o) {
     const sk = MET && pielDe(o.piel3d || o.id);
     if (sk && MET[sk]) return monito3d(x, y, o, sk);
-    const [sx, sy] = iso(x, y, 0);
-    const piel = o.piel || '#e8bf98', ropa = o.ropa || '#5b7bd6', pelo = o.pelo || '#2b2420';
-    let cuerpo;
-    if (o.acostado) {
-      cuerpo = `<g transform="translate(${sx},${sy - 6}) scale(${ESC})"><ellipse cx="0" cy="8" rx="26" ry="7" fill="#0006"/>
-        <rect x="-22" y="-8" width="30" height="16" rx="8" fill="${ropa}" opacity=".75"/>
-        <circle cx="16" cy="-1" r="11" fill="${piel}" opacity=".85"/>
-        <path d="M11,-5 l4,4 m0,-4 l-4,4 M18,-5 l4,4 m0,-4 l-4,4" stroke="#222" stroke-width="1.6"/></g>`;
-    } else {
-      const s = o.sentado ? -6 : 0;
-      cuerpo = `<g transform="translate(${sx},${sy}) scale(${ESC})"><ellipse cx="0" cy="2" rx="13" ry="5" fill="#0006"/>
-        <rect x="-10" y="${-26 - s}" width="20" height="${24 + s}" rx="9" fill="${ropa}"/>
-        <circle cx="0" cy="${-35 - s}" r="11" fill="${piel}"/>
-        <path d="M-11,${-37 - s} a11,11 0 0 1 22,0 q-11,-6 -22,0z" fill="${pelo}"/>
-        <circle cx="-4" cy="${-34 - s}" r="1.5" fill="#1d1d1d"/><circle cx="4" cy="${-34 - s}" r="1.5" fill="#1d1d1d"/>
-        ${o.diadema ? `<path d="M-12,${-38 - s} a12,12 0 0 1 24,0" fill="none" stroke="#222" stroke-width="2.5"/><circle cx="-12" cy="${-34 - s}" r="3" fill="#222"/>` : ''}</g>`;
-    }
-    const alto = (o.acostado ? 18 : 46 - (o.sentado ? 6 : 0)) * ESC;
-    DUENO = o.actor ? o.id : '';
-    if (o.acostado) cuerpoRect(sx, sy, 56 * ESC, 22 * ESC); else cuerpoRect(sx, sy, 26 * ESC, alto + 18);
-    if (o.nombre) etiqueta(sx, sy + 16, o.nombre, '', [[0, 0], [0, -alto - 40], [44, -alto / 2], [-44, -alto / 2], [0, 22]]);
-    DUENO = '';
-    const mano = o.estado === 'rojo' && !o.acostado ? `<path d="M${sx + 9 * ESC},${sy - 24 * ESC} l${8 * ESC},${-20 * ESC}" stroke="${o.ropa || '#5b7bd6'}" stroke-width="${5 * ESC}" stroke-linecap="round"/><circle cx="${sx + 17 * ESC}" cy="${sy - 46 * ESC}" r="${3.5 * ESC}" fill="${o.piel || '#e8bf98'}"/>` : '';
-    const zz = o.dormido ? `<text class="zz" x="${sx + 12}" y="${sy - alto - 6}" font-size="13" font-weight="900" fill="#b9b8c2">z</text>` : '';
-    DUENO = '';
-    return `<g class="mono-3d${o.actor ? ' actor' : ''}" data-a="${esc(o.id || '')}"${o.cuarto ? ` data-c="${o.cuarto}"` : ''}${o.actor ? ` data-actor="${esc(o.id)}" data-tx="${x}" data-ty="${y}" data-alto="${Math.round(alto)}"${o.dormido ? ' data-dormido="1"' : ''}${o.estado === 'rojo' ? ' data-falla="1"' : ''}` : ''}>${cuerpo}${mano}${zz}
-      ${o.estado ? luzEstado(sx, sy - alto - 10, o.estado) : ''}</g>`;
+    return '';   // los monitos dibujados a mano ya no se usan (Kid, 13-nov-2026: se veían un instante al refrescar)
   }
   function monito3d(x, y, o, sk) {
     const [sx, sy] = iso(x, y, 0), pose = o.acostado ? 'acostado' : o.sentado && MET[sk].poses.includes('sentado') ? 'sentado' : 'reposo';
@@ -175,20 +151,10 @@
     return `<g class="mono-3d${o.actor ? ' actor' : ''}" data-a="${esc(o.id || '')}"${o.cuarto ? ` data-c="${o.cuarto}"` : ''}${o.actor ? ` data-actor="${esc(o.id)}" data-tx="${x}" data-ty="${y}" data-alto="${Math.round(alto)}"${o.lado ? ` data-lado="${o.lado.join(',')}"` : ''}${o.dormido ? ' data-dormido="1"' : ''}${o.estado === 'rojo' ? ' data-falla="1"' : ''}` : ''}><ellipse cx="${sx}" cy="${sy}" rx="14" ry="5" fill="#0006"/>${imgMono(sk, pose, sx, sy)}${zz}
       ${o.estado ? luzEstado(sx, sy - alto - 10, o.estado) : ''}</g>`;
   }
-  // Claude: el monito todo naranja (con monitos 3D); mientras llegan, un robot chiquito naranja.
-  function robotNaranja(x, y, texto) {
-    if (MET && MET.claude) { const corto = texto && (texto.length > 46 ? texto.slice(0, 44).replace(/\s+\S*$/, '') + '…' : texto);
-      return monito3d(x, y, { id: 'claude', actor: true, nombre: 'Claude', clase: 'nom-claude' }, 'claude'); }
-    const [sx, sy] = iso(x, y, 0);
-    cuerpoRect(sx, sy, 26 * ESC, 52 * ESC);
-    DUENO = 'claude';
-    if (texto) { const corto = texto.length > 46 ? texto.slice(0, 44).replace(/\s+\S*$/, '') + '…' : texto; etiqueta(sx, sy + 16, '🤖 ' + corto, 'nom-claude', [[0, 0], [0, -80], [0, 22]]); }
-    DUENO = '';
-    return `<g class="claude-3d actor" data-a="claude" data-actor="claude" data-tx="${x}" data-ty="${y}" data-alto="${Math.round(46 * ESC)}"><g transform="translate(${sx},${sy}) scale(${ESC})"><ellipse cx="0" cy="2" rx="12" ry="4.5" fill="#0006"/>
-      <rect x="-9" y="-20" width="18" height="18" rx="4" fill="#ff7a1a"/><rect x="-11" y="-38" width="22" height="17" rx="6" fill="#ff8c33"/>
-      <rect x="-7" y="-33" width="14" height="7" rx="3.5" fill="#3a1d07"/><circle cx="-3" cy="-29.5" r="1.6" fill="#ffd2a8"/><circle cx="3" cy="-29.5" r="1.6" fill="#ffd2a8"/>
-      <line x1="0" y1="-38" x2="0" y2="-45" stroke="#ff7a1a" stroke-width="2"/><circle cx="0" cy="-46" r="2.6" fill="#ffb26b"/></g>
-      </g>`;
+  // Claude: el monito todo naranja. Sin la lista de los monitos 3D no se dibuja nada (nunca el robot viejo).
+  function robotNaranja(x, y) {
+    if (!MET || !MET.claude) return '';
+    return monito3d(x, y, { id: 'claude', actor: true, nombre: 'Claude', clase: 'nom-claude' }, 'claude');
   }
   // Robot con ruedas (una tarea automática) en su estación.
   function robotRuedas(x, y, t, i) {
