@@ -123,7 +123,7 @@
     }).catch(() => { api.cargado = true; });
   }
   // Quién usa qué monito: el equipo y Jason fijos; los demás asistentes toman colores en orden (sin el naranja de Claude)
-  const FIJO = { kid: 'kid', 'equipo-kid': 'kid', 'equipo-daniel': 'morado', 'equipo-dan': 'turquesa', jason: 'jason', claude: 'claude', jesus: 'jesus' };
+  const FIJO = { kid: 'kid', 'equipo-kid': 'kid', 'equipo-daniel': 'papa', 'equipo-dan': 'dan', jason: 'jason', claude: 'claude', jesus: 'jesus' };
   const COLORES = ['verde', 'coral', 'mostaza', 'lila'];
   let ORDEN = {};
   function pielDe(id) { if (FIJO[id]) return FIJO[id]; if (!(id in ORDEN)) ORDEN[id] = COLORES[Object.keys(ORDEN).length % COLORES.length]; return ORDEN[id]; }
