@@ -268,9 +268,16 @@
   // Una sola tabla de tiempos (en segundos).
   const TIEMPO = { pasito: 0.5, paso: 0.6, idaMin: 18, idaMax: 70, quedarse: [3, 6], platica: 5, mas: 4, burbuja: 4 };
   let VIDA = null;
+  // Paredes altas (su caja en pantalla y su profundidad): si alguien camina detrás de una, se ve como silueta
+  // completa encima de la pared, nunca "la cabeza atravesándola" (Kid, 13-nov-2026).
+  let MUROS = [];
+  function tapado(a, key) { const [x, y] = iso(a.pos[0], a.pos[1]), c = { l: x - 14, r: x + 14, t: y - a.alto, b: y };
+    let area = 0; for (const m of MUROS) { if (m.d <= key) continue; const w = Math.min(c.r, m.r) - Math.max(c.l, m.l), h = Math.min(c.b, m.b) - Math.max(c.t, m.t); if (w > 0 && h > 0) area = Math.max(area, w * h); }
+    return area > 28 * a.alto * 0.25; }
   function vida(raiz, O, C) {
     if (!VIDA) VIDA = { actores: {}, previo: {}, reloj: 0, ultimo: performance.now() };
     const V = VIDA, capa = raiz.querySelector('.capa-vida') || (() => { const g = document.createElementNS('http://www.w3.org/2000/svg', 'g'); g.setAttribute('class', 'capa-vida'); raiz.querySelector('svg').appendChild(g); return g; })();
+    V.raiz = raiz; V.capa = capa;
     const as = (O.asistentes && O.asistentes.lista) || [];
     // "+N pláticas" cuando llegan pláticas nuevas
     as.forEach(a => { const ant = V.previo[a.id]; if (ant !== undefined && a.platicas7d > ant) burbujaDe(a.id, '+' + (a.platicas7d - ant), '#3ccf7a', TIEMPO.mas); V.previo[a.id] = a.platicas7d; });
@@ -292,7 +299,6 @@
     const total = as.reduce((t, a) => t + (a.platicas7d || 0), 0);
     V.cupo = 1 + (total > 100 ? 1 : 0) + (total > 1000 ? 1 : 0);
     if (!V.corriendo) { V.corriendo = true; requestAnimationFrame(t => paso(t)); }
-    V.raiz = raiz; V.capa = capa;
   }
   // un punto un poco adentro de la puerta de un cuarto (para que Claude entre y se ponga a trabajar ahí)
   function adentro(id) { const [[ix, iy], [px, py]] = PUERTAS[id], dx = ix - px, dy = iy - py, n = Math.hypot(dx, dy) || 1; return [ix + dx / n * 1.1 - dy / n * 0.6, iy + dy / n * 1.1 + dx / n * 0.6]; }
@@ -320,6 +326,14 @@
         let sig = null; for (const h of esc_.children) { if (h !== caja_ && Number(h.dataset.d) > prof) { sig = h; break; } }
         if (sig !== caja_.nextSibling) esc_.insertBefore(caja_, sig); } }
     const etq = VIDA.raiz && VIDA.raiz.querySelector(`[data-de="${a.id}"]`); if (etq) etq.style.visibility = fuera ? 'hidden' : '';
+    // Detrás de una pared: el monito se esconde y en su lugar va su silueta encima (se entiende que está detrás)
+    const tras = fuera && im && tapado(a, a.pos[0] + a.pos[1]);
+    a.g.style.visibility = tras ? 'hidden' : '';
+    if (tras) {
+      if (!a.sil || !a.sil.isConnected) { a.sil = document.createElementNS('http://www.w3.org/2000/svg', 'image'); a.sil.setAttribute('class', 'silueta'); VIDA.capa.appendChild(a.sil); }
+      ['href', 'x', 'y', 'width', 'height'].forEach(n => a.sil.setAttribute(n, im.getAttribute(n)));
+      a.sil.setAttribute('transform', a.g.getAttribute('transform') + ' ' + (im.getAttribute('transform') || ''));
+    } else if (a.sil) { a.sil.remove(); a.sil = null; }
     let b = a.g.querySelector('.burbuja');
     if (a.burbuja && VIDA.reloj < a.burbuja.hasta) {
       if (!b) { b = document.createElementNS('http://www.w3.org/2000/svg', 'g'); b.setAttribute('class', 'burbuja'); a.g.appendChild(b); }
@@ -376,7 +390,7 @@
   // ---------- el dibujo completo ----------
   function dibuja(O, C, sel, hora) {
     const [lc, lo] = LUZ[luzDe(hora)];
-    ETQ = []; CUERPOS = [];
+    ETQ = []; CUERPOS = []; MUROS = [];
     const as = (O.asistentes && O.asistentes.lista) || [];
     const R = id => CUARTOS.find(c => c.id === id);
     let fondo = '', cosas = [], LETREROS = '';   // cosas: [profundidad, svg]
@@ -464,6 +478,8 @@
             if (alto > 20) svg += tramo(...pt(ha), ...pt(hb), MURO - 34, col, 34, gx, gy); else svg += tramo(...pt(ha - 0.06), ...pt(hb + 0.06), 4, '#7a5230', 32);
           }
           cosas.push([prof, `<g data-c="${c.id}">${svg}</g>`]);
+          if (alto > 20) { const ps = [iso(...pt(k0)), iso(...pt(k1)), iso(...pt(k1), alto), iso(...pt(k0), alto)];
+            MUROS.push({ d: prof, l: Math.min(...ps.map(q => q[0])), r: Math.max(...ps.map(q => q[0])), t: Math.min(...ps.map(q => q[1])), b: Math.max(...ps.map(q => q[1])) }); }
         }
       };
       const gris = c.id === 'gris' || c.id === 'cerrado';

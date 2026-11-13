@@ -72,6 +72,9 @@ small{font-size:15px;font-weight:600}
 .cuerpo{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;padding:4px 14px 18px;-webkit-overflow-scrolling:touch;overflow-wrap:anywhere}
 .fila{display:block;width:100%;padding:10px 0;border-bottom:1px solid #2a2a31}
 .fila small{display:block;color:var(--suave);font-size:15px;font-weight:600}
+#mundo .silueta{filter:brightness(0);opacity:.42;pointer-events:none}
+.contexto{margin:10px 0 6px;font-size:16px;line-height:1.45;font-weight:600;color:#e9e8e3}
+.contexto.chico{font-size:14px;color:var(--suave);margin-top:4px}
 .titulo{font-size:14px;color:var(--suave);margin:14px 0 2px;letter-spacing:.03em}
 .vida{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:10px;align-items:baseline;padding:8px 0}
 .vida small{color:var(--suave);font-size:15px;font-weight:600}
@@ -207,11 +210,14 @@ addEventListener('popstate', () => {
 function alertas() {
   if (!O) return [];
   const l = [];
-  ((O.asistentes && O.asistentes.lista) || []).forEach(a => { if (a.estado === 'rojo') l.push(a.nombre + ': ' + (a.nota || 'falla')); });
-  ((O.tareas && O.tareas.lista) || []).forEach(t => { if (t.resultado !== 'bien' || (t.siguiente && Date.now() - Date.parse(t.siguiente) > 2 * 3600e3)) l.push('Robot con falla: ' + t.nombre); });
-  ((O.suscripciones && O.suscripciones.lista) || []).forEach(s => { if (s.color === 'rojo') l.push(s.nombre + (s.faltan < 0 ? ': se pasó la fecha de pago' : ': se cobra ' + (s.faltan === 0 ? 'hoy' : s.faltan === 1 ? 'mañana' : 'en ' + s.faltan + ' días'))); });
-  if (O.publicaciones && O.publicaciones.fallidas) l.push(O.publicaciones.fallidas + ' publicaciones fallaron hoy');
-  if (O.medicionAtrasada) l.push('La medición de cada hora no ha corrido');
+  // Cada alerta trae su porqué: qué está pasando y qué conviene hacer (cualquiera la entiende sin preguntar).
+  const A = (t, por) => { const x = new String(t); x.por = por; return x; };
+  ((O.asistentes && O.asistentes.lista) || []).forEach(a => { if (a.estado === 'rojo') l.push(A(a.nombre + ': ' + (a.nota || 'falla'), 'Este asistente está fallando y la gente que le escribe puede quedarse sin respuesta. Pídele a Claude que lo revise.')); });
+  ((O.tareas && O.tareas.lista) || []).forEach(t => { const tarde = t.siguiente && Date.now() - Date.parse(t.siguiente) > 2 * 3600e3;
+    if (t.resultado !== 'bien' || tarde) l.push(A('Robot con falla: ' + t.nombre, (tarde ? 'Le tocaba trabajar y no ha corrido.' : 'La última vez que trabajó algo le salió mal.') + ' Mientras no se arregle, lo que hace ese robot no se está haciendo. Pídele a Claude que lo revise.')); });
+  ((O.suscripciones && O.suscripciones.lista) || []).forEach(s => { if (s.color === 'rojo') l.push(A(s.nombre + (s.faltan < 0 ? ': se pasó la fecha de pago' : ': se cobra ' + (s.faltan === 0 ? 'hoy' : s.faltan === 1 ? 'mañana' : 'en ' + s.faltan + ' días')), 'Es un servicio que pagamos cada mes. Revisa que haya saldo en la tarjeta o decide si todavía lo necesitamos.')); });
+  if (O.publicaciones && O.publicaciones.fallidas) l.push(A(O.publicaciones.fallidas + ' publicaciones fallaron hoy', 'Un cambio a una página no se subió a internet: la página sigue con la versión anterior.'));
+  if (O.medicionAtrasada) l.push(A('La medición de cada hora no ha corrido', 'El robot que llena esta oficina no ha trabajado: los números que ves pueden ser viejos.'));
   return l;
 }
 
@@ -334,8 +340,11 @@ const hace = f => { if (!f) return ''; const m = Math.round((Date.now() - Date.p
 const fechaC = f => f ? new Date(Date.parse(f)).toLocaleString('es-MX', { timeZone: 'America/Cancun', weekday: 'short', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' }) : '';
 const COLOR = { verde: 'var(--verde)', amarillo: 'var(--amarillo)', rojo: 'var(--rojo)', gris: '#6b6b73' };
 const liga = p => { if (!p) return ''; const u = /^https:\/\//.test(p) ? p : /^[a-z0-9-]+$/.test(p) ? `https://${p}.vercel.app` : ''; return u ? `<small><a href="${esc(u)}" target="_blank" rel="noopener">${esc(u)}</a></small>` : ''; };
-function filaAsistente(a) {
-  return `<div class="fila"><span class="luz ${a.estado || 'gris'}"></span> ${esc(a.nombre)} · ${esc(a.de)}<small>${a.platicas7d || 0} pláticas · ${a.fallas7d || 0} fallas · $${a.usd7d || 0} USD en 7 días${a.emergencias === false && (a.tipo === 'cliente' || a.tipo === 'demo') ? ' · sin reglas de emergencia' : ''}</small>${a.nota ? `<small>${esc(a.nota)}</small>` : ''}${liga(a.pagina)}</div>`;
+// CONTEXTO (Kid, 13-nov-2026): todo lo que se toca dice qué es y para qué sirve, para que cualquiera lo entienda.
+const CONTEXTO_TIPO = { cliente: 'Asistente de un cliente que nos paga: contesta por voz y por texto a la gente de ese negocio.', demo: 'Asistente que hicimos para enseñárselo a un posible cliente; todavía no hay respuesta.', propio: 'Asistente de MOON Digital.', prueba: 'Copia de prueba para probar cambios sin tocar a los de verdad.', copia: 'Copia de prueba para probar cambios sin tocar a los de verdad.', base: 'La plantilla de la que nacen los asistentes nuevos.', archivado: 'Asistente que dejamos de usar; se guarda por si se retoma.', dijo_no: 'Asistente de alguien que dijo que no; se guarda por si se retoma.' };
+const LEYENDA = '<p class="contexto chico">La luz de cada uno: verde, todo bien; amarilla, algo que vigilar; roja, está fallando y hay que revisarlo. "Pláticas" son las conversaciones que tuvo en 7 días y "fallas" las que salieron mal.</p>';
+function filaAsistente(a, conPara) {
+  return `<div class="fila"><span class="luz ${a.estado || 'gris'}"></span> ${esc(a.nombre)} · ${esc(a.de)}${conPara && a.para ? `<small style="color:#e9e8e3">${esc(a.para)}</small>` : ''}<small>${a.platicas7d || 0} pláticas · ${a.fallas7d || 0} fallas · $${a.usd7d || 0} USD en 7 días${a.emergencias === false && (a.tipo === 'cliente' || a.tipo === 'demo') ? ' · sin reglas de emergencia' : ''}</small>${a.nota ? `<small>${esc(a.nota)}</small>` : ''}${liga(a.pagina)}</div>`;
 }
 function datosLlamada(l) { try { return JSON.parse(l.datos || '{}'); } catch (e) { return {}; } }
 function pintarInfo(refresco) {
@@ -346,46 +355,49 @@ function pintarInfo(refresco) {
   if (sel.tipo === 'resumen') {
     t = 'Cómo va MOON';
     const al = alertas();
-    if (al.length) h += `<p class="titulo">Atención</p>` + al.map(x => `<div class="fila alerta">${esc(x)}</div>`).join('');
+    h += `<p class="contexto">Aquí ves de un vistazo cómo va el negocio: lo que necesita atención, lo que pagamos cada mes y cuánto gastan los asistentes. Toca cualquier cuarto o monito del mapa para ver su detalle.</p>`;
+    if (al.length) h += `<p class="titulo">Atención</p>` + al.map(x => `<div class="fila alerta">${esc(x)}${x.por ? `<small>${esc(x.por)}</small>` : ''}</div>`).join('');
     const s = (O.suscripciones && O.suscripciones.lista) || [];
     const suma = l => { const o = {}; l.forEach(x => { o[x.moneda] = (o[x.moneda] || 0) + Number(x.monto); }); return Object.entries(o).map(([m, v]) => v.toLocaleString('es-MX', { maximumFractionDigits: 2 }) + ' ' + m).join(' + '); };
     const vida = x => `<div class="vida"><span>${esc(x.nombre)}${x.aviso ? ' 🚨💸' : ''}</span><small>${x.faltan < 0 ? 'vencida' : x.faltan === 0 ? 'hoy' : 'en ' + x.faltan + ' d'}</small><div class="barra"><i style="width:${Math.round(x.nivel * 100)}%;background:${COLOR[x.color]}"></i></div>${x.color !== 'verde' && x.nota ? `<small style="grid-column:1/-1">${esc(x.nota)}</small>` : ''}</div>`;
     const ias = s.filter(x => x.grupo !== 'otra'), otras = s.filter(x => x.grupo === 'otra');
-    h += `<p class="titulo">IAs · ${suma(ias)} al mes</p>` + ias.map(vida).join('') + `<p class="titulo">Otras · ${suma(otras)} al mes</p>` + otras.map(vida).join('');
+    h += `<p class="titulo">IAs · ${suma(ias)} al mes</p><p class="contexto chico">Las herramientas de inteligencia artificial que pagamos. La barra muestra cuánto falta para el siguiente cobro: verde hay tiempo, amarillo se acerca, rojo es hoy o ya pasó.</p>` + ias.map(vida).join('') + `<p class="titulo">Otras · ${suma(otras)} al mes</p>` + otras.map(vida).join('');
     const g = O.gasto || {}, p = O.publicaciones || {};
     h += `<p class="titulo">Esta semana</p><div class="fila">$${g.usd7d || 0} USD de los asistentes<small>${(g.creditos7d || 0).toLocaleString('es-MX')} créditos de ElevenLabs</small></div>`;
     h += `<div class="fila">Publicaciones hoy: ${p.total || 0} de ${p.tope || 100}${p.fallidas ? ` · <span class="aviso">${p.fallidas} fallaron</span>` : ''}<small>Medido ${hace((O.medicion || {}).actualizado)}</small></div>`;
   } else if (sel.tipo === 'asistente') {
-    const a = as.find(x => x.id === sel.id) || {}; t = a.nombre || 'Asistente'; h = filaAsistente(a);
+    const a = as.find(x => x.id === sel.id) || {}; t = a.nombre || 'Asistente';
+    h = `<p class="contexto">${esc(a.para || CONTEXTO_TIPO[a.tipo] || 'Un asistente que contesta por voz y por texto.')}</p>` + filaAsistente(a) + LEYENDA;
   } else if (sel.tipo === 'clientes' || sel.tipo === 'demos') {
     t = sel.tipo === 'clientes' ? 'Clientes que pagan' : 'Demos';
-    h = as.filter(a => a.tipo === (sel.tipo === 'clientes' ? 'cliente' : 'demo')).map(filaAsistente).join('');
+    h = `<p class="contexto">${sel.tipo === 'clientes' ? 'Los asistentes de los clientes que ya nos pagan. Cada uno contesta por voz y por texto a la gente de ese negocio, de día y de noche. Si uno se pone en rojo, la gente se está quedando sin respuesta.' : 'Asistentes que hicimos para enseñárselos a un posible cliente. Están sentados esperando: todavía no hay respuesta de ese cliente. Si dice que sí, el asistente pasa a Clientes que pagan.'}</p>` + LEYENDA + as.filter(a => a.tipo === (sel.tipo === 'clientes' ? 'cliente' : 'demo')).map(a => filaAsistente(a, true)).join('');
     const ult = O.actividad && O.actividad.lineas && O.actividad.lineas[0];
     if (sel.tipo === 'clientes' && ult) h += `<p class="titulo">Claude ahorita</p><div class="fila">${esc(ult.texto)}<small>${hace(ult.hora)}</small></div>`;
   } else if (sel.tipo === 'recepcion') {
     // Igual que las Llamadas del Tablero: quién (negocio), de qué se trató y cuándo; las de nosotros dicen "Prueba".
     t = 'Jason · llamadas';
+    h = '<p class="contexto">Jason es el recepcionista de MOON Digital: contesta las llamadas y mensajes de quien se interesa en nosotros, toma sus datos y los deja en el CRM. Aquí ves sus llamadas más recientes; las que dicen Prueba las hicimos nosotros.</p>';
     const ll = ((C && C.llamadas) || []).slice(0, 12);
-    h = ll.length ? ll.map(l => { const d = datosLlamada(l); const per = ((C && C.personas) || []).find(p => p.tel === l.quien) || {};
+    h += ll.length ? ll.map(l => { const d = datosLlamada(l); const per = ((C && C.personas) || []).find(p => p.tel === l.quien) || {};
       return `<div class="fila"><span class="etq${Number(l.prueba) ? '' : ' cli'}">${Number(l.prueba) ? 'Prueba' : 'Cliente'}</span> ${esc(per.negocio || d.negocio || per.nombre || d.nombre || 'Sin nombre')}<small>${esc(l.resumen || '')} · ${hace(l.fecha)}</small></div>`; }).join('') : '<p class="fila">Todavía no hay llamadas.</p>';
   } else if (sel.tipo === 'cubiculos') {
-    t = 'Cubículos';
-    h = (O.cubiculos || []).map(u => `<div class="fila"><span class="luz ${u.presente ? 'verde' : 'gris'}"></span> ${NOMBRE[u.id]}<small>${u.de}:00 a ${u.a}:00, lunes a viernes · ${u.presente ? 'en su horario' : 'fuera de horario'}</small></div>`).join('');
+    t = 'Equipo';
+    h = '<p class="contexto">Las personas de MOON. Cada quien aparece sentado en su cubículo cuando está en su horario de trabajo. Claude, el monito naranja, es el técnico: camina al cuarto donde está trabajando y abajo ves lo último que hizo.</p>' + (O.cubiculos || []).map(u => `<div class="fila"><span class="luz ${u.presente ? 'verde' : 'gris'}"></span> ${NOMBRE[u.id]}<small>${u.de}:00 a ${u.a}:00, lunes a viernes · ${u.presente ? 'en su horario' : 'fuera de horario'}</small></div>`).join('');
     h += '<p class="titulo">Lo último que pasó</p>' + ((O.actividad && O.actividad.lineas) || []).slice(0, 6).map(l => `<div class="fila">${esc(l.texto)}<small>${esc(l.quien)} · ${hace(l.hora)}</small></div>`).join('');
   } else if (sel.tipo === 'robots') {
-    t = 'Robots (tareas automáticas)';
-    h = ((O.tareas && O.tareas.lista) || []).map(x => { const tarde = x.siguiente && Date.now() - Date.parse(x.siguiente) > 2 * 3600e3; return `<div class="fila"><span class="luz ${x.resultado !== 'bien' || tarde ? 'rojo' : 'verde'}"></span> ${esc(x.nombre)}<small>De ${esc(x.deQuien)} · última vez ${hace(x.ultimaVez)} (${esc(x.resultado)}) · siguiente ${fechaC(x.siguiente)}${tarde ? ' · no está corriendo' : ''}</small></div>`; }).join('');
+    t = 'Robots · tareas solas';
+    h = '<p class="contexto">Cada robot es un trabajo que se hace solo, a su hora, sin que nadie lo active: revisar, medir, avisar. Luz verde: le salió bien la última vez. Luz roja: falló o no ha corrido, y ese trabajo no se está haciendo. Toca un robot para ver qué hace.</p>' + ((O.tareas && O.tareas.lista) || []).map(x => { const tarde = x.siguiente && Date.now() - Date.parse(x.siguiente) > 2 * 3600e3; return `<div class="fila"><span class="luz ${x.resultado !== 'bien' || tarde ? 'rojo' : 'verde'}"></span> ${esc(x.nombre)}${x.para ? `<small>${esc(x.para)}</small>` : ''}<small>De ${esc(x.deQuien)} · última vez ${hace(x.ultimaVez)} (${esc(x.resultado)}) · siguiente ${fechaC(x.siguiente)}${tarde ? ' · no está corriendo' : ''}</small></div>`; }).join('');
   } else if (sel.tipo === 'robot') {
     const x = ((O.tareas && O.tareas.lista) || [])[sel.i] || {}, tarde = x.siguiente && Date.now() - Date.parse(x.siguiente) > 2 * 3600e3;
     t = '🤖 ' + (x.nombre || 'Robot');
-    h = `<div class="fila"><span class="luz ${x.resultado !== 'bien' || tarde ? 'rojo' : 'verde'}"></span> ${x.resultado === 'bien' && !tarde ? 'Trabajando bien' : tarde ? 'No está corriendo' : 'Algo falló'}<small>Lo pidió ${esc(x.deQuien || '')} · trabaja solo, sin que nadie lo active</small></div>`
+    h = `<p class="contexto">${esc(x.para || 'Un trabajo que se hace solo, a su hora, sin que nadie lo active.')}</p><div class="fila"><span class="luz ${x.resultado !== 'bien' || tarde ? 'rojo' : 'verde'}"></span> ${x.resultado === 'bien' && !tarde ? 'Trabajando bien' : tarde ? 'No está corriendo' : 'Algo falló'}<small>Lo pidió ${esc(x.deQuien || '')} · trabaja solo, sin que nadie lo active</small></div>`
       + `<div class="fila">Última vez<small>${hace(x.ultimaVez)} (${esc(x.resultado || '')})</small></div><div class="fila">Siguiente vez<small>${fechaC(x.siguiente)}</small></div>`;
   } else if (sel.tipo === 'gris') {
-    t = 'Cuarto gris · dijeron que no'; h = as.filter(a => a.tipo === 'dijo_no' || a.tipo === 'archivado' || a.id === 'donde').map(filaAsistente).join('');
+    t = 'Cuarto gris · dijeron que no'; h = '<p class="contexto">Asistentes que hicimos para alguien que dijo que no, o que dejamos de usar. Se guardan aquí, sin borrarlos, por si algún día se retoman o para reusar lo que ya funcionó en otro cliente.</p>' + as.filter(a => a.tipo === 'dijo_no' || a.tipo === 'archivado' || a.id === 'donde').map(a => filaAsistente(a, true)).join('');
   } else if (sel.tipo === 'oracion') {
-    t = 'Cuarto de oración'; h = '<div class="fila">Aquí está Jesús. Un lugar para detenernos, dar gracias y pedir guía antes de seguir.</div>';
+    t = 'Cuarto de oración'; h = '<p class="contexto">Aquí está Jesús. Es el cuarto para detenernos, dar gracias y pedir guía antes de seguir: todo lo que hacemos empieza y termina con Él.</p>';
   } else if (sel.tipo === 'cerrado') {
-    t = 'Puerta cerrada · pruebas'; h = as.filter(a => ['prueba', 'base', 'copia'].includes(a.tipo) && a.id !== 'donde').map(filaAsistente).join('');
+    t = 'Archivo · pruebas'; h = '<p class="contexto">Copias y pruebas que usamos para probar cambios sin tocar a los asistentes de verdad, y la plantilla de la que nacen los asistentes nuevos. Nadie de afuera las usa.</p>' + as.filter(a => ['prueba', 'base', 'copia'].includes(a.tipo) && a.id !== 'donde').map(a => filaAsistente(a, true)).join('');
   }
   if (sel.tipo !== 'resumen') h = `<button class="fila" id="aResumen" style="color:var(--azul)">‹ Cómo va MOON</button>` + h;
   $('#infoT').textContent = t; k.innerHTML = h; k.scrollTop = y;
@@ -408,7 +420,7 @@ function pintarLibreria() {
   // La respuesta más nueva va arriba, pegada al cuadro de escribir: el teclado nunca la tapa.
   const pares = []; for (let i = 0; i < charla.length; i += 2) pares.push(charla.slice(i, i + 2));
   const k = $('#herrC');
-  k.innerHTML = pares.length ? pares.reverse().map(([q, r]) => `<div class="msj yo">${esc(q.texto)}</div><div class="msj">${esc(r ? r.texto : '')}</div>`).join('') : '<p class="fila"><small>Ejemplos: ¿Se puede poner un asistente en Instagram? · ¿Qué diferencia hay entre créditos y tokens? · ¿Podemos hacer un asistente para un dentista?</small></p>';
+  k.innerHTML = pares.length ? pares.reverse().map(([q, r]) => `<div class="msj yo">${esc(q.texto)}</div><div class="msj">${esc(r ? r.texto : '')}</div>`).join('') : '<p class="contexto">Jason vive en la Librería: sabe todo lo de MOON y, si algo no lo sabe, lo busca en internet. Pregúntale lo que sea con tus palabras; si usa una palabra técnica, te la explica con un ejemplo.</p><p class="fila"><small>Ejemplos: ¿Se puede poner un asistente en Instagram? · ¿Qué diferencia hay entre créditos y tokens? · ¿Podemos hacer un asistente para un dentista?</small></p>';
   k.scrollTop = 0;
 }
 $('#escribe').onsubmit = async e => {
