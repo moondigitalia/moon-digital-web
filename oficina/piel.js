@@ -169,7 +169,7 @@
     const alto = o.acostado ? 22 : ALTO_MONO * (pose === 'sentado' ? 0.85 : 1);
     DUENO = o.actor ? o.id : '';
     if (o.acostado) cuerpoRect(sx, sy, 60, 24); else cuerpoRect(sx, sy, 34, alto + 18);
-    if (o.nombre) etiqueta(sx, sy - alto - 30, o.nombre, o.clase || '', o.opciones || [[0, 0], [0, -20], [46, 10], [-46, 10], [0, alto + 46]]);
+    if (o.nombre) etiqueta(sx, sy - alto - 16, o.nombre, o.clase || '', o.opciones || [[0, 0], [0, -20], [46, 10], [-46, 10], [0, alto + 46]]);
     DUENO = '';
     const zz = o.dormido ? `<text class="zz" x="${sx + 14}" y="${sy - alto - 6}" font-size="13" font-weight="900" fill="#b9b8c2">z</text>` : '';
     return `<g class="mono-3d${o.actor ? ' actor' : ''}" data-a="${esc(o.id || '')}"${o.cuarto ? ` data-c="${o.cuarto}"` : ''}${o.actor ? ` data-actor="${esc(o.id)}" data-tx="${x}" data-ty="${y}" data-alto="${Math.round(alto)}"${o.lado ? ` data-lado="${o.lado.join(',')}"` : ''}${o.dormido ? ' data-dormido="1"' : ''}${o.estado === 'rojo' ? ' data-falla="1"' : ''}` : ''}><ellipse cx="${sx}" cy="${sy}" rx="14" ry="5" fill="#0006"/>${imgMono(sk, pose, sx, sy)}${zz}
@@ -206,7 +206,7 @@
     const [titulo, sub] = c.n.split(' · '), k = 64, max = c.w * k - 36;
     let fs1 = Math.min(36, max / (titulo.length * 0.68)), fs2 = sub ? Math.min(22, max / (sub.length * 0.56)) : 0;
     // dónde queda libre el piso de cada cuarto (medido contra sus muebles); 'y' = las letras corren a lo largo del otro lado
-    const LUGAR = { recepcion: [3, 4.35, 'x', 5], clientes: [12, 5.2], demos: [22, 5.3], cubiculos: [0.95, 8.8, 'y', 3.4, 'logo'], robots: [22, 11.3], crm: [9.6, 13.35], libreria: [14.5, 10.75], crea: [3, 17.45], gris: [12, 18.5], oracion: [18.75, 16.0, 'y', 2.4], cerrado: [24, 18.4] };
+    const LUGAR = { recepcion: [3, 4.35, 'x', 5], clientes: [12, 5.2], demos: [22, 5.3], cubiculos: [0.75, 8.6, 'y', 3.4, 'logo'], robots: [22, 11.3], crm: [9.6, 13.35], libreria: [14.5, 10.75], crea: [3, 17.45], gris: [12, 18.5], oracion: [18.75, 16.0, 'y', 2.4], cerrado: [24, 18.4] };
     const L = LUGAR[c.id] || [c.x + c.w / 2, c.y + c.h * 0.62], [ox, oy] = iso(L[0], L[1]);
     const largo = (L[3] || (L[2] === 'y' ? c.h : c.w)) * k - 36; if (L[2] === 'y' || L[3]) { fs1 = Math.min(36, largo / (titulo.length * 0.68)); fs2 = sub ? Math.min(22, largo / (sub.length * 0.56)) : 0; }
     const m = L[2] === 'y' ? `matrix(${TW / 2 / k},${-TH / 2 / k},${TW / 2 / k},${TH / 2 / k},${ox},${oy})` : `matrix(${TW / 2 / k},${TH / 2 / k},${-TW / 2 / k},${TH / 2 / k},${ox},${oy})`;
