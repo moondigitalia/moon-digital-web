@@ -93,5 +93,16 @@
       "destination": "/tablero",
       "permanent": false
     }
+  ],
+  "headers": [
+    {
+      "source": "/oficina/monitos/(.*).webp",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    }
   ]
 }

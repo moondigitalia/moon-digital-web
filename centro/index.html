@@ -460,12 +460,12 @@ html:not(.ancho) .agenda>.fila:only-child{border-radius:20px}
 <body>
 <div id="marco"><div class="app" id="app"></div></div>
 <div id="ofi" hidden></div>
-<script src="/oficina/piel.js"></script>
-<script src="/oficina/oficina.js"></script>
 
 <script src="/centro/visor-archivo.js" defer></script>
 <script>
 'use strict';
+// La Oficina (el mapa) se baja al mismo tiempo que todo lo demás, sin frenar el arranque del Tablero.
+const OFICINA_LISTA = Promise.all(['/oficina/piel.js', '/oficina/oficina.js'].map(src => new Promise(ok => { const e = document.createElement('script'); e.src = src; e.onload = e.onerror = ok; document.head.appendChild(e); })));
 const API = '/api/centro';
 const LLAVE = 'centro.moon.sesion';
 const GENTE = { daniel: { n: 'Daniel', c: '#2b2b30', i: 'D' }, dan: { n: 'Dan', c: '#3f86ee', i: 'Dn' }, kid: { n: 'Kid', c: '#0b4fd6', i: 'K' } };
@@ -524,7 +524,7 @@ let estado = { tareas: 'mias', crm: 'pendiente', proy: 'todos', busca: '' };
 const app = document.getElementById('app');
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const sesionGuardada = () => { try { return localStorage.getItem(LLAVE) || ''; } catch (e) { return ''; } };
-const guardarSesion = v => { try { v ? localStorage.setItem(LLAVE, v) : (localStorage.removeItem(LLAVE), localStorage.removeItem(COPIA)); } catch (e) {} };
+const guardarSesion = v => { try { v ? localStorage.setItem(LLAVE, v) : (localStorage.removeItem(LLAVE), localStorage.removeItem(COPIA), localStorage.removeItem('oficina.moon.copia')); } catch (e) {} };
 // Copia de lo último que se vio (solo en este aparato y solo para esta sesión): al abrir, el tablero aparece al instante con ella
 // y se pone al día solo en cuanto llega lo nuevo. Al cerrar sesión se borra.
 const COPIA = 'centro.moon.copia';
@@ -811,24 +811,33 @@ async function arrancar() {
   const invita = new URLSearchParams(location.search).get('invita');
   if (invita) return pantallaInvita(invita);   // la sesión de este aparato no se toca hasta que el link funcione
   if (!sesionGuardada()) return pantallaQuien();
-  if (window.Oficina) Oficina.preparar(pideOficina);   // el mapa se pide al mismo tiempo que los datos del Tablero
+  OFICINA_LISTA.then(() => { if (window.Oficina) Oficina.preparar(pideOficina); });   // el mapa se pide al mismo tiempo que los datos del Tablero
   // Si ya se había abierto en este aparato, se pinta al instante con lo último que se vio (nunca una pantalla vacía);
   // lo nuevo llega por detrás y, si algo cambió, se actualiza sin animar nada.
   const copia = !D && leerCopia();
   if (copia) {
-    if (copia.f && !Object.keys(FOTOS).length) FOTOS = await prepararFotos(copia.f);
-    D = copia.d; abrirDeLink(); transicion(() => pinta());
+    D = copia.d; abrirDeLink();
+    if (copia.f && !Object.keys(FOTOS).length) await fotosAntesDe(prepararFotos(copia.f));
+    transicion(() => pinta());
     api('fotos').then(async f => { if (f && f.ok) { guardarCopia(null, f.fotos); } });
     return recargar().then(() => guardarCopia(D));
   }
   if (!D) app.innerHTML = '<div class="top"><div class="marca"><span class="logo" role="img" aria-label="MOON Digital"></span><i>/</i>TABLERO</div></div><div class="entrada"><span class="mini">Cargando…</span></div>';
   // Datos y fotos llegan juntos ANTES de pintar: la pantalla aparece una sola vez, completa, sin repintarse después.
   const [r, f] = await Promise.all([api('inicio'), Object.keys(FOTOS).length ? null : api('fotos')]);
-  if (f && f.ok) { FOTOS = await prepararFotos(f.fotos); guardarCopia(null, f.fotos); }
   if (!r.ok) { if (r.error !== 'sesion' && !D) app.innerHTML = '<div class="entrada"><div class="caja"><h1>Sin conexión</h1><p>Revisa tu internet.</p><button class="boton" onclick="arrancar()">Reintentar</button></div></div>'; return; }
   D = r; guardarCopia(D);
   abrirDeLink();
+  if (f && f.ok) { guardarCopia(null, f.fotos); await fotosAntesDe(prepararFotos(f.fotos)); }
   transicion(() => pinta());
+}
+// Las caras del equipo se preparan antes de cualquier pantalla que las enseña. El mapa no las usa: si lo primero que se
+// ve es el mapa, se preparan por detrás (ahorra ~0.3 s al abrir) y cualquier pantalla que se abra después las espera.
+let fotosEnCamino = null;
+function fotosAntesDe(p) {
+  const prom = p.then(o => { FOTOS = o; fotosEnCamino = null; });
+  if (!pila.length && !esEmb()) { fotosEnCamino = prom; return null; }
+  return prom;
 }
 // Un link puede abrir directo una pantalla (/tablero?abrir=crm): al cerrarla se queda en el inicio, que es la Oficina.
 const LINK = new URLSearchParams(location.search);
@@ -852,6 +861,7 @@ document.addEventListener('visibilitychange', () => { if (D && document.visibili
 
 // El botón "atrás" del celular cierra la capa en vez de salirse de la página.
 async function precargar(capa) {
+  if (fotosEnCamino) await fotosEnCamino;   // nunca una pantalla con caras que llegan después
   const espera = p => Promise.race([p, new Promise(ok => setTimeout(ok, 1500))]);
   if (capa.tipo === 'ficha' && !capa.cargado) await espera(traerFicha(capa.tel).then(r => { if (r && r.ok) { capa.ext = r; capa.cargado = true; } }));
   if (capa.tipo === 'documento' && !capa.doc) await espera(api('documento', { id: capa.id }).then(r => { if (r.ok) capa.doc = r.doc; }));
@@ -906,9 +916,13 @@ function pinta(silencioso) {
   if (esEmb() && pila.some(x => !CAPAS_EMB.includes(x.tipo))) pila = [];
   const c = pila[pila.length - 1];
   if (!c || c.tipo !== 'demo') veloFuera(false);
-  if (!c && !esEmb() && window.Oficina) {   // el inicio es la Oficina: lo de antes se queda hasta que el mapa ya está completo
+  if (!c && !esEmb()) {   // el inicio es la Oficina: lo de antes se queda hasta que el mapa ya está completo
     if (!app.innerHTML.trim()) app.innerHTML = '<div class="top"><div class="marca"><span class="logo" role="img" aria-label="MOON Digital"></span><i>/</i>TABLERO</div></div><div class="entrada"><span class="mini">Cargando…</span></div>';
-    return verOficina(silencioso).then(() => { if (!pila.length && Oficina.visible()) app.innerHTML = ''; });
+    return OFICINA_LISTA.then(() => {
+      if (pila.length) return;
+      if (!window.Oficina) return pintaInicio(silencioso);   // si el mapa no pudo bajar, el Tablero sigue funcionando con sus tarjetas
+      return verOficina(silencioso).then(() => { if (!pila.length && Oficina.visible()) app.innerHTML = ''; });
+    });
   }
   if (window.Oficina) Oficina.esconder();
   if (!c) return esEmb() ? pintaInicioEmbajador(silencioso) : pintaInicio(silencioso);

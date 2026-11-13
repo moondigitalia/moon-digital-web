@@ -111,6 +111,8 @@ let host = null, raiz = null, T = null, listo = false, quiere = false;
 // Lo que tarda (el estado de la oficina y los monitos) se pide al abrir la página, junto con los datos del Tablero:
 // así el mapa sale al mismo tiempo que todo lo demás.
 let previo = null;
+// Lo último que se vio se guarda en el aparato: al volver a abrir, el mapa sale al instante y lo nuevo llega por detrás.
+const COPIA = 'oficina.moon.copia';
 function preparar(pide) { if (!previo) previo = { estado: pide('/api/oficina', 'estado'), piel: window.Piel && Piel.cargar && !Piel.cargado ? Piel.cargar() : null }; }
 const visible = () => host && !host.hidden;
 function montar(h, puente) {
@@ -155,7 +157,7 @@ async function cargar() {
   const pedido = previo && previo.estado; if (previo) previo.estado = null;
   let a = await (pedido || oficina('estado'));
   if (!a.ok && pedido) a = await oficina('estado');   // lo que se pidió al abrir pudo ser con una sesión vieja: una vez más
-  if (a.ok) O = a.oficina;
+  if (a.ok) { O = a.oficina; try { localStorage.setItem(COPIA, JSON.stringify(O)); } catch (e) {} }
   C = T.D();
   // Lo que se está usando no se toca: el mapa se refresca solo si está a la vista y no hay nada abierto encima.
   if (visible() && !$('#mapa').hidden) { dibujarMundo(); pintarInfo(true); }
@@ -421,6 +423,7 @@ $('#escribe').onsubmit = async e => {
   // Lo que el Tablero le pide a la Oficina
   ver = async function () {
     quiere = true;
+    if (!O) { try { O = JSON.parse(localStorage.getItem(COPIA) || 'null'); } catch (e) {} if (O) cargar(); }   // con copia: se dibuja ya y lo nuevo llega solo
     await Promise.all([O ? 0 : cargar(), previo && previo.piel]);   // datos y monitos listos antes del primer dibujo
     if (!quiere) return;   // mientras llegaban, se abrió otra pantalla: el mapa no se pone encima
     const nueva = host.hidden;

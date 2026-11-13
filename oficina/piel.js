@@ -116,19 +116,24 @@
   let MET = null;
   // Al llegar la lista se piden de una vez todas las poses: así, al empezar a caminar, el paso ya está y no parpadea.
   const GUARDADAS = [];
+  // Cada imagen lleva la versión de la lista (?v=…): el celular la guarda un año y solo la vuelve a pedir si los
+  // monitos cambian. Primero se piden las poses con las que aparecen; las de caminar, en cuanto esas ya están.
+  let VER = '';
+  const src = (sk, p) => `${RUTA}${sk}_${p}.webp${VER}`;
   function cargar() {
-    return fetch(RUTA + 'monitos.json').then(r => r.json()).then(j => {
-      // La lista llega en un instante y con ella ya se dibujan los monitos 3D; las poses se piden de fondo
-      // (así el primer paso de cada uno ya está y no parpadea).
+    return fetch(RUTA + 'monitos.json').then(r => r.text()).then(t => {
+      const j = JSON.parse(t);
+      let h = 0; for (let i = 0; i < t.length; i++) h = (h * 31 + t.charCodeAt(i)) | 0;
+      VER = '?v=' + (h >>> 0).toString(36);
       MET = j; api.cargado = true;
       // Las poses con las que aparecen (parado, sentado, acostado) se esperan ya listas para que ningún monito aparezca
       // después del resto (máximo 2.5 s: con internet muy lento, la oficina sale y los monitos llegan solos).
-      const primeras = [];
-      Object.entries(j).forEach(([n, m]) => m.poses.concat(m.acostado ? ['acostado'] : []).forEach(p => {
-        const i = new Image(); i.src = `${RUTA}${n}_${p}.webp`; GUARDADAS.push(i);
-        if (/^(reposo|sentado|acostado)$/.test(p)) primeras.push((i.decode ? i.decode() : Promise.resolve()).catch(() => {}));
-      }));
-      return Promise.race([Promise.all(primeras), new Promise(ok => setTimeout(ok, 2500))]);
+      const primeras = [], despues = [];
+      Object.entries(j).forEach(([n, m]) => m.poses.concat(m.acostado ? ['acostado'] : []).forEach(p => (/^(reposo|sentado|acostado)$/.test(p) ? primeras : despues).push([n, p])));
+      const pide = ([n, p]) => { const i = new Image(); i.src = src(n, p); GUARDADAS.push(i); return (i.decode ? i.decode() : Promise.resolve()).catch(() => {}); };
+      const listas = Promise.all(primeras.map(pide));
+      listas.then(() => despues.forEach(pide));
+      return Promise.race([listas, new Promise(ok => setTimeout(ok, 2500))]);
     }).catch(() => { api.cargado = false; });   // si falla, se vuelve a pedir en el siguiente dibujo
   }
   // Quién usa qué monito: el equipo y Jason fijos; los demás asistentes toman colores en orden (sin el naranja de Claude)
@@ -138,8 +143,8 @@
   function pielDe(id) { if (FIJO[id]) return FIJO[id]; if (!(id in ORDEN)) ORDEN[id] = COLORES[Object.keys(ORDEN).length % COLORES.length]; return ORDEN[id]; }
   function imgMono(sk, pose, sx, sy) {   // la imagen del monito con los pies en (sx, sy)
     const m = MET[sk], k = ALTO_MONO / 200;
-    if (pose === 'acostado') { const [w, h] = m.acostado; return `<image class="m-img" href="${RUTA}${sk}_acostado.webp" x="${sx - w * k / 2}" y="${sy - h * k * 0.8}" width="${w * k}" height="${h * k}"/>`; }
-    return `<image class="m-img" data-sk="${sk}" data-pose="${pose}" data-px="${m.px * k}" data-sx="${sx}" href="${RUTA}${sk}_${pose}.webp" x="${sx - m.px * k}" y="${sy - m.py * k}" width="${m.w * k}" height="${m.h * k}"/>`;
+    if (pose === 'acostado') { const [w, h] = m.acostado; return `<image class="m-img" href="${src(sk, 'acostado')}" x="${sx - w * k / 2}" y="${sy - h * k * 0.8}" width="${w * k}" height="${h * k}"/>`; }
+    return `<image class="m-img" data-sk="${sk}" data-pose="${pose}" data-px="${m.px * k}" data-sx="${sx}" href="${src(sk, pose)}" x="${sx - m.px * k}" y="${sy - m.py * k}" width="${m.w * k}" height="${m.h * k}"/>`;
   }
   // Monito (persona o asistente): sombra, cuerpo, cabeza, pelo; acostado con ojos de tache en el cuarto gris.
   function monito(x, y, o) {
@@ -298,7 +303,7 @@
       if (camina) { const [nx, ny] = a.camino[0], dx = (nx - a.pos[0]) - (ny - a.pos[1]); if (Math.abs(dx) > 0.01) a.mira = dx > 0 ? 1 : -1; }
       const pose = camina ? (Math.floor(VIDA.reloj / TIEMPO.pasito) % 2 ? 'camina_b' : 'camina') : (a.fuera ? 'reposo' : im.dataset.pose);
       const sk = im.dataset.sk, m = MET && MET[sk];
-      if (m && m.poses.includes(pose)) { const h = `${RUTA}${sk}_${pose}.webp`; if (im.getAttribute('href') !== h) im.setAttribute('href', h); }
+      if (m && m.poses.includes(pose)) { const h = src(sk, pose); if (im.getAttribute('href') !== h) im.setAttribute('href', h); }
       const voltea = camina && a.mira > 0, sxp = Number(im.dataset.sx);   // las imágenes miran a la izquierda; si va a la derecha, al espejo
       im.setAttribute('transform', voltea ? `translate(${2 * sxp},0) scale(-1,1)` : '');
     }
