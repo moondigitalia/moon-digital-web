@@ -60,10 +60,6 @@
     {
       "source": "/presentacion/:codigo",
       "destination": "/presentacion/index.html"
-    },
-    {
-      "source": "/oficina",
-      "destination": "/oficina/index.html"
     }
   ],
   "redirects": [
@@ -79,6 +75,21 @@
     },
     {
       "source": "/centro/index.html",
+      "destination": "/tablero",
+      "permanent": false
+    },
+    {
+      "source": "/oficina",
+      "destination": "/tablero",
+      "permanent": false
+    },
+    {
+      "source": "/oficina/",
+      "destination": "/tablero",
+      "permanent": false
+    },
+    {
+      "source": "/oficina/index.html",
       "destination": "/tablero",
       "permanent": false
     }

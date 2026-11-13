@@ -19,3 +19,10 @@ Reglas que nacieron de errores reales (22-oct-2026):
 - Los datos se piden ANTES de cambiar de pantalla; nunca se repinta "cuando llegan".
 - Los campos de texto van en 16 px o más (si no, el iPhone hace zoom solo).
 - La página es fija: el marco mide lo que de verdad se ve (teclado incluido).
+
+Desde el 13-nov-2026 la pantalla de inicio es la Oficina (el mapa con los monitos, `oficina/oficina.js`):
+- Los jueces abren cada pantalla como lo hace el mapa: `abrir({ tipo: 'crm' })` (ya no hay tarjetas de inicio).
+- El servidor de prueba también sirve la Oficina (`/oficina/*` y `/api/oficina` con `pruebas/oficina/oficina.json`;
+  con `DATOS=archivo.json` usa la API real sobre esa base falsa). `PUERTO=` cambia el puerto.
+- Si se toca la unión (el arranque del Tablero o `oficina/oficina.js`), corre también `bash pruebas/oficina/correr.sh`.
+

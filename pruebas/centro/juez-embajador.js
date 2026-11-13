@@ -38,6 +38,7 @@ const corridas = RAPIDO ? [['light', 320, 568, 1], ['light', 1280, 800, 1]] : [[
     await revisa('inicio');
     const ve = await p.evaluate(() => ({ socio: !!document.querySelector('.t-crm,.t-equipo,.t-proy,.t-moon'), txt: document.querySelector('.mosaico').innerText }));
     if (ve.socio) fallas.push(`${w} el embajador ve tarjetas de socios`);
+    if (await p.evaluate(() => { const o = document.getElementById('ofi'); return o && !o.hidden; })) fallas.push(`${w} el embajador ve la Oficina (enseña dinero)`);
     for (const t of ['Mis comisiones', 'Crea tu recepcionista', 'Mis prospectos', 'Mis tareas', 'Material de MOON']) if (!ve.txt.includes(t)) fallas.push(`${w} falta "${t}" en su inicio`);
     for (const ir of ['emComisiones', 'emProspectos', 'emMaterial', 'tareas', 'demo']) {
       await p.click(`[data-ir="${ir}"]`, { position: { x: 12, y: 12 } }); await p.waitForTimeout(ir === 'demo' ? 900 : 300); await revisa(ir);

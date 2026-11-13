@@ -32,11 +32,10 @@ const tam=[[320,568],[375,667],[390,844],[430,932],[768,1024],[1280,800]];
   await revisa('quien');
   await p.click('[data-u="kid"]'); await revisa('clave');
   await teclado(p,w,h,'clave',fallas);
-  await p.fill('#clave','123456'); await p.click('form .boton'); await p.waitForSelector('.mosaico'); await revisa('inicio');{const sol=await p.evaluate(()=>[...document.querySelectorAll('.mosaico .t')].filter(t=>{const n=t.querySelector('.num'),x=t.querySelector('.sub');return n&&(!x||!x.offsetHeight)}).map(t=>t.querySelector('.eti').textContent));if(sol.length)fallas.push(`${tema} ${w}x${h} z${z} inicio: número sin decir qué es en ${sol.join(', ')}`);}
-  // Llamadas y Citas dicen sus números en la primera pantalla (las llamadas de prueba también cuentan).
-  {const n=await p.textContent('.t-tuyo .num').catch(()=>'');if(n.trim()!=='3')fallas.push(`${tema} ${w} llamadas no dice 3: ${n}`);const c=await p.textContent('.t-equipo .num').catch(()=>'');if(c.trim()!=='1')fallas.push(`${tema} ${w} citas no dice 1 próxima: ${c}`);}
+  await p.fill('#clave','123456'); await p.click('form .boton'); await p.waitForSelector('#ofi:not([hidden])'); await revisa('inicio');
+  // El inicio es la Oficina (el mapa): sus números y textos los mide el juez de la Oficina (pruebas/oficina).
   // Crea tu recepcionista: al abrir una hoja adentro, se oscurece TODA la pantalla igual (afuera lo hace el tablero), y tocar afuera la cierra.
-  {await p.click('[data-ir="demo"]',{position:{x:12,y:12}});await p.waitForTimeout(900);await revisa('recepcionista');const fr=p.frameLocator('.doc-html');await fr.locator('#pServicios').evaluate(e=>e.click());await p.waitForTimeout(600);
+  {await p.evaluate(()=>abrir({tipo:'demo'}));await p.waitForTimeout(900);await revisa('recepcionista');const fr=p.frameLocator('.doc-html');await fr.locator('#pServicios').evaluate(e=>e.click());await p.waitForTimeout(600);
    const v=await p.evaluate(()=>{const e=document.getElementById('veloFuera');const f=document.querySelector('.doc-html').getBoundingClientRect();return e?{op:getComputedStyle(e).opacity,cp:e.style.clipPath,top:f.top}:null});
    if(!v||v.op!=='1'||!v.cp.includes(' '+Math.floor(v.top)))fallas.push(`${tema} ${w} recepcionista: la sombra no cubre toda la pantalla ${JSON.stringify(v)}`);
    await p.mouse.click(Math.round(w/2),8);await p.waitForTimeout(600);
@@ -46,7 +45,7 @@ const tam=[[320,568],[375,667],[390,844],[430,932],[768,1024],[1280,800]];
     if(k.h<100||ki.top<0||ki.bottom>ki.ih+1||k.top+ki.bottom>Math.round(h*0.46)+1)fallas.push(`${tema} ${w} recepcionista con teclado: no se ve el campo ${JSON.stringify([k,ki])}`);
     await fr.locator('input[name=giro]').evaluate(e=>e.blur());await teclado.cerrar(p);await p.waitForTimeout(500);}
    await p.click('#volver');await p.waitForTimeout(500);}
-  for(const ir of ['llamadas','crm','clientes','equipo','citas','casa']){if(ir==='equipo'){await p.click('#salir');await p.waitForTimeout(400);if(!await p.$('#irEquipo'))fallas.push(`${w} tu credencial no tiene el botón de Equipo`);await p.click('#volver');await p.waitForTimeout(400);await p.evaluate(()=>abrir({tipo:'equipo'}));}else await p.click(`[data-ir="${ir}"]`,{position:{x:12,y:12}});await revisa(ir);
+  for(const ir of ['llamadas','crm','clientes','equipo','citas','casa']){if(ir==='equipo'){await p.evaluate(()=>abrir({tipo:'cuenta'}));await p.waitForTimeout(400);if(!await p.$('#irEquipo'))fallas.push(`${w} tu credencial no tiene el botón de Equipo`);await p.click('#volver');await p.waitForTimeout(400);await p.evaluate(()=>abrir({tipo:'equipo'}));}else await p.evaluate(x=>abrir({tipo:x}),ir);await revisa(ir);
     if(ir==='crm'){await teclado(p,w,h,'crm',fallas);await p.type('#busca','refacc');await p.waitForTimeout(200);{const n=await p.$$eval('#resultados [data-p]',l=>l.length);if(n<1)fallas.push(`${w} el buscador no encuentra mientras escribes`);}await revisa('crm-buscando');await p.fill('#busca','');await p.dispatchEvent('#busca','input');
 await p.click('[data-g="en órbita"]');await revisa('crm-orbita');{const t=await p.evaluate(()=>pila.map(x=>x.tipo).join('>'));if(t!=='crm')fallas.push(`${w} filtrar por etapa abrió otra pantalla: ${t}`);}await p.click('[data-g="todos"]');await revisa('crm-todos');{const d=await p.$$eval('#resultados [data-p]',l=>l.length);if(d<20)fallas.push(`${w} Todos no trae a todos: ${d}`);}
 await p.click('[data-p]');await revisa('ficha');{const t=await p.evaluate(()=>pila.map(x=>x.tipo).join('>'));if(t!=='crm>ficha')fallas.push(`${w} la ficha no está a 2 toques: ${t}`);if(await p.$('.tabs'))fallas.push(`${w} la ficha todavía tiene pestañas`);if(await p.$('#sigue'))fallas.push(`${w} sigue "Dejar tarea"`);const vacio=await p.evaluate(()=>/Aún no hay/.test(document.querySelector('.vista').textContent));if(vacio)fallas.push(`${w} la ficha enseña secciones vacías`);}
@@ -73,7 +72,7 @@ await p.fill('#q1','Mandarle la propuesta a la clínica con todos los precios nu
 for(const k of [5,6,7]){await revisa('tarea-paso'+k);await teclado(p,w,h,'tarea-paso'+k,fallas);if(k<7){await p.fill('#q'+k,'Algo escrito');await p.focus('#q'+k);await teclado.unToque(p,w,h,'tarea-paso'+k,'#sigue',paso,fallas);}}
 await p.fill('#q7','no es link');await p.click('#sigue');{const t=await p.textContent('#aviso');if(!/https/.test(t))fallas.push(`${w} link malo sin aviso`);}for(let k=0;k<8&&await p.$('form.pasos .pasos-cab');k++){await p.click('#volver');await p.waitForTimeout(200);}{const t=await p.evaluate(()=>pila.map(x=>x.tipo).join('>'));if(t!=='tareas')fallas.push(`${w} la flecha de regresar en Nueva tarea no lleva de pregunta en pregunta hasta salir: ${t}`);}}
     await p.click('#volver');}
-  await p.click('#salir');await revisa('cuenta');await p.click('.cred');await revisa('cuenta-vuelta');
+  await p.evaluate(()=>abrir({tipo:'cuenta'}));await revisa('cuenta');await p.click('.cred');await revisa('cuenta-vuelta');
   await p.setInputFiles('#archivo','prueba.jpg');await p.waitForSelector('#rec');await revisa('foto');await p.click('#guardar');await p.waitForTimeout(400);await revisa('cuenta-despues');
   await p.click('#frase');await revisa('frase');await teclado(p,w,h,'frase',fallas);await p.click('#volver');
   if(errs.length)fallas.push(`${tema} ${w}x${h} errores: ${errs.join(' | ')}`);

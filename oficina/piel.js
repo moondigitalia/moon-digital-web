@@ -121,7 +121,14 @@
       // La lista llega en un instante y con ella ya se dibujan los monitos 3D; las poses se piden de fondo
       // (así el primer paso de cada uno ya está y no parpadea).
       MET = j; api.cargado = true;
-      Object.entries(j).forEach(([n, m]) => m.poses.concat(m.acostado ? ['acostado'] : []).forEach(p => { const i = new Image(); i.src = `${RUTA}${n}_${p}.webp`; GUARDADAS.push(i); }));
+      // Las poses con las que aparecen (parado, sentado, acostado) se esperan ya listas para que ningún monito aparezca
+      // después del resto (máximo 2.5 s: con internet muy lento, la oficina sale y los monitos llegan solos).
+      const primeras = [];
+      Object.entries(j).forEach(([n, m]) => m.poses.concat(m.acostado ? ['acostado'] : []).forEach(p => {
+        const i = new Image(); i.src = `${RUTA}${n}_${p}.webp`; GUARDADAS.push(i);
+        if (/^(reposo|sentado|acostado)$/.test(p)) primeras.push((i.decode ? i.decode() : Promise.resolve()).catch(() => {}));
+      }));
+      return Promise.race([Promise.all(primeras), new Promise(ok => setTimeout(ok, 2500))]);
     }).catch(() => { api.cargado = false; });   // si falla, se vuelve a pedir en el siguiente dibujo
   }
   // Quién usa qué monito: el equipo y Jason fijos; los demás asistentes toman colores en orden (sin el naranja de Claude)
@@ -550,7 +557,9 @@ ${fondo}${LETREROS}<g class="escena">${cosas.map(c => `<g class="d" data-d="${c[
   }
   // De un punto del dibujo al cuarto que está debajo (para tocar muebles, pasillos o el piso).
   function cuartoEn(wx, wy) { const a = (wx - OX) / (TW / 2), b = (wy - OY) / (TH / 2); const x = (a + b) / 2, y = (b - a) / 2; const c = cuartoDe(x, y); return c ? c.id : null; }
-  function pausa(si) { if (VIDA) VIDA.pausaHasta = si ? performance.now() + 350 : 0; }   // la pausa se vence sola: nunca se queda todo congelado
+  // La pausa se vence sola (nunca se queda todo congelado); 'fija' solo mientras la oficina está tapada por otra pantalla
+  // del Tablero (así un CRM encima no va a saltos en celulares lentos) y se suelta al volver al mapa.
+  function pausa(si) { if (VIDA) VIDA.pausaHasta = si === 'fija' ? Infinity : si ? performance.now() + 350 : 0; }
   const api = { pausa, dibuja, MONO, luzDe, vida, ruta, cuartoEn, cargar, cargado: false };
   window.Piel = api;
 })();

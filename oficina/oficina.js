@@ -1,12 +1,10 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=overlays-content">
-<meta name="robots" content="noindex">
-<meta name="theme-color" content="#16161a">
-<title>Oficina MOON</title>
-<style>
+// OFICINA MOON (13-nov-2026): el mapa con los monitos es la pantalla de inicio del Tablero, en la MISMA página.
+// Vive encerrada en su propia caja (sombra): sus estilos no tocan al Tablero ni el Tablero a ella.
+// Lo que es para trabajar (CRM, citas, fichas, cuenta…) son las pantallas del Tablero: se abren encima con T.abrir().
+// Cambiar este archivo no mueve el mapa: el dibujo vive en piel.js, intacto.
+window.Oficina = (function () {
+'use strict';
+const CSS = `
 /* OFICINA MOON — paso 1 (sistemas). La piel 3D se pone encima después sin tocar esto.
    REGLAS (las mide el juez de la oficina en todas las pantallas):
    1. Nada se mueve con el teclado: la página mide lo que mide la pantalla, nunca lo que deja el teclado.
@@ -17,16 +15,15 @@
       Las alertas solo viven en el mapa.
    5. Un toque, una acción.
    6. Nada aparece de golpe: cada vista entra ya lista, con un fundido corto. */
-:root{
+:host{
   --fondo:#16161a; --piso:#1e2b2d; --cuarto:#2b2b33; --linea:#3a3a43; --tinta:#f3f2ee; --suave:#b4b3bb;
   --verde:#3ccf7a; --amarillo:#f2c230; --rojo:#ef4b4b; --naranja:#ff7a1a; --azul:#8fb6ff;
   --alto:100vh; --t:160ms;
 }
 [hidden]{display:none!important}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;overflow:hidden;background:var(--fondo);color:var(--tinta);
+#raiz{height:100%;overflow:hidden;background:var(--fondo);color:var(--tinta);
   font:700 16px/1.35 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overscroll-behavior:none;-webkit-text-size-adjust:100%}
-body{position:fixed;left:0;top:0;right:0}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;text-align:inherit}
 input{font:inherit;font-size:16px}
 a{color:var(--azul)}
@@ -95,19 +92,11 @@ small{font-size:15px;font-weight:600}
 .escribe button{background:var(--tinta);color:#141414;border-radius:14px;padding:0 16px;font-weight:900}
 .msj{padding:10px 12px;border-radius:14px;margin:8px 0;background:#24242b;white-space:pre-wrap}
 .msj.yo{background:#33333b;color:var(--suave)}
-
-/* ---------- Entrada ---------- */
-#entrada{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:20px}
-#entrada h1{font-size:24px;font-weight:900;text-align:center}
-#personajes{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
-#personajes button{width:96px;padding:14px 0;border-radius:18px;background:#24242b;font-weight:900;text-align:center;box-shadow:inset 0 0 0 2px transparent}
-#personajes button.si{box-shadow:inset 0 0 0 2px var(--tinta)}
-#entrada form{display:flex;gap:8px;width:min(340px,100%)}
-#entrada input{flex:1;min-width:0;background:#24242b;border:0;border-radius:14px;padding:12px 14px;color:var(--tinta)}
-#entrada form button{background:var(--tinta);color:#141414;border-radius:14px;padding:0 16px;font-weight:900}
-</style>
-</head>
-<body>
+#raiz{position:relative;width:100%;height:var(--alto)}
+button.fila{text-align:left}
+.fila.mas{color:var(--azul);font-weight:800}
+`;
+const CUERPO = `
 <div id="mapa" class="vista" hidden>
   <div id="oficina"><div id="mundo"></div><div id="hud"></div></div>
   <section id="info"><div class="cab"><h2 id="infoT"></h2></div><div class="cuerpo" id="infoC"></div></section>
@@ -117,29 +106,24 @@ small{font-size:15px;font-weight:600}
   <form class="escribe" id="escribe" autocomplete="off"><input id="texto" enterkeyhint="send" maxlength="600"><button>Preguntar</button></form>
   <div class="cuerpo" id="herrC"></div>
 </div>
-<div id="entrada" class="vista" hidden>
-  <h1>¿Quién entra a la oficina?</h1>
-  <div id="personajes"></div>
-  <form id="clave" hidden><input type="password" id="pass" placeholder="Tu contraseña" autocomplete="current-password"><button>Entrar</button></form>
-  <p id="error" class="aviso"></p>
-</div>
-<script src="/oficina/piel.js"></script>
-<script>
-'use strict';
-const LLAVE = 'centro.moon.sesion';   // la misma sesión del Tablero
-const $ = s => document.querySelector(s);
-const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
-const ses = () => { try { return localStorage.getItem(LLAVE) || ''; } catch (e) { return ''; } };
-async function pide(api, accion, datos) {
-  try {
-    const r = await fetch(api, { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-sesion': ses() }, body: JSON.stringify(Object.assign({ accion }, datos || {})) });
-    const j = await r.json().catch(() => ({ ok: false, error: 'red' }));
-    if (r.status === 401 || j.error === 'sesion') salir();
-    return j;
-  } catch (e) { return { ok: false, error: 'red', mensaje: 'Sin conexión. Se vuelve a intentar solo.' }; }
+`;
+let host = null, raiz = null, T = null, listo = false, quiere = false;
+// Lo que tarda (el estado de la oficina y los monitos) se pide al abrir la página, junto con los datos del Tablero:
+// así el mapa sale al mismo tiempo que todo lo demás.
+let previo = null;
+function preparar(pide) { if (!previo) previo = { estado: pide('/api/oficina', 'estado'), piel: window.Piel && Piel.cargar && !Piel.cargado ? Piel.cargar() : null }; }
+const visible = () => host && !host.hidden;
+function montar(h, puente) {
+  host = h; T = puente;
+  raiz = host.attachShadow({ mode: 'open' });
+  raiz.innerHTML = `<style>${CSS}</style><div id="raiz">${CUERPO}</div>`;
+  codigo();
 }
-const centro = (a, d) => pide('/api/centro', a, d);
-const oficina = (a, d) => pide('/api/oficina', a, d);
+let codigo = function () {
+
+const $ = s => raiz.querySelector(s);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+const oficina = (a, d) => T.pide('/api/oficina', a, d);
 const NOMBRE = { kid: 'Kid', daniel: 'Papá', dan: 'Dan' };
 
 // ---------- Regla 1: la página mide lo que mide la pantalla; el teclado nunca la cambia ----------
@@ -148,64 +132,39 @@ let anchoMedido = 0;
 function medir() {
   if (window.innerWidth === anchoMedido) return false;
   anchoMedido = window.innerWidth;
-  document.documentElement.style.setProperty('--alto', window.innerHeight + 'px');
+  host.style.setProperty('--alto', window.innerHeight + 'px');
   return true;
 }
 medir();
-addEventListener('resize', () => { if (medir() && !$('#mapa').hidden) ajustarVista(); });
+addEventListener('resize', () => { if (medir() && visible()) ajustarVista(); });
 
 function mostrar(id) {
   // Como en el Tablero: la vista nueva ya está completa DEBAJO y la anterior se desvanece ENCIMA.
   // Nunca se aparece "desde transparente" (eso se ve como parpadeo).
-  const nueva = document.getElementById(id);
-  const vieja = ['mapa', 'herramienta', 'entrada'].map(v => document.getElementById(v)).find(e => e !== nueva && !e.hidden);
+  const nueva = raiz.getElementById(id);
+  const vieja = ['mapa', 'herramienta'].map(v => raiz.getElementById(v)).find(e => e !== nueva && !e.hidden);
   nueva.hidden = false; nueva.style.zIndex = 1;
   if (!vieja) return;
   vieja.style.zIndex = 2; vieja.classList.add('sale');
   setTimeout(() => { vieja.hidden = true; vieja.classList.remove('sale'); vieja.style.zIndex = ''; }, 170);
 }
 
-// ---------- Entrada ----------
-let elegido = null;
-async function entrada() {
-  mostrar('entrada');
-  const j = await centro('quienes');
-  $('#personajes').innerHTML = (j.usuarios || []).filter(u => NOMBRE[u.id]).map(u => `<button data-id="${u.id}">${NOMBRE[u.id]}</button>`).join('');
-}
-$('#personajes').onclick = e => {
-  const b = e.target.closest('button'); if (!b) return;
-  elegido = b.dataset.id; [...$('#personajes').children].forEach(x => x.classList.toggle('si', x === b));
-  $('#clave').hidden = false; $('#pass').focus({ preventScroll: true });
-};
-$('#clave').onsubmit = async e => {
-  e.preventDefault();
-  const j = await centro('entrar', { usuario: elegido, clave: $('#pass').value });
-  if (!j.ok) { $('#error').textContent = j.error === 'pausa' ? 'Muchos intentos. Espera 15 minutos.' : j.error === 'sin_clave' ? 'Primero crea tu contraseña en el Tablero.' : 'Esa contraseña no es.'; return; }
-  try { localStorage.setItem(LLAVE, j.sesion); } catch (x) {}
-  $('#pass').blur(); arrancar();
-};
-function salir() { try { localStorage.removeItem(LLAVE); } catch (e) {} entrada(); }
-
 // ---------- Datos ----------
 let O = null, C = null, sel = { tipo: 'resumen' }, reloj = null;
 async function cargar() {
-  const [a, b] = await Promise.all([oficina('estado'), centro('inicio')]);
+  const pedido = previo && previo.estado; if (previo) previo.estado = null;
+  let a = await (pedido || oficina('estado'));
+  if (!a.ok && pedido) a = await oficina('estado');   // lo que se pidió al abrir pudo ser con una sesión vieja: una vez más
   if (a.ok) O = a.oficina;
-  if (b.ok) C = b;
-  // Lo que se está usando no se toca: el mapa se refresca solo si está a la vista; la pantalla completa, nunca.
-  if (!$('#mapa').hidden) { dibujarMundo(); pintarInfo(true); }
-}
-async function arrancar() {
-  if (!ses()) return entrada();
-  await Promise.all([cargar(), window.Piel && Piel.cargar ? Piel.cargar() : 0]);   // los monitos 3D antes del primer dibujo
-  if (!O) return;
-  mostrar('mapa'); ajustarVista(); dibujarMundo(); pintarInfo();
-  clearInterval(reloj); reloj = setInterval(cargar, 60e3);   // leer la base no cuesta: cada minuto
+  C = T.D();
+  // Lo que se está usando no se toca: el mapa se refresca solo si está a la vista y no hay nada abierto encima.
+  if (visible() && !$('#mapa').hidden) { dibujarMundo(); pintarInfo(true); }
 }
 addEventListener('popstate', () => {
+  if (!visible() || (history.state && history.state.capa)) return;   // las pantallas del Tablero las regresa el Tablero
   const h = history.state || {};
   if (h.herramienta) abrirHerramienta(h.herramienta, h.tel, true);
-  else if (O) { mostrar('mapa'); dibujarMundo(); pintarInfo(true); ajustarVista(); }
+  else if (O && $('#mapa').hidden) { mostrar('mapa'); dibujarMundo(); pintarInfo(true); ajustarVista(); }
 });
 
 // ---------- Alertas: solo en el mapa ----------
@@ -318,12 +277,12 @@ const suelta = e => { dedos.delete(e.pointerId); ini = null; if (!dedos.size && 
 of.addEventListener('click', e => { if (!movido) tocar(e.clientX, e.clientY); });
 of.addEventListener('pointerup', suelta); of.addEventListener('pointercancel', suelta);
 of.addEventListener('wheel', e => { e.preventDefault(); const r = of.getBoundingClientRect(); zoomEn(e.clientX - r.left, e.clientY - r.top, vista.z * Math.exp(-e.deltaY * 0.0015)); }, { passive: false });
-['gesturestart', 'gesturechange'].forEach(n => document.addEventListener(n, e => e.preventDefault()));
+
 
 // Un toque: el monito que está ahí; si no, el cuarto.
 function tocar(cx, cy) {
-  const el = document.elementFromPoint(cx, cy); if (!el) return;
-  const m = el.closest('[data-a]'), c = el.closest('[data-c]');
+  let el = raiz.elementFromPoint ? raiz.elementFromPoint(cx, cy) : null; if (el && !raiz.contains(el)) el = null;   // Safari a veces contesta con algo de afuera
+  const m = el && el.closest('[data-a]'), c = el && el.closest('[data-c]');
   if (m && m.dataset.a === 'claude') return elegir({ tipo: 'cubiculos', cuarto: 'cubiculos' });   // el robot naranja: lo último que pasó
   if (m && /^equipo-/.test(m.dataset.a)) return elegir({ tipo: 'cubiculos', cuarto: 'cubiculos' });
   if (m && m.dataset.a === 'jason') return elegir({ tipo: 'recepcion', cuarto: 'recepcion' });   // Jason: lo útil de Jason (llamarle, sus citas y llamadas)
@@ -375,6 +334,10 @@ function pintarInfo(refresco) {
     t = sel.tipo === 'clientes' ? 'Clientes que pagan' : 'Demos';
     h = `<p class="contexto">${sel.tipo === 'clientes' ? 'Los asistentes de los clientes que ya nos pagan. Cada uno contesta por voz y por texto a la gente de ese negocio, de día y de noche. Si uno se pone en rojo, la gente se está quedando sin respuesta.' : 'Asistentes que hicimos para enseñárselos a un posible cliente. Están sentados esperando: todavía no hay respuesta de ese cliente. Si dice que sí, el asistente pasa a Clientes que pagan.'}</p>` + LEYENDA + as.filter(a => a.tipo === (sel.tipo === 'clientes' ? 'cliente' : 'demo')).map(a => filaAsistente(a, true)).join('');
     const ult = O.actividad && O.actividad.lineas && O.actividad.lineas[0];
+    if (sel.tipo === 'clientes') {
+      const cl = T.clientes();
+      if (cl.length) h += '<p class="titulo">Sus fichas</p><p class="contexto chico">Lo de cada cliente: su contrato, sus documentos y cuánto usa la gente su asistente.</p>' + cl.map(x => `<button class="fila" data-abre="${esc(JSON.stringify({ tipo: 'cliente', tel: x.tel }))}">${esc(x.nombre)}<small>Abrir su ficha</small></button>`).join('');
+    }
     if (sel.tipo === 'clientes' && ult) h += `<p class="titulo">Claude ahorita</p><div class="fila">${esc(ult.texto)}<small>${hace(ult.hora)}</small></div>`;
   } else if (sel.tipo === 'recepcion') {
     // Igual que las Llamadas del Tablero: quién (negocio), de qué se trató y cuándo; las de nosotros dicen "Prueba".
@@ -382,17 +345,22 @@ function pintarInfo(refresco) {
     const jas = as.find(a => a.id === 'jason') || {}, tel = String(jas.telefono || '');
     const telBonito = tel.replace(/^\+52(\d{2})(\d{4})(\d{4})$/, '+52 $1 $2 $3');
     h = '<p class="contexto">Jason es el recepcionista de MOON Digital: contesta las llamadas de quien se interesa en nosotros, le explica qué hacemos y le aparta una cita con el equipo. Todo lo que platica queda en el CRM.</p>';
-    if (tel) h += `<p class="contexto chico">Su número es ${esc(telBonito)}: es el que se le da a los clientes. Llámale para escuchar cómo contesta.</p><div class="acciones"><a class="accion" href="tel:${esc(tel)}">Llamar a Jason</a><a class="accion" href="/tablero?abrir=citas&volver=/oficina">Citas que apartó</a></div>`;
+    if (tel) h += `<p class="contexto chico">Su número es ${esc(telBonito)}: es el que se le da a los clientes. Llámale para escuchar cómo contesta.</p>`;
+    h += `<div class="acciones">${tel ? `<a class="accion" href="tel:${esc(tel)}">Llamar a Jason</a>` : ''}<button class="accion" data-abre='{"tipo":"citas"}'>Citas que apartó</button></div>`;
     const prox = ((C && C.citas) || []).filter(c => Date.parse(c.inicio) > Date.now() - 36e5 && !Number(c.prueba)).slice(0, 3);
-    h += '<p class="titulo">Próximas citas</p>' + (prox.length ? prox.map(c => `<div class="fila">${esc(c.negocio || c.nombre || 'Sin nombre')}<small>${fechaC(c.inicio)} · ${esc(c.tipo || c.canal || '')}${c.necesidad ? ' · ' + esc(c.necesidad) : ''}</small></div>`).join('') : '<div class="fila">No hay citas próximas.<small>Cuando Jason aparte una, aparece aquí.</small></div>');
+    h += '<p class="titulo">Próximas citas</p>' + (prox.length ? prox.map(c => `<button class="fila" data-abre="${esc(JSON.stringify({ tipo: 'cita', id: c.id }))}">${esc(c.negocio || c.nombre || 'Sin nombre')}<small>${fechaC(c.inicio)} · ${esc(c.tipo || c.canal || '')}${c.necesidad ? ' · ' + esc(c.necesidad) : ''}</small></button>`).join('') : '<div class="fila">No hay citas próximas.<small>Cuando Jason aparte una, aparece aquí.</small></div>');
     h += '<p class="titulo">Sus llamadas</p><p class="contexto chico">Las que dicen Prueba las hicimos nosotros.</p>';
     const ll = ((C && C.llamadas) || []).slice(0, 12);
     h += ll.length ? ll.map(l => { const d = datosLlamada(l); const per = ((C && C.personas) || []).find(p => p.tel === l.quien) || {};
-      return `<div class="fila"><span class="etq${Number(l.prueba) ? '' : ' cli'}">${Number(l.prueba) ? 'Prueba' : 'Cliente'}</span> ${esc(per.negocio || d.negocio || per.nombre || d.nombre || 'Sin nombre')}<small>${esc(l.resumen || '')} · ${hace(l.fecha)}</small></div>`; }).join('') : '<p class="fila">Todavía no hay llamadas.</p>';
+      return `<button class="fila" data-llamada="${esc(String(l.id))}"><span class="etq${Number(l.prueba) ? '' : ' cli'}">${Number(l.prueba) ? 'Prueba' : 'Cliente'}</span> ${esc(per.negocio || d.negocio || per.nombre || d.nombre || 'Sin nombre')}<small>${esc(l.resumen || '')} · ${hace(l.fecha)}</small></button>`; }).join('') + (((C && C.llamadas) || []).length > 12 ? `<button class="fila mas" data-abre='{"tipo":"llamadas"}'>Ver todas las llamadas</button>` : '') : '<p class="fila">Todavía no hay llamadas.</p>';
   } else if (sel.tipo === 'cubiculos') {
     t = 'Equipo';
     h = '<p class="contexto">Las personas de MOON. Cada quien aparece sentado en su cubículo cuando está en su horario de trabajo. Claude, el monito naranja, es el técnico: camina al cuarto donde está trabajando y abajo ves lo último que hizo.</p>' + (O.cubiculos || []).map(u => `<div class="fila"><span class="luz ${u.presente ? 'verde' : 'gris'}"></span> ${NOMBRE[u.id]}<small>${u.de}:00 a ${u.a}:00, lunes a viernes · ${u.presente ? 'en su horario' : 'fuera de horario'}</small></div>`).join('');
     h += '<p class="titulo">Lo último que pasó</p>' + ((O.actividad && O.actividad.lineas) || []).slice(0, 6).map(l => `<div class="fila">${esc(l.texto)}<small>${esc(l.quien)} · ${hace(l.hora)}</small></div>`).join('');
+    h += '<p class="titulo">Del equipo</p>'
+      + `<button class="fila" data-abre='{"tipo":"cuenta"}'>Tu cuenta<small>Tu foto, tu frase, el tamaño de la letra y cerrar sesión.</small></button>`
+      + `<button class="fila" data-abre='{"tipo":"equipo"}'>Equipo y embajadores<small>Quién entra a la oficina, los embajadores, sus comisiones y la papelera.</small></button>`
+      + `<button class="fila" data-abre='{"tipo":"casa"}'>Hecho en casa<small>Nuestra visión, Jason, la página y la presentación de MOON.</small></button>`;
   } else if (sel.tipo === 'robots') {
     t = 'Robots · tareas solas';
     h = '<p class="contexto">Cada robot es un trabajo que se hace solo, a su hora, sin que nadie lo active: revisar, medir, avisar. Luz verde: le salió bien la última vez. Luz roja: falló o no ha corrido, y ese trabajo no se está haciendo. Toca un robot para ver qué hace.</p>' + ((O.tareas && O.tareas.lista) || []).map(x => { const tarde = x.siguiente && Date.now() - Date.parse(x.siguiente) > 2 * 3600e3; return `<div class="fila"><span class="luz ${x.resultado !== 'bien' || tarde ? 'rojo' : 'verde'}"></span> ${esc(x.nombre)}${x.para ? `<small>${esc(x.para)}</small>` : ''}<small>De ${esc(x.deQuien)} · última vez ${hace(x.ultimaVez)} (${esc(x.resultado)}) · siguiente ${fechaC(x.siguiente)}${tarde ? ' · no está corriendo' : ''}</small></div>`; }).join('');
@@ -413,13 +381,19 @@ function pintarInfo(refresco) {
   const ar = $('#aResumen'); if (ar) ar.onclick = () => elegir({ tipo: 'resumen' });
 }
 
+$('#infoC').addEventListener('click', e => {
+  const b = e.target.closest('[data-abre],[data-llamada]'); if (!b) return;
+  if (b.dataset.llamada) return T.verLlamada(b.dataset.llamada);
+  try { T.abrir(JSON.parse(b.dataset.abre)); } catch (x) {}
+});
+
 // ---------- Pantalla completa ----------
-// El CRM y Crea tu recepcionista SON los del Tablero (con su orden, sus fotos y su botón de editar): se abren ahí
-// mismo y, al cerrarlos, regresan a la Oficina. Aquí solo vive la Librería.
+// El CRM y Crea tu recepcionista SON los del Tablero (con su orden, sus fotos y su botón de editar): se abren encima
+// del mapa, en la misma página, y al cerrarlos se vuelve al mapa. Aquí solo vive la Librería.
 const TABLERO = { crm: 'crm', crea: 'demo' };
 let charla = [];
 function abrirHerramienta(cual, tel, desdeHistoria) {
-  if (TABLERO[cual]) { location.href = '/tablero?abrir=' + TABLERO[cual] + '&volver=/oficina'; return; }
+  if (TABLERO[cual]) return T.abrir({ tipo: TABLERO[cual] });
   if (!desdeHistoria) history.pushState({ herramienta: cual }, '');
   $('#herrT').textContent = 'Jason · Librería'; $('#texto').placeholder = 'Pregúntale a Jason lo que sea'; $('#texto').value = '';
   mostrar('herramienta'); pintarLibreria();
@@ -443,7 +417,30 @@ $('#escribe').onsubmit = async e => {
   pintarLibreria();
 };
 
-arrancar();
-</script>
-</body>
-</html>
+
+  // Lo que el Tablero le pide a la Oficina
+  ver = async function () {
+    quiere = true;
+    await Promise.all([O ? 0 : cargar(), previo && previo.piel]);   // datos y monitos listos antes del primer dibujo
+    if (!quiere) return;   // mientras llegaban, se abrió otra pantalla: el mapa no se pone encima
+    const nueva = host.hidden;
+    host.hidden = false;   // a partir de aquí todo pasa en el mismo instante: el mapa aparece ya completo
+    if (window.Piel && Piel.pausa) Piel.pausa(false);
+    if (!O) {   // sin internet: nunca una pantalla vacía; se dice qué pasa y se vuelve a intentar solo
+      mostrar('mapa'); $('#infoT').textContent = 'Sin conexión';
+      $('#infoC').innerHTML = '<p class="contexto">No se pudo traer cómo va la oficina. Revisa tu internet: se vuelve a intentar solo en unos segundos.</p>';
+      setTimeout(() => { if (visible() && !O) ver(); }, 8000); return;
+    }
+    C = T.D();
+    if (nueva || $('#mapa').hidden) { if ($('#herramienta').hidden) mostrar('mapa'); ajustarVista(); }
+    dibujarMundo(); pintarInfo(!nueva);
+    // Sin fundido: en modo claro un fundido del mapa oscuro se vería como un destello.
+    if (!listo) { listo = true; setInterval(() => { if (visible() && document.visibilityState === 'visible') cargar(); }, 60e3); }
+  };
+  // Para los jueces: las mismas piezas que medían cuando la Oficina era su propia página.
+  window.__ofi = { get vista() { return vista; }, MUNDO, zoomEn, dibujarMundo, ajustarVista, abrirHerramienta, raiz };
+  esconder = function () { quiere = false; if (!host || host.hidden) return; host.hidden = true; if (window.Piel && Piel.pausa) Piel.pausa('fija'); };
+};
+let ver = () => {}, esconder = () => {};
+return { preparar, montar, ver: a => ver(a), esconder: () => esconder(), visible, buscar: q => raiz && raiz.querySelector(q) };
+})();

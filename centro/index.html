@@ -151,6 +151,9 @@ textarea.campo{height:auto;border-radius:22px;padding:14px 18px;resize:none}
 .botones.apilados{display:grid;gap:8px}.botones.apilados .boton{height:44px}
 .boton.rojo{color:var(--rojo)}
 #tour{position:fixed;inset:0;z-index:80}
+/* La Oficina (el mapa con los monitos) es la pantalla de inicio: va encima del marco vacío, en su propia caja. */
+#ofi{position:fixed;left:0;top:0;width:100%;z-index:1}
+#ofi[hidden]{display:none}
 .tour-velo{position:absolute;inset:0}
 .tour-aro{position:absolute;pointer-events:none;box-shadow:0 0 0 3px #fff,0 0 0 200vmax rgba(10,12,20,.58)}
 .tour-globo{position:absolute;background:var(--tarjeta);color:var(--tinta);border-radius:24px;padding:16px;display:grid;gap:8px;box-shadow:0 20px 40px -12px rgba(0,0,0,.55)}
@@ -456,6 +459,9 @@ html:not(.ancho) .agenda>.fila:only-child{border-radius:20px}
 </head>
 <body>
 <div id="marco"><div class="app" id="app"></div></div>
+<div id="ofi" hidden></div>
+<script src="/oficina/piel.js"></script>
+<script src="/oficina/oficina.js"></script>
 
 <script src="/centro/visor-archivo.js" defer></script>
 <script>
@@ -651,7 +657,7 @@ function medir() {
   const act = document.activeElement;
   if (cl.contains('teclado') && act && act.closest && act.closest('form.pasos')) { const f = act.closest('form.pasos'), d = act.closest('.desliza'); const sube = () => { f.scrollTop = 0; if (d) d.scrollTop = 0; }; sube(); requestAnimationFrame(sube); setTimeout(sube, 60); }
 }
-function alMedir() { medir(); clearTimeout(reloj); reloj = setTimeout(() => { if (alCambiarTamano) alCambiarTamano(); else if (D && !pila.length) pinta(true); }, 90); }
+function alMedir() { medir(); clearTimeout(reloj); reloj = setTimeout(() => { if (alCambiarTamano) alCambiarTamano(); else if (D && !pila.length && !(window.Oficina && Oficina.visible())) pinta(true); }, 90); }
 medir();
 addEventListener('resize', alMedir);
 if (window.visualViewport) { visualViewport.addEventListener('resize', alMedir); visualViewport.addEventListener('scroll', medir); }
@@ -661,7 +667,7 @@ document.addEventListener('gesturestart', e => { if (!e.target.closest || !e.tar
 document.addEventListener('touchmove', e => { if (e.touches.length > 1 && !e.target.closest('.recorte')) e.preventDefault(); }, { passive: false });
 // La pantalla nunca se arrastra (ni con el teclado abierto): un dedo solo mueve una lista o un texto que de verdad tenga más abajo.
 function sePuedeDeslizar(el) {
-  for (let x = el; x && x !== document.body; x = x.parentElement) {
+  for (let x = el; x && x !== document.body; x = x.parentElement || (x.getRootNode && x.getRootNode().host) || null) {
     if (x.closest && x.closest('.recorte,.con-zoom')) return true;
     const cs = getComputedStyle(x);
     if (/(auto|scroll)/.test(cs.overflowY) && x.scrollHeight > x.clientHeight + 1) return true;
@@ -669,7 +675,7 @@ function sePuedeDeslizar(el) {
   }
   return false;
 }
-document.addEventListener('touchmove', e => { if (e.touches.length === 1 && e.cancelable && !sePuedeDeslizar(e.target)) e.preventDefault(); }, { passive: false });
+document.addEventListener('touchmove', e => { if (e.touches.length === 1 && e.cancelable && !sePuedeDeslizar(e.composedPath ? e.composedPath()[0] : e.target)) e.preventDefault(); }, { passive: false });
 addEventListener('scroll', () => { if (scrollY || scrollX) scrollTo(0, 0); });
 // Tocar un botón mientras escribes NO cierra el teclado primero: así un solo toque basta (antes el primer toque solo cerraba el teclado).
 const escribiendo = () => { const a = document.activeElement; return a && (a.tagName === 'TEXTAREA' || (a.tagName === 'INPUT' && !/^(checkbox|radio|file|range|date|button|submit)$/.test(a.type))); };
@@ -711,6 +717,7 @@ function transicion(f) {
 
 /* ---------- Entrada ---------- */
 async function pantallaQuien() {
+  if (window.Oficina) Oficina.esconder();
   app.innerHTML = `<div class="top"><div class="marca"><span class="logo" role="img" aria-label="MOON Digital"></span><i>/</i>TABLERO</div></div><div class="entrada"><div class="caja"><span class="eti">Bienvenido</span><h1>¿Quién eres?</h1><div class="gente" id="gente"><span class="mini">Cargando…</span></div><button class="enlace" id="soyEmb">Soy embajador</button></div></div>`;
   document.getElementById('soyEmb').onclick = () => transicion(pantallaEmbajador);
   const r = await api('quienes');
@@ -804,6 +811,7 @@ async function arrancar() {
   const invita = new URLSearchParams(location.search).get('invita');
   if (invita) return pantallaInvita(invita);   // la sesión de este aparato no se toca hasta que el link funcione
   if (!sesionGuardada()) return pantallaQuien();
+  if (window.Oficina) Oficina.preparar(pideOficina);   // el mapa se pide al mismo tiempo que los datos del Tablero
   // Si ya se había abierto en este aparato, se pinta al instante con lo último que se vio (nunca una pantalla vacía);
   // lo nuevo llega por detrás y, si algo cambió, se actualiza sin animar nada.
   const copia = !D && leerCopia();
@@ -822,11 +830,9 @@ async function arrancar() {
   abrirDeLink();
   transicion(() => pinta());
 }
-// Desde la Oficina (11-nov-2026): /tablero?abrir=crm&volver=/oficina abre directo esa pantalla del Tablero, y al
-// cerrarla regresa a la Oficina (no al inicio del Tablero). Sin esos datos, el Tablero se comporta igual que siempre.
+// Un link puede abrir directo una pantalla (/tablero?abrir=crm): al cerrarla se queda en el inicio, que es la Oficina.
 const LINK = new URLSearchParams(location.search);
 const ABRIR_OK = ['crm', 'demo', 'llamadas', 'citas', 'clientes', 'casa'];
-const VOLVER = /^\/oficina$/.test(LINK.get('volver') || '') ? LINK.get('volver') : '';
 let abiertoDeLink = false;
 function abrirDeLink() {
   if (abiertoDeLink) return; abiertoDeLink = true;
@@ -900,10 +906,36 @@ function pinta(silencioso) {
   if (esEmb() && pila.some(x => !CAPAS_EMB.includes(x.tipo))) pila = [];
   const c = pila[pila.length - 1];
   if (!c || c.tipo !== 'demo') veloFuera(false);
-  if (!c && VOLVER && abiertoDeLink) { location.replace(VOLVER); return; }   // vino de la Oficina: regresa allá
+  if (!c && !esEmb() && window.Oficina) {   // el inicio es la Oficina: lo de antes se queda hasta que el mapa ya está completo
+    if (!app.innerHTML.trim()) app.innerHTML = '<div class="top"><div class="marca"><span class="logo" role="img" aria-label="MOON Digital"></span><i>/</i>TABLERO</div></div><div class="entrada"><span class="mini">Cargando…</span></div>';
+    return verOficina(silencioso).then(() => { if (!pila.length && Oficina.visible()) app.innerHTML = ''; });
+  }
+  if (window.Oficina) Oficina.esconder();
   if (!c) return esEmb() ? pintaInicioEmbajador(silencioso) : pintaInicio(silencioso);
   if (c.tipo === 'documento') setTimeout(() => ponOpcionesDoc(c), 0);
   ({ tareas: capaTareas, tarea: capaTarea, nuevaTarea: capaNuevaTarea, crm: capaCRM, crmLista: capaCRMLista, editarContacto: capaEditarContacto, subir: capaSubir, ficha: capaFicha, nuevoCliente: capaNuevoCliente, proyectos: capaProyectos, proyecto: capaProyecto, nuevoProyecto: capaProyecto, equipo: capaEquipo, moon: capaMoon, lector: capaLector, clientes: capaClientes, cliente: capaFicha, seccion: capaSeccion, documento: capaDocumento, casa: capaCasa, demo: capaDemo, nota: capaNota, editarProyecto: capaProyecto, qr: capaQR, cuenta: capaCuenta, frase: capaFrase, foto: capaFoto, docOpciones: capaDocOpciones, emProspectos: capaEmProspectos, emComisiones: capaEmComisiones, emMaterial: capaEmMaterial, emCuenta: capaEmCuenta, embajador: capaEmbajador, comision: capaComision, bitacora: capaBitacora, papelera: capaPapelera, llamadas: capaLlamadas, citas: capaCitas, cita: capaCita })[c.tipo](c, silencioso);
+}
+let oficinaMontada = false;
+async function pideOficina(url, accion, datos) {
+  const r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-sesion': sesionGuardada() }, body: JSON.stringify(Object.assign({ accion }, datos || {})) }).catch(() => null);
+  if (!r) return { ok: false, error: 'red', mensaje: 'Sin conexión. Se vuelve a intentar solo.' };
+  const j = await r.json().catch(() => ({ ok: false, error: 'red' }));
+  if (r.status === 401 && j.error === 'sesion' && D) { guardarSesion(''); D = null; pila = []; Oficina.esconder(); pantallaQuien(); }
+  return j;
+}
+function verOficina(silencioso) {
+  if (!oficinaMontada) {
+    oficinaMontada = true;
+    Oficina.montar(document.getElementById('ofi'), {
+      D: () => D,
+      abrir: c => abrir(c),
+      verLlamada: id => verLlamada(((D && D.llamadas) || []).find(x => String(x.id) === String(id))),
+      clientes: () => reales().filter(p => PAGAN.includes(p.etapa)).map(p => ({ tel: p.tel, nombre: nombreCorto(p) || p.tel })),
+      pide: pideOficina,
+    });
+  }
+  const primera = Oficina.visible() === false;
+  return Oficina.ver(!silencioso).then(() => { if (primera) setTimeout(() => recorrido(), 350); });
 }
 function marco(titulo, accion, cuerpo, icono) {
   app.innerHTML = `<div class="top"><button class="redondo" id="volver" aria-label="Regresar">${I.atras}</button><div class="cabeza" style="flex:1;min-width:0"><h2>${esc(titulo)}</h2>${accion ? `<button class="redondo accion" id="accion" aria-label="${esc(accion)}" title="${esc(accion)}">${icono || I.mas}</button>` : ''}</div></div><div class="vista" style="grid-template-rows:minmax(0,1fr)">${cuerpo}</div>`;
@@ -2327,14 +2359,15 @@ function capaEmCuenta() {
 
 /* ---------- Recorrido de la primera vez: cada sección se explica en una línea, una a la vez ---------- */
 const RECORRIDO = 'centro.moon.recorrido';
+// El recorrido de los socios es sobre la Oficina (el mapa): un cuarto a la vez, con qué es y para qué sirve.
 const PASOS_SOCIO = [
-  ['[data-ir="llamadas"]', 'Llamadas', 'Cada llamada que contestó Jason: de clientes y de prueba. Toca una para ver de qué se habló.'],
-  ['[data-ir="crm"]', 'CRM', 'Todas las personas que nos han buscado, ordenadas por en qué van.'],
-  ['[data-ir="clientes"]', 'Clientes', 'Solo los que ya nos pagan, y los que estamos por cerrar ("En camino").'],
-  ['[data-ir="citas"]', 'Citas', 'Las citas que Jason apartó con el asesor.'],
-  ['[data-ir="casa"]', 'Hecho en casa', 'Lo nuestro: la visión, Jason, la presentación y la página de MOON.'],
-  ['[data-ir="demo"]', 'Crea tu recepcionista', 'Ármale un recepcionista a un cliente y mándale el link para que le hable.'],
-  ['#salir', 'Tu credencial', 'Tu foto, tu frase, el tamaño de la letra y el Equipo (embajadores y papelera).'],
+  ['#oficina', 'La oficina', 'Es MOON en un mapa: cada cuarto es una parte del negocio. Toca un cuarto o un monito y abajo te explica qué es.'],
+  ['#info', 'Lo que tocaste', 'Aquí se explica lo que tocaste. Lo que se puede abrir te lleva a su pantalla, y al cerrarla vuelves al mapa.'],
+  ['.cuarto[data-c="recepcion"]', 'Jason', 'Nuestro recepcionista: sus llamadas y las citas que apartó con el asesor.'],
+  ['.cuarto[data-c="crm"]', 'CRM', 'Todas las personas que nos han buscado, ordenadas por en qué van.'],
+  ['.cuarto[data-c="clientes"]', 'Clientes que pagan', 'Sus asistentes y la ficha de cada cliente: contrato, documentos y cuánto lo usan.'],
+  ['.cuarto[data-c="crea"]', 'Crea tu recepcionista', 'Ármale un recepcionista a un cliente y mándale el link para que le hable.'],
+  ['.cuarto[data-c="cubiculos"]', 'Equipo', 'Tu cuenta (foto, letra, cerrar sesión), el equipo, los embajadores y lo hecho en casa.'],
 ];
 const PASOS_EMB = [
   ['[data-ir="emComisiones"]', 'Mis comisiones', 'Los clientes que cerraste y cuánto ganas.'],
@@ -2349,7 +2382,8 @@ function marcarRecorrido() { try { const v = (localStorage.getItem(RECORRIDO) ||
 function recorrido(desdeCero) {
   if (pila.length || document.getElementById('tour')) return;
   if (!desdeCero && recorridoVisto()) return;
-  const pasos = (esEmb() ? PASOS_EMB : PASOS_SOCIO).filter(p => app.querySelector(p[0]));
+  const buscar = q => app.querySelector(q) || (!esEmb() && window.Oficina && Oficina.visible() ? Oficina.buscar(q) : null);
+  const pasos = (esEmb() ? PASOS_EMB : PASOS_SOCIO).filter(p => buscar(p[0]));
   if (!pasos.length) return;
   let i = 0;
   const t = document.createElement('div'); t.id = 'tour'; t.setAttribute('role', 'dialog'); t.setAttribute('aria-label', 'Recorrido del tablero');
@@ -2358,7 +2392,7 @@ function recorrido(desdeCero) {
   const velo = t.querySelector('.tour-velo'), aro = t.querySelector('.tour-aro'), globo = t.querySelector('.tour-globo');
   const fin = () => { marcarRecorrido(); t.remove(); removeEventListener('resize', dibuja); };
   function dibuja() {
-    let el = app.querySelector(pasos[i][0]); if (!el) return fin();
+    let el = buscar(pasos[i][0]); if (!el) return fin();
     if (!parseFloat(getComputedStyle(el).borderTopLeftRadius) && el.children.length === 1) el = el.firstElementChild;   // la foto redonda dentro del botón
     const r = el.getBoundingClientRect(), W = innerWidth, H = (window.visualViewport ? visualViewport.height : innerHeight), m = 6;
     const x0 = Math.max(4, r.left - m), y0 = Math.max(4, r.top - m), x1 = Math.min(W - 4, r.right + m), y1 = Math.min(H - 4, r.bottom + m);

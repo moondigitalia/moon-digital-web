@@ -37,9 +37,9 @@ const corridas = process.env.RAPIDO === '1' ? [[320, 568, 1], [1280, 800, 1]] : 
       if (despues === antes) fallas.push(`${n0}: un toque en Siguiente no avanzó`);
     }
     if (await p.$('#tour')) fallas.push(`${n0}: el recorrido no se cerró al terminar`);
-    await p.reload(); await p.waitForSelector('.mosaico'); await p.waitForTimeout(900);
+    await p.reload(); await p.waitForSelector(quien === 'socio' ? '#ofi:not([hidden])' : '.mosaico'); await p.waitForTimeout(900);
     if (await p.$('#tour')) fallas.push(`${n0}: el recorrido vuelve a salir aunque ya se vio`);
-    await p.click('#salir'); await p.waitForTimeout(500); await p.click('#verTour'); await p.waitForTimeout(1200);
+    if (quien === 'socio') await p.evaluate(()=>abrir({tipo:'cuenta'})); else await p.click('#salir'); await p.waitForTimeout(500); await p.click('#verTour'); await p.waitForTimeout(1200);
     if (!await p.$('#tour')) fallas.push(`${n0}: "Ver el recorrido otra vez" no lo abre`);
     else { await p.click('#tourSalir'); await p.waitForTimeout(200); if (await p.$('#tour')) fallas.push(`${n0}: "Ya entendí" no lo cierra`); }
     if (errs.length) fallas.push(`${n0} errores: ${errs.join(' | ')}`);
