@@ -8,7 +8,11 @@ const { crypto, leer, sql, t } = require('./_base');
 const huella = s => crypto.createHash('sha256').update(String(s)).digest('hex');
 const MODELOS = ['claude-haiku-5-5', 'claude-haiku-4-5'];   // los mismos que lee-negocio: si el primero no existe en la cuenta, el segundo
 const PREGUNTAS_DIA = 60;            // tope de la Librería por día (todos juntos): de 1 a 4 centavos de dólar cada una
-const CLAVES = ['asistentes', 'gasto', 'tareas', 'publicaciones', 'medicion', 'actividad', 'motor', 'buzon', 'suscripciones'];
+const CLAVES = ['asistentes', 'gasto', 'tareas', 'publicaciones', 'medicion', 'actividad', 'motor', 'buzon', 'suscripciones', 'a_mano'];
+// Lo que escribe una persona (nombre, de quién es, para qué sirve, su teléfono) vive en su propio cajón `a_mano`: la
+// medición de cada hora reescribe `asistentes` y nunca toca `a_mano` (Kid, 13-nov-2026: se perdían el teléfono de
+// Jason y los nombres que pidió). Aquí se pone encima de lo medido.
+const A_MANO = ['nombre', 'de', 'para', 'telefono'];
 
 // Horario de cada cubículo (hora de Cancún, lunes a viernes).
 const HORARIO = { kid: [11, 17], daniel: [9, 18], dan: [9, 18] };
@@ -43,6 +47,9 @@ async function estado() {
   const filas = await sql(`SELECT clave, valor, actualizado FROM oficina WHERE clave IN (${CLAVES.map(() => '?').join(',')})`, CLAVES);
   const o = {};
   for (const f of filas) { try { o[f.clave] = JSON.parse(f.valor); } catch (e) { o[f.clave] = null; } }
+  const am = (o.a_mano && o.a_mano.asistentes) || {};
+  if (o.asistentes && Array.isArray(o.asistentes.lista)) o.asistentes.lista = o.asistentes.lista.map(x => { const m = am[x.id]; if (!m) return x; const y = Object.assign({}, x); A_MANO.forEach(k => { if (m[k] != null && m[k] !== '') y[k] = m[k]; }); return y; });
+  delete o.a_mano;
   const c = cancun();
   if (o.suscripciones && Array.isArray(o.suscripciones.lista)) o.suscripciones.lista = o.suscripciones.lista.map(s => vida(s, c.fecha));
   // Quién está en su cubículo ahora.

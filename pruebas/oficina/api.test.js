@@ -3,7 +3,7 @@ const path='' + require('path').resolve(__dirname, '../..') + '/api/_base.js'; c
 const crudo=require('./crudo.json'); let preguntas=0, guardadas=[];
 require.cache[require.resolve(path)].exports=Object.assign({},real,{sql:async(q,p)=>{
   if(q.includes('FROM sesiones'))return p[0]===real.crypto.createHash('sha256').update('T'.repeat(43)).digest('hex')?[{usuario:'kid',nombre:'Kid',tipo:'socio',activo:1}]:[];
-  if(q.includes('FROM oficina'))return Object.entries(crudo).map(([clave,v])=>({clave,valor:JSON.stringify(v)}));
+  if(q.includes('FROM oficina'))return Object.entries(crudo).map(([clave,v])=>({clave,valor:JSON.stringify(v)})).concat([{clave:'a_mano',valor:JSON.stringify({asistentes:{a0:{telefono:'+520000000000',para:'Contesta el teléfono de MOON.'}}})}]);
   if(q.includes('COUNT(*) n, COALESCE'))return [{n:preguntas,u:12000}];
   if(q.includes('COUNT(*) n FROM libreria_preguntas'))return [{n:preguntas}];
   if(q.includes('FROM libreria'))return [{titulo:'Jason',texto:'Jason contesta el teléfono.'}];
@@ -20,6 +20,7 @@ let mal=0; const ver=(c,n)=>{console.log((c?'✔ ':'✘ ')+n); if(!c)mal++;};
   const s=Object.fromEntries(r.j.oficina.suscripciones.lista.map(x=>[x.id,x]));
   ver(s.wispr.color==='verde','Wispr con recibo: verde'); ver(s.claude.color==='amarillo','Claude sin recibo: amarillo');
   ver(s.vencida.color==='rojo'&&s.vencida.aviso==='vencida','fecha pasada sin recibo: roja con emergencia');
+  {const j=r.j.oficina.asistentes.lista.find(x=>x.id==='a0'),j0=crudo.asistentes.lista.find(x=>x.id==='a0');ver(j.telefono==='+520000000000'&&j.para&&j.platicas7d===j0.platicas7d&&!r.j.oficina.a_mano,'lo escrito a mano (teléfono, para) va encima de lo medido y no se pierde');}
   ver(r.j.oficina.cubiculos.length===3,'tres cubículos'); ver(typeof r.j.oficina.medicionAtrasada==='boolean','aviso de medición');
   require('fs').writeFileSync(__dirname+'/oficina.json',JSON.stringify(r.j.oficina));
   r=await llama('libreria','T'.repeat(43),{pregunta:'¿Qué hace Jason?'}); ver(r.j.ok&&/claude-haiku-5-5/.test(r.j.respuesta),'Librería contesta con el modelo barato');
