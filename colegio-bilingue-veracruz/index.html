@@ -108,6 +108,11 @@ em.c{font-family:var(--c);font-style:italic;font-weight:600;letter-spacing:-.01e
 .fin h2{color:#fff;font-size:clamp(44px,5vw,100px);margin-top:0}
 .fin h2 span{color:var(--claro)}
 .fin .lead{color:#fff;max-width:36ch;margin-top:.8em}
+.undia{display:inline-flex;align-items:center;gap:14px;margin-top:clamp(18px,3vh,30px);background:#fff;color:var(--navy);text-decoration:none;border-radius:999px;padding:9px 26px 9px 9px;font-size:clamp(18px,1.3vw,22px);font-weight:800;white-space:nowrap;transition:transform .35s cubic-bezier(.34,1.45,.5,1)}
+.undia:hover{transform:scale(1.03)}
+.undia .pl{width:46px;height:46px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;flex:none}
+.undia small{font-size:.8em;font-weight:700;color:var(--navy);opacity:.8}
+@media (max-width:560px){.undia small{display:none}.undia{font-size:17px;padding:7px 20px 7px 7px}.undia .pl{width:40px;height:40px}}
 .pasos{display:grid;gap:clamp(18px,3vh,34px)}
 .paso{display:flex;align-items:center;gap:clamp(16px,1.6vw,26px)}
 .paso .n{flex:0 0 clamp(64px,5.6vw,104px);aspect-ratio:1;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:clamp(30px,2.2vw,44px);font-weight:800}
@@ -249,6 +254,7 @@ em.c{font-family:var(--c);font-style:italic;font-weight:600;letter-spacing:-.01e
     <div>
       <h2>Empecemos por <span>mirarlo juntos.</span></h2>
       <p class="lead">Ustedes conocen a sus familias mejor que nadie. Nosotros ponemos la imagen y la comunicación a su servicio.</p>
+      <a class="undia" href="un-dia/" target="_blank" rel="noopener"><span class="pl" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg></span>Ver un día en el colegio<small>3 min, con voz</small></a>
       <div class="firma">
         <img src="img/moon-blanco.png" alt="MOON Digital">
         <span class="sep" aria-hidden="true"></span>
