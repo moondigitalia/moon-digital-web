@@ -1,0 +1,457 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#0E2470">
+<meta property="og:title" content="Colegio María Montessori · Veracruz">
+<meta property="og:description" content="Educación Montessori en Veracruz, de maternal a secundaria. Platica con Monty y agenda tu visita.">
+<meta property="og:image" content="https://www.colegiomariamontessori.com/assets/img/banner/2.jpg">
+<title>Colegio María Montessori · Educación Montessori en Veracruz</title>
+<link rel="icon" href="img/cmm-logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=DM+Sans:opsz,wght@9..40,600;9..40,700;9..40,800&display=swap">
+<style>
+/* Demo de la página de inicio · Colegio María Montessori (MOON Digital, 16-nov-2026).
+   Una sola página, todo a máximo dos toques. Monty (chat con voz y texto) vive en monty/ y se abre aquí dentro.
+   "Agendar una visita" manda los datos a /api/cmm-informes: Jason avisa por WhatsApp a quien atiende admisiones.
+   Las dos fotos vienen de la página actual del colegio; las demás se agregan en GALERIA (abajo, en el script). */
+:root{
+  --marino:#0E2470;--azul:#1B47C4;--azul2:#2B5BE0;--claro:#E4ECFF;--rojo:#E1252F;--sol:#FFC531;--sol2:#FFDB73;
+  --tinta:#101A33;--gris:#2A3550;--linea:#D9E1F0;--fondo:#F6F8FD;
+  --t:"DM Sans",system-ui,-apple-system,"Segoe UI",sans-serif;--r:"Baloo 2","DM Sans",system-ui,sans-serif;
+  --suave:cubic-bezier(.2,.8,.2,1);--rebote:cubic-bezier(.34,1.45,.5,1)
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:96px;-webkit-text-size-adjust:100%}
+body{font-family:var(--t);font-weight:600;color:var(--tinta);background:var(--fondo);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img{display:block;max-width:100%}
+button{font-family:inherit;cursor:pointer;color:inherit}
+a{color:inherit}
+h1,h2,h3{font-family:var(--r);font-weight:800;letter-spacing:-.01em;line-height:1.02;text-wrap:balance}
+.envoltura{width:100%;max-width:1320px;margin:0 auto;padding:0 clamp(18px,4.5vw,64px)}
+.seccion{padding:clamp(56px,9vh,110px) 0}
+.antetitulo{display:inline-flex;align-items:center;gap:10px;font-size:15px;font-weight:800;letter-spacing:.22em;text-transform:uppercase;color:var(--azul)}
+.antetitulo::before{content:"";width:12px;height:12px;border-radius:50%;background:var(--sol);box-shadow:0 0 0 4px rgba(255,197,49,.3)}
+.seccion h2{font-size:clamp(36px,4.6vw,64px);color:var(--marino);margin-top:12px}
+.entrada-txt{font-size:clamp(18px,1.5vw,22px);line-height:1.55;color:var(--gris);margin-top:14px;max-width:38em;text-wrap:pretty}
+
+/* botones: todos redondos */
+.pastilla{display:inline-flex;align-items:center;justify-content:center;gap:10px;border:0;border-radius:999px;font-weight:800;font-size:18px;text-decoration:none;white-space:nowrap;transition:transform .45s var(--rebote),background .35s,box-shadow .35s}
+.pastilla:hover{transform:translateY(-2px) scale(1.03)}
+.pastilla:active{transform:scale(.97);transition-duration:.15s}
+.pastilla:focus-visible,.circulo:focus-visible,.cerrar:focus-visible{outline:3px solid var(--sol);outline-offset:3px}
+.pastilla.sol{background:var(--sol);color:var(--marino);padding:17px 30px;box-shadow:0 12px 26px rgba(255,197,49,.42)}
+.pastilla.sol:hover{background:var(--sol2)}
+.pastilla.monty{background:var(--marino);color:#fff;padding:7px 26px 7px 7px}
+.pastilla.monty img{width:48px;height:48px;border-radius:50%;background:#fff;object-fit:cover;flex:none}
+.pastilla.linea{background:#fff;color:var(--marino);padding:15px 26px;box-shadow:inset 0 0 0 2px var(--linea)}
+
+/* isla dinámica: abierta arriba, se cierra al bajar, se abre al subir o al picarla */
+.isla{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:30;display:flex;align-items:center;gap:6px;padding:7px;border-radius:999px;background:var(--marino);box-shadow:0 0 0 3px #fff,0 18px 44px rgba(14,36,112,.32);max-width:calc(100vw - 24px);transition:padding .5s var(--suave),background .5s}
+.marca{display:flex;align-items:center;gap:12px;color:#fff;text-decoration:none;min-width:0;padding-right:8px}
+.marca img{width:46px;height:46px;border-radius:50%;background:#fff;flex:none;object-fit:contain;padding:3px}
+.marca b{font-family:var(--r);font-size:19px;font-weight:800;line-height:1.05;white-space:nowrap}
+.menu{display:flex;gap:2px;align-items:center;overflow:hidden;max-width:900px;opacity:1;transition:max-width .6s var(--suave),opacity .35s ease .15s}
+.menu a{color:#fff;text-decoration:none;font-size:17px;font-weight:700;padding:11px 15px;border-radius:999px;white-space:nowrap;transition:background .3s}
+.menu a:hover{background:rgba(255,255,255,.14)}
+.menu .pastilla.sol{padding:11px 20px;font-size:17px;margin-left:4px;box-shadow:none}
+.abrir{display:none;width:46px;height:46px;border-radius:50%;border:0;background:rgba(255,255,255,.16);color:#fff;place-items:center;flex:none}
+.abrir .equis{display:none}
+.isla.cerrada{cursor:pointer;padding:6px}
+.isla.cerrada .menu{max-width:0;opacity:0;transition:max-width .5s var(--suave),opacity .2s ease}
+.isla.cerrada .abrir{display:grid}
+.isla.cerrada:hover{background:#17318C}
+
+/* portada */
+.portada{position:relative;padding:104px 0 clamp(40px,7vh,80px);overflow:hidden;background:radial-gradient(55% 55% at 100% 0%,rgba(255,197,49,.30) 0%,rgba(255,197,49,0) 70%),radial-gradient(50% 50% at 0% 100%,rgba(27,71,196,.14) 0%,rgba(27,71,196,0) 70%),var(--fondo)}
+.portada .rejilla{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:clamp(24px,4vw,64px);align-items:center}
+.portada h1{font-size:clamp(46px,6vw,96px);color:var(--marino)}
+.portada h1 span{color:var(--azul);display:block}
+.portada .entrada-txt{margin-top:18px}
+.datos{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+.datos span{display:inline-flex;align-items:center;gap:8px;background:#fff;border-radius:999px;padding:10px 16px;font-size:16px;font-weight:800;color:var(--marino);box-shadow:inset 0 0 0 2px var(--linea)}
+.datos i{width:10px;height:10px;border-radius:50%;background:var(--rojo);flex:none}
+.datos span:nth-child(2) i{background:var(--azul)}.datos span:nth-child(3) i{background:var(--sol)}
+.acciones{display:flex;flex-wrap:wrap;gap:12px;margin-top:26px}
+.foto-portada{position:relative;aspect-ratio:1;width:min(100%,600px);justify-self:center}
+.foto-portada .anillo{position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 210deg,var(--sol),var(--rojo),var(--azul),var(--sol));padding:10px}
+.foto-portada .anillo img{width:100%;height:100%;border-radius:50%;object-fit:cover;object-position:60% 40%;background:var(--claro)}
+.foto-portada .monty-asoma{position:absolute;right:-4%;bottom:-6%;width:44%;filter:drop-shadow(0 18px 30px rgba(14,36,112,.28));animation:asoma 4s ease-in-out infinite}
+@keyframes asoma{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-8px) rotate(-2deg)}}
+
+/* niveles: cuatro círculos, maternal y kínder primero y más grandes */
+.niveles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(14px,2vw,30px);margin-top:clamp(28px,5vh,52px);align-items:start}
+.nivel{text-align:center}
+.nivel .circulo{width:min(100%,250px);aspect-ratio:1;border-radius:50%;margin:0 auto;display:grid;place-items:center;align-content:center;color:#fff;position:relative}
+.nivel.grande .circulo{width:min(100%,300px)}
+.nivel:nth-child(1) .circulo{background:radial-gradient(circle at 30% 25%,#FF5A62 0%,var(--rojo) 60%,#B5141D 100%)}
+.nivel:nth-child(2) .circulo{background:radial-gradient(circle at 30% 25%,#FFE08A 0%,var(--sol) 60%,#E9A90F 100%);color:var(--marino)}
+.nivel:nth-child(3) .circulo{background:radial-gradient(circle at 30% 25%,#4F7BF0 0%,var(--azul) 60%,#13329A 100%)}
+.nivel:nth-child(4) .circulo{background:radial-gradient(circle at 30% 25%,#2A47A8 0%,var(--marino) 65%,#08164A 100%)}
+.circulo b{font-family:var(--r);font-size:clamp(28px,2.6vw,40px);font-weight:800;line-height:1}
+.nivel.grande .circulo b{font-size:clamp(32px,3vw,46px)}
+.circulo small{display:block;font-size:clamp(15px,1.15vw,18px);font-weight:800;margin-top:6px;opacity:.95}
+.nivel p{font-size:18px;line-height:1.5;color:var(--gris);margin:16px auto 0;max-width:17em;text-wrap:pretty}
+.cierre-nivel{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:14px;margin-top:clamp(28px,5vh,48px);text-align:center}
+.cierre-nivel p{font-size:19px;color:var(--marino);font-weight:800}
+
+/* método en tres ideas */
+.metodo{background:var(--marino);color:#fff;position:relative;overflow:hidden}
+.metodo::before{content:"";position:absolute;width:760px;height:760px;border-radius:50%;right:-260px;top:-300px;border:2px solid rgba(255,255,255,.08)}
+.metodo .antetitulo{color:var(--sol2)}
+.metodo h2{color:#fff}
+.metodo .entrada-txt{color:#fff}
+.ideas{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(16px,2.6vw,40px);margin-top:clamp(28px,5vh,52px);position:relative}
+.idea .num{width:84px;height:84px;border-radius:50%;display:grid;place-items:center;font-family:var(--r);font-size:40px;font-weight:800;background:var(--sol);color:var(--marino)}
+.idea:nth-child(2) .num{background:#fff}
+.idea:nth-child(3) .num{background:var(--rojo);color:#fff}
+.idea h3{font-size:clamp(26px,2.2vw,32px);margin-top:16px;color:#fff}
+.idea p{font-size:18px;line-height:1.55;margin-top:8px;color:#fff;max-width:22em}
+.idea p em{font-style:normal;color:var(--sol2)}
+.metodo .pastilla.monty{background:#fff;color:var(--marino);margin-top:clamp(28px,5vh,48px);position:relative}
+
+/* un día en el colegio */
+.galeria{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:clamp(14px,2vw,26px);margin-top:clamp(28px,5vh,52px)}
+.galeria figure{position:relative;border-radius:40px;overflow:hidden;background:var(--claro);min-height:300px}
+.galeria img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.galeria figcaption{position:absolute;left:16px;bottom:16px;background:#fff;color:var(--marino);border-radius:999px;padding:10px 18px;font-size:16px;font-weight:800;max-width:calc(100% - 32px)}
+.galeria .alto{aspect-ratio:4/3.2}
+
+/* admisiones en cuatro pasos */
+.pasos{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(14px,2vw,30px);margin-top:clamp(28px,5vh,52px);position:relative}
+.pasos::before{content:"";position:absolute;left:12%;right:12%;top:46px;height:4px;border-radius:4px;background:repeating-linear-gradient(90deg,var(--linea) 0 14px,transparent 14px 24px)}
+.paso{text-align:center;position:relative}
+.paso .n{width:92px;height:92px;border-radius:50%;margin:0 auto;display:grid;place-items:center;background:#fff;color:var(--marino);font-family:var(--r);font-size:40px;font-weight:800;box-shadow:inset 0 0 0 4px var(--marino)}
+.paso:last-child .n{background:var(--sol);box-shadow:none}
+.paso h3{font-size:24px;color:var(--marino);margin-top:14px}
+.paso p{font-size:17px;line-height:1.5;color:var(--gris);margin:6px auto 0;max-width:15em}
+.cierre-adm{text-align:center;margin-top:clamp(28px,5vh,48px)}
+
+/* contacto */
+.contacto{background:#fff}
+.contacto .rejilla{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:clamp(20px,4vw,56px);align-items:stretch;margin-top:clamp(24px,4vh,40px)}
+.vias{display:grid;gap:12px;align-content:start}
+.via{display:flex;align-items:center;gap:16px;text-decoration:none;background:var(--fondo);border-radius:999px;padding:10px 24px 10px 10px;transition:background .3s,transform .4s var(--rebote)}
+a.via:hover{background:var(--claro);transform:translateX(4px)}
+.via .ic{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;flex:none;background:var(--marino);color:#fff}
+.via:first-child .ic{background:#1FA855}
+.via span{display:block;min-width:0}
+.via small{display:block;font-size:15px;color:var(--gris);font-weight:700}
+.via b{display:block;font-size:19px;color:var(--marino);font-weight:800;line-height:1.3;overflow-wrap:anywhere}
+.mapa{border-radius:40px;overflow:hidden;min-height:340px;background:var(--claro);position:relative}
+.mapa iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.redes{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
+
+/* pie */
+footer{background:var(--marino);color:#fff;padding:34px 0 120px}
+footer .envoltura{display:flex;flex-wrap:wrap;gap:18px 34px;align-items:center;justify-content:space-between;font-size:17px;line-height:1.5}
+footer .familias a{color:#fff;font-weight:800;margin-left:6px}
+footer .moon{display:flex;align-items:center;gap:10px;white-space:nowrap}
+footer .moon img{height:24px;width:auto}
+
+/* Monty siempre a la mano */
+.burbuja{position:fixed;right:clamp(14px,2.4vw,30px);bottom:calc(clamp(14px,2.4vw,30px) + env(safe-area-inset-bottom));z-index:40;display:flex;align-items:center;gap:12px;transition:opacity .45s ease,transform .45s var(--suave)}
+.burbuja .dice{background:#fff;color:var(--marino);font-size:17px;font-weight:800;padding:12px 18px;border-radius:22px 22px 6px 22px;box-shadow:0 12px 30px rgba(14,36,112,.25);white-space:nowrap;opacity:0;transform:translateX(12px) scale(.96);transform-origin:right center;pointer-events:none;transition:opacity .45s ease,transform .55s var(--suave)}
+.burbuja.habla .dice,.burbuja:hover .dice{opacity:1;transform:none}
+.burbuja button{width:80px;height:80px;border-radius:50%;border:4px solid #fff;background:var(--sol);padding:0;box-shadow:0 14px 34px rgba(14,36,112,.35);animation:flota 3.4s ease-in-out infinite;flex:none;overflow:hidden}
+.burbuja button img{width:100%;height:100%;object-fit:cover}
+@keyframes flota{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.burbuja.oculta{opacity:0;pointer-events:none;transform:translateY(16px)}
+
+/* ventana de agendar */
+.velo{position:fixed;inset:0;z-index:50;background:rgba(8,18,50,.55);display:grid;place-items:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .35s ease}
+.velo.on{opacity:1;pointer-events:auto}
+.caja{position:relative;width:min(100%,560px);max-height:calc(100svh - 32px);overflow:auto;overscroll-behavior:contain;background:#fff;border-radius:36px;padding:clamp(24px,4vw,40px);transform:translateY(20px) scale(.98);transition:transform .5s var(--suave)}
+.velo.on .caja{transform:none}
+.cerrar{position:absolute;right:16px;top:16px;width:48px;height:48px;border-radius:50%;border:0;background:var(--fondo);color:var(--marino);display:grid;place-items:center;z-index:2}
+.cab{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:end;padding-right:44px}
+.cab img{height:110px;width:auto}
+.caja h3{font-size:clamp(30px,3.4vw,38px);color:var(--marino)}
+.caja .sub{font-size:17px;color:var(--gris);margin-top:8px;line-height:1.5}
+.campo{display:block;margin-top:16px}
+.campo>span{display:block;font-size:16px;font-weight:800;color:var(--marino)}
+.campo input{width:100%;margin-top:7px;font-family:inherit;font-size:18px;font-weight:600;color:var(--tinta);border:2px solid var(--linea);border-radius:999px;padding:14px 20px;outline:none;background:#fff;transition:border-color .25s}
+.campo input:focus{border-color:var(--azul)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.chips label{position:relative}
+.chips input{position:absolute;opacity:0;inset:0;width:100%;height:100%;margin:0;cursor:pointer}
+.chips span{display:block;border-radius:999px;padding:11px 18px;font-size:17px;font-weight:800;color:var(--marino);background:var(--fondo);box-shadow:inset 0 0 0 2px var(--linea);transition:background .25s,color .25s,box-shadow .25s}
+.chips input:checked+span{background:var(--marino);color:#fff;box-shadow:none}
+.chips input:focus-visible+span{outline:3px solid var(--sol);outline-offset:2px}
+.trampa{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.aviso{margin-top:12px;color:#B3141D;font-size:16px;font-weight:800}
+.privacidad{font-size:15px;color:var(--gris);margin-top:14px;line-height:1.45}
+.caja .pastilla.sol{width:100%;margin-top:20px}
+.listo{text-align:center}
+.listo img{height:170px;width:auto;margin:0 auto}
+.listo h3{margin-top:10px}
+
+/* chat de Monty */
+.chat{position:fixed;right:clamp(14px,2.4vw,30px);bottom:clamp(14px,2.4vw,30px);z-index:60;width:min(420px,calc(100vw - 28px));height:min(700px,calc(100svh - 28px));border-radius:32px;overflow:hidden;background:#fff;box-shadow:0 30px 80px rgba(8,18,50,.4);opacity:0;transform:translateY(24px) scale(.97);transform-origin:bottom right;pointer-events:none;transition:opacity .35s ease,transform .5s var(--suave)}
+.chat.on{opacity:1;transform:none;pointer-events:auto}
+.chat iframe{width:100%;height:100%;border:0;display:block}
+.chat .cerrar{background:rgba(255,255,255,.18);color:#fff;top:14px;right:14px;width:42px;height:42px}
+
+/* aparecer al bajar: suben un poco, nunca desde transparente total */
+.sube{transform:translateY(22px);opacity:.35;transition:transform .9s var(--suave),opacity .9s var(--suave)}
+.sube.visto{transform:none;opacity:1}
+
+@media (max-width:1060px){
+  .isla{left:12px;right:12px;transform:none;max-width:none;justify-content:space-between;border-radius:32px;flex-wrap:wrap;transition:transform .5s var(--suave),border-radius .4s}
+  .isla.escondida{transform:translateY(calc(-100% - 24px))}
+  .marca b{white-space:normal;font-size:17px}
+  .menu{display:none;max-width:none;opacity:1;width:100%;flex-direction:column;align-items:stretch;gap:4px;padding:8px 4px 6px}
+  .isla.panel .menu{display:flex;animation:baja .4s var(--suave)}
+  .menu a{display:block;font-size:19px;padding:14px 18px;border-radius:20px;background:rgba(255,255,255,.08)}
+  .menu .pastilla.sol{margin:4px 0 0;padding:15px;font-size:18px}
+  .abrir{display:grid}
+  .isla.panel .abrir .ham{display:none}.isla.panel .abrir .equis{display:block}
+  .portada .rejilla{grid-template-columns:minmax(0,1fr)}
+  .foto-portada{width:min(100%,460px);order:-1}
+  .niveles{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:34px}
+  .ideas{grid-template-columns:minmax(0,1fr);gap:30px}
+  .idea{display:grid;grid-template-columns:84px minmax(0,1fr);column-gap:20px;align-items:start}
+  .idea h3{margin-top:4px}
+  .idea .num{grid-row:span 2}
+  .contacto .rejilla{grid-template-columns:minmax(0,1fr)}
+}
+@keyframes baja{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+@media (max-width:720px){
+  .pasos{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:30px}
+  .pasos::before{display:none}
+  .galeria{grid-template-columns:minmax(0,1fr)}
+  .galeria figure{min-height:260px}
+}
+@media (max-width:560px){
+  .portada{padding-top:96px}
+  .acciones .pastilla{width:100%}
+  .burbuja .dice{display:none}
+  .chat{right:0;bottom:0;width:100vw;height:100svh;border-radius:0}
+  .cab img{height:84px}
+  .via b{font-size:17px}
+  footer{padding-bottom:116px}
+}
+@media (max-width:420px){
+  .niveles{grid-template-columns:minmax(0,1fr)}
+  .nivel .circulo,.nivel.grande .circulo{width:min(78%,260px)}
+  .marca b{font-size:16px}
+  .marca img{width:42px;height:42px}
+  .idea{grid-template-columns:minmax(0,1fr)}
+  .idea .num{grid-row:auto}
+}
+</style>
+</head>
+<body>
+
+<header class="isla" id="isla">
+  <a class="marca" href="#inicio"><img src="img/cmm-logo.png" alt=""><b>Colegio María Montessori</b></a>
+  <nav class="menu" aria-label="Menú">
+    <a href="#niveles">Niveles</a>
+    <a href="#metodo">Método</a>
+    <a href="#admisiones">Admisiones</a>
+    <a href="#contacto">Contacto</a>
+    <button class="pastilla sol" type="button" data-agendar>Agendar una visita</button>
+  </nav>
+  <button class="abrir" type="button" id="abrirIsla" aria-label="Abrir el menú"><svg class="ham" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M5 8h14M5 16h14"/></svg><svg class="equis" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+</header>
+
+<main>
+<section class="portada" id="inicio">
+  <div class="envoltura rejilla">
+    <div>
+      <h1>Educación Montessori en Veracruz, <span>de maternal a secundaria</span></h1>
+      <p class="entrada-txt">Aquí cada niño aprende a su ritmo, con las manos y con valores que se viven en casa y en la escuela.</p>
+      <div class="datos"><span><i></i>Grupos de máximo 20 alumnos</span><span><i></i>94% de las familias nos recomiendan</span><span><i></i>De maternal a secundaria</span></div>
+      <div class="acciones">
+        <button class="pastilla sol" type="button" data-agendar>Agendar una visita</button>
+        <button class="pastilla monty" type="button" data-monty><img src="img/monty-cara.webp" alt="">Platicar con Monty</button>
+      </div>
+    </div>
+    <div class="foto-portada">
+      <div class="anillo"><img src="https://www.colegiomariamontessori.com/assets/img/banner/2.jpg" alt="Una alumna del Colegio María Montessori en una actividad al aire libre" fetchpriority="high"></div>
+      <img class="monty-asoma" src="img/monty.webp" alt="" width="722" height="900">
+    </div>
+  </div>
+</section>
+
+<section class="seccion" id="niveles">
+  <div class="envoltura">
+    <span class="antetitulo">Niveles</span>
+    <h2>Un lugar para cada etapa</h2>
+    <p class="entrada-txt">Una familia que entra en maternal puede crecer con nosotros hasta secundaria.</p>
+    <div class="niveles">
+      <div class="nivel grande sube"><div class="circulo"><div><b>Maternal</b><small>Antes de kínder</small></div></div><p>Sus primeros pasos fuera de casa: rutinas, lenguaje, movimiento y convivencia, con calma y a su ritmo.</p></div>
+      <div class="nivel grande sube"><div class="circulo"><div><b>Kínder</b><small>3 a 6 años</small></div></div><p>Aprenden con las manos: números, letras y colores con materiales que se tocan, y a hacer las cosas por sí mismos.</p></div>
+      <div class="nivel sube"><div class="circulo"><div><b>Primaria</b><small>6 a 12 años</small></div></div><p>Lectura, matemáticas y ciencias para entender, no solo memorizar, con la atención de un grupo pequeño.</p></div>
+      <div class="nivel sube"><div class="circulo"><div><b>Secundaria</b><small>12 a 15 años</small></div></div><p>Responsabilidad, pensamiento propio y valores para la etapa más importante antes de la prepa.</p></div>
+    </div>
+    <div class="cierre-nivel"><p>¿No sabes qué nivel le toca a tu hijo?</p><button class="pastilla monty" type="button" data-monty="¿Qué nivel le toca a mi hijo?"><img src="img/monty-cara.webp" alt="">Monty te dice en un minuto</button></div>
+  </div>
+</section>
+
+<section class="seccion metodo" id="metodo">
+  <div class="envoltura">
+    <span class="antetitulo">El método</span>
+    <h2>Montessori en tres ideas</h2>
+    <p class="entrada-txt">Una forma de aprender que respeta a cada niño y lo prepara para la vida.</p>
+    <div class="ideas">
+      <div class="idea sube"><span class="num">1</span><h3>A su propio ritmo</h3><p>La maestra observa y guía a cada niño; nadie se queda atrás ni tiene que esperar a los demás.</p></div>
+      <div class="idea sube"><span class="num">2</span><h3>Aprenden haciendo</h3><p>Con materiales que se tocan y se mueven: <em>en lugar de memorizar los números, los cuentan con sus manos.</em></p></div>
+      <div class="idea sube"><span class="num">3</span><h3>Independencia y valores</h3><p>Hacen las cosas por sí mismos, terminan lo que empiezan y cuidan a los demás, en casa y en la escuela.</p></div>
+    </div>
+    <button class="pastilla monty" type="button" data-monty="¿Cómo funciona el método Montessori?"><img src="img/monty-cara.webp" alt="">Que Monty te lo explique</button>
+  </div>
+</section>
+
+<section class="seccion" id="un-dia">
+  <div class="envoltura">
+    <span class="antetitulo">Un día en el colegio</span>
+    <h2>Así se vive el María Montessori</h2>
+    <div class="galeria" id="galeria"></div>
+  </div>
+</section>
+
+<section class="seccion" id="admisiones" style="padding-top:0">
+  <div class="envoltura">
+    <span class="antetitulo">Admisiones</span>
+    <h2>Inscribirte, en cuatro pasos</h2>
+    <div class="pasos">
+      <div class="paso sube"><span class="n">1</span><h3>Agenda tu visita</h3><p>Déjanos tus datos y admisiones te escribe por WhatsApp.</p></div>
+      <div class="paso sube"><span class="n">2</span><h3>Conoce el colegio</h3><p>Recorre los salones y resuelve tus dudas en persona.</p></div>
+      <div class="paso sube"><span class="n">3</span><h3>Entrega documentos</h3><p>Admisiones te dice cuáles y te acompaña en el trámite.</p></div>
+      <div class="paso sube"><span class="n">4</span><h3>¡Bienvenidos!</h3><p>Tu familia ya es parte del María Montessori.</p></div>
+    </div>
+    <div class="cierre-adm"><button class="pastilla sol" type="button" data-agendar>Agendar una visita</button></div>
+  </div>
+</section>
+
+<section class="seccion contacto" id="contacto">
+  <div class="envoltura">
+    <span class="antetitulo">Contacto</span>
+    <h2>Estamos para ayudarte</h2>
+    <div class="rejilla">
+      <div class="vias">
+        <a class="via" href="https://wa.me/522292834408?text=Hola%2C%20me%20gustar%C3%ADa%20recibir%20informes%20del%20Colegio%20Mar%C3%ADa%20Montessori." target="_blank" rel="noopener"><span class="ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.1-4.5-3.9-4.7-4.1-.1-.2-1.1-1.5-1.1-2.9s.7-2.1 1-2.4c.3-.3.6-.3.8-.3h.6c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.4.6-.4.5c-.1.1-.3.3-.1.6.2.3.7 1.2 1.6 2 1.1 1 2 1.3 2.3 1.4.3.2.5.1.6 0l.9-1c.2-.3.4-.2.6-.1l1.9.9c.3.1.5.2.5.3.1.2.1.7-.1 1.3z"/></svg></span><span><small>WhatsApp de informes</small><b>229 283 4408</b></span></a>
+        <a class="via" href="tel:+522291931478"><span class="ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg></span><span><small>Teléfono del colegio</small><b>229 193 1478</b></span></a>
+        <a class="via" href="https://www.google.com/maps/search/?api=1&query=Colegio+Mar%C3%ADa+Montessori+Juan+Enr%C3%ADquez+182+Veracruz" target="_blank" rel="noopener"><span class="ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.6"/></svg></span><span><small>Dirección</small><b>Juan Enríquez #182, C.P. 91900, Veracruz</b></span></a>
+        <a class="via" href="mailto:info@colegiomariamontessori.com"><span class="ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m4 7 8 6 8-6"/></svg></span><span><small>Correo</small><b>info@colegiomariamontessori.com</b></span></a>
+        <div class="redes">
+          <a class="pastilla linea" href="https://www.facebook.com/colegiomariamontessoriveracruz" target="_blank" rel="noopener">Facebook</a>
+          <a class="pastilla linea" href="https://www.instagram.com/cmmveracruz/" target="_blank" rel="noopener">Instagram</a>
+        </div>
+      </div>
+      <div class="mapa"><iframe title="Mapa: Colegio María Montessori, Juan Enríquez 182, Veracruz" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps?q=Colegio%20Mar%C3%ADa%20Montessori%2C%20Juan%20Enr%C3%ADquez%20182%2C%2091900%20Veracruz&output=embed"></iframe></div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="envoltura">
+    <div>© Colegio María Montessori · Veracruz</div>
+    <div class="familias">Familias del colegio: <a href="https://cmm.katu.me" target="_blank" rel="noopener">Katú</a> · <a href="https://cmm.schoolibox.com" target="_blank" rel="noopener">School iBox</a></div>
+    <div class="moon"><img src="img/moon-blanco.png" alt="MOON Digital"> Demo preparado por MOON Digital</div>
+  </div>
+</footer>
+
+<div class="burbuja" id="burbuja"><span class="dice">¿Te ayudo?</span><button type="button" data-monty aria-label="Platicar con Monty"><img src="img/monty-cara.webp" alt=""></button></div>
+
+<div class="chat" id="chat" aria-hidden="true"><button class="cerrar" type="button" id="cerrarChat" aria-label="Cerrar a Monty"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button></div>
+
+<div class="velo" id="agendar"><div class="caja" role="dialog" aria-modal="true" aria-label="Agendar una visita">
+  <button class="cerrar" type="button" data-cierra aria-label="Cerrar"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button>
+  <div id="agendarIn"></div>
+</div></div>
+
+<script>
+(function(){
+  var $=function(s){return document.querySelector(s)};
+  function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+
+  // ── Galería: fotos reales del colegio. Para agregar más, solo se suman aquí (foto + pie). ──
+  var GALERIA=[
+    {src:'https://www.colegiomariamontessori.com/assets/img/banner/2.jpg',pie:'Actividades al aire libre',pos:'60% 40%'},
+    {src:'https://www.colegiomariamontessori.com/assets/img/banner/3.jpg',pie:'Nuestras maestras',pos:'50% 50%'}
+  ];
+  $('#galeria').innerHTML=GALERIA.map(function(g,i){return '<figure class="sube'+(i===0?' alto':'')+'"><img src="'+g.src+'" alt="'+esc(g.pie)+'" loading="lazy" style="object-position:'+g.pos+'"><figcaption>'+esc(g.pie)+'</figcaption></figure>'}).join('');
+
+  // ── Isla: abierta arriba; se cierra al bajar un buen tramo; se abre al subir o al picarla ──
+  var isla=$('#isla'),ultimo=scrollY,tramo=0,dir=0,quieta=0,pendiente=false,cel=matchMedia('(max-width:1060px)');
+  function pon(cerrada){var cls=cel.matches?'escondida':'cerrada';isla.classList.remove(cel.matches?'cerrada':'escondida');
+    if(cerrada&&isla.classList.contains('panel'))return;if(isla.classList.contains(cls)===cerrada)return;
+    isla.classList.toggle(cls,cerrada);quieta=performance.now()+650;tramo=0}
+  $('#abrirIsla').addEventListener('click',function(e){if(!cel.matches)return;e.stopPropagation();isla.classList.toggle('panel')});
+  isla.querySelectorAll('.menu a,.menu button').forEach(function(a){a.addEventListener('click',function(){isla.classList.remove('panel')})});
+  document.addEventListener('click',function(e){if(cel.matches&&!isla.contains(e.target))isla.classList.remove('panel')});
+  if(cel.addEventListener)cel.addEventListener('change',function(){isla.classList.remove('cerrada','escondida','panel')});
+  function mover(){pendiente=false;var y=scrollY,d=y-ultimo;ultimo=y;
+    if(y<80){pon(false);return}
+    var nd=d>0?1:d<0?-1:0;if(nd&&nd!==dir){dir=nd;tramo=0}tramo+=Math.abs(d);
+    if(performance.now()<quieta)return;
+    if(dir>0&&tramo>140)pon(true);else if(dir<0&&tramo>90)pon(false)}
+  addEventListener('scroll',function(){if(!pendiente){pendiente=true;requestAnimationFrame(mover)}},{passive:true});
+  isla.addEventListener('click',function(e){if(!cel.matches&&isla.classList.contains('cerrada')){e.preventDefault();e.stopPropagation();pon(false)}},true);
+  mover();
+
+  // ── Aparecer al bajar ──
+  var subes=document.querySelectorAll('.sube');
+  if('IntersectionObserver' in window){var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('visto');io.unobserve(e.target)}})},{rootMargin:'0px 0px -8% 0px'});subes.forEach(function(s){io.observe(s)})}
+  else subes.forEach(function(s){s.classList.add('visto')});
+
+  // ── Agendar una visita (2 toques: abrir y enviar) ──
+  var velo=$('#agendar'),caja=$('#agendarIn'),volverA=null;
+  var NIVELES=['Maternal','Kínder','Primaria','Secundaria'];
+  function formulario(){
+    caja.innerHTML='<div class="cab"><div><h3>Agenda tu visita</h3><p class="sub">Déjanos tus datos y admisiones te escribe por WhatsApp para elegir el día.</p></div><img src="img/monty.webp" alt=""></div>'+
+      '<form id="fVisita" novalidate autocomplete="on">'+
+      '<label class="campo"><span>Tu nombre</span><input name="nombre" required autocomplete="name" placeholder="Ej. Ana López" maxlength="60"></label>'+
+      '<label class="campo"><span>Tu WhatsApp</span><input name="whatsapp" required inputmode="numeric" autocomplete="tel" placeholder="10 dígitos" maxlength="16"></label>'+
+      '<div class="campo"><span>¿Qué nivel te interesa?</span><div class="chips">'+NIVELES.map(function(n){return '<label><input type="radio" name="nivel" value="'+n+'"><span>'+n+'</span></label>'}).join('')+'</div></div>'+
+      '<label class="trampa" aria-hidden="true">Sitio<input name="sitio" tabindex="-1" autocomplete="off"></label>'+
+      '<p class="aviso" id="aviso" hidden></p>'+
+      '<button class="pastilla sol" type="submit" id="enviar">Enviar y agendar</button>'+
+      '<p class="privacidad">Usamos tus datos solo para que admisiones te contacte.</p></form>';
+    $('#fVisita').addEventListener('submit',enviar);
+  }
+  function enviar(e){
+    e.preventDefault();var f=new FormData(e.target),aviso=$('#aviso'),btn=$('#enviar');
+    var nombre=String(f.get('nombre')||'').trim(),tel=String(f.get('whatsapp')||'').replace(/\D/g,'');
+    if(!nombre){aviso.textContent='Escribe tu nombre, por favor.';aviso.hidden=false;return}
+    if(tel.length<10){aviso.textContent='Escribe tu WhatsApp completo, con 10 dígitos.';aviso.hidden=false;return}
+    aviso.hidden=true;btn.disabled=true;btn.textContent='Enviando…';
+    fetch('/api/cmm-informes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nombre:nombre,whatsapp:tel,nivel:f.get('nivel')||'',visita:'si',origen:'boton',sitio:f.get('sitio')||''})})
+      .then(function(r){return r.json().catch(function(){return {}})})
+      .catch(function(){return {}})
+      .then(function(){listo(nombre.split(/\s+/)[0])});
+  }
+  function listo(nombre){
+    caja.innerHTML='<div class="listo"><img src="img/monty.webp" alt=""><h3>¡Listo, '+esc(nombre)+'!</h3><p class="sub">Admisiones te escribe por WhatsApp muy pronto para agendar tu visita.</p>'+
+      '<button class="pastilla linea" type="button" data-cierra style="margin-top:18px">Seguir viendo el colegio</button></div>';
+  }
+  function abreAgendar(origen){volverA=origen||null;cierraChat();formulario();velo.classList.add('on');setTimeout(function(){var i=velo.querySelector('input[name=nombre]');if(i&&matchMedia('(pointer:fine)').matches)i.focus()},350)}
+  function cierraAgendar(){velo.classList.remove('on');if(volverA)try{volverA.focus()}catch(e){}}
+  document.querySelectorAll('[data-agendar]').forEach(function(b){b.addEventListener('click',function(){abreAgendar(b)})});
+  velo.addEventListener('click',function(e){if(e.target===velo||e.target.closest('[data-cierra]'))cierraAgendar()});
+
+  // ── Monty: el chat (voz y texto) vive en monty/ y se abre aquí dentro ──
+  var chat=$('#chat'),burbuja=$('#burbuja'),marco=null;
+  function abreChat(pregunta){
+    velo.classList.remove('on');
+    if(!marco){marco=document.createElement('iframe');marco.title='Monty';marco.allow='microphone; autoplay';
+      marco.src='monty/?embed=1'+(pregunta?'&q='+encodeURIComponent(pregunta):'');chat.appendChild(marco)}
+    else if(pregunta&&marco.contentWindow){try{marco.contentWindow.postMessage({monty:'pregunta',texto:pregunta},location.origin)}catch(e){}}
+    chat.classList.add('on');chat.setAttribute('aria-hidden','false');burbuja.classList.add('oculta')}
+  function cierraChat(){chat.classList.remove('on');chat.setAttribute('aria-hidden','true');burbuja.classList.remove('oculta')}
+  document.addEventListener('click',function(e){var b=e.target.closest('[data-monty]');if(b){e.preventDefault();abreChat(b.getAttribute('data-monty')||'')}});
+  $('#cerrarChat').addEventListener('click',cierraChat);
+  addEventListener('keydown',function(e){if(e.key==='Escape'){cierraAgendar();cierraChat()}});
+  // "¿Te ayudo?" sale unos segundos y se guarda solo (Monty siempre queda abajo)
+  setTimeout(function(){burbuja.classList.add('habla');setTimeout(function(){burbuja.classList.remove('habla')},6000)},2500);
+  if(location.hash==='#monty')abreChat('');
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#0E2470">
+<meta property="og:title" content="Monty · Colegio María Montessori">
+<meta property="og:description" content="Pregúntale sobre niveles, el método Montessori y cómo agendar tu visita.">
+
+<title>Monty · Colegio María Montessori</title>
+<link rel="icon" href="../img/cmm-logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=DM+Sans:opsz,wght@9..40,600;9..40,700;9..40,800&display=swap">
+<style>
+/* Monty, el búho del Colegio María Montessori (demo de MOON Digital, 16-nov-2026). Mismo motor que Uni y Mileni.
+   Agente: "Monty · Colegio María Montessori (demo)" en ElevenLabs (voz: Antonio).
+   Cuando una familia deja nombre y WhatsApp, /api/cmm-informes hace que Jason avise por WhatsApp a admisiones.
+   El avatar se cambia en una sola línea (AVATAR, abajo). */
+:root{--azul:#1B47C4;--azul2:#0E2470;--hondo:#0E2470;--claro:#E4ECFF;--sol:#FFC531;--ink:#101828;--ink2:#26324A;--line:#D5DDEA;--soft:#EEF2F9;--ok:#13744B;--okbg:#DDF3E8}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:"DM Sans",system-ui,-apple-system,"Segoe UI",sans-serif;font-weight:600;color:var(--ink);background:var(--hondo);-webkit-font-smoothing:antialiased}
+.wrap{height:100dvh;display:grid;grid-template-columns:minmax(0,1fr) clamp(360px,40vw,560px);gap:0}
+/* lado de la marca (computadora) */
+.marca{position:relative;overflow:hidden;background:radial-gradient(120% 90% at 20% 10%,#2E4FA6 0%,#24408E 45%,#132660 100%);color:#fff;display:flex;flex-direction:column;padding:clamp(20px,5vh,96px) clamp(28px,8cqi,96px);container-type:inline-size;overflow:hidden;min-height:0}
+.marca>.cont{margin:auto 0;display:grid;grid-template-columns:minmax(0,1fr);align-items:center;gap:clamp(16px,4cqi,56px);position:relative}
+.marca .txt{display:flex;flex-direction:column;min-width:0}
+.marca .uni{display:none;width:min(26cqi,22vh);height:auto;filter:drop-shadow(0 18px 40px rgba(0,0,0,.25))}
+@container (min-width:460px){.marca>.cont{grid-template-columns:minmax(0,1fr) auto}.marca .uni{display:block}}
+.marca::before{content:"";position:absolute;width:780px;height:780px;border-radius:50%;right:-320px;top:-260px;border:2px solid rgba(255,255,255,.12)}
+.marca::after{content:"";position:absolute;width:420px;height:420px;border-radius:50%;left:-200px;bottom:-160px;border:2px solid rgba(255,255,255,.10)}
+.marca .logo{width:clamp(60px,min(22cqi,15vh),190px);aspect-ratio:1;border-radius:50%;position:relative}
+.marca h1{font-size:clamp(26px,min(7.6cqi,6.2vh),66px);font-weight:800;line-height:1.06;letter-spacing:-.02em;margin-top:clamp(10px,2.4vh,28px);position:relative;max-width:13em;text-wrap:balance}
+.marca h1{font-family:"Baloo 2","DM Sans",sans-serif}.marca h1 em{font-style:normal;color:var(--sol)}
+.marca p{font-size:clamp(16px,min(3.4cqi,2.7vh),24px);line-height:1.45;margin-top:clamp(8px,1.8vh,18px);max-width:30em;position:relative;text-wrap:pretty}
+.marca .lema{margin-top:clamp(12px,2.6vh,28px);font-size:clamp(14px,2.4cqi,18px);letter-spacing:.2em;text-transform:uppercase;font-weight:800;color:var(--claro);position:relative}
+.marca .demo{position:relative;margin-top:clamp(12px,3vh,24px);font-size:15px;color:#fff;display:flex;align-items:center;gap:12px;white-space:nowrap;flex:none}
+.marca .demo img{height:26px}
+/* chat */
+.chat{display:flex;flex-direction:column;background:#F4F6FB;min-height:0;height:100dvh}
+.ch{display:flex;align-items:center;gap:14px;padding:16px 20px;background:var(--azul2);color:#fff;flex:none}
+.embed .ch,.embed .ch[class]{padding-right:68px!important}
+.ch .av{width:52px;height:52px;border-radius:50%;flex:none;background:#fff;object-fit:cover}
+.ch>div{min-width:0}
+.ch b{display:block;font-family:"Baloo 2","DM Sans",sans-serif;font-size:clamp(18px,1.3vw,20px);text-wrap:balance;font-weight:800;line-height:1.15}
+.ch span{display:block;font-size:15px;color:#BFF0D0;font-weight:700}
+.msgs{flex:1;overflow-y:auto;padding:22px 18px 12px;display:flex;flex-direction:column;gap:12px;overscroll-behavior:contain}
+.msg{max-width:86%;padding:13px 17px;border-radius:22px;font-size:18px;line-height:1.5;white-space:pre-wrap;word-wrap:break-word;animation:pop .45s cubic-bezier(.34,1.45,.5,1) both}
+.msg.ai{align-self:flex-start;background:#fff;border-bottom-left-radius:8px;color:#101828;box-shadow:0 0 0 1px var(--line)}
+.msg.me{align-self:flex-end;background:var(--azul);color:#fff;border-bottom-right-radius:8px}
+.msg.sys{align-self:center;background:#FFF4D1;color:#5A4200;font-size:16px;text-align:center}
+.msg a{color:inherit;text-decoration:underline;text-underline-offset:3px}
+.msg.lead{align-self:stretch;max-width:none;background:#fff;border-radius:24px;box-shadow:0 0 0 2px #9FB3DE;white-space:normal;padding:16px 18px}
+.lead-h{display:flex;justify-content:space-between;gap:10px;align-items:center;font-size:17px}
+.lead-h b{color:var(--azul2)}
+.lead-lvl{font-size:14px;font-weight:800;border-radius:999px;padding:4px 12px;background:var(--okbg);color:var(--ok);white-space:nowrap}
+.lead dl{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin:12px 0;font-size:16px}
+.lead dt{color:var(--ink2);font-weight:700}
+.lead dd{font-weight:800}
+.lead-f{font-size:14px;color:var(--ink2);border-top:1px solid var(--line);padding-top:10px}
+@keyframes pop{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
+.typing{align-self:flex-start;background:#fff;border-radius:22px;padding:16px 20px;display:flex;gap:7px;box-shadow:0 0 0 1px var(--line)}
+.typing i{width:10px;height:10px;border-radius:50%;background:#5B6B8A;animation:dot 1s infinite ease-in-out}
+.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+@keyframes dot{0%,80%,100%{transform:translateY(0);opacity:.5}40%{transform:translateY(-6px);opacity:1}}
+.quick{display:flex;gap:10px;padding:0 18px 12px;flex-wrap:wrap;flex:none}
+.quick button{font-family:inherit;font-size:16px;font-weight:700;color:var(--azul2);background:#fff;border:2px solid #B9C7E6;border-radius:999px;padding:10px 16px;cursor:pointer;transition:background .25s,transform .25s}
+.quick button:hover{background:var(--soft)}
+.quick button:active{transform:scale(.96)}
+form{display:flex;gap:10px;padding:12px 16px calc(14px + env(safe-area-inset-bottom));background:#fff;border-top:1px solid var(--line);flex:none}
+input{flex:1;min-width:0;font-family:inherit;font-size:18px;font-weight:600;color:var(--ink);border:2px solid #C9D4EA;border-radius:999px;padding:14px 20px;outline:none;background:#fff}
+input:focus{border-color:var(--azul)}
+form button{width:56px;height:56px;border-radius:50%;border:0;background:var(--azul);color:#fff;display:grid;place-items:center;cursor:pointer;flex:none;transition:transform .25s}
+form button:active{transform:scale(.92)}
+.nota .fuente{font-size:13px;font-weight:600}
+.nota{font-size:13px;color:var(--ink2);text-align:center;padding:0 16px 10px;background:#fff}
+/* voz */
+.btn-voz{display:inline-flex;align-items:center;gap:14px;margin-top:clamp(14px,3.6vh,34px);position:relative;font-family:inherit;font-size:clamp(16px,min(3.6cqi,2.8vh),21px);white-space:nowrap;font-weight:800;color:var(--hondo);background:#fff;border:0;border-radius:999px;padding:clamp(8px,1.4vh,14px) 30px clamp(8px,1.4vh,14px) clamp(8px,1.4vh,14px);cursor:pointer;box-shadow:0 0 0 8px rgba(255,255,255,.14);transition:transform .3s cubic-bezier(.34,1.45,.5,1),box-shadow .3s;align-self:flex-start}
+.btn-voz:hover{transform:scale(1.03);box-shadow:0 0 0 12px rgba(255,255,255,.18)}
+.btn-voz .mic{flex:none;width:clamp(40px,7vh,52px);height:clamp(40px,7vh,52px);border-radius:50%;background:var(--azul);color:#fff;display:grid;place-items:center;animation:latido 2.4s ease-in-out infinite}
+@keyframes latido{0%,100%{box-shadow:0 0 0 0 rgba(36,64,142,.45)}50%{box-shadow:0 0 0 10px rgba(36,64,142,0)}}
+.quick .q-voz{background:var(--azul);color:#fff;border-color:var(--azul);display:none;align-items:center;gap:8px}
+.quick .q-voz:hover{background:var(--azul2)}
+#mic{background:#fff;color:var(--azul);border:2px solid var(--azul)}
+.chat.in-voice .msgs,.chat.in-voice .quick,.chat.in-voice form{display:none}
+.voice{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(8px,2vh,16px);padding:clamp(12px,3vh,24px) 22px;overflow:hidden;background:#F4F6FB;text-align:center;min-height:0}
+.voice[hidden]{display:none}
+.orb{--lvl:0;--o:clamp(170px,30vh,260px);--i:calc(var(--o) * .49);position:relative;width:var(--o);height:var(--o);flex:none;display:grid;place-items:center;margin-bottom:clamp(0px,1vh,10px);animation:breathe 4.2s ease-in-out infinite}
+.orb img{position:relative;z-index:2;width:var(--i);height:var(--i);border-radius:50%;background:var(--sol);object-fit:cover;border:4px solid #fff;box-shadow:0 0 0 3px var(--azul2);transform:translateY(calc(var(--lvl) * -7px)) scale(calc(1 + var(--lvl) * .07)) rotate(calc(var(--lvl) * -3deg));transition:transform .12s ease-out}
+.orb .ring{position:absolute;left:50%;top:50%;width:var(--i);height:var(--i);margin:calc(var(--i) / -2) 0 0 calc(var(--i) / -2);border-radius:50%;background:var(--azul);transition:transform .14s ease-out,opacity .3s}
+.orb .r1{opacity:.6;transform:scale(calc(1.16 + var(--lvl) * .32));box-shadow:0 0 40px 10px rgba(36,64,142,.45)}
+.orb .r2{opacity:.3;transform:scale(calc(1.42 + var(--lvl) * .55))}
+.orb .r3{opacity:.13;transform:scale(calc(1.72 + var(--lvl) * .8))}
+.voice.connecting .orb{animation-duration:1.3s}
+.voice.connecting .orb .ring{opacity:.08}
+.voice.speaking .orb{animation-duration:2.6s}
+@keyframes breathe{0%,100%{transform:scale(.95)}50%{transform:scale(1.05)}}
+.v-status{font-size:22px;font-weight:800;color:var(--azul2)}
+.v-actions{display:flex;gap:12px}
+.v-actions button{font-family:inherit;height:50px;padding:0 24px;border-radius:999px;font-size:17px;font-weight:800;border:2px solid var(--azul2);cursor:pointer}
+.v-mute{background:#fff;color:var(--azul2)}
+.v-mute[aria-pressed="true"]{background:var(--soft)}
+.v-end{background:#C8322B;border-color:#C8322B!important;color:#fff}
+.v-time{font-size:15px;color:var(--ink2);font-weight:700}
+@media (max-height:720px){.quick{gap:8px;padding-bottom:10px}.quick button{font-size:15px;padding:7px 13px}.ch{padding:10px 16px}.ch .av{width:44px;height:44px}form{padding-top:10px;padding-bottom:calc(10px + env(safe-area-inset-bottom))}input{padding:11px 18px}form button{width:48px;height:48px}}
+@media (prefers-reduced-motion:reduce){.orb,.btn-voz .mic{animation:none}}
+@media (max-width:900px){
+  .quick .q-voz{display:inline-flex}
+  .wrap{grid-template-columns:minmax(0,1fr)}
+  .chat{min-width:0}
+  .marca{display:none}
+  .msg{font-size:17px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="marca" aria-label="Colegio María Montessori">
+    <div class="cont"><div class="txt">
+    <img class="logo" src="../img/cmm-logo.png" alt="Colegio María Montessori" style="background:#fff;object-fit:contain;padding:6px">
+    <h1>Conoce a <em>Monty,</em> el búho del Colegio María Montessori</h1>
+    <p>Pregúntale por voz o por escrito: niveles, el método Montessori y cómo agendar tu visita, a cualquier hora.</p>
+    <button type="button" class="btn-voz" id="voz-grande"><span class="mic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></span>Háblale a Monty</button>
+    <div class="lema">De maternal a secundaria</div>
+    </div><img class="uni" src="../img/monty.webp" alt="Monty, el búho del Colegio María Montessori" width="722" height="900"></div>
+    <div class="demo"><img src="../img/moon-blanco.png" alt="MOON Digital"> Demo preparado por MOON Digital</div>
+  </section>
+
+  <section class="chat" aria-label="Chat con Monty">
+    <div class="ch">
+      <img class="av" id="av" src="../img/monty-cara.webp" alt="Monty" style="background:var(--sol)">
+      <div><b>Monty · Colegio María Montessori</b><span id="estado">● En línea</span></div>
+    </div>
+    <div class="msgs" id="msgs" aria-live="polite"></div>
+    <div class="quick" id="quick">
+      <button type="button" class="q-voz" data-voz="1"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>Háblale a Monty</button>
+      <button type="button" data-q="¿Qué nivel le toca a mi hijo?">¿Qué nivel le toca a mi hijo?</button>
+      <button type="button" data-q="¿Cómo funciona el método Montessori?">¿Cómo es el método Montessori?</button>
+      <button type="button" data-q="Quiero agendar una visita">Quiero agendar una visita</button>
+    </div>
+    <form id="f" autocomplete="off">
+      <label for="in" style="position:absolute;left:-9999px">Escribe tu pregunta</label>
+      <input id="in" placeholder="Escribe tu pregunta…" maxlength="500">
+      <button type="button" id="mic" aria-label="Hablar por voz"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
+      <button type="submit" aria-label="Enviar"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+    </form>
+    <div class="voice" id="voice" hidden>
+      <div class="orb" id="orb"><span class="ring r3"></span><span class="ring r2"></span><span class="ring r1"></span><img id="av2" src="../img/monty-cara.webp" alt="Monty"></div>
+      <p class="v-status" id="v-status" role="status">Conectando…</p>
+      <div class="v-actions">
+        <button type="button" class="v-mute" id="v-mute" aria-pressed="false">Silenciar</button>
+        <button type="button" class="v-end" id="v-end">Terminar</button>
+      </div>
+      <small class="v-time" id="v-time"></small>
+    </div>
+    <div class="nota">Monty es el asistente virtual del colegio. Admisiones confirma colegiaturas, fechas y requisitos.</div>
+  </section>
+</div>
+
+<script>if(/[?&]embed=1/.test(location.search))document.documentElement.classList.add('embed')</script>
+<script type="module">
+const AGENT_ID = 'agent_3801m7jq785vepzr6eps0hh7rx0r';
+const AVATAR = '../img/monty-cara.webp';               // cambia aquí el avatar del asistente
+const TEL = '229 283 4408';
+const NOMBRE_ASIS = 'Monty';
+document.getElementById('av').src = AVATAR; document.getElementById('av2').src = AVATAR;
+
+const $ = (s) => document.querySelector(s);
+const msgs = $('#msgs'), form = $('#f'), input = $('#in'), quick = $('#quick'), estado = $('#estado');
+let conv = null, connecting = null, typingEl = null, pending = [], gotFirst = false, sdk = null, userName = '';
+try { userName = localStorage.getItem('cmm_nombre') || ''; } catch (e) {}
+
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+function md(t) {
+  let h = esc(String(t).trim()).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/^\s*[-*]\s+/gm, '• ');
+  return h.replace(/(229\s?283\s?4408)/g, '<a href="https://wa.me/522292834408" target="_blank" rel="noopener">$1</a>').replace(/(229\s?193\s?1478)/g, '<a href="tel:+522291931478">$1</a>');
+}
+function add(role, html) { const d = document.createElement('div'); d.className = 'msg ' + role; d.innerHTML = html; msgs.appendChild(d); msgs.scrollTop = msgs.scrollHeight; return d; }
+function typing(on) {
+  if (on && !typingEl) { typingEl = document.createElement('div'); typingEl.className = 'typing'; typingEl.innerHTML = '<i></i><i></i><i></i>'; msgs.appendChild(typingEl); }
+  if (!on && typingEl) { typingEl.remove(); typingEl = null; }
+  msgs.scrollTop = msgs.scrollHeight;
+}
+function setEstado(t, ok = true) { estado.textContent = t; estado.style.color = ok ? '#BFF0D0' : '#FFE08A'; }
+async function loadSdk() {
+  if (sdk) return sdk;
+  for (const u of ['https://esm.sh/@elevenlabs/client@0', 'https://cdn.jsdelivr.net/npm/@elevenlabs/client@0/+esm']) {
+    try { sdk = await import(u); return sdk; } catch (e) {}
+  }
+  throw new Error('sin sdk');
+}
+const fallback = () => 'No pude conectarme en este momento. Escríbele a admisiones por WhatsApp al <a href="https://wa.me/522292834408" target="_blank" rel="noopener">' + TEL + '</a> y con gusto te atienden.';
+
+function fmtTel(t) { const d = String(t || '').replace(/\D/g, '').slice(-10); return d.length === 10 ? d.slice(0, 3) + ' ' + d.slice(3, 6) + ' ' + d.slice(6) : t; }
+// La familia queda con admisiones: /api/cmm-informes hace que Jason le avise por WhatsApp (en el demo, al equipo de MOON).
+// Si la red falla, a la familia nunca se le carga el problema: se reintenta y se le confirma igual.
+let yaRegistrada = '';
+async function registrarFamilia(p) {
+  p = p || {}; const tel = String(p.whatsapp || '').replace(/\D/g, '').slice(-10);
+  if (!p.nombre || tel.length < 10) return 'Faltan datos: pide el nombre y un WhatsApp de 10 dígitos antes de pasar a la familia.';
+  const datos = { nombre: p.nombre, whatsapp: tel, nivel: p.nivel || '', hijo: p.hijo || '', visita: p.visita === 'no' ? 'no' : 'si', notas: p.notas || '', origen: 'monty' };
+  const huella = JSON.stringify(datos);
+  if (huella !== yaRegistrada) {
+    yaRegistrada = huella;
+    const mandar = async () => {
+      for (let i = 0; i < 2; i++) {
+        try { const r = await fetch('/api/cmm-informes', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: huella, keepalive: true }); if (r.ok || r.status === 429) return; } catch (e) {}
+        await new Promise((s) => setTimeout(s, 700));
+      }
+    };
+    // Monty no se queda callado esperando: a lo mucho 4 segundos y sigue la plática (el envío continúa solo).
+    await Promise.race([mandar(), new Promise((s) => setTimeout(s, 4000))]);
+  }
+  const rows = [['Nombre', p.nombre], ['WhatsApp', fmtTel(tel)], ['Nivel', p.nivel], ['Su hijo o hija', p.hijo], ['Quiere', datos.visita === 'si' ? 'Agendar una visita' : 'Recibir informes']].filter((r) => r[1]);
+  add('lead', '<div class="lead-h"><b>Admisiones ya tiene tus datos</b><span class="lead-lvl">Enviado</span></div>' +
+    '<dl>' + rows.map(([k, v]) => '<dt>' + k + '</dt><dd>' + esc(v) + '</dd>').join('') + '</dl>' +
+    '<div class="lead-f">Te escriben por WhatsApp muy pronto.</div>');
+  return 'Listo: admisiones ya recibió los datos de la familia. Confírmale en una frase que le escriben por WhatsApp muy pronto.';
+}
+function guardarNombre(p) {
+  const n = String((p && p.nombre) || '').trim().split(/\s+/)[0] || ''; if (!n) return 'No recibí el nombre.';
+  userName = n.charAt(0).toUpperCase() + n.slice(1); try { localStorage.setItem('cmm_nombre', userName); } catch (e) {}
+  return 'Nombre guardado: ' + userName + '. Salúdala por su nombre y continúa.';
+}
+const clientTools = { registrar_familia: registrarFamilia, guardar_nombre: guardarNombre };
+
+async function connect() {
+  if (conv) return conv; if (connecting) return connecting;
+  setEstado('● Conectando…', false); typing(true);
+  connecting = (async () => {
+    const { Conversation } = await loadSdk();
+    const c = await Conversation.startSession({
+      agentId: AGENT_ID, connectionType: 'websocket', textOnly: true,
+      dynamicVariables: { modo: 'texto', nombre: userName || 'sin nombre' },
+      overrides: Object.assign({ conversation: { textOnly: true } },
+        userName ? { agent: { firstMessage: '¡Hola, ' + userName + '! Qué gusto verte de nuevo. ¿Para quién buscas colegio? Dime su edad y te cuento qué nivel le toca.' } } : {}),
+      clientTools,
+      onConnect: () => setEstado('● En línea'),
+      onDisconnect: () => { const had = !!typingEl; typing(false); conv = null; connecting = null; gotFirst = false; setEstado('● En línea'); if (had) add('sys', fallback()); },
+      onMessage: ({ message, source }) => { if (source === 'user') return; typing(false); add('ai', md(message)); if (!gotFirst) { gotFirst = true; flush(); } },
+    });
+    conv = c;
+    setTimeout(() => { if (!gotFirst) { gotFirst = true; typing(false); flush(); } }, 4000);
+    return c;
+  })();
+  try { return await connecting; }
+  catch (e) { connecting = null; typing(false); setEstado('● Sin conexión', false); add('sys', fallback()); throw e; }
+}
+function flush() { while (pending.length) deliver(pending.shift()); }
+function deliver(q) { try { conv.sendUserMessage(q); typing(true); } catch (e) { typing(false); conv = null; add('sys', 'Se perdió la conexión. Intenta de nuevo, por favor.'); } }
+async function send(q) {
+  q = (q || '').trim(); if (!q) return;
+  add('me', esc(q)); quick.style.display = 'none';
+  if (conv && gotFirst) { deliver(q); return; }
+  pending.push(q); try { await connect(); } catch (e) { pending = []; }
+}
+form.addEventListener('submit', (e) => { e.preventDefault(); const q = input.value; input.value = ''; send(q); });
+quick.querySelectorAll('button[data-q]').forEach((b) => b.addEventListener('click', () => send(b.dataset.q)));
+// El asistente saluda en cuanto se abre. Si la página lo abrió con una pregunta (?q=), se la manda después del saludo.
+const preguntaInicial = new URLSearchParams(location.search).get('q');
+if (preguntaInicial) send(preguntaInicial.slice(0, 200)); else connect().catch(() => {});
+addEventListener('message', (e) => { if (e.origin === location.origin && e.data && e.data.monty === 'pregunta' && e.data.texto) send(String(e.data.texto).slice(0, 200)); });
+// ───────── Voz ─────────
+// Sesión WebRTC aparte de la de texto. El halo crece con el volumen de la voz. Límite 3 min (demo).
+const VOICE_MAX = 180, chat = $('.chat'), voice = $('#voice'), orb = $('#orb'), vStatus = $('#v-status'), vTime = $('#v-time'), vMute = $('#v-mute');
+let voiceSeq = 0, voiceEnding = null, voiceConv = null, voiceStarting = false, vMode = 'listening', raf = 0, lvl = 0, vTimer = 0, vLeft = 0, muted = false;
+function vState(cls, t) { voice.className = 'voice ' + cls; vStatus.textContent = t; }
+function loop() {
+  let target = 0;
+  if (voiceConv) { try { target = vMode === 'speaking' ? voiceConv.getOutputVolume() * 1.6 : (muted ? 0 : voiceConv.getInputVolume() * 1.1); } catch (e) {} }
+  target = Math.min(1, target || 0); lvl += (target - lvl) * (target > lvl ? 0.35 : 0.12);
+  orb.style.setProperty('--lvl', lvl.toFixed(3)); raf = requestAnimationFrame(loop);
+}
+const fmt = (s) => Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+async function startVoice() {
+  if (voiceConv || voiceStarting) return;
+  voiceStarting = true; const my = ++voiceSeq;
+  if (voiceEnding) { try { await voiceEnding; } catch (e) {} voiceEnding = null; }
+  typing(false); pending = [];
+  if (conv) { const c = conv; conv = null; connecting = null; gotFirst = false; try { await c.endSession(); } catch (e) {} }
+  chat.classList.add('in-voice'); voice.hidden = false;
+  muted = false; vMute.setAttribute('aria-pressed', 'false'); vMute.textContent = 'Silenciar'; vTime.textContent = '';
+  vState('connecting', 'Conectando…'); setEstado('● Llamada de voz');
+  cancelAnimationFrame(raf); raf = requestAnimationFrame(loop);
+  try {
+    const { Conversation } = await loadSdk();
+    if (!voiceStarting || my !== voiceSeq) return;
+    const c = await Conversation.startSession({
+      agentId: AGENT_ID, connectionType: 'webrtc',
+      dynamicVariables: { modo: 'voz', nombre: userName || 'sin nombre' },
+      clientTools,
+      overrides: { agent: { firstMessage: userName
+        ? '¡Hola, ' + userName + '! Soy Monty. ¿Para quién buscas colegio?'
+        : '¡Hola! ¿Cómo estás? Soy Monty, el búho del Colegio María Montessori. ¿Cómo te llamas?' } },
+      onConnect: () => {
+        if (my !== voiceSeq) return;
+        vState('listening', 'Te escucho…');
+        vLeft = VOICE_MAX; vTime.textContent = 'Tiempo restante ' + fmt(vLeft); clearInterval(vTimer);
+        vTimer = setInterval(() => {
+          vLeft--; vTime.textContent = vLeft > 0 ? 'Tiempo restante ' + fmt(vLeft) : 'Despidiéndose…';
+          if (vLeft === 15 && voiceConv) { try { voiceConv.sendContextualUpdate('Aviso del sistema: se terminó el tiempo de la llamada. Despídete ahora en una sola frase, dile que puede seguir escribiendo en el chat o volver a llamar, y usa end_call.'); } catch (e) {} }
+          if (vLeft <= -15) stopVoice('Las llamadas de voz de esta demostración duran hasta 3 minutos. Puedes seguir escribiendo o volver a llamar.');
+        }, 1000);
+      },
+      onDisconnect: (d) => { if (my !== voiceSeq || !voiceConv) return; const byAgent = d && d.reason === 'agent'; voiceConv = null; stopVoice(byAgent ? 'Llamada terminada. Puedes seguir escribiendo aquí o volver a llamar cuando quieras.' : undefined); },
+      onError: (m) => console.warn('[Monty voz]', m),
+      onModeChange: ({ mode }) => { if (my !== voiceSeq) return; vMode = mode; if (!voiceConv) return; mode === 'speaking' ? vState('speaking', 'Monty te está contestando…') : vState('listening', muted ? 'Micrófono silenciado' : 'Te escucho…'); },
+      onMessage: ({ message, source }) => { if (!message || my !== voiceSeq) return; add(source === 'user' ? 'me' : 'ai', source === 'user' ? esc(message) : md(message)); quick.style.display = 'none'; },
+    });
+    if (!voiceStarting || my !== voiceSeq) { try { await c.endSession(); } catch (e) {} return; }
+    voiceConv = c;
+  } catch (e) {
+    console.error('[Monty voz]', e); if (my !== voiceSeq) return;
+    const denied = e && (e.name === 'NotAllowedError' || /permission|denied/i.test(e.message || ''));
+    stopVoice(denied ? 'Para platicar por voz, permite el micrófono en tu navegador. También puedes escribir aquí abajo.' : 'No pude iniciar la llamada de voz. Puedes escribir aquí abajo o escribirle a admisiones por WhatsApp al <a href="https://wa.me/522292834408" target="_blank" rel="noopener">' + TEL + '</a>.');
+  } finally { if (my === voiceSeq) voiceStarting = false; }
+}
+function stopVoice(note) {
+  const c = voiceConv; voiceConv = null; voiceStarting = false; voiceSeq++;
+  clearInterval(vTimer); cancelAnimationFrame(raf); lvl = 0; orb.style.setProperty('--lvl', 0);
+  if (c) voiceEnding = Promise.resolve().then(() => c.endSession()).catch(() => {});
+  chat.classList.remove('in-voice'); voice.hidden = true; setEstado('● En línea');
+  add('sys', note || 'Llamada terminada. Puedes seguir escribiendo aquí o volver a llamar.');
+}
+$('#mic').addEventListener('click', startVoice);
+$('#voz-grande').addEventListener('click', startVoice);
+quick.querySelector('[data-voz]').addEventListener('click', startVoice);
+$('#v-end').addEventListener('click', () => stopVoice());
+vMute.addEventListener('click', () => {
+  if (!voiceConv) return; muted = !muted; try { voiceConv.setMicMuted(muted); } catch (e) {}
+  vMute.setAttribute('aria-pressed', String(muted)); vMute.textContent = muted ? 'Activar micrófono' : 'Silenciar';
+  if (vMode !== 'speaking') vState('listening', muted ? 'Micrófono silenciado' : 'Te escucho…');
+});
+window.__monty = { send, startVoice, stopVoice, state: () => ({ conectado: !!conv, mensajes: msgs.querySelectorAll('.msg.ai').length }) };
+</script>
+</body>
+</html>
