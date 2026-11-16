@@ -456,7 +456,7 @@ const Voz = (() => {
     evento(e) {
       if (!b || !e) return;
       if (e.type === 'conversation_initiation_metadata') { const f = (e.conversation_initiation_metadata_event || {}).agent_output_audio_format || ''; const m = /^pcm_(\d+)/.exec(f);
-        if (m) b.ponerHz(+m[1]); else { b.cerrar(); b = null; } return; }
+        if (m) b.ponerHz(+m[1]); return; }
       if (e.type === 'interruption') { corte = (e.interruption_event || {}).event_id; b.interrumpir(); return; }
       if (e.type !== 'audio') return; const a = e.audio_event || {}; if (!a.audio_base_64 || (corte != null && a.event_id != null && a.event_id < corte)) return;
       if (!conv) { cola.push(a.audio_base_64); return; }
@@ -464,6 +464,10 @@ const Voz = (() => {
     },
     conectar(c) {
       conv = c; if (!b) return;
+      // la velocidad de la voz sale de la conexión misma (no de un aviso que puede no llegar): sin esto sonaba al doble y aguda
+      let hz = 0; try { hz = c.connection.outputFormat.sampleRate; } catch (e) {}
+      if (!(hz > 0)) { this.soltar(); return; }   // si no se sabe, que suene la librería (nunca a otra velocidad)
+      b.ponerHz(hz);
       try { c.setVolume({ volume: 0 }); c.getOutputVolume = () => (b ? b.volumen() : 0);
         const q = cola; cola = []; q.forEach((x) => b.tocar(pcm(x)));
       } catch (e) { console.warn('[Monty voz] no pude usar la bocina propia', e); this.soltar(); }
