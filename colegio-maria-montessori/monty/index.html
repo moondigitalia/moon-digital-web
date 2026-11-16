@@ -85,9 +85,9 @@ form button:active{transform:scale(.92)}
 .chat.in-voice .msgs,.chat.in-voice .quick,.chat.in-voice form{display:none}
 .voice{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(8px,2vh,16px);padding:clamp(12px,3vh,24px) 22px;overflow:hidden;background:#F4F6FB;text-align:center;min-height:0}
 .voice[hidden]{display:none}
-.orb{--lvl:0;--o:clamp(170px,30vh,260px);--i:calc(var(--o) * .49);position:relative;width:var(--o);height:var(--o);flex:none;display:grid;place-items:center;margin-bottom:clamp(0px,1vh,10px);animation:breathe 4.2s ease-in-out infinite}
+.orb{--lvl:0;--o:clamp(190px,36vh,320px);--i:calc(var(--o) * .58);position:relative;width:var(--o);height:var(--o);flex:none;display:grid;place-items:center;margin-bottom:clamp(0px,1vh,10px);animation:breathe 4.2s ease-in-out infinite}
 .orb .cara{position:relative;z-index:2;width:var(--i);height:var(--i);border-radius:50%;overflow:hidden;background:var(--sol);border:4px solid #fff;box-shadow:0 0 0 3px var(--azul2);transform:translateY(calc(var(--lvl) * -6px)) rotate(calc(var(--lvl) * -2deg));transition:transform .12s ease-out}
-.orb .cara img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.orb .cara img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scale(1.32) translateY(5%)}
 /* Monty habla y parpadea como Bolita: capas encimadas que se prenden según la voz */
 .orb .cara .c1,.orb .cara .c2,.orb .cara .cp{opacity:0}
 .orb .cara[data-boca="1"] .c1,.orb .cara[data-boca="2"] .c2,.orb .cara[data-parpadeo] .cp{opacity:1}
