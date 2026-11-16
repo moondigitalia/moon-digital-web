@@ -241,7 +241,7 @@ function setEstado(t, ok = true) { estado.textContent = t; estado.style.color = 
 })();
 async function loadSdk() {
   if (sdk) return sdk;
-  for (const u of ['https://esm.sh/@elevenlabs/client@0', 'https://cdn.jsdelivr.net/npm/@elevenlabs/client@0/+esm']) {
+  for (const u of ['https://esm.sh/@elevenlabs/client@1.26.0', 'https://cdn.jsdelivr.net/npm/@elevenlabs/client@1.26.0/+esm']) {
     try { sdk = await import(u); return sdk; } catch (e) {}
   }
   throw new Error('sin sdk');
@@ -389,10 +389,94 @@ function loop(t) {
   orb.style.setProperty('--lvl', lvl.toFixed(3)); raf = requestAnimationFrame(loop);
 }
 const fmt = (s) => Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+
+// ===== VOZ DE LA LLAMADA, igual que la plantilla MOON (Quali y Luna) =====
+// LA BOCINA DE LA LLAMADA, SIN AudioWorklet (Kid, 29-oct-2026: "¿qué está pasando con la voz en el iPhone 7?").
+// Causa encontrada (investigación, no adivinanza): error de Safari, WebKit 251091 (de iOS 15.4 a 16.3, y iOS 15 ya no recibe
+// el arreglo). Mientras el micrófono está abierto con cancelación de eco, el sistema procesa el audio en bloques de 960
+// muestras, y el código de AudioWorklet de Safari los maneja mal: TODO lo que suena en un AudioContext que usó un
+// AudioWorklet sale distorsionado ("de robot", "no se escucha bien"), aunque la voz llegue completa y a tiempo.
+// https://bugs.webkit.org/show_bug.cgi?id=251091
+// La librería de ElevenLabs reproduce la voz con un AudioWorklet. Aquí la voz suena en un AudioContext que NUNCA usa
+// AudioWorklet: cada pedacito de voz es un AudioBuffer programado justo detrás del anterior (lo que hacen los
+// reproductores de audio en vivo). La librería sigue funcionando igual (turnos, interrupciones), pero callada.
+// Un solo camino para todos los aparatos: no se pregunta el modelo.
+//   · Colchón que crece solo: empieza en 60 ms; si un pedacito llega tarde a media frase, ese aparato gana 40 ms más
+//     (hasta 300 ms). Un celular rápido se queda en 60 ms; uno lento crece hasta que deja de cortarse.
+//   · Interrupción: lo programado se apaga en 30 ms (sin chasquido).
+//   · Volumen para la boca del personaje: del mismo analizador, misma escala que la librería (promedio de 0 a 1).
+// Lo cuida pruebas/voz-bocina.test.mjs (celular rápido, lento, interrupción) y juez-voz (que suene por aquí).
+function crearBocina(ctx, { hz = 48000, minMs = 60, maxMs = 300, pasoMs = 40, graciaMs = 250, alMedir } = {}) {
+  const gain = ctx.createGain(), analyser = ctx.createAnalyser();
+  analyser.fftSize = 512; gain.connect(analyser); analyser.connect(ctx.destination);
+  let fin = 0, colchon = minMs / 1000, huecos = 0, vivas = [], datos = null, ultimoAviso = -1;
+  const avisar = () => { if (alMedir && ultimoAviso !== huecos) { ultimoAviso = huecos; alMedir({ huecos, colchonMs: Math.round(colchon * 1000), hz: ctx.sampleRate }); } };
+  function tocar(pcm) {
+    const ent = pcm instanceof Int16Array ? pcm : new Int16Array(pcm); const n = ent.length; if (!n) return;
+    const buf = ctx.createBuffer(1, n, hz), ch = buf.getChannelData(0);
+    for (let i = 0; i < n; i++) ch[i] = ent[i] / 32768;
+    const ahora = ctx.currentTime;
+    if (fin < ahora + 0.004) {
+      // no hay voz programada: si la anterior terminó hace poco (menos de la gracia), fue un hueco a media frase
+      if (fin > 0 && ahora - fin < graciaMs / 1000) { huecos++; colchon = Math.min(maxMs / 1000, colchon + pasoMs / 1000); avisar(); }
+      const entra = Math.min(n, Math.round(hz * 0.003)); for (let i = 0; i < entra; i++) ch[i] *= i / entra;   // entra suave (3 ms)
+      fin = ahora + colchon;
+    }
+    const s = ctx.createBufferSource(); s.buffer = buf; s.connect(gain); s.start(fin); fin += n / hz;
+    vivas.push(s); s.onended = () => { vivas = vivas.filter((x) => x !== s); };
+    if (ultimoAviso < 0) avisar();
+  }
+  function interrumpir() {
+    const t = ctx.currentTime;
+    try { gain.gain.cancelScheduledValues(t); gain.gain.setValueAtTime(gain.gain.value, t); gain.gain.linearRampToValueAtTime(0, t + 0.03); } catch (e) {}
+    vivas.forEach((s) => { try { s.stop(t + 0.035); } catch (e) {} }); vivas = []; fin = 0;
+    try { gain.gain.setValueAtTime(1, t + 0.04); } catch (e) {}
+  }
+  function volumen() {
+    if (!(fin > ctx.currentTime)) return 0;
+    datos = datos || new Uint8Array(analyser.frequencyBinCount); analyser.getByteFrequencyData(datos);
+    // solo el rango de la voz (hasta ~4 kHz), como la librería
+    const hasta = Math.max(1, Math.min(datos.length, Math.round((4000 / (ctx.sampleRate / 2)) * datos.length)));
+    let v = 0; for (let i = 0; i < hasta; i++) v += datos[i] / 255; return Math.min(1, v / hasta);
+  }
+  return { tocar, interrumpir, volumen, ponerHz(h) { if (h > 0) hz = h; }, sonando: () => fin > ctx.currentTime, get colchonMs() { return Math.round(colchon * 1000); }, get huecos() { return huecos; },
+    cerrar() { interrumpir(); try { gain.disconnect(); analyser.disconnect(); } catch (e) {} } };
+}
+
+// Copiado de plantilla-chatbot-moon/motor/chatbot.js (módulo Voz): la librería queda callada y la voz suena por la bocina propia.
+const Voz = (() => {
+  let ctx = null, b = null, conv = null, corte = -1, cola = [];
+  const pcm = (b64) => { const bin = atob(b64), n = bin.length >> 1, a = new Int16Array(n); for (let i = 0, j = 0; i < n; i++, j += 2) { const v = bin.charCodeAt(j) | (bin.charCodeAt(j + 1) << 8); a[i] = v > 32767 ? v - 65536 : v; } return a; };
+  return {
+    preparar() {   // dentro del toque: crear y despertar la bocina (Safari solo deja sonar así)
+      try { const AC = window.AudioContext || window.webkitAudioContext; if (!ctx || ctx.state === 'closed') ctx = new AC(); if (ctx.state !== 'running') ctx.resume(); } catch (e) { ctx = null; }
+      corte = -1; cola = []; if (b) { b.cerrar(); b = null; }
+      if (ctx) b = crearBocina(ctx, {});
+    },
+    evento(e) {
+      if (!b || !e) return;
+      if (e.type === 'conversation_initiation_metadata') { const f = (e.conversation_initiation_metadata_event || {}).agent_output_audio_format || ''; const m = /^pcm_(\d+)/.exec(f);
+        if (m) b.ponerHz(+m[1]); else { b.cerrar(); b = null; } return; }
+      if (e.type === 'interruption') { corte = (e.interruption_event || {}).event_id; b.interrumpir(); return; }
+      if (e.type !== 'audio') return; const a = e.audio_event || {}; if (!a.audio_base_64 || (corte != null && a.event_id != null && a.event_id < corte)) return;
+      if (!conv) { cola.push(a.audio_base_64); return; }
+      try { b.tocar(pcm(a.audio_base_64)); } catch (err) { console.warn('[Monty voz] bocina propia falló', err); this.soltar(); }
+    },
+    conectar(c) {
+      conv = c; if (!b) return;
+      try { c.setVolume({ volume: 0 }); c.getOutputVolume = () => (b ? b.volumen() : 0);
+        const q = cola; cola = []; q.forEach((x) => b.tocar(pcm(x)));
+      } catch (e) { console.warn('[Monty voz] no pude usar la bocina propia', e); this.soltar(); }
+    },
+    soltar() { if (b) { b.cerrar(); b = null; } try { conv && conv.setVolume({ volume: 1 }); } catch (e) {} },   // nunca sin voz: vuelve a sonar la librería
+    terminar() { if (b) { b.cerrar(); b = null; } conv = null; cola = []; },
+  };
+})();
 let intento = 0;
 async function startVoice() {
   if (voiceConv || voiceStarting) return;
   voiceStarting = true; const my = ++voiceSeq;
+  Voz.preparar();
   if (voiceEnding) { try { await voiceEnding; } catch (e) {} voiceEnding = null; }
   typing(false); pending = [];
   if (conv) { const c = conv; conv = null; connecting = null; gotFirst = false; try { await c.endSession(); } catch (e) {} }
@@ -422,12 +506,11 @@ async function startVoice() {
       },
       onDisconnect: (d) => { if ((my !== voiceSeq || n !== intento) || !voiceConv) return; const byAgent = d && d.reason === 'agent'; voiceConv = null; stopVoice(byAgent ? 'Llamada terminada. Puedes seguir escribiendo aquí o volver a llamar cuando quieras.' : undefined); },
       onError: (m) => console.warn('[Monty voz]', m),
+      onIncomingEvent: (e) => { if (my === voiceSeq && n === intento) Voz.evento(e); },
       onModeChange: ({ mode }) => { if ((my !== voiceSeq || n !== intento)) return; vMode = mode; if (!voiceConv) return; clearTimeout(escuchaT); if (mode === 'speaking') vState('speaking', 'Monty te está contestando…'); else escuchaT = setTimeout(() => { if (voiceConv && vMode !== 'speaking') vState('listening', muted ? 'Micrófono silenciado' : 'Te escucho…'); }, 900); },
       onMessage: ({ message, source }) => { if (!message || (my !== voiceSeq || n !== intento)) return; if (source !== 'user') { if (message === ultimoAi) return; ultimoAi = message; } add(source === 'user' ? 'me' : 'ai', source === 'user' ? esc(message) : md(message)); if (source !== 'user') revisarTarjeta(message); quick.style.display = 'none'; },
     });
-    // Si la llamada no conecta por WebRTC (en 12 s o con error), se reintenta sola por websocket: la familia no hace nada.
-    // Se decide por lo que pasa en ESE aparato, nunca por su marca o modelo.
-    const tipos = ['webrtc', 'websocket'];
+    const tipos = ['websocket'];   // un solo camino, el mismo de Quali y Luna (el micrófono funciona en celulares viejos)
     let c = null, ultimoError = null;
     for (const tipo of tipos) {
       const n = ++intento; const prom = abrir(tipo, n);
@@ -443,7 +526,7 @@ async function startVoice() {
     }
     if (!c) throw ultimoError || new Error('sin conexión');
     if (!voiceStarting || my !== voiceSeq) { try { await c.endSession(); } catch (e) {} return; }
-    voiceConv = c;
+    voiceConv = c; Voz.conectar(c);
   } catch (e) {
     console.error('[Monty voz]', e); if (my !== voiceSeq) return;
     const denied = e && (e.name === 'NotAllowedError' || /permission|denied/i.test(e.message || ''));
@@ -452,6 +535,7 @@ async function startVoice() {
 }
 function stopVoice(note) {
   const c = voiceConv; voiceConv = null; voiceStarting = false; voiceSeq++;
+  Voz.terminar();
   clearInterval(vTimer); cancelAnimationFrame(raf); lvl = 0; orb.style.setProperty('--lvl', 0); bocaPoner(1); delete cara.dataset.parpadeo;
   if (c) voiceEnding = Promise.resolve().then(() => c.endSession()).catch(() => {});
   chat.classList.remove('in-voice'); voice.hidden = true; setEstado('● En línea');
