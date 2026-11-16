@@ -86,7 +86,11 @@ form button:active{transform:scale(.92)}
 .voice{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(8px,2vh,16px);padding:clamp(12px,3vh,24px) 22px;overflow:hidden;background:#F4F6FB;text-align:center;min-height:0}
 .voice[hidden]{display:none}
 .orb{--lvl:0;--o:clamp(170px,30vh,260px);--i:calc(var(--o) * .49);position:relative;width:var(--o);height:var(--o);flex:none;display:grid;place-items:center;margin-bottom:clamp(0px,1vh,10px);animation:breathe 4.2s ease-in-out infinite}
-.orb img{position:relative;z-index:2;width:var(--i);height:var(--i);border-radius:50%;background:var(--sol);object-fit:cover;border:4px solid #fff;box-shadow:0 0 0 3px var(--azul2);transform:translateY(calc(var(--lvl) * -7px)) scale(calc(1 + var(--lvl) * .07)) rotate(calc(var(--lvl) * -3deg));transition:transform .12s ease-out}
+.orb .cara{position:relative;z-index:2;width:var(--i);height:var(--i);border-radius:50%;overflow:hidden;background:var(--sol);border:4px solid #fff;box-shadow:0 0 0 3px var(--azul2);transform:translateY(calc(var(--lvl) * -6px)) rotate(calc(var(--lvl) * -2deg));transition:transform .12s ease-out}
+.orb .cara img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+/* Monty habla y parpadea como Bolita: capas encimadas que se prenden según la voz */
+.orb .cara .c1,.orb .cara .c2,.orb .cara .cp{opacity:0}
+.orb .cara[data-boca="1"] .c1,.orb .cara[data-boca="2"] .c2,.orb .cara[data-parpadeo] .cp{opacity:1}
 .orb .ring{position:absolute;left:50%;top:50%;width:var(--i);height:var(--i);margin:calc(var(--i) / -2) 0 0 calc(var(--i) / -2);border-radius:50%;background:var(--azul);transition:transform .14s ease-out,opacity .3s}
 .orb .r1{opacity:.6;transform:scale(calc(1.16 + var(--lvl) * .32));box-shadow:0 0 40px 10px rgba(36,64,142,.45)}
 .orb .r2{opacity:.3;transform:scale(calc(1.42 + var(--lvl) * .55))}
@@ -145,7 +149,7 @@ form button:active{transform:scale(.92)}
       <button type="submit" aria-label="Enviar"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
     </form>
     <div class="voice" id="voice" hidden>
-      <div class="orb" id="orb"><span class="ring r3"></span><span class="ring r2"></span><span class="ring r1"></span><img id="av2" src="../img/monty-cara.webp" alt="Monty"></div>
+      <div class="orb" id="orb"><span class="ring r3"></span><span class="ring r2"></span><span class="ring r1"></span><div class="cara" id="cara" data-boca="1" role="img" aria-label="Monty"><img src="../img/monty-habla/cabeza.webp" alt=""><img class="c1" src="../img/monty-habla/boca-1.webp" alt=""><img class="c2" src="../img/monty-habla/boca-2.webp" alt=""><img class="cp" src="../img/monty-habla/parpadeo.webp" alt=""></div></div>
       <p class="v-status" id="v-status" role="status">Conectando…</p>
       <div class="v-actions">
         <button type="button" class="v-mute" id="v-mute" aria-pressed="false">Silenciar</button>
@@ -163,7 +167,7 @@ const AGENT_ID = 'agent_3801m7jq785vepzr6eps0hh7rx0r';
 const AVATAR = '../img/monty-cara.webp';               // cambia aquí el avatar del asistente
 const TEL = '229 283 4408';
 const NOMBRE_ASIS = 'Monty';
-document.getElementById('av').src = AVATAR; document.getElementById('av2').src = AVATAR;
+document.getElementById('av').src = AVATAR;
 
 const $ = (s) => document.querySelector(s);
 const msgs = $('#msgs'), form = $('#f'), input = $('#in'), quick = $('#quick'), estado = $('#estado');
@@ -270,7 +274,25 @@ addEventListener('message', (e) => { if (e.origin === location.origin && e.data 
 const VOICE_MAX = 180, chat = $('.chat'), voice = $('#voice'), orb = $('#orb'), vStatus = $('#v-status'), vTime = $('#v-time'), vMute = $('#v-mute');
 let voiceSeq = 0, voiceEnding = null, voiceConv = null, voiceStarting = false, vMode = 'listening', raf = 0, lvl = 0, vTimer = 0, vLeft = 0, muted = false;
 function vState(cls, t) { voice.className = 'voice ' + cls; vStatus.textContent = t; }
-function loop() {
+const cara = $('#cara');
+let bocaT = 0, pico = 0.08, previo = 0, paso = 0, ciclo = [], sigParp = 0;
+function bocaPoner(f) { if (cara.dataset.boca !== String(f)) cara.dataset.boca = f; }
+function nuevaSilaba() { const r = Math.random; ciclo = ['A', 'A', ...(r() < 0.4 ? ['A'] : []), 2, 1, ...(r() < 0.35 ? [1] : [])]; paso = 0; }
+function boca(t) {
+  if (t - bocaT < 75) return; bocaT = t;
+  let v = 0; const habla = !!voiceConv && vMode === 'speaking';
+  if (habla) { try { v = voiceConv.getOutputVolume() || 0; } catch (e) {} }
+  pico = Math.max(v, pico * 0.995, 0.04);
+  const rel = v / pico, caida = previo > 0 && v < previo * 0.45; previo = v;
+  let f = 1; // reposo: pico cerrado
+  if (!habla || rel < 0.15) ciclo = [];
+  else if (caida) { nuevaSilaba(); paso = ciclo.length - 1; }
+  else { if (paso >= ciclo.length) nuevaSilaba(); const k = ciclo[paso++]; f = k === 'A' ? (rel > 0.55 ? 3 : 2) : k; }
+  bocaPoner(f);
+  if (t > sigParp) { if (sigParp) { cara.dataset.parpadeo = ''; setTimeout(() => { delete cara.dataset.parpadeo; }, 140); } sigParp = t + 2500 + Math.random() * 3500; }
+}
+function loop(t) {
+  boca(t || performance.now());
   let target = 0;
   if (voiceConv) { try { target = vMode === 'speaking' ? voiceConv.getOutputVolume() * 1.6 : (muted ? 0 : voiceConv.getInputVolume() * 1.1); } catch (e) {} }
   target = Math.min(1, target || 0); lvl += (target - lvl) * (target > lvl ? 0.35 : 0.12);
@@ -322,7 +344,7 @@ async function startVoice() {
 }
 function stopVoice(note) {
   const c = voiceConv; voiceConv = null; voiceStarting = false; voiceSeq++;
-  clearInterval(vTimer); cancelAnimationFrame(raf); lvl = 0; orb.style.setProperty('--lvl', 0);
+  clearInterval(vTimer); cancelAnimationFrame(raf); lvl = 0; orb.style.setProperty('--lvl', 0); bocaPoner(1); delete cara.dataset.parpadeo;
   if (c) voiceEnding = Promise.resolve().then(() => c.endSession()).catch(() => {});
   chat.classList.remove('in-voice'); voice.hidden = true; setEstado('● En línea');
   add('sys', note || 'Llamada terminada. Puedes seguir escribiendo aquí o volver a llamar.');
