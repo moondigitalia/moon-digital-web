@@ -673,7 +673,7 @@ F().addEventListener('submit', async e => {
   $('crear').disabled = false; $('crear').textContent = texto;
   if (!r.ok) {
     $('aviso').textContent = r.error === 'faltan' ? 'Falta el nombre del negocio o a qué se dedica.'
-      : r.error === 'lleno' ? 'Por hoy ya se armaron muchos demos. Vuelve mañana, con gusto te esperamos.'
+      : r.error === 'lleno' ? (modo === 'abierta' ? 'Por hoy ya se armaron muchos demos. Vuelve mañana, con gusto te esperamos.' : `Hoy ya armaste ${r.tope || 'todos los'} demos, el máximo del día. Mañana se vuelve a abrir.`)
       : r.error === 'sesion' ? 'Tu sesión del tablero se cerró. Vuelve a entrar al tablero de MOON.'
       : 'No se pudo crear. Revisa tu internet y vuelve a intentar.';
     $('aviso').hidden = false; return;

@@ -11,6 +11,7 @@ const { crypto, sql, t, clave10 } = require('./_base');
 
 const AGENTES = { dan: 'agent_7801m5k7sesyektvzg9f2dz6hd48', abierta: 'agent_4501m5kc4jx0ezvssz3smwa4s2nf' };
 const TOPES = { dan: 30, abierta: 20 };           // los mismos topes que tiene cada agente en ElevenLabs
+const DEMOS_SOCIO_DIA = 50;                       // (16-nov-2026, Kid) máximo de demos que arma cada socio (Dan) al día
 const DEMOS_ABIERTA_DIA = 40;                      // cuántos demos nuevos puede armar el público al día (evita que llenen la base)
 const VOCES = { hombre: 'hEKEQC93QpOYMa6WuwWp', mujer: '1u9q7vX1Lcx74yAcFPt7' }; // voz de Jason · voz de Luna
 // Costo medido en una plática real (22-oct-2026): ~0.097 USD por minuto de voz. Se usa solo si no hay llave de ElevenLabs.
@@ -249,7 +250,11 @@ module.exports = async (req, res) => {
     if (emb && ['buscar_persona', 'cobro'].includes(d.accion)) { res.status(200).json({ ok: false, error: 'permiso' }); return; }
     if (d.accion === 'crear' && emb) {
       const hoyN = ((await sql('SELECT COUNT(*) n FROM demos WHERE creado_por = ? AND creado >= ?', [yo.id, inicioHoy()]))[0] || {}).n || 0;
-      if (hoyN >= yo.tope) { res.status(200).json({ ok: false, error: 'lleno' }); return; }
+      if (hoyN >= yo.tope) { res.status(200).json({ ok: false, error: 'lleno', tope: yo.tope }); return; }
+    }
+    if (d.accion === 'crear' && !emb) {
+      const hoyN = ((await sql('SELECT COUNT(*) n FROM demos WHERE creado_por = ? AND creado >= ?', [yo.id, inicioHoy()]))[0] || {}).n || 0;
+      if (hoyN >= DEMOS_SOCIO_DIA) { res.status(200).json({ ok: false, error: 'lleno', tope: DEMOS_SOCIO_DIA }); return; }
     }
     if (d.accion === 'crear') {
       const negocio = t(d.negocio, 80);
