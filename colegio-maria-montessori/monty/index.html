@@ -67,11 +67,11 @@ body{font-family:"DM Sans",system-ui,-apple-system,"Segoe UI",sans-serif;font-we
 .quick button{font-family:inherit;font-size:16px;font-weight:700;color:var(--azul2);background:#fff;border:2px solid #B9C7E6;border-radius:999px;padding:10px 16px;cursor:pointer;transition:background .25s,transform .25s}
 .quick button:hover{background:var(--soft)}
 .quick button:active{transform:scale(.96)}
-form{display:flex;gap:10px;padding:12px 16px calc(14px + env(safe-area-inset-bottom));background:#fff;border-top:1px solid var(--line);flex:none}
+#f{display:flex;gap:10px;padding:12px 16px calc(14px + env(safe-area-inset-bottom));background:#fff;border-top:1px solid var(--line);flex:none}
 input{flex:1;min-width:0;font-family:inherit;font-size:18px;font-weight:600;color:var(--ink);border:2px solid #C9D4EA;border-radius:999px;padding:14px 20px;outline:none;background:#fff}
 input:focus{border-color:var(--azul)}
-form button{width:56px;height:56px;border-radius:50%;border:0;background:var(--azul);color:#fff;display:grid;place-items:center;cursor:pointer;flex:none;transition:transform .25s}
-form button:active{transform:scale(.92)}
+#f button{width:56px;height:56px;border-radius:50%;border:0;background:var(--azul);color:#fff;display:grid;place-items:center;cursor:pointer;flex:none;transition:transform .25s}
+#f button:active{transform:scale(.92)}
 .nota .fuente{font-size:13px;font-weight:600}
 .nota{font-size:13px;color:var(--ink2);text-align:center;padding:0 16px 10px;background:#fff}
 /* voz */
@@ -82,7 +82,7 @@ form button:active{transform:scale(.92)}
 .quick .q-voz{background:var(--azul);color:#fff;border-color:var(--azul);display:none;align-items:center;gap:8px}
 .quick .q-voz:hover{background:var(--azul2)}
 #mic{background:#fff;color:var(--azul);border:2px solid var(--azul)}
-.chat.in-voice .msgs,.chat.in-voice .quick,.chat.in-voice form{display:none}
+.chat.in-voice .msgs,.chat.in-voice .quick,.chat.in-voice #f{display:none}
 .voice{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(8px,2vh,16px);padding:clamp(12px,3vh,24px) 22px;overflow:hidden;background:#fff;text-align:center;min-height:0}
 .voice[hidden]{display:none}
 /* Monty de cuerpo completo sobre fondo blanco: respira, se mueve con su voz, parpadea y mueve el pico (capas como Bolita) */
@@ -102,7 +102,25 @@ form button:active{transform:scale(.92)}
 .v-mute[aria-pressed="true"]{background:var(--soft)}
 .v-end{background:#C8322B;border-color:#C8322B!important;color:#fff}
 .v-time{font-size:15px;color:var(--ink2);font-weight:700}
-@media (max-height:720px){.quick{gap:8px;padding-bottom:10px}.quick button{font-size:15px;padding:7px 13px}.ch{padding:10px 16px}.ch .av{width:44px;height:44px}form{padding-top:10px;padding-bottom:calc(10px + env(safe-area-inset-bottom))}input{padding:11px 18px}form button{width:48px;height:48px}}
+.chat{position:relative}
+/* tarjeta para escribir los datos (Monty la abre cuando la familia acepta que admisiones le escriba) */
+.tarjeta{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;justify-content:flex-end;background:rgba(14,36,112,.42);opacity:0;visibility:hidden;transition:opacity .4s,visibility 0s .4s}
+.tarjeta.on{opacity:1;visibility:visible;transition:opacity .4s}
+.hoja{position:relative;background:#fff;border-radius:30px 30px 0 0;box-shadow:0 -18px 50px rgba(14,36,112,.22);padding:24px 20px calc(18px + env(safe-area-inset-bottom));max-height:100%;overflow:auto;transform:translateY(105%);transition:transform .55s cubic-bezier(.34,1.3,.5,1)}
+.tarjeta.on .hoja{transform:none}
+.tarjeta h3{font-family:"Baloo 2","DM Sans",sans-serif;font-size:26px;font-weight:800;color:var(--azul2);line-height:1.1;padding-right:48px}
+.tarjeta p{font-size:16px;color:var(--ink2);margin-top:6px;line-height:1.45}
+.tarjeta label.c{display:block;margin-top:12px;font-size:16px;font-weight:800;color:var(--azul2)}
+.tarjeta label.c input{margin-top:6px;width:100%;flex:none}
+.tarjeta .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.tarjeta .chips label{position:relative}
+.tarjeta .chips input{position:absolute;opacity:0;inset:0;width:100%;height:100%;margin:0;padding:0;border:0;cursor:pointer}
+.tarjeta .chips span{display:block;border-radius:999px;padding:10px 16px;font-size:16px;font-weight:800;color:var(--azul2);background:var(--soft)}
+.tarjeta .chips input:checked+span{background:var(--azul2);color:#fff}
+.tarjeta .enviar{width:100%;margin-top:16px;height:56px;border:0;border-radius:999px;background:#FFC531;color:#0E2470;font-family:inherit;font-size:18px;font-weight:800;cursor:pointer}
+.tarjeta .x{position:absolute;right:14px;top:14px;width:44px;height:44px;border-radius:50%;border:0;background:var(--soft);color:var(--azul2);display:grid;place-items:center;cursor:pointer}
+.tarjeta .aviso{color:#B3141D;font-size:15px;font-weight:800;margin-top:10px}
+@media (max-height:720px){.quick{gap:8px;padding-bottom:10px}.quick button{font-size:15px;padding:7px 13px}.ch{padding:10px 16px}.ch .av{width:44px;height:44px}#f{padding-top:10px;padding-bottom:calc(10px + env(safe-area-inset-bottom))}input{padding:11px 18px}#f button{width:48px;height:48px}}
 @media (prefers-reduced-motion:reduce){.orb,.btn-voz .mic{animation:none}}
 @media (max-width:900px){
   .quick .q-voz{display:inline-flex}
@@ -153,6 +171,18 @@ form button:active{transform:scale(.92)}
       </div>
       <small class="v-time" id="v-time"></small>
     </div>
+    <div class="tarjeta" id="tarjeta" role="dialog" aria-label="Tus datos para admisiones" aria-hidden="true"><div class="hoja">
+      <button type="button" class="x" id="tx" aria-label="Cerrar la tarjeta"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button>
+      <h3>Escribe tus datos</h3>
+      <p>Así admisiones te escribe por WhatsApp para agendar tu visita.</p>
+      <form id="ft" novalidate autocomplete="on">
+        <label class="c">Tu nombre<input name="nombre" autocomplete="name" placeholder="Ej. Ana López" maxlength="60"></label>
+        <label class="c">Tu WhatsApp<input name="whatsapp" inputmode="numeric" autocomplete="tel" placeholder="10 dígitos" maxlength="16"></label>
+        <div class="c" style="margin-top:12px;font-size:16px;font-weight:800;color:var(--azul2)">Nivel que te interesa<div class="chips" id="tchips"></div></div>
+        <p class="aviso" id="taviso" hidden></p>
+        <button class="enviar" type="submit">Enviar a admisiones</button>
+      </form>
+    </div></div>
     <div class="nota">Monty es el asistente virtual del colegio. Admisiones confirma colegiaturas, fechas y requisitos.</div>
   </section>
 </div>
@@ -223,7 +253,36 @@ function guardarNombre(p) {
   userName = n.charAt(0).toUpperCase() + n.slice(1); 
   return 'Nombre guardado: ' + userName + '. Salúdala por su nombre y continúa.';
 }
-const clientTools = { registrar_familia: registrarFamilia, guardar_nombre: guardarNombre };
+// ── Tarjeta para escribir los datos: Monty la abre (dictar números por voz falla) ──
+const tarjeta = $('#tarjeta'), ft = $('#ft'), taviso = $('#taviso');
+$('#tchips').innerHTML = ['Maternal', 'Kínder', 'Primaria', 'Secundaria'].map((n) => '<label><input type="radio" name="nivel" value="' + n + '"><span>' + n + '</span></label>').join('');
+let tarjetaAbierta = false;
+function abrirTarjeta(p) {
+  p = p || {};
+  ft.nombre.value = ft.nombre.value || (p.nombre || userName || '');
+  if (p.nivel) { const r = ft.querySelector('input[name=nivel][value="' + p.nivel + '"]'); if (r) r.checked = true; }
+  taviso.hidden = true; tarjeta.classList.add('on'); tarjeta.setAttribute('aria-hidden', 'false'); tarjetaAbierta = true;
+  setTimeout(() => { const i = ft.nombre.value ? ft.whatsapp : ft.nombre; try { i.focus({ preventScroll: true }); } catch (e) {} }, 450);
+  return 'Ya está abierta la tarjeta en su pantalla. Dile en una frase que escriba ahí su nombre y su WhatsApp con calma, y espera.';
+}
+function cerrarTarjeta() { tarjeta.classList.remove('on'); tarjeta.setAttribute('aria-hidden', 'true'); tarjetaAbierta = false; }
+$('#tx').addEventListener('click', cerrarTarjeta);
+ft.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const nombre = ft.nombre.value.trim(), tel = ft.whatsapp.value.replace(/\D/g, '');
+  const nivelEl = ft.querySelector('input[name=nivel]:checked'), nivel = nivelEl ? nivelEl.value : '';
+  if (!nombre) { taviso.textContent = 'Escribe tu nombre, por favor.'; taviso.hidden = false; return; }
+  if (tel.length < 10) { taviso.textContent = 'Escribe tu WhatsApp completo, con 10 dígitos.'; taviso.hidden = false; return; }
+  cerrarTarjeta();
+  await registrarFamilia({ nombre, whatsapp: tel, nivel, visita: 'si', notas: 'Llenó la tarjeta en su plática con Monty.' });
+  const n = nombre.split(/\s+/)[0]; userName = userName || n;
+  // Monty se entera y lo confirma (en voz o en texto); ya no vuelve a registrar
+  const aviso = 'Aviso del sistema: la familia ya llenó la tarjeta. Nombre: ' + nombre + '. WhatsApp: ' + fmtTel(tel) + (nivel ? '. Nivel: ' + nivel : '') + '. Sus datos YA quedaron con admisiones; no llames registrar_familia. Confírmale en una frase cálida y sigue la plática.';
+  const c = voiceConv || conv;
+  try { if (c) { c.sendContextualUpdate(aviso); c.sendUserMessage('Listo, ya escribí mis datos en la tarjeta.'); if (!voiceConv) typing(true); } } catch (e) {}
+});
+const clientTools = { registrar_familia: registrarFamilia, guardar_nombre: guardarNombre, abrir_tarjeta_datos: abrirTarjeta };
+if (location.hash === '#tarjeta') abrirTarjeta({});
 
 async function connect() {
   if (conv) return conv; if (connecting) return connecting;
@@ -270,7 +329,8 @@ addEventListener('message', (e) => { if (e.origin === location.origin && e.data 
 // Sesión WebRTC aparte de la de texto. El halo crece con el volumen de la voz. Límite 3 min (demo).
 const VOICE_MAX = 180, chat = $('.chat'), voice = $('#voice'), orb = $('#orb'), vStatus = $('#v-status'), vTime = $('#v-time'), vMute = $('#v-mute');
 let voiceSeq = 0, voiceEnding = null, voiceConv = null, voiceStarting = false, vMode = 'listening', raf = 0, lvl = 0, vTimer = 0, vLeft = 0, muted = false;
-function vState(cls, t) { voice.className = 'voice ' + cls; vStatus.textContent = t; }
+let escuchaT = 0;
+function vState(cls, t) { voice.className = 'voice ' + cls; if (vStatus.textContent !== t) vStatus.textContent = t; }
 const cara = $('#cara');
 let bocaT = 0, pico = 0.08, previo = 0, paso = 0, ciclo = [], sigParp = 0;
 function bocaPoner(f) { if (cara.dataset.boca !== String(f)) cara.dataset.boca = f; }
@@ -328,7 +388,7 @@ async function startVoice() {
       },
       onDisconnect: (d) => { if (my !== voiceSeq || !voiceConv) return; const byAgent = d && d.reason === 'agent'; voiceConv = null; stopVoice(byAgent ? 'Llamada terminada. Puedes seguir escribiendo aquí o volver a llamar cuando quieras.' : undefined); },
       onError: (m) => console.warn('[Monty voz]', m),
-      onModeChange: ({ mode }) => { if (my !== voiceSeq) return; vMode = mode; if (!voiceConv) return; mode === 'speaking' ? vState('speaking', 'Monty te está contestando…') : vState('listening', muted ? 'Micrófono silenciado' : 'Te escucho…'); },
+      onModeChange: ({ mode }) => { if (my !== voiceSeq) return; vMode = mode; if (!voiceConv) return; clearTimeout(escuchaT); if (mode === 'speaking') vState('speaking', 'Monty te está contestando…'); else escuchaT = setTimeout(() => { if (voiceConv && vMode !== 'speaking') vState('listening', muted ? 'Micrófono silenciado' : 'Te escucho…'); }, 900); },
       onMessage: ({ message, source }) => { if (!message || my !== voiceSeq) return; add(source === 'user' ? 'me' : 'ai', source === 'user' ? esc(message) : md(message)); quick.style.display = 'none'; },
     });
     if (!voiceStarting || my !== voiceSeq) { try { await c.endSession(); } catch (e) {} return; }

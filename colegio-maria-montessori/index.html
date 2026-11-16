@@ -26,7 +26,7 @@
   --suave:cubic-bezier(.2,.8,.2,1);--rebote:cubic-bezier(.34,1.45,.5,1)
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth;scroll-padding-top:96px;-webkit-text-size-adjust:100%;background:var(--marino)}
+html{scrollbar-gutter:stable;scroll-behavior:smooth;scroll-padding-top:96px;-webkit-text-size-adjust:100%;background:var(--marino)}
 body{font-family:var(--t);font-weight:600;color:var(--tinta);background:var(--marino);-webkit-font-smoothing:antialiased;overflow-x:hidden}
 img{display:block;max-width:100%;height:auto}
 button{font-family:inherit;cursor:pointer;color:inherit}
@@ -46,7 +46,7 @@ h1,h2,h3{font-family:var(--r);font-weight:800;letter-spacing:-.01em;line-height:
    el degradado y la luz aparecen poco a poco más abajo (máscara), así nunca se ve un rectángulo después del corte */
 .seccion::before{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;background:var(--grad);-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 var(--entra,0px));mask-image:linear-gradient(180deg,transparent 0,#000 var(--entra,0px))}
 .seccion:not(.portada){--entra:clamp(160px,22vh,260px)}
-.seccion:not(.portada) .luz{-webkit-mask-image:linear-gradient(180deg,transparent 0,transparent 60px,#000 clamp(220px,30vh,340px));mask-image:linear-gradient(180deg,transparent 0,transparent 60px,#000 clamp(220px,30vh,340px))}
+.seccion:not(.portada) .burbujas,.seccion:not(.portada) .luz{-webkit-mask-image:linear-gradient(180deg,transparent 0,transparent 60px,#000 clamp(220px,30vh,340px));mask-image:linear-gradient(180deg,transparent 0,transparent 60px,#000 clamp(220px,30vh,340px))}
 .portada{background:#1B47C4;--grad:radial-gradient(70% 60% at 85% 10%,#3D6CF2 0%,rgba(61,108,242,0) 60%),linear-gradient(160deg,#2350D6 0%,var(--azul) 45%,#13339A 100%);color:#fff}
 .edad{background:#FFC531;--grad:radial-gradient(60% 50% at 10% 35%,#FFE9A3 0%,rgba(255,233,163,0) 70%),linear-gradient(180deg,#FFC531 0%,#FFB81C 100%);color:var(--marino)}
 .metodo{background:#0E2470;--grad:radial-gradient(60% 60% at 100% 30%,#24419E 0%,rgba(36,65,158,0) 70%),linear-gradient(180deg,#0E2470 0%,#0A1A55 100%);color:#fff}
@@ -117,7 +117,6 @@ h1,h2,h3{font-family:var(--r);font-weight:800;letter-spacing:-.01em;line-height:
 .intro .monty-sale img{transform-origin:70% 90%;animation:saluda 1.2s ease-in-out 2.1s 2}
 @keyframes sube{to{transform:translateY(12%)}}
 @keyframes saluda{0%,100%{transform:rotate(0)}30%{transform:rotate(-7deg)}65%{transform:rotate(5deg)}}
-.intro .saltar{position:absolute;left:50%;bottom:clamp(16px,4vh,36px);transform:translateX(-50%);font-size:16px;font-weight:800;opacity:.9;white-space:nowrap}
 
 /* portada */
 .portada{padding-top:110px}
@@ -190,7 +189,7 @@ h1,h2,h3{font-family:var(--r);font-weight:800;letter-spacing:-.01em;line-height:
 .idea p em{font-style:normal;color:var(--sol2)}
 .metodo .pastilla{margin-top:clamp(28px,5vh,48px)}
 .metodo .burbujas i{background:var(--sol)}
-.metodo .burbujas i:nth-child(1){width:300px;height:300px;right:-100px;top:-60px;opacity:.08}
+.metodo .burbujas i:nth-child(1){width:300px;height:300px;right:-100px;top:24%;opacity:.08}
 .metodo .burbujas i:nth-child(2){width:90px;height:90px;left:8%;bottom:22%;opacity:.12}
 .metodo .burbujas i:nth-child(3){width:150px;height:150px;left:52%;top:18%;opacity:.06}
 
@@ -355,7 +354,13 @@ footer .moon img{height:24px;width:auto}
   .paso-a p{margin:2px 0 0;max-width:none}
   footer{padding-bottom:116px}
 }
+@media (max-width:480px){
+  .recorrido{grid-template-columns:minmax(0,1fr)}
+}
 @media (max-width:420px){
+  .via{gap:12px;padding:8px 16px 8px 8px}
+  .via .ic{width:48px;height:48px}
+  .via small{font-size:14px}
   .cab{grid-template-columns:minmax(0,1fr)}
   .cab img{display:none}
   .niveles{gap:12px}
@@ -376,7 +381,6 @@ footer .moon img{height:24px;width:auto}
     <div class="nombre">Colegio María Montessori</div>
   </div>
   <div class="monty-sale"><img src="img/monty.webp" alt="" width="722" height="900"></div>
-  <span class="saltar">Toca para entrar</span>
 </div>
 
 <header class="isla" id="isla">
