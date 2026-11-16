@@ -551,6 +551,18 @@ footer .moon img{height:24px;width:auto}
   var $=function(s){return document.querySelector(s)};
   function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
 
+  // ── Siempre empieza en el inicio (Kid, 16-nov-2026): el navegador recordaba dónde se quedó la última vez y abría hasta abajo,
+  // y un link con #contacto (de picar el menú) abría en contacto. Solo los atajos de la junta (#agendar, #monty, #edad-N) se respetan.
+  try{if('scrollRestoration' in history)history.scrollRestoration='manual'}catch(e){}
+  var atajo=/^#(agendar|monty|edad-\d+)$/.test(location.hash);
+  if(location.hash&&!atajo){try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}}
+  if(!atajo)scrollTo(0,0);
+  // si vuelve a la pestaña después de un buen rato (el celular la tenía guardada), también arranca arriba
+  var oculta=0;document.addEventListener('visibilitychange',function(){if(document.hidden)oculta=Date.now()});
+  addEventListener('pageshow',function(e){if(e.persisted&&oculta&&Date.now()-oculta>30*60*1000){document.documentElement.style.scrollBehavior='auto';scrollTo(0,0);document.documentElement.style.scrollBehavior=''}});
+  // los links del menú bajan a su sección sin dejar "#seccion" pegado en la dirección
+  document.addEventListener('click',function(e){var a=e.target.closest('a[href^="#"]');if(!a||a.hasAttribute('data-monty'))return;var id=a.getAttribute('href').slice(1),el=id?document.getElementById(id):null;if(!el)return;e.preventDefault();el.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'})});
+
   // ── Entrada: escudo, "Educando en valores" y Monty. Una vez por visita; un toque la salta ──
   var intro=$('#intro'),visto=false; // la entrada sale cada vez que se abre o se actualiza la página
   function entra(){document.documentElement.classList.add('listo-entrada')}
