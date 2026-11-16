@@ -182,6 +182,18 @@ function typing(on) {
   msgs.scrollTop = msgs.scrollHeight;
 }
 function setEstado(t, ok = true) { estado.textContent = t; estado.style.color = ok ? '#BFF0D0' : '#FFE08A'; }
+// NADIE SE QUEDA SIN LLAMADA (de la plantilla MOON, motor/compat.js; nació con Quali en el iPhone 7 de Kid, 29-oct-2026):
+// la librería de voz pregunta el permiso del micrófono con navigator.permissions.query, que Safari antes de 16 no tiene
+// (y algunos navegadores no aceptan "microphone"). Truena aunque el micrófono YA esté permitido y la llamada no conecta.
+// Aquí se completa: si no existe o falla, responde "permitido" (el micrófono ya pasó por getUserMedia en ese momento).
+(() => { const stub = () => ({ state: 'granted', onchange: null, addEventListener() {}, removeEventListener() {}, dispatchEvent() { return false; } });
+  try {
+    const nav = navigator, orig = nav.permissions && typeof nav.permissions.query === 'function' ? nav.permissions.query.bind(nav.permissions) : null;
+    const query = async (d) => { if (!orig) return stub(); try { return await orig(d); } catch (e) { return stub(); } };
+    if (!nav.permissions) Object.defineProperty(nav, 'permissions', { value: { query }, configurable: true });
+    else try { nav.permissions.query = query; } catch (e) { Object.defineProperty(nav, 'permissions', { value: { query }, configurable: true }); }
+  } catch (e) {}
+})();
 async function loadSdk() {
   if (sdk) return sdk;
   for (const u of ['https://esm.sh/@elevenlabs/client@0', 'https://cdn.jsdelivr.net/npm/@elevenlabs/client@0/+esm']) {
