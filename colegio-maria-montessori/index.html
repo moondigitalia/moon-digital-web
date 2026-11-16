@@ -319,8 +319,11 @@ footer .moon img{height:24px;width:auto}
 .sube:nth-child(2){transition-delay:.08s}.sube:nth-child(3){transition-delay:.16s}.sube:nth-child(4){transition-delay:.24s}
 
 @media (max-width:1060px){
-  .isla{left:12px;right:12px;transform:none;max-width:none;justify-content:space-between;border-radius:32px;flex-wrap:wrap;transition:transform .5s var(--suave),border-radius .4s}
-  .isla.escondida{transform:translateY(calc(-100% - 24px))}
+  .isla{left:50%;right:auto;transform:translateX(-50%);width:calc(100% - 24px);max-width:none;justify-content:space-between;border-radius:32px;flex-wrap:wrap;transition:width .55s var(--suave),border-radius .4s,padding .5s var(--suave)}
+  .isla.cerrada{width:112px;overflow:hidden;cursor:pointer;flex-wrap:nowrap}
+  .isla .marca b{transition:opacity .3s ease .15s}
+  .isla.cerrada .marca b{opacity:0;width:0;overflow:hidden;transition:none}
+  .isla.cerrada .marca{padding-right:0;gap:0}
   .marca b{white-space:normal;font-size:17px}
   .menu{display:none;max-width:none;opacity:1;width:100%;flex-direction:column;align-items:stretch;gap:4px;padding:8px 4px 6px}
   .isla.panel .menu{display:flex;animation:baja .4s var(--suave)}
@@ -348,7 +351,7 @@ footer .moon img{height:24px;width:auto}
 }
 @media (max-width:560px){
   .portada{padding-top:96px}
-  .foto-portada{width:min(66%,300px);justify-self:start}
+  .foto-portada{width:min(66%,300px);justify-self:center;margin-right:4%}
   .foto-portada .anillo img{inset:7px;width:calc(100% - 14px);height:calc(100% - 14px)}
   .portada .acciones .pastilla{width:100%}
   .burbuja .dice{display:none}
@@ -551,20 +554,20 @@ footer .moon img{height:24px;width:auto}
 
   // ── Isla: abierta arriba; se cierra al bajar un buen tramo; se abre al subir o al picarla ──
   var isla=$('#isla'),ultimo=scrollY,tramo=0,dir=0,quieta=0,pendiente=false,cel=matchMedia('(max-width:1060px)');
-  function pon(cerrada){var cls=cel.matches?'escondida':'cerrada';isla.classList.remove(cel.matches?'cerrada':'escondida');
+  function pon(cerrada){var cls='cerrada';
     if(cerrada&&isla.classList.contains('panel'))return;if(isla.classList.contains(cls)===cerrada)return;
     isla.classList.toggle(cls,cerrada);quieta=performance.now()+650;tramo=0}
   $('#abrirIsla').addEventListener('click',function(e){if(!cel.matches)return;e.stopPropagation();isla.classList.toggle('panel')});
   isla.querySelectorAll('.menu a,.menu button').forEach(function(a){a.addEventListener('click',function(){isla.classList.remove('panel')})});
   document.addEventListener('click',function(e){if(cel.matches&&!isla.contains(e.target))isla.classList.remove('panel')});
-  if(cel.addEventListener)cel.addEventListener('change',function(){isla.classList.remove('cerrada','escondida','panel')});
+  if(cel.addEventListener)cel.addEventListener('change',function(){isla.classList.remove('cerrada','panel')});
   function mover(){pendiente=false;var y=scrollY,d=y-ultimo;ultimo=y;
     if(y<80){pon(false);return}
     var nd=d>0?1:d<0?-1:0;if(nd&&nd!==dir){dir=nd;tramo=0}tramo+=Math.abs(d);
     if(performance.now()<quieta)return;
-    if(dir>0&&tramo>140)pon(true);else if(dir<0&&tramo>90)pon(false)}
+    if(dir>0&&tramo>140)pon(true);else if(dir<0&&tramo>120)pon(false)}
   addEventListener('scroll',function(){if(!pendiente){pendiente=true;requestAnimationFrame(mover)}},{passive:true});
-  isla.addEventListener('click',function(e){if(!cel.matches&&isla.classList.contains('cerrada')){e.preventDefault();e.stopPropagation();pon(false)}},true);
+  isla.addEventListener('click',function(e){if(!isla.classList.contains('cerrada'))return;pon(false);if(cel.matches&&e.target.closest('.abrir'))return;e.preventDefault();e.stopPropagation()},true);
   mover();
 
   // ── Luz de la portada: sigue al mouse ──
@@ -638,8 +641,13 @@ footer .moon img{height:24px;width:auto}
     caja.innerHTML='<div class="listo"><img src="img/monty.webp" alt=""><h3>¡Listo, '+esc(nombre)+'!</h3><p class="sub">Admisiones te escribe por WhatsApp muy pronto para agendar tu visita.</p>'+
       '<button class="pastilla linea" type="button" data-cierra style="margin-top:18px;box-shadow:inset 0 0 0 2px var(--linea)">Seguir viendo el colegio</button></div>';
   }
-  function abreAgendar(origen){volverA=origen||null;cierraChat();formulario();velo.classList.add('on');setTimeout(function(){var i=velo.querySelector('input[name=nombre]');if(i&&matchMedia('(pointer:fine)').matches)i.focus()},350)}
-  function cierraAgendar(){velo.classList.remove('on');if(volverA)try{volverA.focus()}catch(e){}}
+  // gesto de "atrás": si hay una ventana abierta (Monty o agendar), atrás la cierra y te deja en la página
+  var capa=false;
+  function empujaCapa(){if(!capa){capa=true;try{history.pushState({cmmCapa:1},'')}catch(e){}}}
+  function sueltaCapa(){if(capa){capa=false;if(history.state&&history.state.cmmCapa)history.back()}}
+  addEventListener('popstate',function(){if(!capa)return;capa=false;velo.classList.remove('on');ocultaChat()});
+  function abreAgendar(origen){volverA=origen||null;ocultaChat();formulario();velo.classList.add('on');empujaCapa();setTimeout(function(){var i=velo.querySelector('input[name=nombre]');if(i&&matchMedia('(pointer:fine)').matches)i.focus()},350)}
+  function cierraAgendar(){if(!velo.classList.contains('on'))return;velo.classList.remove('on');sueltaCapa();if(volverA)try{volverA.focus()}catch(e){}}
   document.querySelectorAll('[data-agendar]').forEach(function(b){b.addEventListener('click',function(){abreAgendar(b)})});
   velo.addEventListener('click',function(e){if(e.target===velo||e.target.closest('[data-cierra]'))cierraAgendar()});
 
@@ -650,8 +658,9 @@ footer .moon img{height:24px;width:auto}
     if(!marco){marco=document.createElement('iframe');marco.title='Monty';marco.allow='microphone; autoplay';
       marco.src='monty/?embed=1'+(pregunta?'&q='+encodeURIComponent(pregunta):'');chat.appendChild(marco)}
     else if(pregunta&&marco.contentWindow){try{marco.contentWindow.postMessage({monty:'pregunta',texto:pregunta},location.origin)}catch(e){}}
-    chat.classList.add('on');chat.setAttribute('aria-hidden','false');burbuja.classList.add('oculta')}
-  function cierraChat(){chat.classList.remove('on');chat.setAttribute('aria-hidden','true');burbuja.classList.remove('oculta')}
+    chat.classList.add('on');chat.setAttribute('aria-hidden','false');burbuja.classList.add('oculta');empujaCapa()}
+  function ocultaChat(){chat.classList.remove('on');chat.setAttribute('aria-hidden','true');burbuja.classList.remove('oculta')}
+  function cierraChat(){if(!chat.classList.contains('on'))return;ocultaChat();sueltaCapa()}
   document.addEventListener('click',function(e){var b=e.target.closest('[data-monty]');if(b){e.preventDefault();abreChat(b.getAttribute('data-monty')||'')}});
   $('#cerrarChat').addEventListener('click',cierraChat);
   addEventListener('keydown',function(e){if(e.key==='Escape'){cierraAgendar();cierraChat()}});
