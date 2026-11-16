@@ -83,22 +83,18 @@ form button:active{transform:scale(.92)}
 .quick .q-voz:hover{background:var(--azul2)}
 #mic{background:#fff;color:var(--azul);border:2px solid var(--azul)}
 .chat.in-voice .msgs,.chat.in-voice .quick,.chat.in-voice form{display:none}
-.voice{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(8px,2vh,16px);padding:clamp(12px,3vh,24px) 22px;overflow:hidden;background:#F4F6FB;text-align:center;min-height:0}
+.voice{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(8px,2vh,16px);padding:clamp(12px,3vh,24px) 22px;overflow:hidden;background:#fff;text-align:center;min-height:0}
 .voice[hidden]{display:none}
-.orb{--lvl:0;--o:clamp(190px,36vh,320px);--i:calc(var(--o) * .58);position:relative;width:var(--o);height:var(--o);flex:none;display:grid;place-items:center;margin-bottom:clamp(0px,1vh,10px);animation:breathe 4.2s ease-in-out infinite}
-.orb .cara{position:relative;z-index:2;width:var(--i);height:var(--i);border-radius:50%;overflow:hidden;background:var(--sol);border:4px solid #fff;box-shadow:0 0 0 3px var(--azul2);transform:translateY(calc(var(--lvl) * -6px)) rotate(calc(var(--lvl) * -2deg));transition:transform .12s ease-out}
-.orb .cara img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scale(1.32) translateY(5%)}
-/* Monty habla y parpadea como Bolita: capas encimadas que se prenden según la voz */
+/* Monty de cuerpo completo sobre fondo blanco: respira, se mueve con su voz, parpadea y mueve el pico (capas como Bolita) */
+.orb{--lvl:0;position:relative;flex:none;height:clamp(180px,min(48vh,62vw),440px);aspect-ratio:722/900;margin-bottom:clamp(0px,1vh,10px)}
+.orb::after{content:"";position:absolute;left:18%;right:18%;bottom:-2%;height:7%;border-radius:50%;background:rgba(14,36,112,.14);transform:scaleX(calc(1 - var(--lvl) * .15));z-index:0}
+.orb .cara{position:absolute;inset:0;z-index:1;transform-origin:50% 96%;animation:breathe 4.2s ease-in-out infinite}
+.orb .cara img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;transform:translateY(calc(var(--lvl) * -10px)) rotate(calc(var(--lvl) * -2.5deg));transform-origin:50% 96%;transition:transform .12s ease-out}
 .orb .cara .c1,.orb .cara .c2,.orb .cara .cp{opacity:0}
 .orb .cara[data-boca="1"] .c1,.orb .cara[data-boca="2"] .c2,.orb .cara[data-parpadeo] .cp{opacity:1}
-.orb .ring{position:absolute;left:50%;top:50%;width:var(--i);height:var(--i);margin:calc(var(--i) / -2) 0 0 calc(var(--i) / -2);border-radius:50%;background:var(--azul);transition:transform .14s ease-out,opacity .3s}
-.orb .r1{opacity:.6;transform:scale(calc(1.16 + var(--lvl) * .32));box-shadow:0 0 40px 10px rgba(36,64,142,.45)}
-.orb .r2{opacity:.3;transform:scale(calc(1.42 + var(--lvl) * .55))}
-.orb .r3{opacity:.13;transform:scale(calc(1.72 + var(--lvl) * .8))}
-.voice.connecting .orb{animation-duration:1.3s}
-.voice.connecting .orb .ring{opacity:.08}
-.voice.speaking .orb{animation-duration:2.6s}
-@keyframes breathe{0%,100%{transform:scale(.95)}50%{transform:scale(1.05)}}
+.voice.connecting .orb .cara{animation-duration:1.4s}
+.voice.speaking .orb .cara{animation-duration:2.6s}
+@keyframes breathe{0%,100%{transform:scale(1,1)}50%{transform:scale(1.015,.985)}}
 .v-status{font-size:22px;font-weight:800;color:var(--azul2)}
 .v-actions{display:flex;gap:12px}
 .v-actions button{font-family:inherit;height:50px;padding:0 24px;border-radius:999px;font-size:17px;font-weight:800;border:2px solid var(--azul2);cursor:pointer}
@@ -149,7 +145,7 @@ form button:active{transform:scale(.92)}
       <button type="submit" aria-label="Enviar"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
     </form>
     <div class="voice" id="voice" hidden>
-      <div class="orb" id="orb"><span class="ring r3"></span><span class="ring r2"></span><span class="ring r1"></span><div class="cara" id="cara" data-boca="1" role="img" aria-label="Monty"><img src="../img/monty-habla/cabeza.webp" alt=""><img class="c1" src="../img/monty-habla/boca-1.webp" alt=""><img class="c2" src="../img/monty-habla/boca-2.webp" alt=""><img class="cp" src="../img/monty-habla/parpadeo.webp" alt=""></div></div>
+      <div class="orb" id="orb"><div class="cara" id="cara" data-boca="1" role="img" aria-label="Monty, el búho del colegio"><img src="../img/monty-habla/cuerpo.webp" alt=""><img class="c1" src="../img/monty-habla/cuerpo-boca-1.webp" alt=""><img class="c2" src="../img/monty-habla/cuerpo-boca-2.webp" alt=""><img class="cp" src="../img/monty-habla/cuerpo-parpadeo.webp" alt=""></div></div>
       <p class="v-status" id="v-status" role="status">Conectando…</p>
       <div class="v-actions">
         <button type="button" class="v-mute" id="v-mute" aria-pressed="false">Silenciar</button>
