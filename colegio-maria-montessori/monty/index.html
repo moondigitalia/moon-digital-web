@@ -34,7 +34,7 @@
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
 body{font-family:"DM Sans",system-ui,-apple-system,"Segoe UI",sans-serif;font-weight:600;color:var(--ink);background:var(--hondo);-webkit-font-smoothing:antialiased}
-.wrap{height:100dvh;display:grid;grid-template-columns:minmax(0,1fr) clamp(360px,40vw,560px);gap:0}
+.wrap{height:100vh;height:100dvh;display:grid;grid-template-columns:minmax(0,1fr) clamp(360px,40vw,560px);gap:0}
 /* lado de la marca (computadora) */
 .marca{position:relative;overflow:hidden;background:radial-gradient(120% 90% at 20% 10%,#2E4FA6 0%,#24408E 45%,#132660 100%);color:#fff;display:flex;flex-direction:column;padding:clamp(20px,5vh,96px) clamp(28px,8cqi,96px);container-type:inline-size;overflow:hidden;min-height:0}
 .marca>.cont{margin:auto 0;display:grid;grid-template-columns:minmax(0,1fr);align-items:center;gap:clamp(16px,4cqi,56px);position:relative}
@@ -51,7 +51,7 @@ body{font-family:"DM Sans",system-ui,-apple-system,"Segoe UI",sans-serif;font-we
 .marca .demo{position:relative;margin-top:clamp(12px,3vh,24px);font-size:15px;color:#fff;display:flex;align-items:center;gap:12px;white-space:nowrap;flex:none}
 .marca .demo img{height:26px}
 /* chat */
-.chat{display:flex;flex-direction:column;background:#F4F6FB;min-height:0;height:100dvh}
+.chat{display:flex;flex-direction:column;background:#F4F6FB;min-height:0;height:100vh;height:100dvh}
 .ch{display:flex;align-items:center;gap:14px;padding:16px 20px;background:var(--azul2);color:#fff;flex:none}
 .embed .ch,.embed .ch[class]{padding-right:68px!important}
 .ch .av{width:52px;height:52px;border-radius:50%;flex:none;background:#fff;object-fit:cover}
@@ -377,6 +377,7 @@ function loop(t) {
   orb.style.setProperty('--lvl', lvl.toFixed(3)); raf = requestAnimationFrame(loop);
 }
 const fmt = (s) => Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+let intento = 0;
 async function startVoice() {
   if (voiceConv || voiceStarting) return;
   voiceStarting = true; const my = ++voiceSeq;
@@ -390,15 +391,15 @@ async function startVoice() {
   try {
     const { Conversation } = await loadSdk();
     if (!voiceStarting || my !== voiceSeq) return;
-    const c = await Conversation.startSession({
-      agentId: AGENT_ID, connectionType: 'webrtc',
+    const abrir = (tipo, n) => Conversation.startSession({
+      agentId: AGENT_ID, connectionType: tipo,
       dynamicVariables: { modo: 'voz', nombre: userName || 'sin nombre' },
       clientTools,
       overrides: { agent: { firstMessage: userName
         ? '¡Hola, ' + userName + '! Soy Monty. ¿Para quién buscas colegio?'
         : '¡Hola! ¿Cómo estás? Soy Monty, el búho del Colegio María Montessori. ¿Cómo te llamas?' } },
       onConnect: () => {
-        if (my !== voiceSeq) return;
+        if ((my !== voiceSeq || n !== intento)) return;
         vState('listening', 'Te escucho…');
         vLeft = VOICE_MAX; vTime.textContent = 'Tiempo restante ' + fmt(vLeft); clearInterval(vTimer);
         vTimer = setInterval(() => {
@@ -407,11 +408,29 @@ async function startVoice() {
           if (vLeft <= -15) stopVoice('Las llamadas de voz de esta demostración duran hasta 3 minutos. Puedes seguir escribiendo o volver a llamar.');
         }, 1000);
       },
-      onDisconnect: (d) => { if (my !== voiceSeq || !voiceConv) return; const byAgent = d && d.reason === 'agent'; voiceConv = null; stopVoice(byAgent ? 'Llamada terminada. Puedes seguir escribiendo aquí o volver a llamar cuando quieras.' : undefined); },
+      onDisconnect: (d) => { if ((my !== voiceSeq || n !== intento) || !voiceConv) return; const byAgent = d && d.reason === 'agent'; voiceConv = null; stopVoice(byAgent ? 'Llamada terminada. Puedes seguir escribiendo aquí o volver a llamar cuando quieras.' : undefined); },
       onError: (m) => console.warn('[Monty voz]', m),
-      onModeChange: ({ mode }) => { if (my !== voiceSeq) return; vMode = mode; if (!voiceConv) return; clearTimeout(escuchaT); if (mode === 'speaking') vState('speaking', 'Monty te está contestando…'); else escuchaT = setTimeout(() => { if (voiceConv && vMode !== 'speaking') vState('listening', muted ? 'Micrófono silenciado' : 'Te escucho…'); }, 900); },
-      onMessage: ({ message, source }) => { if (!message || my !== voiceSeq) return; if (source !== 'user') { if (message === ultimoAi) return; ultimoAi = message; } add(source === 'user' ? 'me' : 'ai', source === 'user' ? esc(message) : md(message)); if (source !== 'user') revisarTarjeta(message); quick.style.display = 'none'; },
+      onModeChange: ({ mode }) => { if ((my !== voiceSeq || n !== intento)) return; vMode = mode; if (!voiceConv) return; clearTimeout(escuchaT); if (mode === 'speaking') vState('speaking', 'Monty te está contestando…'); else escuchaT = setTimeout(() => { if (voiceConv && vMode !== 'speaking') vState('listening', muted ? 'Micrófono silenciado' : 'Te escucho…'); }, 900); },
+      onMessage: ({ message, source }) => { if (!message || (my !== voiceSeq || n !== intento)) return; if (source !== 'user') { if (message === ultimoAi) return; ultimoAi = message; } add(source === 'user' ? 'me' : 'ai', source === 'user' ? esc(message) : md(message)); if (source !== 'user') revisarTarjeta(message); quick.style.display = 'none'; },
     });
+    // Celulares viejos (iPhone 7/8 con iOS 15 o antes) no aguantan la llamada por WebRTC: van directo por websocket.
+    // En los demás, si WebRTC no conecta en 12 s o falla, se reintenta solo por websocket (la familia no hace nada).
+    const ios = /(iPhone|iPad|iPod).* OS (\d+)_/.exec(navigator.userAgent), viejo = ios && +ios[2] < 16;
+    const tipos = viejo ? ['websocket'] : ['webrtc', 'websocket'];
+    let c = null, ultimoError = null;
+    for (const tipo of tipos) {
+      const n = ++intento; const prom = abrir(tipo, n);
+      try {
+        c = await Promise.race([prom, new Promise((_, no) => setTimeout(() => no(new Error('tardó demasiado')), 12000))]);
+        break;
+      } catch (e) {
+        ultimoError = e; prom.then((x) => { try { x.endSession(); } catch (_) {} }).catch(() => {});
+        if (e && (e.name === 'NotAllowedError' || /permission|denied/i.test(e.message || ''))) throw e;
+        console.warn('[Monty voz] no conectó por ' + tipo, e);
+        if (!voiceStarting || my !== voiceSeq) return;
+      }
+    }
+    if (!c) throw ultimoError || new Error('sin conexión');
     if (!voiceStarting || my !== voiceSeq) { try { await c.endSession(); } catch (e) {} return; }
     voiceConv = c;
   } catch (e) {

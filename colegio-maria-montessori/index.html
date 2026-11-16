@@ -280,7 +280,7 @@ footer .moon img{height:24px;width:auto}
 /* ventana de agendar */
 .velo{position:fixed;inset:0;z-index:50;background:rgba(8,18,50,.6);display:grid;place-items:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .35s ease}
 .velo.on{opacity:1;pointer-events:auto}
-.caja{position:relative;width:min(100%,560px);max-height:calc(100svh - 32px);overflow:auto;overscroll-behavior:contain;background:#fff;border-radius:40px;padding:clamp(24px,4vw,40px);transform:translateY(24px) scale(.96);transition:transform .55s var(--rebote)}
+.caja{position:relative;width:min(100%,560px);max-height:calc(100vh - 32px);max-height:calc(100svh - 32px);overflow:auto;overscroll-behavior:contain;background:#fff;border-radius:40px;padding:clamp(24px,4vw,40px);transform:translateY(24px) scale(.96);transition:transform .55s var(--rebote)}
 .velo.on .caja{transform:none}
 .cerrar{position:absolute;right:16px;top:16px;width:48px;height:48px;border-radius:50%;border:0;background:var(--claro);color:var(--marino);display:grid;place-items:center;z-index:2;transition:transform .4s var(--rebote)}
 .cerrar:hover{transform:rotate(90deg)}
@@ -308,7 +308,7 @@ footer .moon img{height:24px;width:auto}
 .listo h3{margin-top:10px}
 
 /* chat de Monty */
-.chat{position:fixed;right:clamp(14px,2.4vw,30px);bottom:clamp(14px,2.4vw,30px);z-index:60;width:min(420px,calc(100vw - 28px));height:min(700px,calc(100svh - 28px));border-radius:32px;overflow:hidden;background:#fff;box-shadow:0 30px 80px rgba(8,18,50,.45);opacity:0;transform:translateY(24px) scale(.95);transform-origin:bottom right;pointer-events:none;transition:opacity .35s ease,transform .55s var(--rebote)}
+.chat{position:fixed;right:clamp(14px,2.4vw,30px);bottom:clamp(14px,2.4vw,30px);z-index:60;width:min(420px,calc(100vw - 28px));height:min(700px,calc(100vh - 28px));height:min(700px,calc(100svh - 28px));border-radius:32px;overflow:hidden;background:#fff;box-shadow:0 30px 80px rgba(8,18,50,.45);opacity:0;transform:translateY(24px) scale(.95);transform-origin:bottom right;pointer-events:none;transition:opacity .35s ease,transform .55s var(--rebote)}
 .chat.on{opacity:1;transform:none;pointer-events:auto}
 .chat iframe{width:100%;height:100%;border:0;display:block}
 .chat .cerrar{background:rgba(255,255,255,.18);color:#fff;top:14px;right:14px;width:42px;height:42px}
@@ -319,12 +319,16 @@ footer .moon img{height:24px;width:auto}
 .sube:nth-child(2){transition-delay:.08s}.sube:nth-child(3){transition-delay:.16s}.sube:nth-child(4){transition-delay:.24s}
 
 @media (max-width:1060px){
-  .isla{left:50%;right:auto;transform:translateX(-50%);width:calc(100% - 24px);max-width:none;justify-content:space-between;border-radius:32px;flex-wrap:wrap;transition:width .55s var(--suave),border-radius .4s,padding .5s var(--suave)}
-  .isla.cerrada{width:112px;overflow:hidden;cursor:pointer;flex-wrap:nowrap}
+  .isla{left:50%;right:auto;transform:translateX(-50%);width:calc(100% - 24px);max-width:none;justify-content:space-between;border-radius:32px;flex-wrap:nowrap;transition:width .55s var(--suave),border-radius .4s,padding .5s var(--suave)}
+  .isla.panel{flex-wrap:wrap}
+  .isla.cerrada{width:112px;overflow:hidden;cursor:pointer}
+  .isla.cerrada .marca{flex:0 0 auto}
   .isla .marca b{transition:opacity .3s ease .15s}
   .isla.cerrada .marca b{opacity:0;width:0;overflow:hidden;transition:none}
   .isla.cerrada .marca{padding-right:0;gap:0}
-  .marca b{white-space:normal;font-size:17px}
+  .marca b{white-space:nowrap;overflow:hidden;min-width:0;font-size:17px;line-height:1.08}
+  .marca b span{display:block}
+  .marca{flex:1 1 auto}
   .menu{display:none;max-width:none;opacity:1;width:100%;flex-direction:column;align-items:stretch;gap:4px;padding:8px 4px 6px}
   .isla.panel .menu{display:flex;animation:baja .4s var(--suave)}
   .menu a{display:block;font-size:19px;padding:14px 18px;border-radius:20px;background:var(--claro)}
@@ -355,7 +359,9 @@ footer .moon img{height:24px;width:auto}
   .foto-portada .anillo img{inset:7px;width:calc(100% - 14px);height:calc(100% - 14px)}
   .portada .acciones .pastilla{width:100%}
   .burbuja .dice{display:none}
-  .chat{right:0;bottom:0;width:100vw;height:100svh;border-radius:0}
+  .chat{top:0;right:0;bottom:0;left:0;width:auto;height:auto;border-radius:0;transform-origin:bottom center}
+  html.con-chat{overflow:hidden}
+  html.con-chat .isla,html.con-chat .burbuja{visibility:hidden}
   .cab img{height:84px}
   .via b{font-size:17px}
   .pastilla{white-space:normal;text-align:left;line-height:1.2}
@@ -399,7 +405,7 @@ footer .moon img{height:24px;width:auto}
 </div>
 
 <header class="isla" id="isla">
-  <a class="marca" href="#inicio"><img src="img/cmm-logo.png" alt=""><b>Colegio María Montessori</b></a>
+  <a class="marca" href="#inicio"><img src="img/cmm-logo.png" alt=""><b><span>Colegio </span><span>María Montessori</span></b></a>
   <nav class="menu" aria-label="Menú">
     <a href="#niveles">Niveles</a>
     <a href="#metodo">Método</a>
@@ -658,8 +664,8 @@ footer .moon img{height:24px;width:auto}
     if(!marco){marco=document.createElement('iframe');marco.title='Monty';marco.allow='microphone; autoplay';
       marco.src='monty/?embed=1'+(pregunta?'&q='+encodeURIComponent(pregunta):'');chat.appendChild(marco)}
     else if(pregunta&&marco.contentWindow){try{marco.contentWindow.postMessage({monty:'pregunta',texto:pregunta},location.origin)}catch(e){}}
-    chat.classList.add('on');chat.setAttribute('aria-hidden','false');burbuja.classList.add('oculta');empujaCapa()}
-  function ocultaChat(){chat.classList.remove('on');chat.setAttribute('aria-hidden','true');burbuja.classList.remove('oculta')}
+    chat.classList.add('on');chat.setAttribute('aria-hidden','false');burbuja.classList.add('oculta');document.documentElement.classList.add('con-chat');empujaCapa()}
+  function ocultaChat(){chat.classList.remove('on');document.documentElement.classList.remove('con-chat');chat.setAttribute('aria-hidden','true');burbuja.classList.remove('oculta')}
   function cierraChat(){if(!chat.classList.contains('on'))return;ocultaChat();sueltaCapa()}
   document.addEventListener('click',function(e){var b=e.target.closest('[data-monty]');if(b){e.preventDefault();abreChat(b.getAttribute('data-monty')||'')}});
   $('#cerrarChat').addEventListener('click',cierraChat);
