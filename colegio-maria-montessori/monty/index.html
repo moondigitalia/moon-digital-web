@@ -257,8 +257,13 @@ async function send(q) {
 form.addEventListener('submit', (e) => { e.preventDefault(); const q = input.value; input.value = ''; send(q); });
 quick.querySelectorAll('button[data-q]').forEach((b) => b.addEventListener('click', () => send(b.dataset.q)));
 // El asistente saluda en cuanto se abre. Si la página lo abrió con una pregunta (?q=), se la manda después del saludo.
-const preguntaInicial = new URLSearchParams(location.search).get('q');
-if (preguntaInicial) send(preguntaInicial.slice(0, 200)); else connect().catch(() => {});
+// Así el saludo de Monty sale primero y la pregunta de la familia después, en orden.
+const preguntaInicial = (new URLSearchParams(location.search).get('q') || '').slice(0, 200);
+connect().then(() => {
+  if (!preguntaInicial) return;
+  const t0 = Date.now();
+  (function cuandoSalude() { if (gotFirst || Date.now() - t0 > 5000) send(preguntaInicial); else setTimeout(cuandoSalude, 150); })();
+}).catch(() => {});
 addEventListener('message', (e) => { if (e.origin === location.origin && e.data && e.data.monty === 'pregunta' && e.data.texto) send(String(e.data.texto).slice(0, 200)); });
 // ───────── Voz ─────────
 // Sesión WebRTC aparte de la de texto. El halo crece con el volumen de la voz. Límite 3 min (demo).
