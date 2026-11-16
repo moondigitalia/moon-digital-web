@@ -10,7 +10,7 @@
 const { crypto, sql, t, clave10 } = require('./_base');
 
 const AGENTES = { dan: 'agent_7801m5k7sesyektvzg9f2dz6hd48', abierta: 'agent_4501m5kc4jx0ezvssz3smwa4s2nf' };
-const TOPES = { dan: 30, abierta: 20 };           // los mismos topes que tiene cada agente en ElevenLabs
+const TOPES = { dan: 50, abierta: 20 };           // los mismos topes que tiene cada agente en ElevenLabs
 const DEMOS_SOCIO_DIA = 50;                       // (16-nov-2026, Kid) máximo de demos que arma cada socio (Dan) al día
 const DEMOS_ABIERTA_DIA = 40;                      // cuántos demos nuevos puede armar el público al día (evita que llenen la base)
 const VOCES = { hombre: 'hEKEQC93QpOYMa6WuwWp', mujer: '1u9q7vX1Lcx74yAcFPt7' }; // voz de Jason · voz de Luna
