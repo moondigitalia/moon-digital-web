@@ -497,7 +497,7 @@ async function startVoice() {
       clientTools,
       overrides: { agent: { firstMessage: userName
         ? '¡' + userName + ', qué gusto escucharte! Soy Monty. ¿Para quién buscas colegio?'
-        : '¡Hola, hola! Soy Monty, el búho del Colegio María Montessori. ¡Qué gusto escucharte! ¿Cómo te llamas?' } },
+        : '¡Hola! Soy Monty, el búho del Colegio María Montessori. ¡Qué gusto escucharte! ¿Cómo te llamas?' } },
       onConnect: () => {
         if ((my !== voiceSeq || n !== intento)) return;
         vState('listening', 'Te escucho…');
