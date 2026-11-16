@@ -16,7 +16,7 @@
 <style>
 /* Demo de la página de inicio · Colegio María Montessori (MOON Digital, 16-nov-2026, segunda vuelta).
    Una sola página, todo a máximo dos toques. Cada sección tiene su color y se corta con una figura (ola, nubes, arco).
-   Entrada animada (escudo + "Educando en valores" + Monty), una vez por visita; un toque la salta.
+   Entrada animada (escudo + "Educando en valores" + Monty) cada vez que se abre; un toque la salta.
    "¿Cuántos años tiene tu hijo?" lleva a la familia a su nivel y al botón de agendar con ese nivel ya marcado.
    Monty (chat con voz y texto) vive en monty/ y se abre aquí dentro. Agendar manda los datos a /api/cmm-informes. */
 :root{
@@ -527,9 +527,9 @@ footer .moon img{height:24px;width:auto}
   function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
 
   // ── Entrada: escudo, "Educando en valores" y Monty. Una vez por visita; un toque la salta ──
-  var intro=$('#intro'),visto=false;try{visto=sessionStorage.getItem('cmm_intro')==='1'}catch(e){}
+  var intro=$('#intro'),visto=false; // la entrada sale cada vez que se abre o se actualiza la página
   function entra(){document.documentElement.classList.add('listo-entrada')}
-  function salir(){if(intro.classList.contains('fuera'))return;intro.classList.add('fuera');document.documentElement.style.overflow='';entra();try{sessionStorage.setItem('cmm_intro','1')}catch(e){}setTimeout(function(){intro.style.display='none'},1050)}
+  function salir(){if(intro.classList.contains('fuera'))return;intro.classList.add('fuera');document.documentElement.style.overflow='';entra();setTimeout(function(){intro.style.display='none'},1050)}
   if(visto||/[?&]sin-entrada/.test(location.search)||location.hash==='#agendar'||location.hash==='#monty'||/^#edad-/.test(location.hash)){intro.style.display='none';entra()}
   else{document.documentElement.style.overflow='hidden';setTimeout(salir,3600);intro.addEventListener('click',salir)}
 
