@@ -27,7 +27,7 @@
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth;scroll-padding-top:96px;-webkit-text-size-adjust:100%}
 body{font-family:var(--t);font-weight:600;color:var(--tinta);background:var(--fondo);-webkit-font-smoothing:antialiased;overflow-x:hidden}
-img{display:block;max-width:100%}
+img{display:block;max-width:100%;height:auto}
 button{font-family:inherit;cursor:pointer;color:inherit}
 a{color:inherit}
 h1,h2,h3{font-family:var(--r);font-weight:800;letter-spacing:-.01em;line-height:1.02;text-wrap:balance}
@@ -39,7 +39,7 @@ h1,h2,h3{font-family:var(--r);font-weight:800;letter-spacing:-.01em;line-height:
 .entrada-txt{font-size:clamp(18px,1.5vw,22px);line-height:1.55;color:var(--gris);margin-top:14px;max-width:38em;text-wrap:pretty}
 
 /* botones: todos redondos */
-.pastilla{display:inline-flex;align-items:center;justify-content:center;gap:10px;border:0;border-radius:999px;font-weight:800;font-size:18px;text-decoration:none;white-space:nowrap;transition:transform .45s var(--rebote),background .35s,box-shadow .35s}
+.pastilla{max-width:100%;display:inline-flex;align-items:center;justify-content:center;gap:10px;border:0;border-radius:999px;font-weight:800;font-size:18px;text-decoration:none;white-space:nowrap;transition:transform .45s var(--rebote),background .35s,box-shadow .35s}
 .pastilla:hover{transform:translateY(-2px) scale(1.03)}
 .pastilla:active{transform:scale(.97);transition-duration:.15s}
 .pastilla:focus-visible,.circulo:focus-visible,.cerrar:focus-visible{outline:3px solid var(--sol);outline-offset:3px}
@@ -68,7 +68,7 @@ h1,h2,h3{font-family:var(--r);font-weight:800;letter-spacing:-.01em;line-height:
 /* portada */
 .portada{position:relative;padding:104px 0 clamp(40px,7vh,80px);overflow:hidden;background:radial-gradient(55% 55% at 100% 0%,rgba(255,197,49,.30) 0%,rgba(255,197,49,0) 70%),radial-gradient(50% 50% at 0% 100%,rgba(27,71,196,.14) 0%,rgba(27,71,196,0) 70%),var(--fondo)}
 .portada .rejilla{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:clamp(24px,4vw,64px);align-items:center}
-.portada h1{font-size:clamp(46px,6vw,96px);color:var(--marino)}
+.portada h1{font-size:clamp(40px,min(6vw,9.5vh),96px);color:var(--marino)}
 .portada h1 span{color:var(--azul);display:block}
 .portada .entrada-txt{margin-top:18px}
 .datos{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
@@ -149,7 +149,7 @@ a.via:hover{background:var(--claro);transform:translateX(4px)}
 footer{background:var(--marino);color:#fff;padding:34px 0 120px}
 footer .envoltura{display:flex;flex-wrap:wrap;gap:18px 34px;align-items:center;justify-content:space-between;font-size:17px;line-height:1.5}
 footer .familias a{color:#fff;font-weight:800;margin-left:6px}
-footer .moon{display:flex;align-items:center;gap:10px;white-space:nowrap}
+footer .moon{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
 footer .moon img{height:24px;width:auto}
 
 /* Monty siempre a la mano */
@@ -219,11 +219,21 @@ footer .moon img{height:24px;width:auto}
   .contacto .rejilla{grid-template-columns:minmax(0,1fr)}
 }
 @keyframes baja{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
-@media (max-width:720px){
+@media (max-width:1060px){
   .pasos{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:30px}
   .pasos::before{display:none}
+}
+@media (max-width:720px){
   .galeria{grid-template-columns:minmax(0,1fr)}
   .galeria figure{min-height:260px}
+  .galeria .alto{aspect-ratio:auto}
+}
+@media (max-width:520px){
+  .pasos{grid-template-columns:minmax(0,1fr);row-gap:18px}
+  .paso{display:grid;grid-template-columns:72px minmax(0,1fr);column-gap:16px;text-align:left;align-items:center}
+  .paso .n{width:72px;height:72px;font-size:32px;grid-row:span 2}
+  .paso h3{margin-top:0;font-size:22px}
+  .paso p{margin:2px 0 0;max-width:none}
 }
 @media (max-width:560px){
   .portada{padding-top:96px}
@@ -232,9 +242,13 @@ footer .moon img{height:24px;width:auto}
   .chat{right:0;bottom:0;width:100vw;height:100svh;border-radius:0}
   .cab img{height:84px}
   .via b{font-size:17px}
+  .pastilla{white-space:normal;text-align:left;line-height:1.2}
+  .pastilla.monty{padding-right:20px}
   footer{padding-bottom:116px}
 }
 @media (max-width:420px){
+  .cab{grid-template-columns:minmax(0,1fr)}
+  .cab img{display:none}
   .niveles{grid-template-columns:minmax(0,1fr)}
   .nivel .circulo,.nivel.grande .circulo{width:min(78%,260px)}
   .marca b{font-size:16px}
@@ -337,7 +351,7 @@ footer .moon img{height:24px;width:auto}
         <a class="via" href="https://wa.me/522292834408?text=Hola%2C%20me%20gustar%C3%ADa%20recibir%20informes%20del%20Colegio%20Mar%C3%ADa%20Montessori." target="_blank" rel="noopener"><span class="ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.1-4.5-3.9-4.7-4.1-.1-.2-1.1-1.5-1.1-2.9s.7-2.1 1-2.4c.3-.3.6-.3.8-.3h.6c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.4.6-.4.5c-.1.1-.3.3-.1.6.2.3.7 1.2 1.6 2 1.1 1 2 1.3 2.3 1.4.3.2.5.1.6 0l.9-1c.2-.3.4-.2.6-.1l1.9.9c.3.1.5.2.5.3.1.2.1.7-.1 1.3z"/></svg></span><span><small>WhatsApp de informes</small><b>229 283 4408</b></span></a>
         <a class="via" href="tel:+522291931478"><span class="ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg></span><span><small>Teléfono del colegio</small><b>229 193 1478</b></span></a>
         <a class="via" href="https://www.google.com/maps/search/?api=1&query=Colegio+Mar%C3%ADa+Montessori+Juan+Enr%C3%ADquez+182+Veracruz" target="_blank" rel="noopener"><span class="ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.6"/></svg></span><span><small>Dirección</small><b>Juan Enríquez #182, C.P. 91900, Veracruz</b></span></a>
-        <a class="via" href="mailto:info@colegiomariamontessori.com"><span class="ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m4 7 8 6 8-6"/></svg></span><span><small>Correo</small><b>info@colegiomariamontessori.com</b></span></a>
+        <a class="via" href="mailto:info@colegiomariamontessori.com"><span class="ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m4 7 8 6 8-6"/></svg></span><span><b>info@colegiomariamontessori.com</b></span></a>
         <div class="redes">
           <a class="pastilla linea" href="https://www.facebook.com/colegiomariamontessoriveracruz" target="_blank" rel="noopener">Facebook</a>
           <a class="pastilla linea" href="https://www.instagram.com/cmmveracruz/" target="_blank" rel="noopener">Instagram</a>
@@ -451,6 +465,7 @@ footer .moon img{height:24px;width:auto}
   // "¿Te ayudo?" sale unos segundos y se guarda solo (Monty siempre queda abajo)
   setTimeout(function(){burbuja.classList.add('habla');setTimeout(function(){burbuja.classList.remove('habla')},6000)},2500);
   if(location.hash==='#monty')abreChat('');
+  if(location.hash==='#agendar')abreAgendar();
 })();
 </script>
 </body>

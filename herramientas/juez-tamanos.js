@@ -7,7 +7,7 @@ const url = process.argv[2]; const dir = process.argv[3] || '.';
 if (!url) { console.log('Uso: node juez-tamanos.js <url> [carpeta]'); process.exit(1); }
 (async () => {
   const b = await chromium.launch(); const p = await b.newPage();
-  await p.goto(url, { waitUntil: 'load' }); await p.waitForTimeout(1200);
+  await p.goto(url, { waitUntil: 'load' }); await p.waitForTimeout(+process.env.JUEZ_ESPERA || 1200); // JUEZ_ESPERA: para páginas con un globito que sale unos segundos y se guarda solo (ej. «¿Te ayudo?»)
   const fallas = new Map();
   for (let w = 320; w <= 2560; w += 20) for (const h of [480, 560, 640, 720, 800, 900, 1080, 1440]) {
     await p.setViewportSize({ width: w, height: h }); await p.waitForTimeout(25);
