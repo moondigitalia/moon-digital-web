@@ -15,7 +15,9 @@ if (!url) { console.log('Uso: node juez-tamanos.js <url> [carpeta]'); process.ex
       const out = [];
       const vis = (e) => { const r = e.getBoundingClientRect(); const cs = getComputedStyle(e); if (!(r.width > 0 && r.height > 0 && cs.visibility !== 'hidden') || e.closest('[hidden],[aria-hidden=true]')) return false; for (let q = e; q; q = q.parentElement) if (parseFloat(getComputedStyle(q).opacity) < 0.05) return false; return true; };
       if (document.documentElement.scrollWidth > innerWidth + 1) out.push('la página se sale de lado');
-      const textos = [...document.querySelectorAll('h1,h2,h3,h4,h5,p,li,button,a,label,span,b,strong,small,em,dd,dt,input,.msg')].filter((e) => vis(e) && (e.value || e.textContent).trim());
+      // pantallas de una sola vista (chat, asistente): nunca deben tener scroll propio, se marcan con <meta name="juez" content="una-pantalla">
+      const m = document.querySelector('meta[name=juez]'); if (m && /una-pantalla/.test(m.content) && document.documentElement.scrollHeight > innerHeight + 1) out.push('la pantalla tiene scroll de más (debe caber en una vista)');
+      const textos = [...document.querySelectorAll('h1,h2,h3,h4,h5,p,li,button,a,label,span,b,strong,small,em,dd,dt,input,.msg')].filter((e) => vis(e) && (e.value || e.textContent).trim() && !(e.getBoundingClientRect().width <= 1 && e.getBoundingClientRect().height <= 1)); // las etiquetas solo para lectores de pantalla (1 px) no se ven: no cuentan
       const hojas = [];
       for (const e of textos) {
         const t = (e.value || e.textContent).trim().replace(/\s+/g, ' '), cs = getComputedStyle(e), r = e.getBoundingClientRect();

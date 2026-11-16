@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
+<meta name="juez" content="una-pantalla">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="robots" content="noindex,nofollow">
 <meta name="theme-color" content="#0E2470">
@@ -102,9 +103,9 @@ input:focus{border-color:var(--azul)}
 .v-mute[aria-pressed="true"]{background:var(--soft)}
 .v-end{background:#C8322B;border-color:#C8322B!important;color:#fff}
 .v-time{font-size:15px;color:var(--ink2);font-weight:700}
-.chat{position:relative}
+.chat{position:relative;overflow:hidden}
 /* tarjeta para escribir los datos (Monty la abre cuando la familia acepta que admisiones le escriba) */
-.tarjeta{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;justify-content:flex-end;background:rgba(14,36,112,.42);opacity:0;visibility:hidden;transition:opacity .4s,visibility 0s .4s}
+.tarjeta{position:absolute;inset:0;z-index:5;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;background:rgba(14,36,112,.42);opacity:0;visibility:hidden;transition:opacity .4s,visibility 0s .4s}
 .tarjeta.on{opacity:1;visibility:visible;transition:opacity .4s}
 .hoja{position:relative;background:#fff;border-radius:30px 30px 0 0;box-shadow:0 -18px 50px rgba(14,36,112,.22);padding:24px 20px calc(18px + env(safe-area-inset-bottom));max-height:100%;overflow:auto;transform:translateY(105%);transition:transform .55s cubic-bezier(.34,1.3,.5,1)}
 .tarjeta.on .hoja{transform:none}
@@ -157,7 +158,7 @@ input:focus{border-color:var(--azul)}
       <button type="button" data-q="Quiero agendar una visita">Quiero agendar una visita</button>
     </div>
     <form id="f" autocomplete="off">
-      <label for="in" style="position:absolute;left:-9999px">Escribe tu pregunta</label>
+      <label for="in" style="position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap">Escribe tu pregunta</label>
       <input id="in" placeholder="Escribe tu pregunta…" maxlength="500">
       <button type="button" id="mic" aria-label="Hablar por voz"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
       <button type="submit" aria-label="Enviar"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
@@ -256,19 +257,24 @@ function guardarNombre(p) {
 // ── Tarjeta para escribir los datos: Monty la abre (dictar números por voz falla) ──
 const tarjeta = $('#tarjeta'), ft = $('#ft'), taviso = $('#taviso');
 $('#tchips').innerHTML = ['Maternal', 'Kínder', 'Primaria', 'Secundaria'].map((n) => '<label><input type="radio" name="nivel" value="' + n + '"><span>' + n + '</span></label>').join('');
-let tarjetaAbierta = false;
+let tarjetaAbierta = false, platica = { hijo: '', resumen: '' }, actividadT = 0;
+// mientras la familia escribe, Monty no la interrumpe con "¿sigues ahí?"
+function avisarActividad() { const c = voiceConv || conv; try { if (c && c.sendUserActivity) c.sendUserActivity(); } catch (e) {} }
 function abrirTarjeta(p) {
   p = p || {};
   ft.nombre.value = ft.nombre.value || (p.nombre || userName || '');
   if (p.nivel) { const r = ft.querySelector('input[name=nivel][value="' + p.nivel + '"]'); if (r) r.checked = true; }
+  if (p.hijo) platica.hijo = p.hijo; if (p.resumen) platica.resumen = p.resumen;
+  clearInterval(actividadT); actividadT = setInterval(avisarActividad, 4000); avisarActividad();
   taviso.hidden = true; tarjeta.classList.add('on'); tarjeta.setAttribute('aria-hidden', 'false'); tarjetaAbierta = true;
   setTimeout(() => { const i = ft.nombre.value ? ft.whatsapp : ft.nombre; try { i.focus({ preventScroll: true }); } catch (e) {} }, 450);
   return 'Ya está abierta la tarjeta en su pantalla. Dile en una frase que escriba ahí su nombre y su WhatsApp con calma, y espera.';
 }
 let tarjetaEnviada = false, ultimoAi = '';
 function revisarTarjeta(texto) { if (!tarjetaAbierta && !tarjetaEnviada && /tarjeta/i.test(texto || '') && /abr[ií]|escrib/i.test(texto || '')) abrirTarjeta({}); }
-function cerrarTarjeta() { tarjeta.classList.remove('on'); tarjeta.setAttribute('aria-hidden', 'true'); tarjetaAbierta = false; }
+function cerrarTarjeta() { clearInterval(actividadT); tarjeta.classList.remove('on'); tarjeta.setAttribute('aria-hidden', 'true'); tarjetaAbierta = false; }
 $('#tx').addEventListener('click', cerrarTarjeta);
+ft.addEventListener('input', avisarActividad);
 ft.addEventListener('submit', async (e) => {
   e.preventDefault();
   const nombre = ft.nombre.value.trim(), tel = ft.whatsapp.value.replace(/\D/g, '');
@@ -276,7 +282,7 @@ ft.addEventListener('submit', async (e) => {
   if (!nombre) { taviso.textContent = 'Escribe tu nombre, por favor.'; taviso.hidden = false; return; }
   if (tel.length < 10) { taviso.textContent = 'Escribe tu WhatsApp completo, con 10 dígitos.'; taviso.hidden = false; return; }
   cerrarTarjeta(); tarjetaEnviada = true;
-  await registrarFamilia({ nombre, whatsapp: tel, nivel, visita: 'si', notas: 'Llenó la tarjeta en su plática con Monty.' });
+  await registrarFamilia({ nombre, whatsapp: tel, nivel, hijo: platica.hijo, visita: 'si', notas: platica.resumen || 'Llenó la tarjeta en su plática con Monty.' });
   const n = nombre.split(/\s+/)[0]; userName = userName || n;
   // Monty se entera y lo confirma (en voz o en texto); ya no vuelve a registrar
   const c = voiceConv || conv;
@@ -391,7 +397,7 @@ async function startVoice() {
       onDisconnect: (d) => { if (my !== voiceSeq || !voiceConv) return; const byAgent = d && d.reason === 'agent'; voiceConv = null; stopVoice(byAgent ? 'Llamada terminada. Puedes seguir escribiendo aquí o volver a llamar cuando quieras.' : undefined); },
       onError: (m) => console.warn('[Monty voz]', m),
       onModeChange: ({ mode }) => { if (my !== voiceSeq) return; vMode = mode; if (!voiceConv) return; clearTimeout(escuchaT); if (mode === 'speaking') vState('speaking', 'Monty te está contestando…'); else escuchaT = setTimeout(() => { if (voiceConv && vMode !== 'speaking') vState('listening', muted ? 'Micrófono silenciado' : 'Te escucho…'); }, 900); },
-      onMessage: ({ message, source }) => { if (!message || my !== voiceSeq) return; add(source === 'user' ? 'me' : 'ai', source === 'user' ? esc(message) : md(message)); if (source !== 'user') revisarTarjeta(message); quick.style.display = 'none'; },
+      onMessage: ({ message, source }) => { if (!message || my !== voiceSeq) return; if (source !== 'user') { if (message === ultimoAi) return; ultimoAi = message; } add(source === 'user' ? 'me' : 'ai', source === 'user' ? esc(message) : md(message)); if (source !== 'user') revisarTarjeta(message); quick.style.display = 'none'; },
     });
     if (!voiceStarting || my !== voiceSeq) { try { await c.endSession(); } catch (e) {} return; }
     voiceConv = c;

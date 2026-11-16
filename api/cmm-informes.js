@@ -86,7 +86,7 @@ module.exports = async (req, res) => {
     nivel ? 'Nivel: ' + nivel : null,
     hijo ? 'Su hijo o hija: ' + hijo : null,
     'Quiere: ' + (visita ? 'agendar una visita al colegio' : 'recibir informes'),
-    notas ? 'Dudas: ' + notas : null,
+    notas ? (d.origen === 'monty' ? 'Lo que platicó con Monty: ' : 'Dudas: ') + notas : null,
     'Llegó por: ' + origen,
     '',
     'Para escribirle ahora: https://wa.me/52' + tel,
