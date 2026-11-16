@@ -251,7 +251,7 @@ async function registrarFamilia(p) {
 function guardarNombre(p) {
   const n = String((p && p.nombre) || '').trim().split(/\s+/)[0] || ''; if (!n) return 'No recibí el nombre.';
   userName = n.charAt(0).toUpperCase() + n.slice(1); 
-  return 'Nombre guardado: ' + userName + '. Salúdala por su nombre y continúa.';
+  return 'Nombre guardado: ' + userName + '. Si en este turno ya le contestaste, no digas nada más; si no, salúdala por su nombre y continúa.';
 }
 // ── Tarjeta para escribir los datos: Monty la abre (dictar números por voz falla) ──
 const tarjeta = $('#tarjeta'), ft = $('#ft'), taviso = $('#taviso');
@@ -265,7 +265,7 @@ function abrirTarjeta(p) {
   setTimeout(() => { const i = ft.nombre.value ? ft.whatsapp : ft.nombre; try { i.focus({ preventScroll: true }); } catch (e) {} }, 450);
   return 'Ya está abierta la tarjeta en su pantalla. Dile en una frase que escriba ahí su nombre y su WhatsApp con calma, y espera.';
 }
-let tarjetaEnviada = false;
+let tarjetaEnviada = false, ultimoAi = '';
 function revisarTarjeta(texto) { if (!tarjetaAbierta && !tarjetaEnviada && /tarjeta/i.test(texto || '') && /abr[ií]|escrib/i.test(texto || '')) abrirTarjeta({}); }
 function cerrarTarjeta() { tarjeta.classList.remove('on'); tarjeta.setAttribute('aria-hidden', 'true'); tarjetaAbierta = false; }
 $('#tx').addEventListener('click', cerrarTarjeta);
@@ -299,7 +299,7 @@ async function connect() {
       clientTools,
       onConnect: () => setEstado('● En línea'),
       onDisconnect: () => { const had = !!typingEl; typing(false); conv = null; connecting = null; gotFirst = false; setEstado('● En línea'); if (had) add('sys', fallback()); },
-      onMessage: ({ message, source }) => { if (source === 'user') return; typing(false); add('ai', md(message)); revisarTarjeta(message); if (!gotFirst) { gotFirst = true; flush(); } },
+      onMessage: ({ message, source }) => { if (source === 'user') return; typing(false); if (message === ultimoAi) return; ultimoAi = message; add('ai', md(message)); revisarTarjeta(message); if (!gotFirst) { gotFirst = true; flush(); } },
     });
     conv = c;
     setTimeout(() => { if (!gotFirst) { gotFirst = true; typing(false); flush(); } }, 4000);
