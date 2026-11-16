@@ -265,6 +265,8 @@ function abrirTarjeta(p) {
   setTimeout(() => { const i = ft.nombre.value ? ft.whatsapp : ft.nombre; try { i.focus({ preventScroll: true }); } catch (e) {} }, 450);
   return 'Ya está abierta la tarjeta en su pantalla. Dile en una frase que escriba ahí su nombre y su WhatsApp con calma, y espera.';
 }
+let tarjetaEnviada = false;
+function revisarTarjeta(texto) { if (!tarjetaAbierta && !tarjetaEnviada && /tarjeta/i.test(texto || '') && /abr[ií]|escrib/i.test(texto || '')) abrirTarjeta({}); }
 function cerrarTarjeta() { tarjeta.classList.remove('on'); tarjeta.setAttribute('aria-hidden', 'true'); tarjetaAbierta = false; }
 $('#tx').addEventListener('click', cerrarTarjeta);
 ft.addEventListener('submit', async (e) => {
@@ -273,13 +275,13 @@ ft.addEventListener('submit', async (e) => {
   const nivelEl = ft.querySelector('input[name=nivel]:checked'), nivel = nivelEl ? nivelEl.value : '';
   if (!nombre) { taviso.textContent = 'Escribe tu nombre, por favor.'; taviso.hidden = false; return; }
   if (tel.length < 10) { taviso.textContent = 'Escribe tu WhatsApp completo, con 10 dígitos.'; taviso.hidden = false; return; }
-  cerrarTarjeta();
+  cerrarTarjeta(); tarjetaEnviada = true;
   await registrarFamilia({ nombre, whatsapp: tel, nivel, visita: 'si', notas: 'Llenó la tarjeta en su plática con Monty.' });
   const n = nombre.split(/\s+/)[0]; userName = userName || n;
   // Monty se entera y lo confirma (en voz o en texto); ya no vuelve a registrar
-  const aviso = 'Aviso del sistema: la familia ya llenó la tarjeta. Nombre: ' + nombre + '. WhatsApp: ' + fmtTel(tel) + (nivel ? '. Nivel: ' + nivel : '') + '. Sus datos YA quedaron con admisiones; no llames registrar_familia. Confírmale en una frase cálida y sigue la plática.';
   const c = voiceConv || conv;
-  try { if (c) { c.sendContextualUpdate(aviso); c.sendUserMessage('Listo, ya escribí mis datos en la tarjeta. Me llamo ' + n + '.'); if (!voiceConv) typing(true); } } catch (e) {}
+  // un solo mensaje (el aviso aparte hacía que Monty contestara dos veces)
+  try { if (c) { c.sendUserMessage('Listo, ya escribí mis datos en la tarjeta (ya quedaron con admisiones). Me llamo ' + n + '.'); if (!voiceConv) typing(true); } } catch (e) {}
 });
 const clientTools = { registrar_familia: registrarFamilia, guardar_nombre: guardarNombre, abrir_tarjeta_datos: abrirTarjeta };
 if (location.hash === '#tarjeta') abrirTarjeta({});
@@ -297,7 +299,7 @@ async function connect() {
       clientTools,
       onConnect: () => setEstado('● En línea'),
       onDisconnect: () => { const had = !!typingEl; typing(false); conv = null; connecting = null; gotFirst = false; setEstado('● En línea'); if (had) add('sys', fallback()); },
-      onMessage: ({ message, source }) => { if (source === 'user') return; typing(false); add('ai', md(message)); if (!gotFirst) { gotFirst = true; flush(); } },
+      onMessage: ({ message, source }) => { if (source === 'user') return; typing(false); add('ai', md(message)); revisarTarjeta(message); if (!gotFirst) { gotFirst = true; flush(); } },
     });
     conv = c;
     setTimeout(() => { if (!gotFirst) { gotFirst = true; typing(false); flush(); } }, 4000);
@@ -389,7 +391,7 @@ async function startVoice() {
       onDisconnect: (d) => { if (my !== voiceSeq || !voiceConv) return; const byAgent = d && d.reason === 'agent'; voiceConv = null; stopVoice(byAgent ? 'Llamada terminada. Puedes seguir escribiendo aquí o volver a llamar cuando quieras.' : undefined); },
       onError: (m) => console.warn('[Monty voz]', m),
       onModeChange: ({ mode }) => { if (my !== voiceSeq) return; vMode = mode; if (!voiceConv) return; clearTimeout(escuchaT); if (mode === 'speaking') vState('speaking', 'Monty te está contestando…'); else escuchaT = setTimeout(() => { if (voiceConv && vMode !== 'speaking') vState('listening', muted ? 'Micrófono silenciado' : 'Te escucho…'); }, 900); },
-      onMessage: ({ message, source }) => { if (!message || my !== voiceSeq) return; add(source === 'user' ? 'me' : 'ai', source === 'user' ? esc(message) : md(message)); quick.style.display = 'none'; },
+      onMessage: ({ message, source }) => { if (!message || my !== voiceSeq) return; add(source === 'user' ? 'me' : 'ai', source === 'user' ? esc(message) : md(message)); if (source !== 'user') revisarTarjeta(message); quick.style.display = 'none'; },
     });
     if (!voiceStarting || my !== voiceSeq) { try { await c.endSession(); } catch (e) {} return; }
     voiceConv = c;
