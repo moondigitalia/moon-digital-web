@@ -12,7 +12,7 @@ const CLAVES = ['asistentes', 'gasto', 'tareas', 'publicaciones', 'medicion', 'a
 // Lo que escribe una persona (nombre, de quién es, para qué sirve, su teléfono) vive en su propio cajón `a_mano`: la
 // medición de cada hora reescribe `asistentes` y nunca toca `a_mano` (Kid, 13-nov-2026: se perdían el teléfono de
 // Jason y los nombres que pidió). Aquí se pone encima de lo medido.
-const A_MANO = ['nombre', 'de', 'para', 'telefono'];
+const A_MANO = ['nombre', 'de', 'para', 'telefono', 'tipo', 'pagina'];   // tipo: cuando un demo empieza a pagar, pasa a cliente (Kid, 19-nov-2026)
 
 // Horario de cada cubículo (hora de Cancún, lunes a viernes).
 const HORARIO = { kid: [11, 17], daniel: [9, 18], dan: [9, 18] };

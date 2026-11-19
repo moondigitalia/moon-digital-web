@@ -561,7 +561,8 @@
     // Clientes que pagan: cada uno en su escritorio con pantalla; Claude, el robot naranja, va hacia lo último que tocó
     const clientes = as.filter(a => a.tipo === 'cliente');
     clientes.forEach((a, i) => {
-      const x = 9 + i * 4, y = 2.6;
+      // Hasta 2 clientes van holgados; de 3 en adelante, filas de 3 escritorios que caben en el cuarto (19-nov-2026: entró la UN)
+      const n = clientes.length, x = n <= 2 ? 9 + i * 4 : 8.6 + (i % 3) * 3, y = 2.6 + Math.floor(i / 3) * 3;
       pon(x + 0.1, y + 1, mesa(x - 1, y + 0.45, 2.4, 1, { cajonera: true }) + compu(x - 0.2, y + 0.45, 22) + papeles(x + 0.5, y + 0.6, 22) + taza(x - 0.8, y + 0.9, 22) + lampara(x + 1.1, y + 1.1, 22));
       silla(x, y);
       pon(x, y, monito(x, y, { id: a.id, lado: [1.6, 0], actor: true, dormido: !a.platicas7d, cuarto: 'clientes', nombre: a.nombre, estado: a.estado, ropa: ['#c45a7a', '#3f7d6a', '#7a5ac4'][i % 3], sentado: true }));
