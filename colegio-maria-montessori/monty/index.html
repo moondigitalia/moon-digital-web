@@ -23,7 +23,7 @@
 <meta name="description" content="Pregúntale sobre niveles, el método Montessori y cómo agendar tu visita.">
 
 <title>Monty · Colegio María Montessori</title>
-<link rel="icon" href="../img/cmm-logo.png">
+<link rel="icon" href="/colegio-maria-montessori/img/cmm-logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=DM+Sans:opsz,wght@9..40,600;9..40,700;9..40,800&display=swap">
 <style>
 /* Monty, el búho del Colegio María Montessori (demo de MOON Digital, 16-nov-2026). Mismo motor que Uni y Mileni.
@@ -149,18 +149,18 @@ input:focus{border-color:var(--azul)}
 <div class="wrap">
   <section class="marca" aria-label="Colegio María Montessori">
     <div class="cont"><div class="txt">
-    <img class="logo" src="../img/cmm-logo.png" alt="Colegio María Montessori" style="background:#fff;object-fit:contain;padding:6px">
+    <img class="logo" src="/colegio-maria-montessori/img/cmm-logo.png" alt="Colegio María Montessori" style="background:#fff;object-fit:contain;padding:6px">
     <h1>Conoce a <em>Monty,</em> el búho del Colegio María Montessori</h1>
     <p>Pregúntale por voz o por escrito: niveles, el método Montessori y cómo agendar tu visita, a cualquier hora.</p>
     <button type="button" class="btn-voz" id="voz-grande"><span class="mic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></span>Háblale a Monty</button>
     <div class="lema">De maternal a secundaria</div>
-    </div><img class="uni" src="../img/monty.webp" alt="Monty, el búho del Colegio María Montessori" width="722" height="900"></div>
-    <div class="demo"><img src="../img/moon-blanco.png" alt="MOON Digital"> Demo preparado por MOON Digital</div>
+    </div><img class="uni" src="/colegio-maria-montessori/img/monty.webp" alt="Monty, el búho del Colegio María Montessori" width="722" height="900"></div>
+    <div class="demo"><img src="/colegio-maria-montessori/img/moon-blanco.png" alt="MOON Digital"> Demo preparado por MOON Digital</div>
   </section>
 
   <section class="chat" aria-label="Chat con Monty">
     <div class="ch">
-      <img class="av" id="av" src="../img/monty-cara.webp" alt="Monty" style="background:var(--sol)">
+      <img class="av" id="av" src="/colegio-maria-montessori/img/monty-cara.webp" alt="Monty" style="background:var(--sol)">
       <div><b>Monty · Colegio María Montessori</b><span id="estado">● En línea</span></div>
     </div>
     <div class="msgs" id="msgs" aria-live="polite"></div>
@@ -177,7 +177,7 @@ input:focus{border-color:var(--azul)}
       <button type="submit" aria-label="Enviar"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
     </form>
     <div class="voice" id="voice" hidden>
-      <div class="orb" id="orb"><div class="cara" id="cara" data-boca="1" role="img" aria-label="Monty, el búho del colegio"><img src="../img/monty-habla/cuerpo.webp" alt=""><img class="c1" src="../img/monty-habla/cuerpo-boca-1.webp" alt=""><img class="c2" src="../img/monty-habla/cuerpo-boca-2.webp" alt=""><img class="cp" src="../img/monty-habla/cuerpo-parpadeo.webp" alt=""></div></div>
+      <div class="orb" id="orb"><div class="cara" id="cara" data-boca="1" role="img" aria-label="Monty, el búho del colegio"><img src="/colegio-maria-montessori/img/monty-habla/cuerpo.webp" alt=""><img class="c1" src="/colegio-maria-montessori/img/monty-habla/cuerpo-boca-1.webp" alt=""><img class="c2" src="/colegio-maria-montessori/img/monty-habla/cuerpo-boca-2.webp" alt=""><img class="cp" src="/colegio-maria-montessori/img/monty-habla/cuerpo-parpadeo.webp" alt=""></div></div>
       <p class="v-status" id="v-status" role="status">Conectando…</p>
       <div class="v-actions">
         <button type="button" class="v-mute" id="v-mute" aria-pressed="false">Silenciar</button>
@@ -204,7 +204,7 @@ input:focus{border-color:var(--azul)}
 <script>if(/[?&]embed=1/.test(location.search))document.documentElement.classList.add('embed')</script>
 <script type="module">
 const AGENT_ID = 'agent_3801m7jq785vepzr6eps0hh7rx0r';
-const AVATAR = '../img/monty-cara.webp';               // cambia aquí el avatar del asistente
+const AVATAR = '/colegio-maria-montessori/img/monty-cara.webp';               // cambia aquí el avatar del asistente
 const TEL = '229 283 4408';
 const NOMBRE_ASIS = 'Monty';
 document.getElementById('av').src = AVATAR;
