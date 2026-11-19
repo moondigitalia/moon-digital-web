@@ -313,8 +313,15 @@
       const id = g.dataset.actor, casa = [Number(g.dataset.tx), Number(g.dataset.ty)];
       let a = V.actores[id];
       if (!a) a = V.actores[id] = { id, casa, pos: casa.slice(), camino: [], espera: 0, prox: (6 + Math.random() * TIEMPO.idaMax) * (id === 'jason' ? 3 : 1), modo: 'casa', burbuja: null };
+      const mudo = Math.hypot(casa[0] - a.casa[0], casa[1] - a.casa[1]) > 0.05;   // su lugar cambió (llegó otro cliente, pasó de demo a cliente…)
       a.casa = casa; a.g = g; a.alto = Number(g.dataset.alto) || 50;
       a.lado = g.dataset.lado ? g.dataset.lado.split(',').map(Number) : null;   // por dónde se sale del escritorio
+      // Si su lugar cambió mientras la oficina estaba abierta, nadie se queda parado donde estaba antes (Kid, 19-nov-2026):
+      // en su lugar, ya sentado en el nuevo; si venía de regreso, ahora regresa al nuevo.
+      if (mudo && id !== 'claude') {
+        if (a.modo === 'casa' && !a.camino.length) a.pos = casa.slice();
+        else if (a.modo === 'regreso') a.camino = a.lado ? ruta(a.pos, salida(a)).concat([casa]) : ruta(a.pos, casa);
+      }
       a.quieto = !!g.dataset.dormido || !!g.dataset.falla;
       a.marcador = a.marcador && a.marcador.isConnected ? a.marcador : null;
       if (id === 'claude' && PUERTAS[destinoClaude] && a.destino !== destinoClaude) { a.destino = destinoClaude; const d = PUERTAS[destinoClaude][0]; a.camino = ruta(a.pos, destinoClaude === 'clientes' ? casa : adentro(destinoClaude)); a.modo = 'fuera'; a.claudeFijo = true; }
