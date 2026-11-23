@@ -25,7 +25,7 @@ await paso('cuenta',()=>p.evaluate(()=>abrir({tipo:'cuenta'})));
 await paso('volver5',()=>p.click('#volver',{noWaitAfter:true}));
 await paso('clientes',()=>p.evaluate(()=>abrir({tipo:'clientes'})));
 await paso('cliente',()=>p.evaluate(()=>abrir({tipo:'cliente',tel:'c-cli0'})));
-await paso('documento',()=>p.click('[data-doc]',{noWaitAfter:true}));
+await paso('archivos',()=>p.click('#archivero',{noWaitAfter:true}));await paso('documento',()=>p.click('[data-doc]',{noWaitAfter:true}));
 await paso('volver6',()=>p.click('#volver',{noWaitAfter:true}));await paso('volver7',()=>p.click('#volver',{noWaitAfter:true}));await paso('volver8',()=>p.click('#volver',{noWaitAfter:true}));
 await paso('casa',()=>p.evaluate(()=>abrir({tipo:'casa'})));
 await paso('bienvenida',()=>p.click('[data-j="bienvenida"]',{noWaitAfter:true}));

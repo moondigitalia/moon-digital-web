@@ -927,7 +927,7 @@ function pinta(silencioso) {
   if (window.Oficina) Oficina.esconder();
   if (!c) return esEmb() ? pintaInicioEmbajador(silencioso) : pintaInicio(silencioso);
   if (c.tipo === 'documento') setTimeout(() => ponOpcionesDoc(c), 0);
-  ({ tareas: capaTareas, tarea: capaTarea, nuevaTarea: capaNuevaTarea, crm: capaCRM, crmLista: capaCRMLista, editarContacto: capaEditarContacto, subir: capaSubir, archivero: capaArchivero, ficha: capaFicha, nuevoCliente: capaNuevoCliente, proyectos: capaProyectos, proyecto: capaProyecto, nuevoProyecto: capaProyecto, equipo: capaEquipo, moon: capaMoon, lector: capaLector, clientes: capaClientes, cliente: capaFicha, seccion: capaSeccion, documento: capaDocumento, casa: capaCasa, demo: capaDemo, nota: capaNota, editarProyecto: capaProyecto, qr: capaQR, cuenta: capaCuenta, frase: capaFrase, foto: capaFoto, docOpciones: capaDocOpciones, emProspectos: capaEmProspectos, emComisiones: capaEmComisiones, emMaterial: capaEmMaterial, emCuenta: capaEmCuenta, embajador: capaEmbajador, comision: capaComision, bitacora: capaBitacora, papelera: capaPapelera, llamadas: capaLlamadas, citas: capaCitas, cita: capaCita })[c.tipo](c, silencioso);
+  ({ tareas: capaTareas, tarea: capaTarea, nuevaTarea: capaNuevaTarea, crm: capaCRM, crmLista: capaCRMLista, editarContacto: capaEditarContacto, subir: capaSubir, archivero: capaArchivero, archivos: capaArchivos, ficha: capaFicha, nuevoCliente: capaNuevoCliente, proyectos: capaProyectos, proyecto: capaProyecto, nuevoProyecto: capaProyecto, equipo: capaEquipo, moon: capaMoon, lector: capaLector, clientes: capaClientes, cliente: capaFicha, seccion: capaSeccion, documento: capaDocumento, casa: capaCasa, demo: capaDemo, nota: capaNota, editarProyecto: capaProyecto, qr: capaQR, cuenta: capaCuenta, frase: capaFrase, foto: capaFoto, docOpciones: capaDocOpciones, emProspectos: capaEmProspectos, emComisiones: capaEmComisiones, emMaterial: capaEmMaterial, emCuenta: capaEmCuenta, embajador: capaEmbajador, comision: capaComision, bitacora: capaBitacora, papelera: capaPapelera, llamadas: capaLlamadas, citas: capaCitas, cita: capaCita })[c.tipo](c, silencioso);
 }
 let oficinaMontada = false;
 async function pideOficina(url, accion, datos) {
@@ -1308,8 +1308,8 @@ async function capaFicha(c, sil) {
       ${pan ? `<div class="demo f-demo" style="--c:${pan.color};min-height:clamp(250px,40vh,340px)"><div class="demo-logo">${icono(pan.imagen ? Object.assign({}, pan, { icono: pan.imagen }) : pan, P, 0)}</div>
         <div class="demo-info"><span class="eti">Su demo</span><b>${esc(nombreCorto(P))}</b><span>${esc(dominio(pan.demo))}</span></div>
         <div class="demo-botones"><button class="boton demo-boton" id="demo">Abrir demo ${I.abre}</button><button class="redondo demo-enviar" id="demoEnviar" aria-label="Enviar el demo" title="Enviar el demo">${I.enviar}</button></div></div>` : ''}
-      ${docs.length ? `<div><span class="eti">Archivos</span><div class="lista" style="margin-top:6px">${docs.map(d => `<button class="fila chica" data-doc="${esc(d.id)}"><span class="estado" style="--c:var(--cobalto);--cf:var(--azulf)">${esc(nomSec(d.seccion))}</span><span class="q"><b>${esc(d.titulo)}</b>${d.resumen || d.frase ? `<span>${esc(d.resumen || d.frase)}</span>` : ''}</span><span class="flecha-f">${I.der}</span></button>`).join('')}</div></div>` : ''}
-      <div class="f-bloque"><span class="eti">¿En qué va?</span><div class="f-etapas" id="etapas">${Object.keys(ETAPA).map(e => `<button class="${(P.etapa || 'pendiente') === e ? 'on' : ''}" data-e="${e}" style="--c:${ETAPA[e].c};--cf:${ETAPA[e].cf}">${ETAPA[e].n}</button>`).join('')}</div></div>
+      <button class="fila" id="archivero" style="grid-template-columns:auto minmax(0,1fr) auto"><span class="doc-ic">${I.subir}</span><span class="q" style="min-width:0"><b>Archivero${docs.length ? ` · ${docs.length} archivo${docs.length === 1 ? '' : 's'}` : ''}</b><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${docs.length ? 'Lo más nuevo: ' + esc(docsRecientes(docsDe(c.tel))[0].titulo) : 'Aquí va lo que nos mande por WhatsApp: fotos, audios, PDF'}</span></span><span class="flecha-f">${I.der}</span></button>
+      <div class="f-bloque"><span class="eti">Estado</span><div class="fila chica" style="cursor:default;grid-template-columns:minmax(0,1fr) auto;margin-top:6px"><span class="q"><b style="color:${E.c}">${E.n}</b><span>${esc(E.d)}</span></span><button type="button" class="pilita${c.etapas ? ' on' : ''}" id="cambiaEtapa">${c.etapas ? 'Listo' : 'Cambiar'}</button></div>${c.etapas ? `<div class="f-etapas" id="etapas" style="margin-top:8px">${Object.keys(ETAPA).filter(e => e !== (P.etapa || 'pendiente')).map(e => `<button data-e="${e}" style="--c:${ETAPA[e].c};--cf:${ETAPA[e].cf}">${ETAPA[e].n}</button>`).join('')}</div>` : ''}</div>
       ${P.notas_equipo ? `<div><span class="eti">Nota del equipo</span><button class="nota" id="nota" style="display:block;width:100%;margin-top:6px;height:auto;overflow:visible;text-align:start;font:inherit;font-weight:600">${esc(P.notas_equipo)}</button></div>` : '<button class="boton dos" id="nota">Escribir una nota</button>'}
       ${datos.length ? `<div><span class="eti">Datos</span><div class="lista" style="margin-top:6px">${datos.map(([k, v]) => `<div class="fila chica" style="cursor:default;grid-template-columns:100px minmax(0,1fr)"><span class="eti" style="letter-spacing:.1em">${esc(k)}</span><span class="q"><b style="font-weight:600">${esc(v)}</b></span></div>`).join('')}</div></div>` : ''}
       <label class="mini" style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="prueba"${P.es_prueba ? ' checked' : ''}> Es de prueba (no cuenta como cliente)</label>`}
@@ -1317,7 +1317,11 @@ async function capaFicha(c, sil) {
   if (sil) app.querySelector('.vista').style.animation = 'none';
   const lienzo = app.querySelector('.f-todo'); if (c.scroll) lienzo.scrollTop = c.scroll; lienzo.onscroll = () => { c.scroll = lienzo.scrollTop; };
   const guarda = async datos => { const r = await api('editar_persona', Object.assign({ tel: c.tel }, datos)); if (r.ok) { Object.assign(per0, datos); if (c.ext && c.ext.persona) Object.assign(c.ext.persona, datos); delete FICHAS[c.tel]; } return r; };
-  document.getElementById('accion').onclick = () => abrir({ tipo: 'subir', tel: c.tel });
+  // Archivero de la persona (Kid, 23-nov-2026): un botón que abre TODOS sus archivos; subir = la pantalla del Archivero con
+  // esta persona ya elegida (un solo montón: "Llegó").
+  document.getElementById('accion').onclick = () => abrir({ tipo: 'archivero', para: c.tel });
+  { const b = document.getElementById('archivero'); if (b) b.onclick = () => abrir({ tipo: 'archivos', tel: c.tel }); }
+  { const b = document.getElementById('cambiaEtapa'); if (b) b.onclick = () => { c.etapas = !c.etapas; pinta(true); }; }
   document.getElementById('editar').onclick = () => { c.editando = !c.editando; pinta(true); };
   if (c.editando) return activarEdicion(c, P, pan, docs, guarda);
   let seguro = false;
@@ -1329,7 +1333,7 @@ async function capaFicha(c, sil) {
     if (r.ok) { await recargar(true); avisoFlotante('Está en la papelera (Equipo › Papelera)'); cerrar(); }
   };
   app.querySelectorAll('[data-doc]').forEach(b => b.onclick = () => { const d = docs.find(x => x.id === b.dataset.doc); if (d) abrirDoc(d); });
-  app.querySelectorAll('#etapas [data-e]').forEach(b => b.onclick = async () => { const antes = per0.etapa; const r = await guarda({ etapa: b.dataset.e }); if (r.ok) { pinta(true); recargar(true); const e = b.dataset.e; avisoFlotante(!PAGAN.includes(antes) && PAGAN.includes(e) ? 'Listo: ya aparece en Clientes' : PAGAN.includes(antes) && !PAGAN.includes(e) ? `Ahora está en ${ETAPA[e].n}: ya no aparece en Clientes` : `Listo: ahora está en ${ETAPA[e].n}`); } });
+  app.querySelectorAll('#etapas [data-e]').forEach(b => b.onclick = async () => { const antes = per0.etapa; const r = await guarda({ etapa: b.dataset.e }); if (r.ok) { c.etapas = false; pinta(true); recargar(true); const e = b.dataset.e; avisoFlotante(!PAGAN.includes(antes) && PAGAN.includes(e) ? 'Listo: ya aparece en Clientes' : PAGAN.includes(antes) && !PAGAN.includes(e) ? `Ahora está en ${ETAPA[e].n}: ya no aparece en Clientes` : `Listo: ahora está en ${ETAPA[e].n}`); } });
   document.getElementById('nota').onclick = () => abrir({ tipo: 'nota', tel: c.tel });
   document.getElementById('prueba').onchange = async e => { const r = await guarda({ es_prueba: e.target.checked ? 1 : 0 }); if (r.ok) recargar(true); };
   if (pan) {
@@ -1783,6 +1787,16 @@ async function subirPartes(id, f, avance) {
     fallas = 0; pos += trozo.length; n++; avance(Math.round(pos / bytes.length * 100));
   }
   return n;
+}
+// Los archivos de una persona, lo más nuevo primero (lo que llegó por el Archivero trae fecha; lo viejo va después).
+const docsRecientes = ds => ds.slice().sort((a, b) => String(b.creado || '').localeCompare(String(a.creado || '')) || (a.orden || 0) - (b.orden || 0));
+function capaArchivos(c) {
+  const per = personaDe(c.tel); if (!per) return cerrar();
+  const ds = docsRecientes(docsDe(c.tel)), nomSec = k => (SECCIONES.find(x => x[0] === k) || [k, k])[1];
+  marco(`Archivero · ${nombreCorto(per) || nombreDe(per)}`, 'Subir archivos', `<div class="cuerpo" style="grid-template-rows:minmax(0,1fr) auto"><div class="lista dos"></div><div class="pie"></div></div>`, I.subir);
+  document.getElementById('accion').onclick = () => abrir({ tipo: 'archivero', para: c.tel });
+  alCambiarTamano = paginar(app.querySelector('.cuerpo'), ds, d => `<button class="fila" data-doc="${esc(d.id)}" style="grid-template-columns:auto minmax(0,1fr) auto"><span class="estado" style="--c:var(--cobalto);--cf:var(--azulf)">${esc(nomSec(d.seccion))}</span><span class="q" style="min-width:0"><b>${esc(d.titulo)}</b><span>${esc(d.resumen || d.frase || (d.seccion === 'recibido' ? 'Claude todavía no lo lee' : d.formato === 'archivo' ? 'Archivo subido' : 'Se abre aquí mismo'))}</span></span><span class="flecha-f">${I.der}</span></button>`,
+    { pagina: c.p, vacio: '<b>Todavía no hay archivos</b>Toca Subir archivos: fotos, audios, videos, PDF, lo que nos mande por WhatsApp.', alPintar: l => l.querySelectorAll('[data-doc]').forEach(b => b.onclick = () => abrirDoc(ds.find(x => x.id === b.dataset.doc))) });
 }
 // ARCHIVERO (Kid, 23-nov-2026): lo que llega por WhatsApp (fotos, videos, audios, PDF, Word, Excel…) se sube aquí, con
 // un solo dato: para quién es. Todo cae en un mismo montón ("Llegó") en la ficha de esa persona; Claude lo lee y lo explica.
