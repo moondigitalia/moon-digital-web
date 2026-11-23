@@ -179,6 +179,13 @@ function alertas() {
   // Cada alerta trae su porqué: qué está pasando y qué conviene hacer (cualquiera la entiende sin preguntar).
   const A = (t, por) => { const x = new String(t); x.por = por; return x; };
   ((O.asistentes && O.asistentes.lista) || []).forEach(a => { if (a.estado === 'rojo') l.push(A(a.nombre + ': ' + (a.nota || 'falla'), 'Este asistente está fallando y la gente que le escribe puede quedarse sin respuesta. Pídele a Claude que lo revise.')); });
+  // Un cliente que paga (en la Oficina) y que no está en el CRM no sale en el buscador del Archivero ni tiene ficha (23-nov-2026: pasó con Quálitas).
+  { const sa = x => String(x || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const crm = ((C && C.personas) || []).map(p => sa(p.negocio + ' ' + p.nombre));
+    ((O.asistentes && O.asistentes.lista) || []).filter(a => a.tipo === 'cliente' && a.de && C && C.personas).forEach(a => {
+      const pal = sa(a.de).split(/\s+/).filter(w => w.length > 3);
+      if (pal.length && !crm.some(c => pal.some(w => c.includes(w)))) l.push(A(a.de + ': no está en el CRM', 'Es un cliente que paga, pero no tiene ficha: sus archivos no se pueden subir al Archivero. Pídele a Claude que lo dé de alta.'));
+    }); }
   ((O.tareas && O.tareas.lista) || []).forEach(t => { const tarde = t.siguiente && Date.now() - Date.parse(t.siguiente) > 2 * 3600e3;
     if (t.resultado !== 'bien' || tarde) l.push(A('Robot con falla: ' + t.nombre, (tarde ? 'Le tocaba trabajar y no ha corrido.' : 'La última vez que trabajó algo le salió mal.') + ' Mientras no se arregle, lo que hace ese robot no se está haciendo. Pídele a Claude que lo revise.')); });
   ((O.suscripciones && O.suscripciones.lista) || []).forEach(s => { if (s.color === 'rojo') l.push(A(s.nombre + (s.faltan < 0 ? ': se pasó la fecha de pago' : ': se cobra ' + (s.faltan === 0 ? 'hoy' : s.faltan === 1 ? 'mañana' : 'en ' + s.faltan + ' días')), 'Es un servicio que pagamos cada mes. Revisa que haya saldo en la tarjeta o decide si todavía lo necesitamos.')); });
