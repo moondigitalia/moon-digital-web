@@ -29,3 +29,15 @@ botón de editar, documentos) y se perdieron horas en lo que ya funcionaba.
 - Tablero: `pruebas/centro/LEEME.md` (sus jueces abren las pantallas como lo hace el mapa: `abrir({ tipo })`).
 - Si se toca la unión (`oficina/oficina.js` o el arranque del Tablero): los dos, Oficina y Tablero.
 - Solo se corre el juez del área que tocó el cambio.
+
+## Archivero: lo que llega por WhatsApp no se pierde (Kid, 23-nov-2026)
+- El cuarto Estado ahora es el **Archivero** (id `cerrado` en el mapa). Arriba: subir archivos + lo último que llegó;
+  "Cómo va MOON" (alertas, pagos, gasto) a un toque dentro del mismo cuarto.
+- Subir = la pantalla `archivero` del Tablero (`T.abrir({ tipo: 'archivero' })`): un buscador "¿Para quién es?" (el
+  mismo del CRM: escribes y salen), varios archivos a la vez, una línea opcional "¿para qué?". Todo cae en UN montón:
+  sección `recibido` de la ficha de esa persona (o `moon`). Nada de secciones nuevas: el orden lo pone Claude.
+- "¿Qué hay nuevo?": documentos `seccion='recibido'` sin `resumen` en `fuente`. Claude los baja con
+  `herramientas/archivero-leer.py` (llave en la tabla `claves_claude` de moon-crm, nunca en el código), los lee y guarda
+  lo que entendió con `UPDATE documentos SET fuente = json_set(fuente, '$.resumen', ?) WHERE id = ?`. Ese resumen sale
+  en el Archivero y en la ficha. Si el archivo parece de otro cliente, se avisa antes de moverlo.
+- Tope por archivo: 25 MB (la base). Lo más grande se avisa en pantalla; no se sube a medias.

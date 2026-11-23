@@ -9,8 +9,8 @@ const USUARIOS = ['kid', 'dan', 'daniel'];
 const { leerCifrado, preparar, enviable, mdAHoja } = require('./_visor');
 // Foto o logo: una imagen chica ya reducida en el celular (data:image/…), nunca un archivo cualquiera.
 const fotoValida = f => { if (f === '' || f == null) return ''; f = String(f); return /^data:image\/(webp|jpeg|png);base64,[A-Za-z0-9+/=]+$/.test(f) && f.length < 160000 ? f : null; };
-const SECCIONES_CLIENTE = ['propuesta', 'contrato', 'material', 'avance'];
-const SECCIONES_MOON = ['presentacion', 'pagina', 'bienvenida'];   // lo de MOON: también se sube, se cambia y se quita
+const SECCIONES_CLIENTE = ['propuesta', 'contrato', 'material', 'avance', 'recibido'];   // recibido: lo que llega por WhatsApp y se sube en el Archivero (Kid, 23-nov-2026)
+const SECCIONES_MOON = ['presentacion', 'pagina', 'bienvenida', 'recibido'];   // lo de MOON: también se sube, se cambia y se quita
 const huella = s => crypto.createHash('sha256').update(String(s)).digest('hex');
 const ahora = () => new Date().toISOString();
 const ocultar = c => { const [u, d] = String(c).split('@'); return u.slice(0, 2) + '•••@' + d; };
@@ -144,7 +144,8 @@ async function inicio(yo) {
     sql('SELECT * FROM actividad ORDER BY id DESC LIMIT 12'),
     sql('SELECT proyecto, COUNT(*) n FROM uso WHERE fecha >= ? AND quien NOT IN (SELECT tel FROM personas WHERE es_prueba = 1) GROUP BY proyecto', [new Date(Date.now() - 30 * 864e5).toISOString()]),
     sql('SELECT tel, orden, demo, color, imagen, icono FROM paneles ORDER BY orden'),
-    sql("SELECT id, tel, seccion, orden, titulo, frase, url, formato FROM documentos WHERE seccion != 'oculto' AND COALESCE(borrado, '') = '' AND NOT (formato = 'archivo' AND fuente NOT LIKE '%\"listo\":1%') ORDER BY tel, seccion, orden"),
+    // creado, subio y leido: el Archivero muestra qué llegó, quién lo subió y si Claude ya lo leyó (resumen = lo que entendió).
+    sql("SELECT id, tel, seccion, orden, titulo, frase, url, formato, creado, CASE WHEN json_valid(fuente) THEN json_extract(fuente, '$.subio') END subio, CASE WHEN json_valid(fuente) THEN json_extract(fuente, '$.resumen') END resumen FROM documentos WHERE seccion != 'oculto' AND COALESCE(borrado, '') = '' AND NOT (formato = 'archivo' AND fuente NOT LIKE '%\"listo\":1%') ORDER BY tel, seccion, orden"),
     sql("SELECT id, nombre, color FROM usuarios WHERE tipo = 'embajador' AND activo = 1 ORDER BY creado"),
     // Las llamadas de Jason en la primera pantalla: todas (también las del equipo, marcadas como prueba).
     sql("SELECT id, proyecto, fecha, quien, canal, resumen, datos, (quien IN (SELECT tel FROM personas WHERE es_prueba = 1)) prueba FROM uso WHERE canal = 'llamada' ORDER BY fecha DESC LIMIT 60"),
@@ -327,6 +328,9 @@ async function conSocio(d, yo) {
     if (!tel || !(moon ? SECCIONES_MOON : SECCIONES_CLIENTE).includes(seccion)) return { ok: false };
     if (!moon && !(await sql('SELECT tel FROM personas WHERE tel = ?', [tel]))[0]) return { ok: false };
     const tamano = Number(d.tamano) || 0; if (tamano <= 0 || tamano > 25e6) return { ok: false, error: 'tamano' };
+    // El mismo archivo (mismo nombre y peso) ya está con esa persona: no se duplica, se avisa.
+    const rep = seccion === 'recibido' && (await sql("SELECT titulo FROM documentos WHERE tel = ? AND formato = 'archivo' AND COALESCE(borrado, '') = '' AND fuente LIKE ? AND fuente LIKE ? AND fuente LIKE '%\"listo\":1%'", [tel, '%"nombre":' + JSON.stringify(t(d.nombre, 160)) + '%', '%"tamano":' + tamano + ',%']))[0];   // solo en el Archivero: "Cambiar archivo" de las otras secciones sigue igual
+    if (rep && !d.repetir) return { ok: false, error: 'repetido', titulo: rep.titulo };
     const id = 'a-' + crypto.randomBytes(6).toString('hex');
     const orden = (((await sql('SELECT MAX(orden) m FROM documentos WHERE tel = ? AND seccion = ?', [tel, seccion]))[0] || {}).m || 0) + 1;
     const fuente = JSON.stringify({ nombre: t(d.nombre, 160), mime: t(d.mime, 80) || 'application/octet-stream', tamano, listo: 0, subio: yo.id });

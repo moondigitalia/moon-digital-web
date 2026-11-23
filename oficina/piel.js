@@ -27,7 +27,7 @@
     { id: 'crea', n: 'Crea tu recepcionista', x: 0, y: 14, w: 6, h: 4, piso: '#4d7a72', herramienta: 'crea' },
     { id: 'gris', n: 'Cuarto gris · dijeron que no', x: 7, y: 15, w: 10, h: 4, piso: '#6b4e36' },
     { id: 'oracion', n: 'Oración', x: 18, y: 13, w: 4, h: 6, piso: '#8a7860' },
-    { id: 'cerrado', n: 'Estado', x: 22, y: 13, w: 4, h: 6, piso: '#4b6c70' },   // Kid, 13-nov-2026: cómo va MOON (antes Archivo)
+    { id: 'cerrado', n: 'Archivero', x: 22, y: 13, w: 4, h: 6, piso: '#4b6c70' },   // Kid, 23-nov-2026: los archivos que llegan + cómo va MOON (antes Estado)
   ];
   const LUZ = { mostaza: ['#e0a53c', 0.16], amarilla: ['#f4d56a', 0.12], morada: ['#6b4fd0', 0.22] };
   const COLOR = { verde: '#3ccf7a', amarillo: '#f2c230', rojo: '#ef4b4b', gris: '#7d7d86' };
@@ -184,13 +184,16 @@
   }
   // EL NOMBRE DEL CUARTO VA PINTADO EN EL PISO (como en los juegos de oficinas y hospitales): letras grandes y suaves,
   // acostadas en la perspectiva del piso, sin globo. Así no parece un personaje más. Título grande y, abajo, qué es.
+  // Ancho de una letra mayúscula gruesa (con su espacio) medido en el navegador: 0.68 se quedaba corto y cortaba
+  // "CREA TU RECEPCIONISTA" y "ARCHIVERO" contra la barda (23-nov-2026).
+  const ANCHO_LETRA = 0.8;
   function letrero(c) {
     const [titulo, sub] = c.n.split(' · '), k = 64, max = c.w * k - 36;
-    let fs1 = Math.min(36, max / (titulo.length * 0.68)), fs2 = sub ? Math.min(22, max / (sub.length * 0.56)) : 0;
+    let fs1 = Math.min(36, max / (titulo.length * ANCHO_LETRA)), fs2 = sub ? Math.min(22, max / (sub.length * 0.56)) : 0;
     // dónde queda libre el piso de cada cuarto (medido contra sus muebles); 'y' = las letras corren a lo largo del otro lado
     const LUGAR = { recepcion: [3, 4.35, 'x', 5], clientes: [12, 5.2], demos: [22, 5.3], cubiculos: [0.75, 8.6, 'y', 3.4, 'logo'], robots: [22, 11.3], crm: [9.6, 13.35], libreria: [14.5, 10.75], crea: [3, 17.45], gris: [12, 18.5], oracion: [18.75, 16.0, 'y', 2.4], cerrado: [24, 18.4] };
     const L = LUGAR[c.id] || [c.x + c.w / 2, c.y + c.h * 0.62], [ox, oy] = iso(L[0], L[1]);
-    const largo = (L[3] || (L[2] === 'y' ? c.h : c.w)) * k - 36; if (L[2] === 'y' || L[3]) { fs1 = Math.min(36, largo / (titulo.length * 0.68)); fs2 = sub ? Math.min(22, largo / (sub.length * 0.56)) : 0; }
+    const largo = (L[3] || (L[2] === 'y' ? c.h : c.w)) * k - 36; if (L[2] === 'y' || L[3]) { fs1 = Math.min(36, largo / (titulo.length * ANCHO_LETRA)); fs2 = sub ? Math.min(22, largo / (sub.length * 0.56)) : 0; }
     const m = L[2] === 'y' ? `matrix(${TW / 2 / k},${-TH / 2 / k},${TW / 2 / k},${TH / 2 / k},${ox},${oy})` : `matrix(${TW / 2 / k},${TH / 2 / k},${-TW / 2 / k},${TH / 2 / k},${ox},${oy})`;
     return `<g class="letrero" transform="${m}" fill="#fbfaf6" font-weight="900" text-anchor="middle" stroke="#1d2a2b" stroke-width="5" stroke-linejoin="round" paint-order="stroke" stroke-opacity=".55" style="pointer-events:none"><text x="0" y="${sub ? -fs2 - 8 : 0}" font-size="${fs1.toFixed(1)}" opacity=".92" letter-spacing="1">${esc(titulo.toUpperCase())}</text>${sub ? `<text x="0" y="0" font-size="${fs2.toFixed(1)}" opacity=".85">${esc(sub)}</text>` : ''}${L[4] === 'logo' ? `<image href="/oficina/logo-moon.webp" x="${-largo * 0.42}" y="12" width="${largo * 0.84}" height="${largo * 0.84 * 124 / 480}" opacity=".9"/>` : ''}</g>`;   // el logo de MOON abajo de "Equipo"
   }
@@ -617,8 +620,8 @@
     // Garrafón de agua en el cruce de pasillos (a donde van por agua)
     pon(AGUA[0], AGUA[1], caja(AGUA[0] - 0.24, AGUA[1] - 0.24, 0.48, 0.48, 28, ['#f1f1ec', '#d6d6cf', '#bdbdb5']) + caraY(AGUA[0] - 0.1, AGUA[0] + 0.1, AGUA[1] + 0.24, 16, 20, '#3a6fb0')
       + (() => { const [gx, gy] = iso(AGUA[0], AGUA[1], 28); return `<path d="M${gx - 11},${gy - 1} v-20 q0,-6 11,-7 q11,1 11,7 v20 q-11,6 -22,0 z" fill="#5aa6e6" opacity=".9"/><path d="M${gx - 11},${gy - 21} q11,6 22,0" stroke="#3a86c6" fill="none"/><rect x="${gx - 4}" y="${gy - 31}" width="8" height="5" rx="2" fill="#3a86c6"/><path d="M${gx - 6},${gy - 16} v10" stroke="#ffffffaa" stroke-width="3" stroke-linecap="round"/>`; })());
-    // Estado: cuántas cosas hay que atender (el detalle está en el panel al tocar el cuarto)
-    { const n = O.porAtender || 0; pon(24, 16.5, etiqueta(...iso(24, 16.5), n ? n + ' por atender' : 'Todo en orden')); }
+    // Archivero: primero lo que hay que atender; si no hay, cuántos archivos nuevos faltan por leer (el detalle, al tocar el cuarto)
+    { const n = O.porAtender || 0, nv = O.nuevos || 0; pon(24, 16.5, etiqueta(...iso(24, 16.5), n ? n + ' por atender' : nv ? nv + (nv === 1 ? ' archivo nuevo' : ' archivos nuevos') : 'Todo en orden')); }
     // Cuarto de oración: solo Jesús, con dos velitas
     [[19.7, 17.7], [21.4, 17.5]].forEach(([x, y]) => pon(x, y, caja(x - 0.15, y - 0.15, 0.3, 0.3, 10, ['#efe6d2', '#cfc4ad', '#b9ae98']) + (() => { const [vx, vy] = iso(x, y, 16); return `<circle cx="${vx}" cy="${vy}" r="10" fill="#ffcf6b" opacity=".35" filter="url(#brillo)"/><ellipse cx="${vx}" cy="${vy}" rx="2.2" ry="4" fill="#ffd97a"/>`; })()));
     pon(20.2, 15.5, monito(20.2, 15.5, { id: 'jesus', piel3d: 'jesus', cuarto: 'oracion', nombre: 'Jesús', ropa: '#efe6d2', pelo: '#4a2c18' }));

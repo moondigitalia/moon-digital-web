@@ -84,6 +84,37 @@ const posiciones = () => [...ofiR().querySelectorAll('.cab, #escribe, #texto, .c
       await p.click('#app #volver'); await p.waitForSelector('#mapa:not([hidden]) .cuarto'); await p.waitForTimeout(200); await p.evaluate(() => ajustarVista());
       ver(await p.evaluate(() => !document.getElementById('ofi').hidden && !document.querySelector('#app .top')), n + ': al cerrar ' + cuarto + ' vuelve al mapa');
     }
+    // ARCHIVERO (Kid, 23-nov-2026): tocar el cuarto → "Subir archivos" abre la pantalla del Tablero encima; se elige para quién,
+    // se sube, y al volver al mapa el archivo aparece en "Lo último que llegó". Dos toques para llegar a subir.
+    {
+      const rc = await p.evaluate(() => { const e = ofiR().querySelector('.cuarto[data-c=cerrado]'), pol = e.querySelector('polygon'); const b = (pol || e).getBoundingClientRect(); return pol ? { x: b.left + b.width * 0.5, y: b.top + b.height * 0.62 } : { x: b.left + b.width * 0.85, y: b.top + b.height * 0.85 }; });
+      if (tactil) await p.touchscreen.tap(rc.x, rc.y); else await p.mouse.click(rc.x, rc.y);
+      await p.waitForTimeout(80);
+      ver(await p.evaluate(() => ofiR().getElementById('infoT').textContent === 'Archivero' && !!ofiR().querySelector('#infoC [data-abre*=archivero]')), n + ': el Archivero tiene su botón de subir');
+      await p.evaluate(() => ofiR().querySelector('#infoC [data-abre*=archivero]').click());
+      await p.waitForSelector('#app #arch', { state: 'attached', timeout: 3000 }).catch(() => {});
+      ver(await p.evaluate(() => (document.querySelector('#app .top h2') || {}).textContent === 'Subir al Archivero' && document.getElementById('ofi').hidden), n + ': subir abre encima del mapa (2 toques)');
+      t = await p.evaluate(revisaTextos); ver(!t.length, n + ': textos de subir → ' + t.slice(0, 3).join(' · '));
+      await p.click('#app #subirBtn'); await p.waitForTimeout(50);
+      ver(/para quién/.test(await p.textContent('#app #aviso')), n + ': sin elegir persona, avisa');
+      await p.click('#app #paraRes [data-t="moon"]');
+      const nombre = 'prueba-' + n.replace(/\W/g, '') + '.txt';
+      await p.setInputFiles('#app #arch', { name: nombre, mimeType: 'text/plain', buffer: Buffer.from('hola archivero') });
+      await p.fill('#app #frase', 'para probar');
+      await p.click('#app #subirBtn');
+      await p.waitForSelector('#ofi:not([hidden])', { timeout: 6000 }).catch(() => {});
+      await p.waitForTimeout(300);
+      const lista = await p.evaluate(() => ofiR().getElementById('infoC').textContent);
+      ver(lista.includes(nombre.replace(/\.txt$/, '')), n + ': al volver, el archivo está en "Lo último que llegó"');
+      // El mismo archivo otra vez: no se duplica, se avisa
+      await p.evaluate(() => ofiR().querySelector('#infoC [data-abre*=archivero]').click());
+      await p.waitForSelector('#app #arch', { state: 'attached', timeout: 3000 }).catch(() => {});
+      await p.click('#app #paraRes [data-t="moon"]');
+      await p.setInputFiles('#app #arch', { name: nombre, mimeType: 'text/plain', buffer: Buffer.from('hola archivero') });
+      await p.click('#app #subirBtn'); await p.waitForFunction(() => /Ya estaba/.test((document.querySelector('#app #aviso') || {}).textContent || ''), null, { timeout: 4000 }).catch(() => {});
+      ver(/Ya estaba/.test(await p.textContent('#app #aviso')), n + ': un archivo repetido no se duplica');
+      await p.click('#app #volver'); await p.waitForSelector('#ofi:not([hidden])'); await p.waitForTimeout(150); await p.evaluate(() => ajustarVista());
+    }
     // Librería en pantalla completa; las alertas no salen ahí
     await p.evaluate(() => abrirHerramienta('libreria')); await p.waitForTimeout(250);
     ver(await p.evaluate(() => ofiR().getElementById('mapa').hidden && !ofiR().getElementById('herramienta').hidden), n + ': Librería en pantalla completa');

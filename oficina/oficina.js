@@ -199,14 +199,14 @@ const CUARTOS = [
   { id: 'crea', t: 'Crea tu recepcionista', x: 20, y: 460, w: 260, h: 110, herramienta: 'crea' },
   { id: 'gris', t: 'Cuarto gris', x: 300, y: 590, w: 560, h: 190 },
   { id: 'oracion', t: 'Oración', x: 880, y: 490, w: 140, h: 290 },
-  { id: 'cerrado', t: 'Puerta cerrada', x: 1040, y: 490, w: 140, h: 290 },
+  { id: 'cerrado', t: 'Archivero', x: 1040, y: 490, w: 140, h: 290 },
 ];
 function dibujarMundo() {
   if (!O) return;
   if (window.Piel) {
     const luz = new URLSearchParams(location.search).get('luz');
     const hora = luz === 'morada' ? 21 : luz === 'amarilla' ? 15 : luz === 'mostaza' ? 9 : (O.ahora ? O.ahora.hora : 12);
-    O.porAtender = alertas().length;
+    O.porAtender = alertas().length; O.nuevos = nuevos().length;
     const r = Piel.dibuja(O, C, sel, hora);
     const cambio = MUNDO.w !== r.ancho; MUNDO.w = r.ancho; MUNDO.h = r.alto; MUNDO.mono = r.monito;
     const m = $('#mundo'); m.style.width = r.ancho + 'px'; m.style.height = r.alto + 'px'; m.innerHTML = r.svg;
@@ -304,7 +304,7 @@ function tocar(cx, cy) {
 function elegir(s) { sel = s; if (window.Piel) dibujarMundo(); else $('#mundo').querySelectorAll('.cuarto').forEach(x => x.classList.toggle('sel', x.dataset.c === s.cuarto)); pintarInfo(); }
 
 // ---------- Información (abajo o a la derecha) ----------
-const hace = f => { if (!f) return ''; const m = Math.round((Date.now() - Date.parse(f)) / 6e4); return m < 60 ? `hace ${m} min` : m < 1440 ? `hace ${Math.round(m / 60)} h` : `hace ${Math.round(m / 1440)} días`; };
+const hace = f => { if (!f) return ''; const m = Math.round((Date.now() - Date.parse(f)) / 6e4); return m < 1 ? 'ahora' : m < 60 ? `hace ${m} min` : m < 1440 ? `hace ${Math.round(m / 60)} h` : `hace ${Math.round(m / 1440)} días`; };
 const fechaC = f => f ? new Date(Date.parse(f)).toLocaleString('es-MX', { timeZone: 'America/Cancun', weekday: 'short', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' }) : '';
 const COLOR = { verde: 'var(--verde)', amarillo: 'var(--amarillo)', rojo: 'var(--rojo)', gris: '#6b6b73' };
 const liga = p => { if (!p) return ''; const u = /^https:\/\//.test(p) ? p : /^[a-z0-9-]+$/.test(p) ? `https://${p}.vercel.app` : ''; return u ? `<small><a href="${esc(u)}" target="_blank" rel="noopener">${esc(u)}</a></small>` : ''; };
@@ -315,27 +315,41 @@ function filaAsistente(a, conPara) {
   return `<div class="fila"><span class="luz ${a.estado || 'gris'}"></span> ${esc(a.nombre)} · ${esc(a.de)}${conPara && a.para ? `<small style="color:#e9e8e3">${esc(a.para)}</small>` : ''}<small>${a.platicas7d || 0} pláticas · ${a.fallas7d || 0} fallas · $${a.usd7d || 0} USD en 7 días${a.emergencias === false && (a.tipo === 'cliente' || a.tipo === 'demo') ? ' · sin reglas de emergencia' : ''}</small>${a.nota ? `<small>${esc(a.nota)}</small>` : ''}${liga(a.pagina)}</div>`;
 }
 function datosLlamada(l) { try { return JSON.parse(l.datos || '{}'); } catch (e) { return {}; } }
+// Archivero: lo que se subió (sección "recibido"), lo más nuevo primero; "nuevo" = Claude todavía no lo lee (no tiene resumen).
+const recibidos = () => ((C && C.documentos) || []).filter(d => d.seccion === 'recibido').sort((a, b) => String(b.creado || '').localeCompare(String(a.creado || '')));
+const nuevos = () => recibidos().filter(d => !d.resumen);
+const deQuien = tel => { if (tel === 'moon') return 'MOON'; const p = ((C && C.personas) || []).find(x => x.tel === tel) || {}; return String(p.negocio || p.nombre || 'Sin nombre').replace(/\s*\(.*\)\s*/g, ' ').trim(); };
+const ir2 = (ver, titulo, linea, clase) => `<button class="fila${clase ? ' ' + clase : ''}" data-cuarto="cerrado" data-ver="${ver}">${titulo}<small>${linea}</small></button>`;
 function pintarInfo(refresco) {
   if (!O) return;
   const k = $('#infoC'), y = refresco ? k.scrollTop : 0;
   const as = (O.asistentes && O.asistentes.lista) || [];
   let t = '', h = '';
   if (sel.tipo === 'resumen') {
-    // Al abrir: poco texto (Kid, 13-nov-2026). Lo de cómo va MOON vive en el cuarto Estado.
+    // Al abrir: poco texto (Kid, 13-nov-2026). Lo de cómo va MOON vive en el Archivero (antes Estado), a un toque.
     t = 'Oficina MOON';
     const n = alertas().length, ll = (C && C.llamadas) || [], hoy = ll.filter(l => Date.now() - Date.parse(l.fecha) < 864e5).length;
     const prox = ((C && C.citas) || []).filter(c => Date.parse(c.inicio) > Date.now() - 36e5 && !Number(c.prueba)).length;
     const cli = as.filter(a => a.tipo === 'cliente'), malos = cli.filter(a => a.estado === 'rojo').length;
-    const g = O.gasto || {};
-    const ir = (cuarto, titulo, linea, clase) => `<button class="fila${clase ? ' ' + clase : ''}" data-cuarto="${cuarto}">${titulo}<small>${linea}</small></button>`;
-    // Un vistazo corto y en orden (Kid, 13-nov-2026): cada renglón lleva a su cuarto; el detalle largo vive en Estado.
+    const g = O.gasto || {}, nv = nuevos();
+    const ir = (cuarto, titulo, linea, clase, ver) => `<button class="fila${clase ? ' ' + clase : ''}" data-cuarto="${cuarto}"${ver ? ` data-ver="${ver}"` : ''}>${titulo}<small>${linea}</small></button>`;
+    // Un vistazo corto y en orden (Kid, 13-nov-2026): cada renglón lleva a su cuarto; el detalle largo vive en el Archivero › Cómo va MOON.
     h = '<p class="contexto">Toca cualquier cuarto o monito del mapa y aquí te explico qué es y para qué sirve.</p>'
-      + ir('cerrado', n ? `${n} ${n === 1 ? 'cosa' : 'cosas'} por atender` : 'Todo en orden', 'Estado: alertas, lo que pagamos y lo que gastan los asistentes.', n ? 'alerta' : '')
+      + ir('cerrado', n ? `${n} ${n === 1 ? 'cosa' : 'cosas'} por atender` : 'Todo en orden', 'Cómo va MOON: alertas, lo que pagamos y lo que gastan los asistentes.', n ? 'alerta' : '', 'estado')
       + ir('recepcion', `Jason · ${hoy} llamada${hoy === 1 ? '' : 's'} hoy`, prox ? `${prox} cita${prox === 1 ? '' : 's'} próxima${prox === 1 ? '' : 's'} con el asesor` : 'Sin citas próximas')
       + ir('clientes', `Clientes que pagan · ${cli.length}`, malos ? `${malos} con falla: la gente se está quedando sin respuesta` : 'Sus asistentes están contestando bien')
-      + ir('cerrado', `Esta semana · $${g.usd7d || 0} USD`, 'Lo que gastaron los asistentes en voz y respuestas.');
+      + (nv.length ? ir('cerrado', `Archivero · ${nv.length} ${nv.length === 1 ? 'archivo nuevo' : 'archivos nuevos'}`, 'Lo que subieron y Claude todavía no lee. Pregúntale: "¿qué hay nuevo?"')
+        : ir('cerrado', `Esta semana · $${g.usd7d || 0} USD`, 'Lo que gastaron los asistentes en voz y respuestas.', '', 'estado'));
   } else if (sel.tipo === 'cerrado') {
-    t = 'Estado';
+    // ARCHIVERO (Kid, 23-nov-2026): lo que llega por WhatsApp se sube aquí y no se pierde. Un solo montón: Claude lo lee y lo explica.
+    t = 'Archivero';
+    const ds = recibidos(), n = alertas().length;
+    h = '<p class="contexto">Lo que nos mandan por WhatsApp se guarda aquí, para no perderlo. Luego pregúntale a Claude: "¿qué hay nuevo?".</p>'
+      + `<div class="acciones"><button class="accion" data-abre='{"tipo":"archivero"}'>Subir archivos</button></div>`;
+    h += '<p class="titulo">Lo último que llegó</p>' + (ds.length ? ds.slice(0, 4).map(d => `<button class="fila" data-abre="${esc(JSON.stringify({ tipo: 'documento', id: d.id, titulo: d.titulo }))}">${d.resumen ? '' : '<span class="etq cli">Nuevo</span> '}${esc(d.titulo)} · ${esc(deQuien(d.tel))}<small>${esc(d.resumen || d.frase || 'Claude todavía no lo lee')} · ${esc(NOMBRE[d.subio] || '')} ${hace(d.creado)}</small></button>`).join('') : '<div class="fila">Todavía no se sube nada.<small>Lo que subas aparece aquí y en la ficha de esa persona.</small></div>');
+    h += ir2('estado', n ? `Cómo va MOON · ${n} por atender` : 'Cómo va MOON · todo en orden', 'Alertas, lo que pagamos cada mes y lo que gastan los asistentes.', n ? 'alerta' : '');
+  } else if (sel.tipo === 'estado') {
+    t = 'Cómo va MOON';
     const al = alertas();
     h += `<p class="contexto">Cómo va el negocio: lo que necesita atención, lo que pagamos cada mes y cuánto gastan los asistentes. Lo llena solo un robot cada hora.</p>`;
     if (al.length) h += `<p class="titulo">Atención</p>` + al.map(x => `<div class="fila alerta">${esc(x)}${x.por ? `<small>${esc(x.por)}</small>` : ''}</div>`).join('');
@@ -398,11 +412,11 @@ function pintarInfo(refresco) {
   }
   if (sel.tipo !== 'resumen') h = `<button class="fila" id="aResumen" style="color:var(--azul)">‹ Volver</button>` + h;
   $('#infoT').textContent = t; k.innerHTML = h; k.scrollTop = y;
-  const ar = $('#aResumen'); if (ar) ar.onclick = () => elegir({ tipo: 'resumen' });
+  const ar = $('#aResumen'); if (ar) ar.onclick = () => elegir(sel.tipo === 'estado' ? { tipo: 'cerrado', cuarto: 'cerrado' } : { tipo: 'resumen' });
 }
 
 $('#infoC').addEventListener('click', e => {
-  { const r = e.target.closest('[data-cuarto]'); if (r) return elegir({ tipo: r.dataset.cuarto, cuarto: r.dataset.cuarto }); }
+  { const r = e.target.closest('[data-cuarto]'); if (r) return elegir({ tipo: r.dataset.ver || r.dataset.cuarto, cuarto: r.dataset.cuarto }); }
   const b = e.target.closest('[data-abre],[data-llamada]'); if (!b) return;
   if (b.dataset.llamada) return T.verLlamada(b.dataset.llamada);
   try { T.abrir(JSON.parse(b.dataset.abre)); } catch (x) {}

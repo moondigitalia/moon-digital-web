@@ -41,7 +41,8 @@ http.createServer((q,r)=>{
   else if(d.accion==='quienes')o.usuarios=[{id:'daniel',nombre:'Daniel',correo:'ta•••@gmail.com',tieneClave:true},{id:'dan',nombre:'Dan',tieneClave:false,correo:'da•••@hotmail.com'},{id:'kid',nombre:'Kid',tieneClave:true,correo:'ca•••@gmail.com'}];
   else if(d.accion==='entrar'||d.accion==='crear_clave')o.sesion='x'.repeat(43);
   else if(d.accion==='uso'){const hoy=new Date();o.cifras={hoy:3,semana:17,mes:58,personas:41,total:58};o.porDia=Array.from({length:28},(_,i)=>({d:new Date(Date.now()-5*36e5-i*864e5).toISOString().slice(0,10),n:(i*7)%9}));o.ultimos=Array.from({length:40},(_,i)=>({id:i+1,fecha:ahora,quien:i%3?'99'+String(i).padStart(8,'0'):'anon-'+i,canal:['llamada','chat','voz'][i%3],resumen:'Preguntó por los horarios de inscripción y el costo de la colegiatura '+i,datos:JSON.stringify({nombre:'Persona '+i,interes:'Licenciatura'})}));o.conectado=true;}
-  else if(d.accion==='subir_inicio'){o.id='a-'+Math.random().toString(16).slice(2,14).padEnd(12,'0');PARTES[o.id]=[];documentos.push({id:o.id,tel:d.tel,seccion:d.seccion,orden:9,titulo:d.titulo||d.nombre,frase:'',url:'',formato:'archivo',mime:d.mime,nombre:d.nombre,oculto:1});}
+  else if(d.accion==='subir_inicio'&&d.seccion==='recibido'&&documentos.some(x=>x.tel===d.tel&&x.nombre===d.nombre&&!x.oculto)&&!d.repetir){o={ok:false,error:'repetido'};}
+  else if(d.accion==='subir_inicio'){o.id='a-'+Math.random().toString(16).slice(2,14).padEnd(12,'0');PARTES[o.id]=[];documentos.push({id:o.id,tel:d.tel,seccion:d.seccion,orden:9,titulo:d.titulo||d.nombre,frase:d.frase||'',url:'',formato:'archivo',mime:d.mime,nombre:d.nombre,oculto:1,creado:new Date().toISOString(),subio:'kid'});}
   else if(d.accion==='subir_parte'){PARTES[d.id][d.n]=d.datos;}
   else if(d.accion==='subir_fin'){const x=documentos.find(y=>y.id===d.id);if(x)delete x.oculto;}
   else if(d.accion==='archivo_parte'){o.datos=(PARTES[d.id]||[])[d.n];if(o.datos==null)o.ok=false;}

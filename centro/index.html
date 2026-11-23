@@ -927,7 +927,7 @@ function pinta(silencioso) {
   if (window.Oficina) Oficina.esconder();
   if (!c) return esEmb() ? pintaInicioEmbajador(silencioso) : pintaInicio(silencioso);
   if (c.tipo === 'documento') setTimeout(() => ponOpcionesDoc(c), 0);
-  ({ tareas: capaTareas, tarea: capaTarea, nuevaTarea: capaNuevaTarea, crm: capaCRM, crmLista: capaCRMLista, editarContacto: capaEditarContacto, subir: capaSubir, ficha: capaFicha, nuevoCliente: capaNuevoCliente, proyectos: capaProyectos, proyecto: capaProyecto, nuevoProyecto: capaProyecto, equipo: capaEquipo, moon: capaMoon, lector: capaLector, clientes: capaClientes, cliente: capaFicha, seccion: capaSeccion, documento: capaDocumento, casa: capaCasa, demo: capaDemo, nota: capaNota, editarProyecto: capaProyecto, qr: capaQR, cuenta: capaCuenta, frase: capaFrase, foto: capaFoto, docOpciones: capaDocOpciones, emProspectos: capaEmProspectos, emComisiones: capaEmComisiones, emMaterial: capaEmMaterial, emCuenta: capaEmCuenta, embajador: capaEmbajador, comision: capaComision, bitacora: capaBitacora, papelera: capaPapelera, llamadas: capaLlamadas, citas: capaCitas, cita: capaCita })[c.tipo](c, silencioso);
+  ({ tareas: capaTareas, tarea: capaTarea, nuevaTarea: capaNuevaTarea, crm: capaCRM, crmLista: capaCRMLista, editarContacto: capaEditarContacto, subir: capaSubir, archivero: capaArchivero, ficha: capaFicha, nuevoCliente: capaNuevoCliente, proyectos: capaProyectos, proyecto: capaProyecto, nuevoProyecto: capaProyecto, equipo: capaEquipo, moon: capaMoon, lector: capaLector, clientes: capaClientes, cliente: capaFicha, seccion: capaSeccion, documento: capaDocumento, casa: capaCasa, demo: capaDemo, nota: capaNota, editarProyecto: capaProyecto, qr: capaQR, cuenta: capaCuenta, frase: capaFrase, foto: capaFoto, docOpciones: capaDocOpciones, emProspectos: capaEmProspectos, emComisiones: capaEmComisiones, emMaterial: capaEmMaterial, emCuenta: capaEmCuenta, embajador: capaEmbajador, comision: capaComision, bitacora: capaBitacora, papelera: capaPapelera, llamadas: capaLlamadas, citas: capaCitas, cita: capaCita })[c.tipo](c, silencioso);
 }
 let oficinaMontada = false;
 async function pideOficina(url, accion, datos) {
@@ -1297,7 +1297,7 @@ async function capaFicha(c, sil) {
   const pan = (D.paneles || []).find(x => x.tel === c.tel), E = ETAPA[P.etapa || 'pendiente'] || ETAPA.pendiente;
   const tel = String(P.telefono || '').replace(/\D/g, ''), paga = PAGAN.includes(P.etapa);
   const orden = SECCIONES.map(x => x[0]);
-  const docs = (D.documentos || []).filter(d => d.tel === c.tel).sort((x, y) => orden.indexOf(x.seccion) - orden.indexOf(y.seccion) || (x.orden || 0) - (y.orden || 0));
+  const docs = (D.documentos || []).filter(d => d.tel === c.tel).sort((x, y) => orden.indexOf(x.seccion) - orden.indexOf(y.seccion) || (x.seccion === 'recibido' ? (y.orden || 0) - (x.orden || 0) : (x.orden || 0) - (y.orden || 0)));   // lo que llegó: lo más nuevo arriba
   const nomSec = k => (SECCIONES.find(x => x[0] === k) || [k, ''])[1];
   const util = v => v !== '' && v != null && !/^otros?$/i.test(String(v).trim());
   const datos = [['Negocio', P.negocio], ['Teléfono', P.telefono], ['Correo', P.correo], ['Giro', P.giro], ['Servicio', P.servicio], ['Llegó por', P.origen], ['Necesita', P.necesidad], ['Volumen', P.volumen], ['Urgencia', P.urgencia], ['Decide', P.decide], ['Cita', P.proxima_cita]].filter(x => util(x[1]));
@@ -1308,7 +1308,7 @@ async function capaFicha(c, sil) {
       ${pan ? `<div class="demo f-demo" style="--c:${pan.color};min-height:clamp(250px,40vh,340px)"><div class="demo-logo">${icono(pan.imagen ? Object.assign({}, pan, { icono: pan.imagen }) : pan, P, 0)}</div>
         <div class="demo-info"><span class="eti">Su demo</span><b>${esc(nombreCorto(P))}</b><span>${esc(dominio(pan.demo))}</span></div>
         <div class="demo-botones"><button class="boton demo-boton" id="demo">Abrir demo ${I.abre}</button><button class="redondo demo-enviar" id="demoEnviar" aria-label="Enviar el demo" title="Enviar el demo">${I.enviar}</button></div></div>` : ''}
-      ${docs.length ? `<div><span class="eti">Archivos</span><div class="lista" style="margin-top:6px">${docs.map(d => `<button class="fila chica" data-doc="${esc(d.id)}"><span class="estado" style="--c:var(--cobalto);--cf:var(--azulf)">${esc(nomSec(d.seccion))}</span><span class="q"><b>${esc(d.titulo)}</b>${d.frase ? `<span>${esc(d.frase)}</span>` : ''}</span><span class="flecha-f">${I.der}</span></button>`).join('')}</div></div>` : ''}
+      ${docs.length ? `<div><span class="eti">Archivos</span><div class="lista" style="margin-top:6px">${docs.map(d => `<button class="fila chica" data-doc="${esc(d.id)}"><span class="estado" style="--c:var(--cobalto);--cf:var(--azulf)">${esc(nomSec(d.seccion))}</span><span class="q"><b>${esc(d.titulo)}</b>${d.resumen || d.frase ? `<span>${esc(d.resumen || d.frase)}</span>` : ''}</span><span class="flecha-f">${I.der}</span></button>`).join('')}</div></div>` : ''}
       <div class="f-bloque"><span class="eti">¿En qué va?</span><div class="f-etapas" id="etapas">${Object.keys(ETAPA).map(e => `<button class="${(P.etapa || 'pendiente') === e ? 'on' : ''}" data-e="${e}" style="--c:${ETAPA[e].c};--cf:${ETAPA[e].cf}">${ETAPA[e].n}</button>`).join('')}</div></div>
       ${P.notas_equipo ? `<div><span class="eti">Nota del equipo</span><button class="nota" id="nota" style="display:block;width:100%;margin-top:6px;height:auto;overflow:visible;text-align:start;font:inherit;font-weight:600">${esc(P.notas_equipo)}</button></div>` : '<button class="boton dos" id="nota">Escribir una nota</button>'}
       ${datos.length ? `<div><span class="eti">Datos</span><div class="lista" style="margin-top:6px">${datos.map(([k, v]) => `<div class="fila chica" style="cursor:default;grid-template-columns:100px minmax(0,1fr)"><span class="eti" style="letter-spacing:.1em">${esc(k)}</span><span class="q"><b style="font-weight:600">${esc(v)}</b></span></div>`).join('')}</div></div>` : ''}
@@ -1689,7 +1689,7 @@ function pintaUso(c, p) {
 }
 
 /* ---------- Clientes: un panel por cliente con lo que se le enseña ---------- */
-const SECCIONES = [['propuesta', 'Propuesta', 'Aún no hay propuesta'], ['contrato', 'Contrato', 'Aún no hay contrato'], ['material', 'Material', 'Aún no hay material'], ['avance', 'Avance', 'Aún no hay avance']];
+const SECCIONES = [['recibido', 'Llegó', 'Aún no llega nada'], ['propuesta', 'Propuesta', 'Aún no hay propuesta'], ['contrato', 'Contrato', 'Aún no hay contrato'], ['material', 'Material', 'Aún no hay material'], ['avance', 'Avance', 'Aún no hay avance']];
 function nombreCorto(per) { return per ? (per.negocio || per.nombre || '').replace(/\s*\(.*\)\s*/g, ' ').trim() : ''; }
 function panelesCliente() { return (D.paneles || []).filter(p => p.tel !== 'moon').map(p => ({ p, per: personaDe(p.tel) })).filter(x => x.per); }
 const docsDe = (tel, sec) => (D.documentos || []).filter(d => d.tel === tel && (!sec || d.seccion === sec));
@@ -1766,6 +1766,97 @@ function activarRects(tel, secciones) {
   });
 }
 const SECCIONES_MOON = [['presentacion', 'Presentación de MOON'], ['pagina', 'Página web de MOON'], ['bienvenida', 'Bienvenida de Jason']];
+// Sube un archivo en pedazos; si un pedazo no cabe, se parte a la mitad y se reintenta (funciona con cualquier internet).
+// Regresa cuántos pedazos subió (-1 si no pudo).
+async function subirPartes(id, f, avance) {
+  const bytes = new Uint8Array(await f.arrayBuffer());
+  let pos = 0, n = 0, tam = 600000, fallas = 0;
+  while (pos < bytes.length) {
+    const trozo = bytes.subarray(pos, Math.min(bytes.length, pos + tam));
+    let b = ''; for (let i = 0; i < trozo.length; i += 32768) b += String.fromCharCode.apply(null, trozo.subarray(i, i + 32768));
+    const r = await api('subir_parte', { id, n, datos: btoa(b) }).catch(() => ({ ok: false }));
+    if (!r.ok) {   // no cupo o se cortó el internet: pedazo más chico, una pausa y otra vez (hasta 6 veces seguidas)
+      if (++fallas > 6) return -1;
+      if (tam > 40000) tam = Math.floor(tam / 2);
+      await new Promise(ok => setTimeout(ok, 700 * fallas)); continue;
+    }
+    fallas = 0; pos += trozo.length; n++; avance(Math.round(pos / bytes.length * 100));
+  }
+  return n;
+}
+// ARCHIVERO (Kid, 23-nov-2026): lo que llega por WhatsApp (fotos, videos, audios, PDF, Word, Excel…) se sube aquí, con
+// un solo dato: para quién es. Todo cae en un mismo montón ("Llegó") en la ficha de esa persona; Claude lo lee y lo explica.
+const MAX_ARCHIVO = 25e6;
+// ¿Para quién es? = el buscador del CRM (Kid, 23-nov-2026: "mientras escribes, ya salen los que llevan esas letras").
+// Sin escribir: MOON y los clientes que pagan (máximo 4 renglones, sin scroll). Al elegir, queda uno solo y se puede cambiar.
+const TOPE_PARA = 3;
+function paraQuien(q) {
+  const pan = tel => (D.paneles || []).find(x => x.tel === tel);
+  const peso = p => PAGAN.includes(p.etapa) ? 0 : p.etapa === 'en proceso' ? 1 : 2;
+  const moon = { tel: 'moon', n: 'MOON (interno)', d: 'Lo del equipo' };
+  const gente = reales().slice().sort((a, b) => peso(a) - peso(b) || (pan(b.tel) ? 1 : 0) - (pan(a.tel) ? 1 : 0) || nombreDe(a).localeCompare(nombreDe(b)))
+    .map(p => ({ tel: p.tel, n: nombreCorto(p) || nombreDe(p), d: (ETAPA[p.etapa] || ETAPA.pendiente).n + (p.negocio && p.nombre ? ' · ' + p.nombre : ''), p }));
+  if (!q) return [moon].concat(gente.filter(x => PAGAN.includes(x.p.etapa))).slice(0, TOPE_PARA);
+  const digitos = q.replace(/\D/g, '');
+  return [moon].concat(gente).filter(x => sinAcento(x.tel === 'moon' ? 'moon interno nosotros equipo' : [x.p.nombre, x.p.negocio, x.p.notas_equipo].join(' ')).includes(q)
+    || (digitos.length >= 3 && x.p && String(x.p.telefono || '').replace(/\D/g, '').includes(digitos))).slice(0, TOPE_PARA);
+}
+function capaArchivero(c) {
+  c.para = c.para || '';
+  marco('Subir al Archivero', '', `<form class="hoja editando pasos" id="f" novalidate style="align-self:start">
+    <div><div class="eti" style="margin-bottom:8px">¿Para quién es?</div><div id="paraZona"></div></div>
+    <label class="campo-foto"><span class="cf-vista">${I.subir}</span><span><b id="archNombre">Elegir archivos</b><small>Fotos, videos, audios, PDF, Word, Excel · varios a la vez</small></span><input type="file" id="arch" multiple hidden></label>
+    <label class="et-campo">¿Para qué es? (opcional)<input class="campo" id="frase" maxlength="160" enterkeyhint="done" placeholder="Ejemplo: fotos para su página"></label>
+    <button class="boton" id="subirBtn">Subir</button><div class="aviso" id="aviso" role="status"></div></form>`, I.subir);
+  const aviso = document.getElementById('aviso'), inp = document.getElementById('arch'), zona = document.getElementById('paraZona');
+  const nombrePara = tel => tel === 'moon' ? 'MOON (interno)' : (nombreCorto(personaDe(tel)) || nombreDe(personaDe(tel)));
+  const una = 'white-space:nowrap;overflow:hidden;text-overflow:ellipsis';   // un renglón por nombre: la lista nunca empuja el botón
+  const fila = x => `<button type="button" class="fila chica" data-t="${esc(x.tel)}" title="${esc(x.n)}"><span class="q" style="min-width:0"><b style="${una}">${esc(x.n)}</b><span style="${una}">${esc(x.d)}</span></span></button>`;
+  const pinta = () => {
+    if (c.para) {   // ya elegido: un solo renglón, con "Cambiar"
+      zona.innerHTML = `<div class="fila chica on" style="cursor:default;grid-template-columns:minmax(0,1fr) auto"><span class="q" style="min-width:0"><b style="${una}">${esc(nombrePara(c.para))}</b><span>Aquí se va a guardar</span></span><button type="button" class="pilita" id="cambiarPara">Cambiar</button></div>`;
+      document.getElementById('cambiarPara').onclick = () => { c.para = ''; c.q = ''; pinta(); const b = document.getElementById('buscaPara'); if (b) b.focus(); };
+      return;
+    }
+    zona.innerHTML = `<label class="buscador">${I.lupa}<input id="buscaPara" placeholder="Escribe el nombre o el teléfono" enterkeyhint="search" autocomplete="off"></label><div class="lista" id="paraRes" style="margin-top:8px"></div>`;
+    const b = document.getElementById('buscaPara'), res = document.getElementById('paraRes');
+    const lista = () => { c.q = b.value; const q = sinAcento(b.value.trim()), l = paraQuien(q);
+      res.innerHTML = l.length ? l.map(fila).join('') : `<div class="fila chica" style="cursor:default"><span class="q"><b>Nadie con “${esc(b.value.trim())}”</b><span>Prueba con otra parte del nombre. Si es alguien nuevo, primero agrégalo en el CRM.</span></span></div>`;
+      res.querySelectorAll('[data-t]').forEach(x => x.onclick = () => { c.para = x.dataset.t; aviso.textContent = ''; pinta(); });
+      if (l.length === TOPE_PARA && !c.alto) c.alto = res.offsetHeight;   // con menos resultados, el espacio se queda: nada se mueve
+      res.style.minHeight = c.alto ? c.alto + 'px' : ''; };
+    b.value = c.q || ''; b.oninput = lista; b.onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); const x = res.querySelector('[data-t]'); if (x) x.click(); } };
+    lista();
+  };
+  pinta();
+  inp.onchange = () => { const n = inp.files.length; document.getElementById('archNombre').textContent = !n ? 'Elegir archivos' : n === 1 ? inp.files[0].name : `${n} archivos elegidos`; aviso.textContent = ''; };
+  document.getElementById('f').onsubmit = async e => {
+    e.preventDefault();
+    const fs = Array.from(inp.files || []), frase = document.getElementById('frase').value.trim();
+    if (!c.para) { aviso.textContent = 'Primero elige para quién es.'; return; }
+    if (!fs.length) { aviso.textContent = 'Primero elige los archivos.'; return; }
+    const btn = document.getElementById('subirBtn'); btn.disabled = true;
+    const hechos = [], grandes = [], repetidos = [], fallaron = [];
+    for (let i = 0; i < fs.length; i++) {
+      const f = fs[i], cual = fs.length > 1 ? `${i + 1} de ${fs.length}: ` : '';
+      if (f.size > MAX_ARCHIVO) { grandes.push(f.name); continue; }
+      aviso.textContent = cual + 'Preparando…';
+      const ini = await api('subir_inicio', { tel: c.para, seccion: 'recibido', titulo: f.name.replace(/\.[^.]+$/, ''), frase, nombre: f.name, mime: f.type, tamano: f.size });
+      if (!ini.ok) { (ini.error === 'repetido' ? repetidos : fallaron).push(f.name); continue; }
+      const n = await subirPartes(ini.id, f, p => { aviso.textContent = `${cual}Subiendo… ${p}%`; });
+      const fin = n < 0 ? { ok: false } : await api('subir_fin', { id: ini.id, partes: n });
+      (fin.ok ? hechos : fallaron).push(f.name);
+    }
+    if (hechos.length) await recargar();
+    const quien = nombrePara(c.para);
+    const malas = [grandes.length ? `${grandes.length === 1 ? 'Uno pesa' : grandes.length + ' pesan'} más de 25 MB: ${grandes.join(', ')}. Mándalo como video más corto o comprimido.` : '',
+      repetidos.length ? `Ya estaba${repetidos.length === 1 ? '' : 'n'}: ${repetidos.join(', ')}.` : '',
+      fallaron.length ? `No se pudo${fallaron.length === 1 ? '' : 'ieron'} subir: ${fallaron.join(', ')}. Revisa tu internet e intenta de nuevo.` : ''].filter(Boolean).join(' ');
+    if (!malas) { avisoFlotante(`Listo: ${hechos.length === 1 ? 'ya está' : `${hechos.length} archivos están`} en el Archivero, para ${quien}.`); cerrar(); return; }
+    aviso.textContent = (hechos.length ? `Se subi${hechos.length === 1 ? 'ó 1' : 'eron ' + hechos.length} para ${quien}. ` : '') + malas;
+    btn.disabled = false;
+  };
+}
 function capaSubir(c) {
   const moon = c.tel === 'moon', per = personaDe(c.tel); if (!moon && !per) return cerrar();
   const secs = moon ? SECCIONES_MOON : SECCIONES;
@@ -1786,16 +1877,8 @@ function capaSubir(c) {
     const btn = document.getElementById('subirBtn'); btn.disabled = true; aviso.textContent = 'Preparando…';
     const ini = await api('subir_inicio', { tel: c.tel, seccion: c.sec, titulo: tit.value, nombre: f.name, mime: f.type, tamano: f.size });
     if (!ini.ok) { aviso.textContent = 'No se pudo empezar. Revisa tu internet y vuelve a intentar.'; btn.disabled = false; return; }
-    const bytes = new Uint8Array(await f.arrayBuffer());
-    // Va en pedazos; si un pedazo no cabe, se parte a la mitad y se reintenta (funciona con cualquier internet).
-    let pos = 0, n = 0, tam = 600000;
-    while (pos < bytes.length) {
-      const trozo = bytes.subarray(pos, Math.min(bytes.length, pos + tam));
-      let b = ''; for (let i = 0; i < trozo.length; i += 32768) b += String.fromCharCode.apply(null, trozo.subarray(i, i + 32768));
-      const r = await api('subir_parte', { id: ini.id, n, datos: btoa(b) });
-      if (!r.ok) { if (tam > 40000) { tam = Math.floor(tam / 2); continue; } aviso.textContent = 'Se cortó la subida. Revisa tu internet y vuelve a intentar.'; btn.disabled = false; return; }
-      pos += trozo.length; n++; aviso.textContent = `Subiendo… ${Math.round(pos / bytes.length * 100)}%`;
-    }
+    const n = await subirPartes(ini.id, f, p => { aviso.textContent = `Subiendo… ${p}%`; });
+    if (n < 0) { aviso.textContent = 'Se cortó la subida. Revisa tu internet y vuelve a intentar.'; btn.disabled = false; return; }
     const fin = await api('subir_fin', { id: ini.id, partes: n, reemplaza: c.reemplaza || '' });
     if (!fin.ok) { aviso.textContent = 'No se pudo terminar. Vuelve a intentar.'; btn.disabled = false; return; }
     await recargar(); avisoFlotante(viejo ? 'Listo: archivo cambiado' : 'Listo: ya está en ' + (secs.find(x => x[0] === c.sec) || [, ''])[1] + '.');
@@ -2376,7 +2459,7 @@ const RECORRIDO = 'centro.moon.recorrido';
 // El recorrido de los socios es sobre la Oficina (el mapa): un cuarto a la vez, con qué es y para qué sirve.
 const PASOS_SOCIO = [
   ['#oficina', 'La oficina', 'Es MOON en un mapa: cada cuarto es una parte del negocio. Toca un cuarto o un monito y abajo te explica qué es.'],
-  ['.cuarto[data-c="cerrado"]', 'Estado', 'Cómo va MOON: lo que hay que atender, lo que pagamos cada mes y lo que gastan los asistentes.'],
+  ['.cuarto[data-c="cerrado"]', 'Archivero', 'Lo que nos mandan los clientes por WhatsApp se sube aquí: solo eliges para quién es y Claude te explica qué es. También está cómo va MOON.'],
   ['.cuarto[data-c="recepcion"]', 'Jason', 'Nuestro recepcionista: llámale, ve sus llamadas y las citas que apartó con el asesor.'],
   ['.cuarto[data-c="crm"]', 'CRM', 'Todas las personas que nos han buscado, ordenadas por en qué van.'],
   ['.cuarto[data-c="clientes"]', 'Clientes que pagan', 'Sus asistentes y la ficha de cada cliente: contrato, documentos y cuánto lo usan.'],
