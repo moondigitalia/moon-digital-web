@@ -10,6 +10,15 @@ function quien(req) {
   return igual(req.headers['x-clave'], process.env.JASON_CLAVE) ? 'sistema' : null;
 }
 
+// El teléfono SIEMPRE va al inicio del resumen, aunque ya esté en el CRM (Kid, 24-nov-2026: "es lo más importante,
+// lo tienes que ver luego luego"). Jason no siempre lo dice; aquí se pone solo. Formato: +52 998 123 4567.
+const telBonito = tel => '+52 ' + tel.slice(0, 3) + ' ' + tel.slice(3, 6) + ' ' + tel.slice(6);
+function conTel(resumen, tel) {
+  if (!tel || !/^\d{10}$/.test(tel)) return resumen;
+  if (String(resumen || '').replace(/\D/g, '').includes(tel)) return resumen;   // ya lo trae
+  return ('Tel. ' + telBonito(tel) + (resumen ? ' · ' + resumen : '')).slice(0, 420);
+}
+
 // --- Registrar un contacto (lo usa la agenda de Jason; después WhatsApp y cuestionarios) ---
 async function registrar(d) {
   const tel = clave10(d.tel);
@@ -56,15 +65,16 @@ async function registrar(d) {
   for (const k in x) if (x[k] !== '' && x[k] != null) datos[k] = t(x[k], 600);
   const pesos = { cita: 3, recado: 2 };
   const tipoFinal = viejo && (pesos[viejo.tipo] || 0) > (pesos[tipo] || 0) ? viejo.tipo : tipo;
-  const resumen = t(d.resumen || x.resumen || x.necesidad || '', 400);
+  // Si esta parte de la llamada no trae resumen, se conserva el que ya había; luego se le asegura el teléfono.
+  const resumen = conTel(t(d.resumen || x.resumen || x.necesidad || '', 400) || (viejo ? viejo.resumen || '' : ''), tel);
   await sql('INSERT OR REPLACE INTO contactos (id, tel, canal, tipo, fecha, resumen, datos) VALUES (?,?,?,?,?,?,?)',
-    [id, tel, canal, tipoFinal, fecha, resumen || (viejo ? viejo.resumen || '' : ''), JSON.stringify(datos).slice(0, 8000)]);
+    [id, tel, canal, tipoFinal, fecha, resumen, JSON.stringify(datos).slice(0, 8000)]);
   await sql('UPDATE personas SET contactos = (SELECT COUNT(*) FROM contactos WHERE tel = ?), creado = MIN(COALESCE(creado, ?), ?) WHERE tel = ?', [tel, fecha, fecha, tel]);
   // Cada contacto con Jason también es "uso" del proyecto de Jason (pestaña Uso del Centro).
   await sql(`INSERT INTO uso (proyecto, fecha, quien, canal, resumen, datos, ref)
              SELECT id, ?, ?, ?, ?, ?, ? FROM proyectos WHERE clave = 'jason' LIMIT 1
              ON CONFLICT(ref) DO UPDATE SET resumen = excluded.resumen, datos = excluded.datos`,
-    [fecha, tel, canal, resumen || (viejo ? viejo.resumen || '' : ''), JSON.stringify(datos).slice(0, 6000), 'contacto:' + id]).catch(e => console.log('USO-JASON', e.message));
+    [fecha, tel, canal, resumen, JSON.stringify(datos).slice(0, 6000), 'contacto:' + id]).catch(e => console.log('USO-JASON', e.message));
   return { ok: true, tel, nueva: !prev, etapa };
 }
 
