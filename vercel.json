@@ -7,7 +7,9 @@
       "includeFiles": "{api/_docs/**,api/_lib/**}"
     },
     "api/leer-negocio.js": {
-      "maxDuration": 60
+      "maxDuration": 60,
+      "memory": 2048,
+      "includeFiles": "node_modules/@sparticuz/chromium/bin/**"
     },
     "api/demo-eventos.js": {
       "includeFiles": "{api/_docs/**}"

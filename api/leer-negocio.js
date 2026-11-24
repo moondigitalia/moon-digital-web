@@ -5,6 +5,7 @@
 // Facebook e Instagram no se pueden leer (piden iniciar sesión): se le pide una foto o PDF.
 // Llave: ANTHROPIC_LLAVE en Vercel. Tope: LECTURAS_DIA por día para que nadie dispare el gasto.
 const { sql, t } = require('./_base');
+const { leerConNavegador } = require('./_navegador');
 
 const MODELOS = ['claude-haiku-5-5', 'claude-haiku-4-5'];   // si el primero no existe en la cuenta, se usa el segundo
 const LECTURAS_DIA = 150;
@@ -138,10 +139,17 @@ async function leerSitio(entrada) {
   let texto = 'Página: ' + p.final + '\n' + aTexto(p.html);
   const extra = await Promise.all(enlacesUtiles(p.html, p.final).map(u => traer(u, 5000).then(x => x ? '\n\nPágina: ' + x.final + '\n' + aTexto(x.html) : '')));
   texto = (texto + extra.join('')).slice(0, MAX_TEXTO);
-  // Página hecha con código (React, Vite, Lovable…): el texto se saca del archivo de código.
+  // Página hecha con código (React, Vite, Lovable…): llega casi vacía.
+  // 1) Se abre con un navegador de verdad y se lee lo que ve un visitante (incluye listas que cargan aparte).
+  // 2) Si el navegador no pudo, se saca el texto del archivo de código. Las dos cosas corren al mismo tiempo.
   if (texto.replace(/\s/g, '').length < 800) {
-    const delCodigo = await textoDelCodigo(p.html, p.final).catch(() => '');
-    if (delCodigo) texto = (texto + '\n\nTexto de la página (sacado de su código; puede traer textos del sistema, como avisos o meses en inglés: usa solo lo que sea del negocio):\n' + delCodigo).slice(0, MAX_TEXTO);
+    const [vista, delCodigo] = await Promise.all([leerConNavegador(p.final, 25000).catch(() => null), textoDelCodigo(p.html, p.final).catch(() => '')]);
+    const visto = vista && vista.texto.replace(/\s+\n/g, '\n').trim();
+    if (visto && visto.replace(/\s/g, '').length >= 300) {
+      texto = ('Página: ' + vista.final + '\n' + [vista.titulo && 'Título: ' + vista.titulo, vista.desc && 'Descripción: ' + vista.desc].filter(Boolean).join('\n') + '\n' + visto).slice(0, MAX_TEXTO);
+    } else if (delCodigo) {
+      texto = (texto + '\n\nTexto de la página (sacado de su código; puede traer textos del sistema, como avisos o meses en inglés: usa solo lo que sea del negocio):\n' + delCodigo).slice(0, MAX_TEXTO);
+    }
   }
   // Si aun así casi no hay texto, se pide foto o PDF.
   if (texto.replace(/\s/g, '').length < 300) return { error: 'poco_texto' };

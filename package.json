@@ -1,0 +1,10 @@
+{
+  "name": "moon-digital-web",
+  "private": true,
+  "description": "moondigitalia.com: páginas y funciones de MOON Digital. Las dependencias son solo para el lector de páginas con navegador (api/_navegador.js).",
+  "engines": { "node": "24.x" },
+  "dependencies": {
+    "@sparticuz/chromium": "153.0.0",
+    "puppeteer-core": "25.12.0"
+  }
+}
