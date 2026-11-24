@@ -14,6 +14,7 @@ function quien(req) {
 // lo tienes que ver luego luego"). Jason no siempre lo dice; aquí se pone solo. Formato: +52 998 123 4567.
 const telBonito = tel => '+52 ' + tel.slice(0, 3) + ' ' + tel.slice(3, 6) + ' ' + tel.slice(6);
 function conTel(resumen, tel) {
+  resumen = String(resumen || '').replace(/\bD[ií]yital\b/g, 'Digital');   // el resumen escribe el nombre como suena
   if (!tel || !/^\d{10}$/.test(tel)) return resumen;
   if (String(resumen || '').replace(/\D/g, '').includes(tel)) return resumen;   // ya lo trae
   return ('Tel. ' + telBonito(tel) + (resumen ? ' · ' + resumen : '')).slice(0, 420);
