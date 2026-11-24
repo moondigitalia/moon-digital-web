@@ -59,6 +59,74 @@ function enlacesUtiles(html, base) {
   return [...out];
 }
 
+// (24-nov-2026) Páginas hechas con React/Vite/Lovable: el HTML llega vacío y TODO el texto vive dentro del archivo de código.
+// En vez de pedir foto o PDF, se abre ese archivo y se sacan solo las frases humanas (no el código ni los nombres de estilos).
+// Recorre el código letra por letra (como lo leería el navegador) y junta cada texto entre comillas.
+// Buscar comillas "a lo bruto" se desfasa con un apóstrofo suelto y se pierden frases (pasó con "Lunes a Domingo").
+function textosDelCodigo(js) {
+  const out = []; const n = Math.min(js.length, 4000000); let i = 0, previo = '';
+  const puedeSerRegex = () => /[(,=:[!&|?{};+\-*%<>~^]$|^$/.test(previo) || /\b(return|typeof|case|do|else|in|of|void|yield|await|delete|throw|new)$/.test(previo);
+  const leerCadena = (q) => { let t = ''; i++; while (i < n) { const c = js[i]; if (c === '\\') { t += js.slice(i, i + 2); i += 2; continue; } if (c === q || (c === '\n' && q !== '`')) { i++; break; } t += c; i++; } return t; };
+  const pila = [];   // llaves abiertas dentro de ${ } de un texto con comillas invertidas
+  // Lee el cuerpo de un texto con comillas invertidas desde la posición actual, hasta su cierre o hasta un ${.
+  const leerPlantilla = () => { let t = ''; while (i < n) { const c = js[i]; if (c === '\\') { t += js.slice(i, i + 2); i += 2; continue; } if (c === '`') { i++; break; } if (c === '$' && js[i + 1] === '{') { i += 2; pila.push(0); break; } t += c; i++; } out.push(t); };
+  while (i < n) {
+    const c = js[i];
+    if (c === '"' || c === "'") { out.push(leerCadena(c)); previo = 'x'; continue; }
+    if (c === '`') { i++; leerPlantilla(); previo = 'x'; continue; }
+    if (pila.length && c === '{') { pila[pila.length - 1]++; i++; previo = '{'; continue; }
+    if (pila.length && c === '}') { if (pila[pila.length - 1] === 0) { pila.pop(); i++; leerPlantilla(); previo = 'x'; continue; } pila[pila.length - 1]--; i++; previo = '}'; continue; }
+    if (c === '/' && js[i + 1] === '/') { while (i < n && js[i] !== '\n') i++; continue; }
+    if (c === '/' && js[i + 1] === '*') { const k = js.indexOf('*/', i + 2); i = k < 0 ? n : k + 2; continue; }
+    if (c === '/' && puedeSerRegex()) { i++; let clase = false; while (i < n) { const d = js[i]; if (d === '\\') { i += 2; continue; } if (d === '[') clase = true; else if (d === ']') clase = false; else if (d === '/' && !clase) { i++; break; } else if (d === '\n') break; i++; } while (/[a-z]/i.test(js[i] || '')) i++; previo = 'x'; continue; }
+    if (/\s/.test(c)) { i++; continue; }
+    if (/[\w$]/.test(c)) { let k = i; while (k < n && /[\w$]/.test(js[k])) k++; previo = js.slice(i, k); i = k; continue; }
+    previo = c; i++;
+  }
+  return out;
+}
+function frasesDelCodigo(js) {
+  const out = new Set();
+  for (const crudo of textosDelCodigo(js)) {
+    if (crudo.length < 3 || crudo.length > 1500) continue;
+    const x = crudo.replace(/\\n/g, ' ').replace(/\\u([0-9a-f]{4})/gi, (_, h) => String.fromCharCode(parseInt(h, 16))).replace(/\\(.)/g, '$1').replace(/\s+/g, ' ').trim();
+    if (x.length < 3 || out.has(x)) continue;
+    if (/[{};=<>|]|=>|&&|\bfunction\b|\breturn\b|\bconst\b|\bnull\b|\bundefined\b|^https?:|^\/|\.(js|css|png|jpe?g|svg|webp)\b|^[a-z]+[A-Z]\w*$/.test(x)) continue;
+    const palabras = x.split(' ');
+    const tecnicas = palabras.map(w => w.replace(/[.,:;!?)"']+$/, '')).filter(w => /[-:\/\[\]#_.@]/.test(w) && !/^\$?[\d.,]+$/.test(w)).length;
+    if (tecnicas / palabras.length > 0.3) continue;                                    // nombres de estilos ("flex items-center")
+    const conLetras = palabras.filter(w => /^[¡¿("'$]?[A-Za-zÁÉÍÓÚÜÑáéíóúüñ$\d][A-Za-zÁÉÍÓÚÜÑáéíóúüñ\d.,!?¡¿:;%'")·$-]*$/.test(w)).length;
+    if (conLetras / palabras.length < 0.8) continue;
+    const precio = /\$\s?\d/.test(x);
+    if (palabras.length < 2 && !precio && !/^[A-ZÁÉÍÓÚÑ][a-záéíóúñ]{3,}$/.test(x)) continue;  // palabras sueltas solo si son nombre o precio
+    out.add(x);
+  }
+  return [...out].join('\n');
+}
+async function textoDelCodigo(html, base) {
+  const host = new URL(base).host;
+  const srcs = [...html.matchAll(/<script[^>]+src=["']([^"']+)["']/gi)].map(m => { try { return new URL(m[1], base); } catch (e) { return null; } })
+    .filter(u => u && u.host === host && /\.m?js(\?|$)/.test(u.pathname)).slice(0, 3);
+  const leidos = new Set(), partes = [];
+  const bajar = async u => {
+    if (leidos.has(u.href) || leidos.size >= 10) return null; leidos.add(u.href);
+    const c = new AbortController(); const reloj = setTimeout(() => c.abort(), 6000);
+    try { const r = await fetch(u.href, { signal: c.signal, headers: { 'User-Agent': 'Mozilla/5.0 (compatible; MOON-Digital-lector/1.0)' } }); return r.ok ? (await r.text()).slice(0, 4000000) : null; }
+    catch (e) { return null; } finally { clearTimeout(reloj); }
+  };
+  // Todo a la vez (no uno tras otro) para no pasarnos del tiempo: a lo mucho ~12 s extra.
+  await Promise.all(srcs.map(async u => {
+    const js = await bajar(u); if (!js) return;
+    partes.push(frasesDelCodigo(js));
+    // Las secciones que se cargan aparte (otras páginas del sitio) vienen en archivos vecinos.
+    const vecinos = [...js.matchAll(/["'`](\.{0,2}\/?(?:assets\/)?[\w.-]+\.js)["'`]/g)].map(m => { try { return new URL(m[1], u); } catch (e) { return null; } })
+      .filter(v => v && v.host === host && !leidos.has(v.href)).slice(0, 7);
+    const mas = await Promise.all(vecinos.map(bajar));
+    mas.forEach(x => x && partes.push(frasesDelCodigo(x)));
+  }));
+  return partes.join('\n');
+}
+
 async function leerSitio(entrada) {
   let url = String(entrada || '').trim();
   if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
@@ -70,7 +138,12 @@ async function leerSitio(entrada) {
   let texto = 'Página: ' + p.final + '\n' + aTexto(p.html);
   const extra = await Promise.all(enlacesUtiles(p.html, p.final).map(u => traer(u, 5000).then(x => x ? '\n\nPágina: ' + x.final + '\n' + aTexto(x.html) : '')));
   texto = (texto + extra.join('')).slice(0, MAX_TEXTO);
-  // Páginas hechas solo con código (sin texto real) no se pueden leer sin un navegador: se pide foto o PDF.
+  // Página hecha con código (React, Vite, Lovable…): el texto se saca del archivo de código.
+  if (texto.replace(/\s/g, '').length < 800) {
+    const delCodigo = await textoDelCodigo(p.html, p.final).catch(() => '');
+    if (delCodigo) texto = (texto + '\n\nTexto de la página (sacado de su código; puede traer textos del sistema, como avisos o meses en inglés: usa solo lo que sea del negocio):\n' + delCodigo).slice(0, MAX_TEXTO);
+  }
+  // Si aun así casi no hay texto, se pide foto o PDF.
   if (texto.replace(/\s/g, '').length < 300) return { error: 'poco_texto' };
   return { texto };
 }
