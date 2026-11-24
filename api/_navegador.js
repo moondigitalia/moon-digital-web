@@ -9,10 +9,11 @@ async function leerConNavegador(url, ms) {
   const limite = ms || 22000, inicio = Date.now();
   let navegador = null;
   try {
-    const puppeteer = require('puppeteer-core');
+    // import() y no require(): en Vercel estos paquetes solo cargan así.
+    const pp = await import('puppeteer-core'); const puppeteer = pp.default || pp;
     let ruta = process.env.CHROME_RUTA, args = ['--no-sandbox', '--disable-dev-shm-usage'];
     if (!ruta) {
-      const m = require('@sparticuz/chromium'); const chromium = m.default || m;
+      const m = await import('@sparticuz/chromium'); const chromium = m.default || m;
       ruta = await chromium.executablePath();
       args = chromium.args;
     }
