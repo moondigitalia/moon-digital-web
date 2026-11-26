@@ -19,7 +19,7 @@ const CATALOGO = {
   dentxlife: {
     voz: VOZ_JASON,
     frases: {
-      '01': { toma: 1, mostrar: 'Hola, Doctora. Soy Jason, de MOON Digital. Gracias por tu confianza.' },
+      '01': { toma: 2, mostrar: 'Hola, Doctora. Soy Jason, de MOON Digital. Gracias por tu confianza.' },
       '02': { toma: 1, mostrar: 'Con tus respuestas preparamos la recepcionista de Dentxlife. Si alguna no la sabes, no pasa nada.' },
       '13': { toma: 1, mostrar: 'Si un paciente pregunta precios, ¿qué quieres que diga tu recepcionista?' },
     },
