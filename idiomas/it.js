@@ -9,7 +9,7 @@
  "calc": {
   "titulo_pagina": "Quanto ti costano le chiamate perse",
   "titulo": "Quanto ti costano le [chiamate senza risposta]",
-  "q1": "Chiamate perse al giorno",
+  "q1": "Chiamate perse a settimana",
   "q1_ayuda": "Conta quelle di notte, nel weekend e quando sei occupato.",
   "q2": "Il minimo che chiedi per un lavoro",
   "q3": "Su 10 che ti chiamano, quanti ti danno il lavoro?",

@@ -9,7 +9,7 @@
  "calc": {
   "titulo_pagina": "Was dich verpasste Anrufe kosten",
   "titulo": "Was dich [unbeantwortete Anrufe] kosten",
-  "q1": "Verpasste Anrufe pro Tag",
+  "q1": "Verpasste Anrufe pro Woche",
   "q1_ayuda": "Zähl Nächte, Wochenenden und volle Tage mit.",
   "q2": "Dein Mindestpreis für einen Auftrag",
   "q3": "Von 10 Anrufern: Wie viele beauftragen dich?",

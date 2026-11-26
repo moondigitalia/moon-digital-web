@@ -9,7 +9,7 @@
  "calc": {
   "titulo_pagina": "Lo que te cuestan las llamadas perdidas",
   "titulo": "Lo que te cuestan las [llamadas que no contestas]",
-  "q1": "Llamadas que no contestas al día",
+  "q1": "Llamadas que se pierden a la semana",
   "q1_ayuda": "Cuenta las de la noche, el fin de semana y cuando estás ocupado.",
   "q2": "Lo menos que cobras por un trabajo",
   "q3": "De cada 10 que te llaman, ¿cuántos te contratan?",

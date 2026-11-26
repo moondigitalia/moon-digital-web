@@ -88,7 +88,7 @@ html.dentro.ancho .lado{grid-row:1}
     <div class="q">
       <div class="q-cab"><label for="r1" data-t="calc.q1"></label><output id="o1" for="r1"></output></div>
       <p class="ayuda" data-t="calc.q1_ayuda"></p>
-      <input type="range" id="r1" min="0" max="40" step="1" value="3">
+      <input type="range" id="r1" min="0" max="200" step="1" value="20">
     </div>
     <div class="q">
       <div class="q-cab"><label for="r2" data-t="calc.q2"></label><output id="o2" for="r2"></output></div>
@@ -124,7 +124,9 @@ html.dentro.ancho .lado{grid-row:1}
 
   function calcula() {
     var llamadas = +$('r1').value, precio = PRECIOS[+$('r2').value], de10 = +$('r3').value;
-    var mes = llamadas * 30, trabajos = llamadas * 3 * de10, pierde = trabajos * precio;
+    // (26-nov-2026, Daniel) la barra es por SEMANA: es lo que el dueño contesta en la presentación ("¿cuántas se te pasaron la semana pasada?").
+    // Un mes = 52 semanas / 12 meses = 4.33 semanas.
+    var mes = Math.round(llamadas * 52 / 12), trabajos = Math.round(mes * de10 / 10), pierde = trabajos * precio;
     $('o1').textContent = num.format(llamadas);
     $('o2').innerHTML = dinero(precio);
     $('o3').textContent = KVI.t('calc.q3_valor', { n: num.format(de10) });
@@ -151,7 +153,7 @@ html.dentro.ancho .lado{grid-row:1}
     var ancho = innerWidth >= 700 && innerWidth > innerHeight * 1.05;
     document.documentElement.classList.toggle('ancho', ancho);
     var r = [+$('r1').value, +$('r2').value, +$('r3').value];
-    $('r1').value = 40; $('r2').value = PRECIOS.length - 1; $('r3').value = 10; calcula();   // la cifra más larga
+    $('r1').value = $('r1').max; $('r2').value = PRECIOS.length - 1; $('r3').value = 10; calcula();   // la cifra más larga
     var salidas = ['o1', 'o2', 'o3'].map(function (id) { var o = $(id); o.style.minWidth = ''; return o; });
     /* se empieza grande (que llene la pantalla, sin aire de sobra) y se baja hasta que cabe */
     var k = ancho ? Math.min(innerWidth / 880, 2.2) : Math.min(innerWidth / 330, 1.7);

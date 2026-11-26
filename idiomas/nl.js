@@ -9,7 +9,7 @@
  "calc": {
   "titulo_pagina": "Wat gemiste oproepen je kosten",
   "titulo": "Wat [onbeantwoorde oproepen] je kosten",
-  "q1": "Gemiste oproepen per dag",
+  "q1": "Gemiste oproepen per week",
   "q1_ayuda": "Tel 's avonds, het weekend en drukke momenten mee.",
   "q2": "Het minste dat je voor een klus vraagt",
   "q3": "Hoeveel van de 10 bellers huren je in?",

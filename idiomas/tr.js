@@ -9,7 +9,7 @@
  "calc": {
   "titulo_pagina": "Kaçan aramaların sana maliyeti",
   "titulo": "[Açamadığın aramaların] sana maliyeti",
-  "q1": "Günde açamadığın aramalar",
+  "q1": "Haftada açamadığın aramalar",
   "q1_ayuda": "Gece, hafta sonu ve meşgulken gelenleri de say.",
   "q2": "Bir iş için aldığın en düşük ücret",
   "q3": "Arayan 10 kişiden kaçı işi sana veriyor?",

@@ -9,7 +9,7 @@
  "calc": {
   "titulo_pagina": "Quanto custam as ligações perdidas",
   "titulo": "Quanto custam as [ligações que você não atende]",
-  "q1": "Ligações que você não atende por dia",
+  "q1": "Ligações que você não atende por semana",
   "q1_ayuda": "Conte as da noite, do fim de semana e de quando está ocupado.",
   "q2": "O mínimo que você cobra por um serviço",
   "q3": "De cada 10 que ligam, quantos te contratam?",

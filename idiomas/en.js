@@ -9,7 +9,7 @@
  "calc": {
   "titulo_pagina": "What missed calls cost you",
   "titulo": "What [unanswered calls] cost you",
-  "q1": "Calls you miss per day",
+  "q1": "Calls you miss per week",
   "q1_ayuda": "Count nights, weekends and when you're busy.",
   "q2": "The least you charge for a job",
   "q3": "Out of 10 callers, how many hire you?",

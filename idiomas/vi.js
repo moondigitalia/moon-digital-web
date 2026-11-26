@@ -9,7 +9,7 @@
  "calc": {
   "titulo_pagina": "Cuộc gọi nhỡ khiến bạn mất bao nhiêu",
   "titulo": "Bạn mất bao nhiêu vì [cuộc gọi không nghe]",
-  "q1": "Cuộc gọi bạn không nghe mỗi ngày",
+  "q1": "Cuộc gọi bạn không nghe mỗi tuần",
   "q1_ayuda": "Tính cả buổi tối, cuối tuần và lúc bạn bận.",
   "q2": "Giá thấp nhất cho một việc",
   "q3": "10 người gọi, bao nhiêu người thuê bạn?",

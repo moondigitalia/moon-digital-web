@@ -9,7 +9,7 @@
  "calc": {
   "titulo_pagina": "Ile kosztują cię nieodebrane połączenia",
   "titulo": "Ile kosztują cię [nieodebrane połączenia]",
-  "q1": "Nieodebrane połączenia dziennie",
+  "q1": "Nieodebrane połączenia tygodniowo",
   "q1_ayuda": "Policz te w nocy, w weekend i gdy jesteś zajęty.",
   "q2": "Najmniej, ile bierzesz za zlecenie",
   "q3": "Ilu z 10 dzwoniących daje ci zlecenie?",

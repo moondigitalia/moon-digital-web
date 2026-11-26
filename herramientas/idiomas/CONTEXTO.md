@@ -14,7 +14,7 @@ Se leen y escriben con `herramientas/idiomas/dic.py` (`dic.leer(lang)`, `dic.esc
 8. Árabe: solo traduce; el volteo de derecha a izquierda lo hace la página.
 
 ## Glosario
-- **Calculadora (`calc.*`)**: el dueño de un negocio (muchas veces de oficio: plomero, electricista, taller) mueve tres barras: cuántas llamadas no contesta al día, lo menos que cobra por un trabajo, y de cada 10 que le llaman cuántos lo contratan. Ve cuánto dinero se le va al mes. "Contratar" = que el cliente lo contrata para un trabajo (no "reservar").
+- **Calculadora (`calc.*`)**: el dueño de un negocio (muchas veces de oficio: plomero, electricista, taller) mueve tres barras: cuántas llamadas se le pierden a la semana (la misma pregunta de la presentación: "¿cuántas se te pasaron la semana pasada?"), lo menos que cobra por un trabajo, y de cada 10 que le llaman cuántos lo contratan. Ve cuánto dinero se le va al mes. "Contratar" = que el cliente lo contrata para un trabajo (no "reservar").
 - **Presentación (`pres.*`)**: láminas que un vendedor de MOON enseña al dueño: quiénes somos, el problema de no contestar fuera de horario, preguntas para el dueño, ejemplos de cuánto pesa, comparación entre una persona recepcionista y un recepcionista con inteligencia artificial, y al final un demo para probarlo.
 - **Recepcionista con IA**: asistente con inteligencia artificial que contesta las llamadas del negocio.
 - **Respeto**: el dueño es el experto en su negocio. Nada debe sonar a regaño ni a que no sabe.

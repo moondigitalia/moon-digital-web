@@ -9,7 +9,7 @@
  "calc": {
   "titulo_pagina": "Ce que te coûtent les appels manqués",
   "titulo": "Ce que te coûtent les [appels sans réponse]",
-  "q1": "Appels manqués par jour",
+  "q1": "Appels manqués par semaine",
   "q1_ayuda": "Compte ceux du soir, du week-end et quand tu es occupé.",
   "q2": "Ton prix minimum pour un travail",
   "q3": "Sur 10 qui t'appellent, combien t'engagent ?",

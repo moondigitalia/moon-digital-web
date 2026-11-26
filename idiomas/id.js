@@ -9,7 +9,7 @@
  "calc": {
   "titulo_pagina": "Kerugian dari telepon tak terjawab",
   "titulo": "Kerugian dari [telepon yang tak kamu angkat]",
-  "q1": "Telepon tak terangkat per hari",
+  "q1": "Telepon tak terangkat per minggu",
   "q1_ayuda": "Hitung juga yang malam, akhir pekan, dan saat kamu sibuk.",
   "q2": "Tarif terendahmu per pekerjaan",
   "q3": "Dari 10 penelepon, berapa yang memakai jasamu?",
