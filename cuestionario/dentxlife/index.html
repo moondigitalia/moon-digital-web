@@ -59,6 +59,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--azul);color:var(
 .inicio .lleno{width:min(72vw,300px);font-size:19px}
 /* Muchas opciones cortas: dos columnas, para que todo quepa sin scroll */
 .rejilla{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.rejilla .boton:last-child:nth-child(odd){grid-column:1/-1}
 .rejilla .boton{min-height:48px;padding:8px 14px;font-size:16px;justify-content:center;text-align:center}
 textarea,input{width:100%;border-radius:22px;border:2px solid var(--blanco);background:rgba(255,255,255,.08);
   color:var(--blanco);font:500 18px/1.4 var(--letra);padding:14px 18px;outline:none}
