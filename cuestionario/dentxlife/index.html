@@ -415,6 +415,8 @@ button:focus-visible,textarea:focus-visible,input:focus-visible{outline:3px soli
   function empezar(){
     desbloquear();
     var fin = PANTALLAS[PANTALLAS.length - 1];
+    var salto = REVISAR && (location.search.match(/[?&]ir=([0-9a-z]+)/) || [])[1];
+    if (salto && porClave(salto)) return ir(porClave(salto));
     if (estado.completo) return ir(fin);
     var p = porClave(estado.pila[estado.pila.length - 1]);
     if (p) estado.pila.pop();
