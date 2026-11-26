@@ -20,6 +20,10 @@
   },
   "rewrites": [
     {
+      "source": "/cuestionario/:cliente",
+      "destination": "/cuestionario/:cliente/index.html"
+    },
+    {
       "source": "/privacidad",
       "destination": "https://jason.moondigitalia.workers.dev/api/privacidad"
     },

@@ -6,7 +6,7 @@
 // Necesita dos variables PROPIAS de MOON en este proyecto de Vercel: CF_ACCOUNT_ID y CF_D1_TOKEN (llave "moon-cuestionarios",
 // permiso "D1 Edit"). Nunca se usan llaves de un proyecto de cliente.
 const BASE = '815fc6e5-71ed-4f8c-b7e2-4e66615e8688'; // moon-cuestionarios
-const PERMITIDOS = /^https:\/\/moon-digital-web(-[a-z0-9-]+)?\.vercel\.app$|^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
+const PERMITIDOS = /^https:\/\/(www\.)?moondigitalia\.com$|^https:\/\/moon-digital-web(-[a-z0-9-]+)?\.vercel\.app$|^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
 const NOMBRE = /^[a-z0-9-]{1,40}$/;
 
 // Números largos (tarjetas, cuentas) se tapan antes de guardarse: nunca deben vivir en el buzón.
