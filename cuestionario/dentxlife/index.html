@@ -17,25 +17,24 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@500;600;700&display=swap">
 <style>
-/* MUESTRA (25-nov-2026): pantallas 0, 1, 2 y 13 del cuestionario de Dentxlife, con la voz de Jason y karaoke.
+/* CUESTIONARIO CON VOZ (25-nov-2026). Jason dice cada pregunta y cada palabra se ilumina al decirla.
    Reglas de Kid: sin scroll, letra grande que una persona de más de 50 lea sin esfuerzo, nada brinca,
-   cada pregunta máximo 4 renglones, el cambio de pantalla es un fundido (la anterior se desvanece encima de la nueva). */
+   cada pregunta máximo 4 renglones, el cambio de pantalla es un fundido (la anterior se desvanece encima de la nueva).
+   Cada respuesta se guarda en el momento (en el celular y en la base de MOON): si cierra, sigue donde se quedó. */
 :root{--azul:#0c347c;--blanco:#ffffff;--tenue:rgba(255,255,255,.42);--linea:rgba(255,255,255,.55);
   --letra:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;height:100%;overflow:hidden;background:var(--azul);color:var(--blanco);font-family:var(--letra)}
-/* El marco mide lo que de verdad se ve (teclado incluido): la página nunca se recorre. */
 #marco{position:fixed;left:0;top:0;width:100%;height:100dvh;overflow:hidden}
 .pantalla{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--azul);
-  padding:max(12px,env(safe-area-inset-top)) 20px max(20px,env(safe-area-inset-bottom))}
+  padding:max(12px,env(safe-area-inset-top)) 20px max(20px,env(safe-area-inset-bottom));max-width:560px;margin:0 auto}
 .pantalla.sale{z-index:2;transition:opacity .38s ease;pointer-events:none}
 .pantalla.sale.ya{opacity:0}
 
-/* Pantalla 0: el logo al centro, con aire, y un solo botón */
-.inicio{align-items:center;justify-content:center;gap:clamp(40px,9vh,72px)}
-.inicio img{width:min(58vw,260px);height:auto;display:block}
+/* Inicio: el logo al centro, chico y con mucho aire, y un solo botón */
+.inicio{align-items:center;justify-content:center;gap:clamp(56px,12vh,96px)}
+.inicio img{width:min(42vw,180px);height:auto;display:block}
 
-/* Barra de arriba: atrás · avance · silenciar y repetir */
 .barra{display:flex;align-items:center;justify-content:space-between;height:52px;flex:none}
 .icono{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:56px;background:none;border:0;color:var(--blanco);
   font:600 12px/1 var(--letra);padding:6px 4px;cursor:pointer;border-radius:12px}
@@ -45,30 +44,36 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--azul);color:var(
 .avance{height:5px;border-radius:5px;background:rgba(255,255,255,.22);flex:none;overflow:hidden}
 .avance i{display:block;height:100%;background:var(--blanco);border-radius:5px}
 
-/* La pregunta: lugar fijo para 4 renglones, así nada se mueve cuando cambia el texto */
-.pregunta{flex:none;margin:22px 0 0;min-height:calc(4 * 1.3em);font:700 clamp(22px,6.2vw,27px)/1.3 var(--letra);letter-spacing:-.005em}
+.pregunta{flex:none;margin:22px 0 0;font:700 clamp(22px,6.2vw,27px)/1.3 var(--letra);letter-spacing:-.005em}
 .pregunta span{transition:color .12s linear}
 .pregunta.hablando span{color:var(--tenue)}
 .pregunta.hablando span.dicha{color:var(--blanco)}
 
-/* Respuestas */
 .respuestas{flex:1;display:flex;flex-direction:column;justify-content:flex-start;gap:10px;min-height:0;padding-top:20px}
 .boton{width:100%;min-height:56px;border-radius:999px;border:2px solid var(--linea);background:transparent;color:var(--blanco);
   font:600 18px/1.25 var(--letra);padding:12px 22px;text-align:left;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer}
 .boton .sug{font:600 13px/1 var(--letra);border:1.5px solid currentColor;border-radius:999px;padding:5px 9px;flex:none}
 .boton.elegido{background:var(--blanco);border-color:var(--blanco);color:var(--azul)}
 .lleno{background:var(--blanco);border-color:var(--blanco);color:var(--azul);justify-content:center;text-align:center;font-weight:700}
+.lleno[disabled]{opacity:.45;cursor:default}
 .inicio .lleno{width:min(72vw,300px);font-size:19px}
-textarea{width:100%;min-height:96px;resize:none;border-radius:22px;border:2px solid var(--blanco);background:rgba(255,255,255,.08);
+/* Muchas opciones cortas: dos columnas, para que todo quepa sin scroll */
+.rejilla{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.rejilla .boton{min-height:48px;padding:8px 14px;font-size:16px;justify-content:center;text-align:center}
+textarea,input{width:100%;border-radius:22px;border:2px solid var(--blanco);background:rgba(255,255,255,.08);
   color:var(--blanco);font:500 18px/1.4 var(--letra);padding:14px 18px;outline:none}
-textarea::placeholder{color:rgba(255,255,255,.72)}
+textarea{min-height:96px;resize:none}
+input{min-height:56px;border-radius:999px;color-scheme:dark}
+textarea::placeholder,input::placeholder{color:rgba(255,255,255,.72)}
+.par{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.par label{display:grid;gap:6px;font:600 15px/1.2 var(--letra)}
+.par input{padding:12px 14px;font-size:17px}
 .mini{background:none;border:0;color:var(--blanco);font:600 15px/1 var(--letra);text-decoration:underline;align-self:center;padding:10px;cursor:pointer}
 /* Con el teclado abierto solo queda lo indispensable: la pregunta, lo que escribe y "Siguiente". */
-#marco.teclado .respuestas .boton.elegido,#marco.teclado .mini{display:none}
+#marco.teclado .respuestas .boton.elegido,#marco.teclado .mini,#marco.teclado .atajo{display:none}
 #marco.teclado textarea{min-height:72px}
 #marco.teclado .pregunta{margin-top:10px}
-.nota{font:500 18px/1.45 var(--letra);margin:24px 0 0}
-button:focus-visible,textarea:focus-visible{outline:3px solid var(--blanco);outline-offset:3px}
+button:focus-visible,textarea:focus-visible,input:focus-visible{outline:3px solid var(--blanco);outline-offset:3px}
 </style>
 </head>
 <body>
@@ -76,158 +81,143 @@ button:focus-visible,textarea:focus-visible{outline:3px solid var(--blanco);outl
 
 <script>
 (function(){
-  // Las frases (iguales a api/_voces/catalogo.js). Si la voz no llega, el texto sale igual y nunca se atora.
+  var CLIENTE = 'dentxlife', CUESTIONARIO = 'recepcionista-v1', VOCES = 'dentxlife';
+  var REVISAR = /[?&]revisar\b/.test(location.search); // Para que MOON escuche todo: muestra todas las pantallas y no guarda nada.
+  var GUARDADO = 'moon-cuestionario-dentxlife-v1';
+
+  // Ayudas para escribir las opciones
+  function O(t, mas){ var o = { t: t }; for (var k in (mas || {})) o[k] = mas[k]; return o; }
+  var OTRO = O('Otro', { escribir: 'Escribe cuál' });
+  var NO_SE = O('No estoy segura');
+  function cubre(){ var r = estado.crudo['20']; return REVISAR || (r && !r.atajo && r.texto); }
+
+  // Las pantallas, en orden. Los textos son los mismos que dice Jason (api/_voces/catalogo.js).
   var PANTALLAS = [
     { id: 'inicio' },
-    { id: '01', texto: 'Hola, Doctora. Soy Jason, de MOON Digital. Gracias por tu confianza.', tipo: 'va' },
-    { id: '02', texto: 'Con tus respuestas preparamos la recepcionista de Dentxlife. Si alguna no la sabes, no pasa nada.', tipo: 'va' },
-    { id: '13', texto: 'Si un paciente pregunta precios, ¿qué quieres que diga tu recepcionista?', tipo: 'opciones', opciones: [
-      { t: 'Precio de la valoración y lo demás en consulta', sug: true },
-      { t: 'Rangos de precios', escribir: 'Escribe los rangos. Ejemplo: limpieza de 500 a 800 pesos' },
-      { t: 'No da precios' },
-      { t: 'Otro', escribir: 'Escribe qué quieres que diga' } ] },
-    { id: 'fin', texto: 'Hasta aquí llega la muestra. Así se verán y escucharán todas las preguntas.' }
+    { id: '01', tipo: 'va', texto: 'Hola, Doctora. Soy Jason, de MOON Digital. Gracias por tu confianza.' },
+    { id: '02', tipo: 'va', texto: 'Con tus respuestas preparamos la recepcionista de Dentxlife. Si alguna no la sabes, no pasa nada.' },
+    { id: '03', tipo: 'texto', texto: '¿Cuál es la dirección? Agrega referencias y si hay estacionamiento.', ph: 'Ejemplo: Calle 5 #120, frente al parque. Hay estacionamiento en la calle.' },
+    { id: '04', tipo: 'texto', texto: '¿Tienes página web, Instagram o Facebook? Pega los links aquí.', ph: 'Pega aquí tus links', atajos: ['No tengo'] },
+    { id: '05', tipo: 'texto', texto: '¿Quiénes atienden en tu consultorio? Escribe nombre y especialidad de cada uno.', ph: 'Ejemplo: Dra. Ana López, odontología general' },
+    { id: '06', tipo: 'varios', texto: '¿Qué días abres?', opciones: ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'].map(function(d){ return O(d); }) },
+    { id: '07', tipo: 'uno', texto: 'Nos dijiste que atiendes de 11 a 1 y de 4 a 7:30. ¿Es igual esos días?', opciones: [O('Sí'), O('Cambia', { escribir: 'Escribe cómo cambia. Ejemplo: sábados de 9 a 2' })] },
+    { id: '08', tipo: 'texto', texto: '¿Cuál es tu nombre completo o el nombre fiscal del consultorio? Es para tu aviso de privacidad.', ph: 'Nombre completo o nombre fiscal' },
+    { id: '09', tipo: 'varios', texto: '¿Qué tratamientos haces? Puedes marcar varios.', opciones: ['Limpieza','Resinas','Extracciones','Endodoncia','Ortodoncia','Blanqueamiento','Coronas','Implantes','Prótesis','Odontopediatría','Otro'].map(function(d){ return O(d); }) },
+    { id: '10', tipo: 'uno', texto: '¿Cuánto dura la primera cita, la de valoración?', opciones: [O('30 minutos'), O('45 minutos'), O('1 hora'), O('Otro', { escribir: 'Escribe cuánto dura' }), NO_SE] },
+    { id: '11', tipo: 'uno', texto: '¿Y cuánto dura una cita de seguimiento?', opciones: [O('30 minutos'), O('45 minutos'), O('1 hora'), O('Otro', { escribir: 'Escribe cuánto dura' }), NO_SE] },
+    { id: '12', tipo: 'uno', texto: '¿La valoración tiene costo?', opciones: [O('Es gratis'), O('Sí tiene costo', { escribir: 'Escribe cuánto cuesta' })] },
+    { id: '13', tipo: 'uno', texto: 'Si un paciente pregunta precios, ¿qué quieres que diga tu recepcionista?', opciones: [
+      O('Precio de la valoración y lo demás en consulta', { sug: true }),
+      O('Rangos de precios', { escribir: 'Escribe los rangos. Ejemplo: limpieza de 500 a 800 pesos' }),
+      O('No da precios'), O('Otro', { escribir: 'Escribe qué quieres que diga' })] },
+    { id: '14', tipo: 'varios', texto: '¿Qué formas de pago aceptas?', opciones: ['Efectivo','Tarjeta','Transferencia','Meses sin intereses','Otro'].map(function(d){ return O(d); }) },
+    { id: '15', tipo: 'uno', texto: '¿Das factura?', opciones: [O('Sí'), O('No')] },
+    { id: '16', tipo: 'uno', texto: '¿Aceptas seguros dentales?', opciones: [O('No'), O('Sí', { escribir: 'Escribe cuáles seguros' })] },
+    { id: '17', tipo: 'uno', texto: 'Hoy, ¿dónde anotas tus citas? Las pasamos a tu agenda nueva.', opciones: [O('Google Calendar'), O('Doctoralia'), O('App del celular'), O('Libreta'), OTRO] },
+    { id: '18', tipo: 'uno', texto: '¿Tu recepcionista agenda sola, o aparta la cita y tú la confirmas?', opciones: [O('Agenda sola', { sug: true }), O('Aparta la cita y yo la confirmo')] },
+    { id: '19', tipo: 'uno', texto: 'Si alguien quiere cambiar o cancelar su cita, ¿qué hace tu recepcionista?', opciones: [O('La cambia ella'), O('Me avisa a mí')] },
+    { id: '20', tipo: 'texto', texto: '¿Alguien te cubre las urgencias cuando no estás? Escribe su nombre y teléfono.', ph: 'Ejemplo: Dr. Luis Pérez, 229 123 4567', atajos: ['Nadie'] },
+    { id: '21', tipo: 'uno', texto: 'Si llama alguien con dolor fuerte, hinchazón o sangrado, ¿qué hace tu recepcionista?', opciones: [
+      O('Da la cita más cercana'), O('Me pasa la llamada'), O('Da el número de quien me cubre', { si: cubre }), O('Otro', { escribir: 'Escribe qué hace' })] },
+    { id: '21b', tipo: 'tel', texto: '¿A qué número te la pasamos? De preferencia, tu celular personal.', si: function(){ return REVISAR || (estado.crudo['21'] || {}).opcion === 'Me pasa la llamada'; } },
+    { id: '22', tipo: 'texto', texto: 'Tu recepcionista nunca da diagnósticos. ¿Hay algo más que nunca deba decir?', ph: 'Escribe aquí', atajos: ['No, es todo'] },
+    { id: '23', tipo: 'texto', texto: '¿Qué es lo que más te preguntan tus pacientes, y cómo lo contestas?', ph: 'Ejemplo: ¿Cuánto cuesta una limpieza? Les digo que…' },
+    { id: '24', tipo: 'fechas', texto: '¿Desde qué día y hasta qué día cierra el consultorio por vacaciones?' },
+    { id: '25', tipo: 'uno', texto: 'Mientras no estás, ¿tu recepcionista agenda para tu regreso o solo toma recados?', opciones: [O('Agenda para mi regreso'), O('Toma recados'), O('Otro', { escribir: 'Escribe qué hace' })] },
+    { id: '26', tipo: 'uno', texto: '¿Te gustó la voz de Sofía, la que escuchaste?', opciones: [O('Me quedo con Sofía'), O('Otra voz de mujer'), O('Voz de hombre')] },
+    { id: '26b', tipo: 'texto', texto: '¿Cómo quieres que se llame tu recepcionista?', ph: 'Nombre de tu recepcionista', si: function(){ return REVISAR || ((estado.crudo['26'] || {}).opcion && estado.crudo['26'].opcion !== 'Me quedo con Sofía'); } },
+    { id: '27', tipo: 'uno', texto: '¿Cómo trata a tus pacientes: de usted o de tú?', opciones: [O('De usted', { sug: true }), O('De tú')] },
+    { id: '28', tipo: 'uno', texto: '¿Cómo quieres que suene?', opciones: [O('Cálida y tranquila'), O('Alegre'), O('Formal'), OTRO] },
+    { id: '29', tipo: 'uno', texto: '¿Qué idiomas habla?', opciones: [O('Solo español'), O('También inglés'), OTRO] },
+    { id: '30', tipo: 'tel', texto: '¿A qué número llaman tus pacientes?' },
+    { id: '31', tipo: 'uno', texto: '¿De qué compañía es ese número?', opciones: [O('Telcel'), O('AT&T'), O('Movistar'), O('Telmex'), O('Izzi'), O('Totalplay'), OTRO, NO_SE] },
+    { id: '32', tipo: 'uno', texto: 'En ese número, ¿usas WhatsApp Business o WhatsApp normal?', opciones: [O('WhatsApp Business'), O('WhatsApp normal'), O('Mi WhatsApp es otro número', { escribir: 'Escribe el número de tu WhatsApp' }), NO_SE] },
+    { id: '33', tipo: 'uno', texto: 'Hoy, ¿quién contesta las llamadas?', opciones: [O('Yo'), O('Mi asistente'), OTRO] },
+    { id: '34', tipo: 'tel', texto: '¿A qué WhatsApp te mandamos los avisos de citas?', atajos: ['Al mismo del consultorio'] },
+    { id: '35', tipo: 'uno', texto: '¿Cuándo te avisamos? Todo queda guardado también en tu panel.', opciones: [O('Después de cada llamada'), O('Una vez al día'), O('Las dos')] },
+    { id: '35b', tipo: 'uno', texto: '¿A qué hora te mandamos el resumen del día?', si: function(){ var o = (estado.crudo['35'] || {}).opcion; return REVISAR || o === 'Una vez al día' || o === 'Las dos'; },
+      opciones: [O('Al cerrar, 8 pm', { sug: true }), O('En la mañana, 9 am'), O('Otra hora', { escribir: 'Escribe la hora' })] },
+    { id: '36', tipo: 'correo', texto: '¿Cuál es tu correo? Con él entras a tu panel.' },
+    { id: '37', tipo: 'uno', texto: '¿Alguien más ve tu panel?', opciones: [O('Solo yo'), O('También mi asistente', { escribir: 'Escribe su nombre y su correo' })] },
+    { id: '38', tipo: 'texto', texto: '¿Hay algo que no te preguntamos, o algo que quieras preguntarnos?', ph: 'Escribe aquí', atajos: ['No, es todo'], ultima: true },
+    { id: '39', tipo: 'fin', texto: 'Listo, Doctora. Gracias por tu tiempo. Ya nos llegaron tus respuestas.' }
   ];
-  var CUESTIONARIO = 'dentxlife';
+  var TOTAL = PANTALLAS.filter(function(p){ return !p.si && p.id !== 'inicio'; }).length;
+  // Pantalla que aparece cuando marcó "Otro" en una pregunta de varias opciones.
+  function pantallaOtro(padre){ return { id: 'otro', padre: padre.id, tipo: 'texto', texto: 'Escribe cuál es el otro, por favor.', ph: 'Escribe aquí' }; }
+
   var marco = document.getElementById('marco');
   var audio = new Audio(); audio.preload = 'auto';
-  var voces = {}, respuestas = {}, actual = -1, silencio = false, ocupado = false, raf = 0;
+  var voces = {}, silencio = false, ocupado = false, raf = 0, actual = null;
 
-  // El marco mide lo que de verdad se ve, también con el teclado abierto.
+  // Lo que lleva contestado (también si cierra y vuelve a abrir el link).
+  var estado = { sesion: '', crudo: {}, pila: [], completo: false };
+  if (!REVISAR) try { var g = JSON.parse(localStorage.getItem(GUARDADO) || 'null'); if (g) estado = g; } catch (e) {}
+  if (!estado.sesion) estado.sesion = Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+
+  // ---------- Guardar: en el celular al instante y en la base de MOON (reintenta solo si falla) ----------
+  var pendiente = false, temporizador = 0;
+  function guardarLocal(){ if (!REVISAR) try { localStorage.setItem(GUARDADO, JSON.stringify(estado)); } catch (e) {} }
+  function respuestasLegibles(){
+    var out = {};
+    PANTALLAS.forEach(function(p){
+      var r = estado.crudo[p.id]; if (!r) return;
+      var v = r.atajo || [r.opcion, r.lista && r.lista.join(', '), r.texto, r.otro && 'Otro: ' + r.otro].filter(Boolean).join(' · ');
+      out[p.id + '. ' + p.texto] = v;
+    });
+    return out;
+  }
+  function enviar(completo){
+    if (REVISAR) return Promise.resolve(true);
+    var cuerpo = { cliente: CLIENTE, cuestionario: CUESTIONARIO, sesion: estado.sesion, completo: !!completo, respuestas: respuestasLegibles() };
+    var ctrl = new AbortController(), t = setTimeout(function(){ ctrl.abort(); }, 12000);
+    return fetch('/api/cuestionario', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(cuerpo), signal: ctrl.signal })
+      .then(function(r){ clearTimeout(t); return r.json().then(function(j){ return r.ok && j.ok; }); })
+      .catch(function(){ return false; });
+  }
+  function guardar(){
+    guardarLocal(); pendiente = true; clearTimeout(temporizador);
+    temporizador = setTimeout(function intento(){
+      enviar(estado.completo).then(function(ok){ if (ok) pendiente = false; else temporizador = setTimeout(intento, 8000); });
+    }, 1200);
+  }
+  addEventListener('online', function(){ if (pendiente) guardar(); });
+  function esperar(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
+  function enviarHastaQueLlegue(){
+    var pausas = [0, 2000, 5000, 10000, 20000, 30000], i = 0;
+    return (function vuelta(){
+      return esperar(pausas[Math.min(i++, pausas.length - 1)]).then(function(){ return enviar(true); })
+        .then(function(ok){ return ok ? true : vuelta(); });
+    })();
+  }
+
+  // ---------- El marco mide lo que de verdad se ve, también con el teclado abierto ----------
   var altoSinTeclado = innerHeight;
   function medir(){
     var vv = window.visualViewport, alto = vv ? vv.height : innerHeight;
     marco.style.height = alto + 'px'; if (vv) marco.style.top = vv.offsetTop + 'px';
-    var escribiendo = document.activeElement && document.activeElement.tagName === 'TEXTAREA';
+    var a = document.activeElement, escribiendo = a && (a.tagName === 'TEXTAREA' || a.tagName === 'INPUT');
     if (!escribiendo) altoSinTeclado = Math.max(altoSinTeclado, alto);
-    marco.classList.toggle('teclado', escribiendo && alto < altoSinTeclado * 0.8);
+    marco.classList.toggle('teclado', !!escribiendo && alto < altoSinTeclado * 0.8);
   }
-  document.addEventListener('focusout', function(){ setTimeout(medir, 50); });
   if (window.visualViewport){ visualViewport.addEventListener('resize', medir); visualViewport.addEventListener('scroll', medir); }
-  addEventListener('resize', medir); medir();
+  addEventListener('resize', medir); document.addEventListener('focusout', function(){ setTimeout(medir, 50); }); medir();
 
-  // Pide la voz de una pantalla una sola vez (y la tiene lista antes de mostrarla).
+  // ---------- La voz ----------
+  function idVoz(p){ return p && p.tipo && p.texto ? p.id : null; }
   function pedirVoz(p){
-    if (!p || !p.texto || p.id === 'fin') return Promise.resolve(null);
-    if (voces[p.id]) return voces[p.id];
-    voces[p.id] = fetch('/api/voz?c=' + CUESTIONARIO + '&f=' + p.id).then(function(r){ return r.ok ? r.json() : null; })
+    var id = idVoz(p); if (!id) return Promise.resolve(null);
+    if (voces[id]) return voces[id];
+    voces[id] = fetch('/api/voz?c=' + VOCES + '&f=' + id).then(function(r){ return r.ok ? r.json() : null; })
       .then(function(j){
-        if (!j || !j.ok) return null;
+        if (!j || !j.ok) { voces[id] = null; return null; }
         var bin = atob(j.audio), b = new Uint8Array(bin.length);
         for (var i = 0; i < bin.length; i++) b[i] = bin.charCodeAt(i);
         return { url: URL.createObjectURL(new Blob([b], { type: 'audio/mpeg' })), palabras: j.palabras };
-      }).catch(function(){ voces[p.id] = null; return null; });
-    return voces[p.id];
+      }).catch(function(){ voces[id] = null; return null; });
+    return voces[id];
   }
-  function conTope(prom, ms){ return Promise.race([prom, new Promise(function(r){ setTimeout(function(){ r(null); }, ms); })]); }
-
-  var ICONOS = {
-    atras: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>',
-    voz: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5h3.5L12 5v14l-4.5-4.5H4z"/><path d="M15.5 9a4.5 4.5 0 0 1 0 6M18 6.5a8 8 0 0 1 0 11"/></svg>',
-    mudo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5h3.5L12 5v14l-4.5-4.5H4z"/><path d="M16 9.5l5 5M21 9.5l-5 5"/></svg>',
-    repetir: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v4.5h4.5"/></svg>'
-  };
-
-  function el(html){ var d = document.createElement('div'); d.innerHTML = html.trim(); return d.firstChild; }
-  function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]; }); }
-
-  function armar(i){
-    var p = PANTALLAS[i];
-    if (p.id === 'inicio'){
-      var s0 = el('<section class="pantalla inicio"><img src="/img/logo-blanco.webp" alt="MOON Digital" width="640" height="169"><button class="boton lleno" type="button">Empezar</button></section>');
-      s0.querySelector('button').onclick = function(){ ir(1); };
-      return s0;
-    }
-    var total = PANTALLAS.length - 2, paso = Math.min(i, total);
-    var s = el('<section class="pantalla">' +
-      '<div class="barra"><button class="icono" data-a="atras" type="button">' + ICONOS.atras + 'Atrás</button>' +
-      '<div class="grupo"><button class="icono" data-a="voz" type="button">' + (silencio ? ICONOS.mudo + 'Sin voz' : ICONOS.voz + 'Silenciar') + '</button>' +
-      '<button class="icono" data-a="repetir" type="button">' + ICONOS.repetir + 'Repetir</button></div></div>' +
-      '<div class="avance"><i style="width:' + Math.round(paso / total * 100) + '%"></i></div>' +
-      '<p class="pregunta">' + p.texto.split(' ').map(function(w){ return '<span>' + esc(w) + '</span>'; }).join(' ') + '</p>' +
-      '<div class="respuestas"></div></section>');
-    var r = s.querySelector('.respuestas');
-    if (p.tipo === 'va') r.appendChild(boton('Va', 'lleno', function(){ ir(i + 1); }));
-    if (p.tipo === 'opciones') p.opciones.forEach(function(o){
-      var b = boton(o.t, '', function(){ elegir(s, p, o, b, i); });
-      if (o.sug) b.insertAdjacentHTML('beforeend', '<span class="sug">Sugerido</span>');
-      if (respuestas[p.id] && respuestas[p.id].opcion === o.t) b.classList.add('elegido');
-      r.appendChild(b);
-    });
-    if (p.id === 'fin'){ r.appendChild(boton('Volver a empezar', 'lleno', function(){ respuestas = {}; ir(1); })); s.querySelector('[data-a="voz"]').hidden = true; s.querySelector('[data-a="repetir"]').hidden = true; }
-    s.querySelector('[data-a="atras"]').onclick = function(){ ir(i - 1 < 1 ? 0 : i - 1); };
-    s.querySelector('[data-a="voz"]').onclick = function(){ silencio = !silencio; audio.muted = silencio; this.innerHTML = silencio ? ICONOS.mudo + 'Sin voz' : ICONOS.voz + 'Silenciar'; if (silencio) iluminarTodo(s); };
-    s.querySelector('[data-a="repetir"]').onclick = function(){ hablar(s, p); };
-    return s;
-  }
-
-  function boton(t, clase, fn){ var b = el('<button class="boton ' + clase + '" type="button"></button>'); b.textContent = t; b.onclick = fn; return b; }
-
-  // Opciones: las de un toque avanzan solas; las que piden escribir abren su espacio en el mismo lugar.
-  function elegir(s, p, o, b, i){
-    if (ocupado) return;
-    s.querySelectorAll('.respuestas .boton').forEach(function(x){ x.classList.remove('elegido'); });
-    b.classList.add('elegido');
-    respuestas[p.id] = { opcion: o.t };
-    if (!o.escribir){ setTimeout(function(){ ir(i + 1); }, 260); return; }
-    var r = s.querySelector('.respuestas');
-    r.innerHTML = '';
-    r.appendChild(b);
-    var ta = el('<textarea rows="3"></textarea>'); ta.placeholder = o.escribir; ta.setAttribute('aria-label', o.escribir);
-    ta.oninput = function(){ respuestas[p.id].texto = ta.value; };
-    r.appendChild(ta);
-    r.appendChild(boton('Siguiente', 'lleno', function(){ ir(i + 1); }));
-    var cambiar = el('<button class="mini" type="button">Elegir otra opción</button>');
-    cambiar.onclick = function(){ var n = armar(i); s.replaceWith(n); };
-    r.appendChild(cambiar);
-    ta.focus();
-  }
-
-  function iluminarTodo(s){ cancelAnimationFrame(raf); var q = s.querySelector('.pregunta'); if (q) q.classList.remove('hablando'); }
-
-  // Jason dice la pregunta y cada palabra se ilumina justo cuando la dice; al terminar queda completa.
-  function hablar(s, p){
-    cancelAnimationFrame(raf); audio.pause();
-    var q = s.querySelector('.pregunta'); if (!q || !p.texto) return;
-    pedirVoz(p).then(function(v){
-      if (!v || silencio){ q.classList.remove('hablando'); return; }
-      var spans = q.querySelectorAll('span');
-      spans.forEach(function(x){ x.classList.remove('dicha'); });
-      audio.src = v.url; audio.currentTime = 0; audio.muted = silencio;
-      var pr = audio.play();
-      if (pr && pr.catch) pr.catch(function(){ q.classList.remove('hablando'); });
-      q.classList.add('hablando');
-      (function paso(){
-        var t = audio.currentTime;
-        v.palabras.forEach(function(w, k){ if (spans[k] && t >= w.ini - 0.03) spans[k].classList.add('dicha'); });
-        if (audio.ended || audio.paused && t > 0){ q.classList.remove('hablando'); return; }
-        raf = requestAnimationFrame(paso);
-      })();
-    });
-  }
-  audio.addEventListener('ended', function(){ var q = marco.querySelector('.pantalla:not(.sale) .pregunta'); if (q) q.classList.remove('hablando'); });
-
-  // Cambio de pantalla: la voz se pide ANTES; la nueva se arma completa debajo y la anterior se desvanece encima.
-  function ir(i){
-    if (ocupado || i < 0 || i >= PANTALLAS.length) return;
-    ocupado = true;
-    var p = PANTALLAS[i];
-    // El toque de "Empezar" es el que permite que la página hable (los celulares no dejan antes).
-    if (actual === 0) desbloquear();
-    conTope(pedirVoz(p), 4000).then(function(){
-      var vieja = marco.querySelector('.pantalla'), nueva = armar(i);
-      marco.appendChild(nueva);
-      actual = i;
-      pedirVoz(PANTALLAS[i + 1]);
-      if (vieja){
-        cancelAnimationFrame(raf); audio.pause();
-        vieja.classList.add('sale'); marco.appendChild(vieja);
-        requestAnimationFrame(function(){ requestAnimationFrame(function(){ vieja.classList.add('ya'); }); });
-        setTimeout(function(){ vieja.remove(); }, 420);
-      }
-      setTimeout(function(){ ocupado = false; hablar(nueva, p); }, vieja ? 380 : 0);
-    });
-  }
+  function conTope(prom, ms){ return Promise.race([prom, esperar(ms).then(function(){ return null; })]); }
 
   // Un silencio de un instante, tocado dentro del toque de "Empezar": desde ahí el celular deja hablar a Jason.
   function desbloquear(){
@@ -241,7 +231,220 @@ button:focus-visible,textarea:focus-visible{outline:3px solid var(--blanco);outl
     var pr = audio.play(); if (pr && pr.catch) pr.catch(function(){});
   }
 
-  marco.appendChild(armar(0)); actual = 0;
+  // Jason dice la pregunta y cada palabra se ilumina justo cuando la dice; al terminar queda completa.
+  function hablar(s, p){
+    cancelAnimationFrame(raf); audio.pause();
+    var q = s.querySelector('.pregunta'); if (!q) return;
+    pedirVoz(p).then(function(v){
+      if (!v || silencio || actual !== p){ q.classList.remove('hablando'); return; }
+      var spans = q.querySelectorAll('span');
+      spans.forEach(function(x){ x.classList.remove('dicha'); });
+      audio.src = v.url; audio.currentTime = 0; audio.muted = silencio;
+      var pr = audio.play(); if (pr && pr.catch) pr.catch(function(){ q.classList.remove('hablando'); });
+      q.classList.add('hablando');
+      (function paso(){
+        var t = audio.currentTime;
+        v.palabras.forEach(function(w, k){ if (spans[k] && t >= w.ini - 0.03) spans[k].classList.add('dicha'); });
+        if (audio.ended || (audio.paused && t > 0)){ q.classList.remove('hablando'); return; }
+        raf = requestAnimationFrame(paso);
+      })();
+    });
+  }
+  audio.addEventListener('ended', function(){ var q = marco.querySelector('.pantalla:not(.sale) .pregunta'); if (q) q.classList.remove('hablando'); });
+
+  // ---------- Armar cada pantalla ----------
+  var ICONOS = {
+    atras: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>',
+    voz: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5h3.5L12 5v14l-4.5-4.5H4z"/><path d="M15.5 9a4.5 4.5 0 0 1 0 6M18 6.5a8 8 0 0 1 0 11"/></svg>',
+    mudo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5h3.5L12 5v14l-4.5-4.5H4z"/><path d="M16 9.5l5 5M21 9.5l-5 5"/></svg>',
+    repetir: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v4.5h4.5"/></svg>'
+  };
+  function el(html){ var d = document.createElement('div'); d.innerHTML = html.trim(); return d.firstChild; }
+  function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]; }); }
+  function boton(t, clase, fn){ var b = el('<button class="boton ' + (clase || '') + '" type="button"></button>'); b.textContent = t; b.onclick = fn; return b; }
+  function posicion(p){ var i = PANTALLAS.indexOf(PANTALLAS.filter(function(x){ return x.id === (p.padre || p.id); })[0]); return PANTALLAS.slice(1, i + 1).filter(function(x){ return !x.si; }).length; }
+
+  function armar(p){
+    if (p.id === 'inicio'){
+      var s0 = el('<section class="pantalla inicio"><img src="/img/logo-blanco.webp" alt="MOON Digital" width="640" height="169"><button class="boton lleno" type="button">Empezar</button></section>');
+      s0.querySelector('button').onclick = empezar;
+      return s0;
+    }
+    var fin = p.tipo === 'fin';
+    var s = el('<section class="pantalla">' +
+      '<div class="barra"><button class="icono" data-a="atras" type="button"' + (fin ? ' hidden' : '') + '>' + ICONOS.atras + 'Atrás</button>' +
+      '<div class="grupo"><button class="icono" data-a="voz" type="button">' + (silencio ? ICONOS.mudo + 'Sin voz' : ICONOS.voz + 'Silenciar') + '</button>' +
+      '<button class="icono" data-a="repetir" type="button">' + ICONOS.repetir + 'Repetir</button></div></div>' +
+      '<div class="avance"><i style="width:' + Math.round(Math.min(1, posicion(p) / TOTAL) * 100) + '%"></i></div>' +
+      '<p class="pregunta">' + p.texto.split(' ').map(function(w){ return '<span>' + esc(w) + '</span>'; }).join(' ') + '</p>' +
+      '<div class="respuestas"></div></section>');
+    var r = s.querySelector('.respuestas'), crudo = estado.crudo[p.id] || {};
+    s.querySelector('[data-a="atras"]').onclick = atras;
+    s.querySelector('[data-a="voz"]').onclick = function(){
+      silencio = !silencio; audio.muted = silencio;
+      this.innerHTML = silencio ? ICONOS.mudo + 'Sin voz' : ICONOS.voz + 'Silenciar';
+      if (silencio){ cancelAnimationFrame(raf); s.querySelector('.pregunta').classList.remove('hablando'); } else hablar(s, p);
+    };
+    s.querySelector('[data-a="repetir"]').onclick = function(){ if (silencio){ silencio = false; audio.muted = false; s.querySelector('[data-a="voz"]').innerHTML = ICONOS.voz + 'Silenciar'; } hablar(s, p); };
+
+    if (p.tipo === 'va') r.appendChild(boton('Va', 'lleno', function(){ adelante(p); }));
+    if (p.tipo === 'uno') armarUno(s, r, p, crudo);
+    if (p.tipo === 'varios') armarVarios(r, p, crudo);
+    if (p.tipo === 'texto' || p.tipo === 'tel' || p.tipo === 'correo') armarEscribir(r, p, crudo);
+    if (p.tipo === 'fechas') armarFechas(r, p, crudo);
+    return s;
+  }
+
+  function armarUno(s, r, p, crudo){
+    var ops = p.opciones.filter(function(o){ return !o.si || o.si(); });
+    var caja = r;
+    if (ops.length >= 6){ caja = el('<div class="rejilla"></div>'); r.appendChild(caja); }
+    ops.forEach(function(o){
+      var b = boton(o.t, crudo.opcion === o.t ? 'elegido' : '', function(){ elegir(s, p, o, b); });
+      if (o.sug) b.insertAdjacentHTML('beforeend', '<span class="sug">Sugerido</span>');
+      caja.appendChild(b);
+    });
+  }
+  // Las de un toque avanzan solas; las que piden escribir abren su espacio en el mismo lugar.
+  function elegir(s, p, o, b){
+    if (ocupado) return;
+    s.querySelectorAll('.respuestas .boton').forEach(function(x){ x.classList.remove('elegido'); });
+    b.classList.add('elegido');
+    var antes = estado.crudo[p.id] || {};
+    estado.crudo[p.id] = { opcion: o.t, texto: antes.opcion === o.t ? antes.texto : '' };
+    guardar();
+    if (!o.escribir){ setTimeout(function(){ adelante(p); }, 260); return; }
+    var r = s.querySelector('.respuestas'); r.innerHTML = ''; r.appendChild(b);
+    var ta = el('<textarea rows="3"></textarea>'); ta.placeholder = o.escribir; ta.setAttribute('aria-label', o.escribir); ta.value = estado.crudo[p.id].texto || '';
+    var sig = boton('Siguiente', 'lleno', function(){ adelante(p); });
+    function revisar(){ sig.disabled = !ta.value.trim(); }
+    ta.oninput = function(){ estado.crudo[p.id].texto = ta.value; revisar(); guardar(); };
+    revisar();
+    r.appendChild(ta); r.appendChild(sig);
+    var cambiar = el('<button class="mini" type="button">Elegir otra opción</button>');
+    cambiar.onclick = function(){ var n = armar(p); s.replaceWith(n); };
+    r.appendChild(cambiar);
+    ta.focus();
+  }
+
+  function armarVarios(r, p, crudo){
+    var lista = (crudo.lista || []).slice();
+    var caja = el('<div class="rejilla"></div>'); r.appendChild(caja);
+    var sig = boton('Siguiente', 'lleno', function(){
+      estado.crudo[p.id] = { lista: lista, otro: (estado.crudo[p.id] || {}).otro || '' }; guardar();
+      if (lista.indexOf('Otro') >= 0) ir(pantallaOtro(p)); else adelante(p);
+    });
+    function revisar(){ sig.disabled = !lista.length; }
+    p.opciones.forEach(function(o){
+      var b = boton(o.t, lista.indexOf(o.t) >= 0 ? 'elegido' : '', function(){
+        var k = lista.indexOf(o.t); if (k >= 0) lista.splice(k, 1); else lista.push(o.t);
+        b.classList.toggle('elegido', k < 0);
+        estado.crudo[p.id] = { lista: lista.slice(), otro: (estado.crudo[p.id] || {}).otro || '' }; guardar(); revisar();
+      });
+      caja.appendChild(b);
+    });
+    revisar(); r.appendChild(sig);
+  }
+
+  function armarEscribir(r, p, crudo){
+    var otro = p.id === 'otro', guarda = otro ? estado.crudo[p.padre] : crudo;
+    var campo = p.tipo === 'texto' ? el('<textarea rows="3"></textarea>')
+      : el('<input type="' + (p.tipo === 'tel' ? 'tel' : 'email') + '" autocomplete="' + (p.tipo === 'tel' ? 'tel' : 'email') + '"' + (p.tipo === 'tel' ? ' inputmode="tel"' : ' inputmode="email" autocapitalize="off"') + '>');
+    campo.placeholder = p.ph || (p.tipo === 'tel' ? 'Ejemplo: 229 123 4567' : p.tipo === 'correo' ? 'Ejemplo: nombre@correo.com' : 'Escribe aquí');
+    campo.setAttribute('aria-label', p.texto);
+    campo.value = (otro ? guarda && guarda.otro : guarda && !guarda.atajo && guarda.texto) || '';
+    var sig = boton('Siguiente', 'lleno', function(){ adelante(p); });
+    function revisar(){ sig.disabled = !campo.value.trim(); }
+    campo.oninput = function(){
+      if (otro) estado.crudo[p.padre].otro = campo.value; else estado.crudo[p.id] = { texto: campo.value };
+      revisar(); guardar();
+    };
+    revisar();
+    r.appendChild(campo); r.appendChild(sig);
+    (p.atajos || []).forEach(function(t){
+      var b = boton(t, 'atajo' + (crudo.atajo === t ? ' elegido' : ''), function(){
+        estado.crudo[p.id] = { atajo: t }; guardar(); b.classList.add('elegido'); setTimeout(function(){ adelante(p); }, 260);
+      });
+      b.style.justifyContent = 'center';
+      r.appendChild(b);
+    });
+  }
+
+  function armarFechas(r, p, crudo){
+    var caja = el('<div class="par"><label>Desde<input type="date"></label><label>Hasta<input type="date"></label></div>');
+    var ins = caja.querySelectorAll('input'); ins[0].value = crudo.desde || ''; ins[1].value = crudo.hasta || '';
+    var sig = boton('Siguiente', 'lleno', function(){ adelante(p); });
+    function revisar(){ sig.disabled = !(ins[0].value && ins[1].value); }
+    function cambio(){
+      estado.crudo[p.id] = { desde: ins[0].value, hasta: ins[1].value, texto: 'Del ' + ins[0].value + ' al ' + ins[1].value };
+      revisar(); guardar();
+    }
+    ins[0].onchange = cambio; ins[1].onchange = cambio; revisar();
+    r.appendChild(caja); r.appendChild(sig);
+  }
+
+  // ---------- Moverse entre pantallas ----------
+  function siguienteDe(p){
+    var i = PANTALLAS.indexOf(PANTALLAS.filter(function(x){ return x.id === (p.padre || p.id); })[0]);
+    for (var j = i + 1; j < PANTALLAS.length; j++) if (!PANTALLAS[j].si || PANTALLAS[j].si()) return PANTALLAS[j];
+    return null;
+  }
+  function adelante(p){
+    if (ocupado) return;
+    var sig = siguienteDe(p); if (!sig) return;
+    if (sig.tipo !== 'fin'){ ir(sig); return; }
+    // La última: "Listo" solo sale cuando la base de MOON confirma que todo llegó.
+    var b = marco.querySelector('.pantalla:not(.sale) .respuestas .lleno');
+    if (b){ b.disabled = true; b.textContent = 'Enviando…'; }
+    estado.completo = true; guardarLocal();
+    enviarHastaQueLlegue().then(function(){ pendiente = false; ir(sig); });
+  }
+  // En la pila cada pantalla se guarda por su id; la de "Otro" como "otro:<pregunta>".
+  function clave(p){ return p.id === 'otro' ? 'otro:' + p.padre : p.id; }
+  function porClave(k){
+    if (!k) return null;
+    if (k.indexOf('otro:') === 0) return pantallaOtro(porClave(k.slice(5)));
+    return PANTALLAS.filter(function(x){ return x.id === k; })[0] || null;
+  }
+  function atras(){
+    if (ocupado) return;
+    if (estado.pila.length < 2){ ir(PANTALLAS[0], true); return; }
+    estado.pila.pop(); var k = estado.pila.pop(); guardarLocal();
+    ir(porClave(k));
+  }
+  function empezar(){
+    desbloquear();
+    var fin = PANTALLAS[PANTALLAS.length - 1];
+    if (estado.completo) return ir(fin);
+    var p = porClave(estado.pila[estado.pila.length - 1]);
+    if (p) estado.pila.pop();
+    ir(p || PANTALLAS[1]);
+  }
+
+  // Cambio de pantalla: la voz se pide ANTES; la nueva se arma completa debajo y la anterior se desvanece encima.
+  function ir(p, sinPila){
+    if (ocupado || !p) return;
+    ocupado = true;
+    conTope(pedirVoz(p), 4000).then(function(){
+      var vieja = marco.querySelector('.pantalla'), nueva = armar(p);
+      marco.appendChild(nueva);
+      actual = p;
+      if (p.id !== 'inicio' && !sinPila){ estado.pila.push(clave(p)); guardarLocal(); }
+      if (p.id === 'inicio') estado.pila = [];
+      pedirVoz(siguienteDe(p) || null);
+      if (vieja){
+        cancelAnimationFrame(raf); audio.pause();
+        vieja.classList.add('sale'); marco.appendChild(vieja);
+        requestAnimationFrame(function(){ requestAnimationFrame(function(){ vieja.classList.add('ya'); }); });
+        setTimeout(function(){ vieja.remove(); }, 420);
+      }
+      setTimeout(function(){ ocupado = false; if (p.id !== 'inicio') hablar(nueva, p); }, vieja ? 380 : 0);
+    });
+  }
+
+  // Si quedó algo sin enviar en una visita anterior, se manda solo.
+  if (!REVISAR && estado.pila.length) guardar();
+  marco.appendChild(armar(PANTALLAS[0])); actual = PANTALLAS[0];
   pedirVoz(PANTALLAS[1]);
 })();
 </script>

@@ -36,10 +36,11 @@ async function asegurarTabla() {
 }
 
 // Parte el texto de pantalla en pedazos: los normales se dicen igual; los de PRONUNCIAR se dicen distinto.
-function pedazos(mostrar) {
-  const llaves = Object.keys(PRONUNCIAR).sort((a, b) => b.length - a.length);
+function pedazos(mostrar, extra) {
+  const cambios = Object.assign({}, PRONUNCIAR, extra || {});
+  const llaves = Object.keys(cambios).sort((a, b) => b.length - a.length);
   const re = new RegExp('(' + llaves.map(k => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')', 'g');
-  return mostrar.split(re).filter(Boolean).map(p => ({ mostrar: p, decir: PRONUNCIAR[p] || p }));
+  return mostrar.split(re).filter(Boolean).map(p => ({ mostrar: p, decir: cambios[p] || p }));
 }
 
 // Para cada letra de pantalla: qué letras de lo que se dice le tocan (para saber su tiempo).
@@ -57,9 +58,9 @@ function mapaDeLetras(partes) {
 }
 
 // Palabras de pantalla con el segundo en que empiezan y terminan de decirse.
-function palabrasConTiempo(mostrar, decir, al) {
+function palabrasConTiempo(mostrar, decir, al, extra) {
   const ini = al.character_start_times_seconds, fin = al.character_end_times_seconds;
-  const n = ini.length, mapa = mapaDeLetras(pedazos(mostrar));
+  const n = ini.length, mapa = mapaDeLetras(pedazos(mostrar, extra));
   // Si ElevenLabs devolvió un número distinto de letras, se reparte en proporción (nunca falla).
   const aIndice = j => (n === decir.length ? j : Math.min(n - 1, Math.round(j * (n - 1) / Math.max(1, decir.length - 1))));
   const out = []; const re = /\S+/g; let m;
@@ -76,7 +77,7 @@ module.exports = async (req, res) => {
   if (!frase) { res.status(404).json({ ok: false }); return; }
   if (!process.env.ELEVENLABS_VOZ || !process.env.CF_D1_TOKEN) { res.status(503).json({ ok: false, falta: 'llaves' }); return; }
 
-  const decir = pedazos(frase.mostrar).map(p => p.decir).join('');
+  const decir = pedazos(frase.mostrar, frase.decir).map(p => p.decir).join('');
   const clave = `${c}:${f}:${frase.toma}:` + crypto.createHash('sha1').update(grupo.voz + '|' + decir).digest('hex').slice(0, 12);
   try {
     await asegurarTabla();
@@ -92,7 +93,7 @@ module.exports = async (req, res) => {
         res.status(502).json({ ok: false }); return;
       }
       const j = await r.json();
-      const palabras = palabrasConTiempo(frase.mostrar, decir, j.alignment);
+      const palabras = palabrasConTiempo(frase.mostrar, decir, j.alignment, frase.decir);
       fila = { audio: j.audio_base64, palabras: JSON.stringify(palabras) };
       await d1('INSERT OR IGNORE INTO voces (clave, grupo, frase, toma, texto, audio, palabras) VALUES (?,?,?,?,?,?,?)',
         [clave, c, f, frase.toma, frase.mostrar, fila.audio, fila.palabras]);

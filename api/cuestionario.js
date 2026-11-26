@@ -43,7 +43,11 @@ module.exports = async (req, res) => {
   if (!NOMBRE.test(d.cliente || '') || !NOMBRE.test(d.cuestionario || '')) { res.status(400).json({ ok: false }); return; }
   if (!d.respuestas || typeof d.respuestas !== 'object') { res.status(400).json({ ok: false }); return; }
 
-  const respuestas = taparDatos(JSON.stringify(d.respuestas)).slice(0, 60000);
+  // Cuestionarios que guardan cada respuesta en el momento (25-nov-2026): traen una "sesion" y se guarda solo
+  // la versión más nueva de esa sesión; "_completo" dice si la persona ya llegó al final.
+  const sesion = /^[a-z0-9]{8,32}$/.test(d.sesion || '') ? d.sesion : '';
+  const cuerpo = sesion ? Object.assign({ _sesion: sesion, _completo: !!d.completo }, d.respuestas) : d.respuestas;
+  const respuestas = taparDatos(JSON.stringify(cuerpo)).slice(0, 60000);
   const navegador = String(req.headers['user-agent'] || '').slice(0, 300);
   const respaldo = motivo => console.log('RESPALDO-CUESTIONARIO', JSON.stringify({ motivo, cliente: d.cliente, cuestionario: d.cuestionario, respuestas }));
   if (!CF_ACCOUNT_ID || !CF_D1_TOKEN) { respaldo('buzón sin conectar'); res.status(503).json({ ok: false, falta: 'buzón sin conectar' }); return; }
@@ -57,6 +61,17 @@ module.exports = async (req, res) => {
       }),
     });
     if (!r.ok) { respaldo('cloudflare ' + r.status); res.status(502).json({ ok: false, cloudflare: r.status }); return; }
+    // Ya guardada la nueva, se borran las versiones viejas de la misma sesión (nunca antes: así nada se pierde).
+    if (sesion) {
+      await fetch(`https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/d1/database/${BASE}/query`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${CF_D1_TOKEN}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sql: "DELETE FROM respuestas WHERE cliente = ?1 AND cuestionario = ?2 AND json_extract(respuestas, '$._sesion') = ?3 AND id < (SELECT MAX(id) FROM respuestas WHERE cliente = ?1 AND cuestionario = ?2 AND json_extract(respuestas, '$._sesion') = ?3)",
+          params: [d.cliente, d.cuestionario, sesion],
+        }),
+      }).catch(() => {});
+    }
     res.status(200).json({ ok: true });
   } catch (e) {
     respaldo('sin conexión');
