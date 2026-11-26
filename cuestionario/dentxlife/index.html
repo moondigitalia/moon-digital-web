@@ -63,6 +63,10 @@ textarea{width:100%;min-height:96px;resize:none;border-radius:22px;border:2px so
   color:var(--blanco);font:500 18px/1.4 var(--letra);padding:14px 18px;outline:none}
 textarea::placeholder{color:rgba(255,255,255,.72)}
 .mini{background:none;border:0;color:var(--blanco);font:600 15px/1 var(--letra);text-decoration:underline;align-self:center;padding:10px;cursor:pointer}
+/* Con el teclado abierto solo queda lo indispensable: la pregunta, lo que escribe y "Siguiente". */
+#marco.teclado .respuestas .boton.elegido,#marco.teclado .mini{display:none}
+#marco.teclado textarea{min-height:72px}
+#marco.teclado .pregunta{margin-top:10px}
 .nota{font:500 18px/1.45 var(--letra);margin:24px 0 0}
 button:focus-visible,textarea:focus-visible{outline:3px solid var(--blanco);outline-offset:3px}
 </style>
@@ -90,7 +94,15 @@ button:focus-visible,textarea:focus-visible{outline:3px solid var(--blanco);outl
   var voces = {}, respuestas = {}, actual = -1, silencio = false, ocupado = false, raf = 0;
 
   // El marco mide lo que de verdad se ve, también con el teclado abierto.
-  function medir(){ var vv = window.visualViewport; marco.style.height = (vv ? vv.height : innerHeight) + 'px'; if (vv) marco.style.top = vv.offsetTop + 'px'; }
+  var altoSinTeclado = innerHeight;
+  function medir(){
+    var vv = window.visualViewport, alto = vv ? vv.height : innerHeight;
+    marco.style.height = alto + 'px'; if (vv) marco.style.top = vv.offsetTop + 'px';
+    var escribiendo = document.activeElement && document.activeElement.tagName === 'TEXTAREA';
+    if (!escribiendo) altoSinTeclado = Math.max(altoSinTeclado, alto);
+    marco.classList.toggle('teclado', escribiendo && alto < altoSinTeclado * 0.8);
+  }
+  document.addEventListener('focusout', function(){ setTimeout(medir, 50); });
   if (window.visualViewport){ visualViewport.addEventListener('resize', medir); visualViewport.addEventListener('scroll', medir); }
   addEventListener('resize', medir); medir();
 
