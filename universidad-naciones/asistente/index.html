@@ -153,7 +153,7 @@ form button:active{transform:scale(.92)}
       </div>
       <small class="v-time" id="v-time"></small>
     </div>
-    <div class="nota">Uni es un asistente virtual de demostración. Un asesor de admisiones confirma toda la información.<br><span class="fuente">Información de fuentes públicas (directorio Mextudia, nov. 2026).</span></div>
+    <div class="nota">Uni es un asistente virtual. Admisiones confirma toda la información.</div>
   </section>
 </div>
 
@@ -161,7 +161,7 @@ form button:active{transform:scale(.92)}
 <script type="module">
 const AGENT_ID = 'agent_1701m70rth64f888ydpqmmr2zvay';
 const AVATAR = '/universidad-naciones/sitio/img/uni-logo.webp';           // cambia aquí el avatar del asistente
-const TEL = '229 931 6707';
+const TEL = '229 114 6364';
 const NOMBRE_ASIS = 'Uni';
 document.getElementById('av').src = AVATAR; document.getElementById('av2').src = AVATAR;
 
@@ -173,7 +173,7 @@ try { userName = localStorage.getItem('un_nombre') || ''; } catch (e) {}
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 function md(t) {
   let h = esc(String(t).trim().replace(/\bYuni\b/g, 'Uni')).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/^\s*[-*]\s+/gm, '• ');
-  return h.replace(/(229\s?931\s?6707)/g, '<a href="tel:2299316707">$1</a>');
+  return h.replace(/(229\s?114\s?6364)/g, '<a href="https://wa.me/522291146364" target="_blank" rel="noopener">$1</a>');
 }
 function add(role, html) { const d = document.createElement('div'); d.className = 'msg ' + role; d.innerHTML = html; msgs.appendChild(d); msgs.scrollTop = msgs.scrollHeight; return d; }
 function typing(on) {
@@ -201,7 +201,7 @@ async function loadSdk() {
   }
   throw new Error('sin sdk');
 }
-const fallback = () => 'No pude conectarme en este momento. Puedes llamar a Admisiones al <a href="tel:2299316707">' + TEL + '</a> y con gusto te atienden.';
+const fallback = () => 'No pude conectarme en este momento. Puedes escribir a Admisiones por WhatsApp al <a href="https://wa.me/522291146364" target="_blank" rel="noopener">' + TEL + '</a> y con gusto te atienden.';
 
 function fmtTel(t) { const d = String(t || '').replace(/\D/g, '').slice(-10); return d.length === 10 ? d.slice(0, 3) + ' ' + d.slice(3, 6) + ' ' + d.slice(6) : t; }
 // Demo: el interesado NO se envía a ningún sistema. Solo se muestra cómo le llegaría a Admisiones.
@@ -296,7 +296,7 @@ async function startVoice() {
         vTimer = setInterval(() => {
           vLeft--; vTime.textContent = vLeft > 0 ? 'Tiempo restante ' + fmt(vLeft) : 'Despidiéndose…';
           if (vLeft === 15 && voiceConv) { try { voiceConv.sendContextualUpdate('Aviso del sistema: se terminó el tiempo de la llamada. Despídete ahora en una sola frase, dile que puede seguir escribiendo en el chat o volver a llamar, y usa end_call.'); } catch (e) {} }
-          if (vLeft <= -15) stopVoice('Las llamadas de voz de esta demostración duran hasta 3 minutos. Puedes seguir escribiendo o volver a llamar.');
+          if (vLeft <= -15) stopVoice('Las llamadas de voz duran hasta 3 minutos. Puedes seguir escribiendo o volver a llamar.');
         }, 1000);
       },
       onDisconnect: (d) => { if (my !== voiceSeq || !voiceConv) return; const byAgent = d && d.reason === 'agent'; voiceConv = null; stopVoice(byAgent ? 'Llamada terminada. Puedes seguir escribiendo aquí o volver a llamar cuando quieras.' : undefined); },
@@ -309,7 +309,7 @@ async function startVoice() {
   } catch (e) {
     console.error('[UN voz]', e); if (my !== voiceSeq) return;
     const denied = e && (e.name === 'NotAllowedError' || /permission|denied/i.test(e.message || ''));
-    stopVoice(denied ? 'Para platicar por voz, permite el micrófono en tu navegador. También puedes escribir aquí abajo.' : 'No pude iniciar la llamada de voz. Puedes escribir aquí abajo o llamar a Admisiones al <a href="tel:2299316707">' + TEL + '</a>.');
+    stopVoice(denied ? 'Para platicar por voz, permite el micrófono en tu navegador. También puedes escribir aquí abajo.' : 'No pude iniciar la llamada de voz. Puedes escribir aquí abajo o escribir a Admisiones por WhatsApp al <a href="https://wa.me/522291146364" target="_blank" rel="noopener">' + TEL + '</a>.');
   } finally { if (my === voiceSeq) voiceStarting = false; }
 }
 function stopVoice(note) {
